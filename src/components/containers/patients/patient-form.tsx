@@ -3,7 +3,7 @@ import { Form, useFormikContext } from 'formik';
 import { Save, X } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { FormViewSection } from '@/components/common/form/form-view-section';
 import {
   DocumentType,
   DOCUMENT_TYPE_LABELS,
@@ -24,12 +24,6 @@ interface PatientFormProps {
   /** Al editar, el telefono ya viene con prefijo y no se re-enmascara. */
   maskPhone?: boolean;
 }
-
-const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Typography variant={TypographyVariant.SECTION_TITLE} className="mb-4">
-    {children}
-  </Typography>
-);
 
 export const PatientFormFields: React.FC<PatientFormProps> = ({
   submitLabel,
@@ -54,9 +48,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 
   return (
     <Form className="flex flex-col gap-6">
-      <section className="rounded-card border border-navy-200 bg-white p-5">
-        <SectionTitle>Datos personales</SectionTitle>
-
+      <FormViewSection title="Datos personales">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField name="firstName" label="Nombre" placeholder="Maria" required maxLength={60} />
           <FormField
@@ -95,11 +87,9 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             ))}
           </FormField>
         </div>
-      </section>
+      </FormViewSection>
 
-      <section className="rounded-card border border-navy-200 bg-white p-5">
-        <SectionTitle>Contacto</SectionTitle>
-
+      <FormViewSection title="Contacto" caption="Al menos un medio de contacto facilita avisar al paciente.">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             name="phone"
@@ -124,14 +114,15 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             className="sm:col-span-2"
           />
         </div>
-      </section>
+      </FormViewSection>
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-4">
         <Button
           variant={ButtonVariant.SECONDARY}
           onClick={onCancel}
           disabled={isSubmitting}
           icon={<X className="h-4 w-4" aria-hidden />}
+          className="w-full sm:w-auto"
         >
           Cancelar
         </Button>
@@ -140,6 +131,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
           variant={ButtonVariant.PRIMARY}
           isLoading={isSubmitting}
           icon={<Save className="h-4 w-4" aria-hidden />}
+          className="w-full sm:w-auto"
         >
           {submitLabel}
         </Button>

@@ -22,7 +22,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/70 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
       onClick={onCancel}
     >
       <div
@@ -34,9 +34,9 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
             <AlertTriangle className="h-5 w-5 text-danger" aria-hidden />
           </span>
           <div className="min-w-0">
-            <Typography variant={TypographyVariant.CARD_TITLE}>Eliminar archivo</Typography>
+            <Typography variant={TypographyVariant.ACCENT}>Eliminar archivo</Typography>
             <Typography variant={TypographyVariant.BODY} className="mt-1">
-              Se eliminara <span className="font-medium text-navy-800">{fileName}</span> de forma
+              Se eliminara <span className="font-medium text-ink-800">{fileName}</span> de forma
               permanente. Esta accion no se puede deshacer.
             </Typography>
           </div>

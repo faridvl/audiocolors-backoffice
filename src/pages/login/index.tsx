@@ -9,10 +9,7 @@ export default function LoginPage() {
         <title>Iniciar sesion · AudioColors Expedientes</title>
       </Head>
 
-      <SplitScreenLayout
-        imageSrc="/login-bg.jpeg"
-        imageAlt="Laboratorio de audiologia de AudioColors"
-      >
+      <SplitScreenLayout>
         <LoginContainer />
       </SplitScreenLayout>
     </>

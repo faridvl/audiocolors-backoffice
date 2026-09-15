@@ -12,15 +12,19 @@ export const LoginContainer: React.FC = () => {
 
   return (
     <div className="w-full max-w-sm">
-      <div className="flex flex-col items-center">
-        <BrandLogo className="text-2xl" />
-        <Typography variant={TypographyVariant.CAPTION} className="mt-1 tracking-widest uppercase">
+      {/* En md+ el logo ya preside el panel izquierdo; aqui solo hace falta en movil. */}
+      <div className="flex flex-col items-center md:hidden">
+        <BrandLogo className="h-[52px] w-[128px]" priority />
+        <Typography
+          variant={TypographyVariant.HELPER}
+          className="mt-2 uppercase tracking-[0.2em] text-ink-400"
+        >
           Expedientes
         </Typography>
       </div>
 
-      <div className="mt-10">
-        <Typography variant={TypographyVariant.PAGE_TITLE}>Iniciar sesion</Typography>
+      <div className="mt-10 md:mt-0">
+        <Typography variant={TypographyVariant.HEADER}>Iniciar sesion</Typography>
         <Typography variant={TypographyVariant.BODY} className="mt-1">
           Ingresa con la cuenta que te asigno la clinica.
         </Typography>
@@ -29,7 +33,7 @@ export const LoginContainer: React.FC = () => {
       {wasSessionExpired && (
         <div className="mt-5 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3">
           <Clock className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden />
-          <Typography variant={TypographyVariant.BODY} className="text-navy-700">
+          <Typography variant={TypographyVariant.BODY} className="text-ink-700">
             Tu sesion expiro por seguridad. Vuelve a ingresar.
           </Typography>
         </div>
@@ -41,7 +45,7 @@ export const LoginContainer: React.FC = () => {
           className="mt-5 flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/10 p-3"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-danger" aria-hidden />
-          <Typography variant={TypographyVariant.BODY} className="text-navy-700">
+          <Typography variant={TypographyVariant.BODY} className="text-ink-700">
             {errorMessage}
           </Typography>
         </div>
@@ -81,10 +85,6 @@ export const LoginContainer: React.FC = () => {
           </Form>
         )}
       </Formik>
-
-      <Typography variant={TypographyVariant.CAPTION} className="mt-8 block text-center">
-        Si no tienes acceso, solicitalo al administrador de la clinica.
-      </Typography>
     </div>
   );
 };

@@ -4,6 +4,6 @@
 
 @layer base {
   body {
-    @apply bg-navy-50 text-navy-700 font-sans antialiased;
+    @apply bg-ink-50 text-ink-700 font-sans antialiased;
   }
 }

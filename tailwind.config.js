@@ -1,7 +1,11 @@
 /**
- * Paleta AudioColors — tomada de landing-audiocolors (identidad ya en producción).
+ * Paleta AudioColors.
+ *
+ * `brand` (verde del logo) es el UNICO color de acento: acciones, estado
+ * activo y foco. `ink` es una escala de grises NEUTROS — sin tinte azul, para
+ * no competir con los colores del logo.
  * Regla del proyecto: los colores se consumen SIEMPRE por token (bg-brand,
- * text-navy-700...), nunca como arbitrary value hex en el JSX. Zynka acabó con
+ * text-ink-700...), nunca como arbitrary value hex en el JSX. Zynka acabo con
  * dos paletas rivales y ~60 hex sueltos justamente por saltarse esto.
  */
 module.exports = {
@@ -10,32 +14,32 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          DEFAULT: '#f97316',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+          50: '#f4faef',
+          100: '#e3f3d8',
+          200: '#c7e7b1',
+          300: '#a5d882',
+          400: '#83ca54',
+          DEFAULT: '#66ae36',
+          500: '#66ae36',
+          600: '#54902d',
+          700: '#447524',
+          800: '#39611e',
+          900: '#2e4e18',
         },
-        navy: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          DEFAULT: '#1e293b',
-          800: '#1e293b',
-          900: '#0f172a',
+        ink: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          DEFAULT: '#27272a',
+          800: '#27272a',
+          900: '#18181b',
         },
-        success: '#22c55e',
+        success: '#0d9488',
         warning: '#f59e0b',
         danger: '#ef4444',
         info: '#3b82f6',

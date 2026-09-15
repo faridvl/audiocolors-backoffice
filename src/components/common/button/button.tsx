@@ -12,9 +12,9 @@ export enum ButtonVariant {
 const VARIANT_STYLES: Record<ButtonVariant, string> = {
   [ButtonVariant.PRIMARY]: 'bg-brand text-white hover:bg-brand-600 focus-visible:outline-brand',
   [ButtonVariant.SECONDARY]:
-    'bg-white text-navy-700 border border-navy-200 hover:bg-navy-50 focus-visible:outline-navy-400',
+    'bg-white text-ink-700 border border-ink-200 hover:bg-ink-50 focus-visible:outline-ink-400',
   [ButtonVariant.DANGER]: 'bg-danger text-white hover:bg-red-600 focus-visible:outline-danger',
-  [ButtonVariant.GHOST]: 'bg-transparent text-navy-600 hover:bg-navy-100 focus-visible:outline-navy-400',
+  [ButtonVariant.GHOST]: 'bg-transparent text-ink-600 hover:bg-ink-100 focus-visible:outline-ink-400',
 };
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

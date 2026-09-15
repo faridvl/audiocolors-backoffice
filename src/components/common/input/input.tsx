@@ -8,10 +8,10 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
  * entre patient-create y patient-edit; aqui viven en un solo sitio.
  */
 export const inputBaseClasses =
-  'w-full rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm text-navy-800 ' +
-  'placeholder:text-navy-400 transition-colors ' +
+  'w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-800 ' +
+  'placeholder:text-ink-400 transition-colors ' +
   'focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 ' +
-  'disabled:cursor-not-allowed disabled:bg-navy-50';
+  'disabled:cursor-not-allowed disabled:bg-ink-50';
 
 interface FormFieldProps {
   name: string;
@@ -44,7 +44,7 @@ export const FormField: React.FC<FormFieldProps> = ({
 }) => (
   <div className={tailwind('flex flex-col gap-1.5', className)}>
     <label htmlFor={name}>
-      <Typography variant={TypographyVariant.LABEL}>
+      <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
         {label}
         {required && <span className="ml-0.5 text-danger">*</span>}
       </Typography>
@@ -64,7 +64,7 @@ export const FormField: React.FC<FormFieldProps> = ({
       {children}
     </Field>
 
-    {hint && <Typography variant={TypographyVariant.CAPTION}>{hint}</Typography>}
+    {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
 
     <ErrorMessage name={name}>
       {(message) => <Typography variant={TypographyVariant.ERROR}>{message}</Typography>}

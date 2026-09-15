@@ -17,7 +17,7 @@ export const PatientCreateContainer: React.FC = () => {
           className="mb-4 flex items-start gap-2 rounded-lg border border-danger/30 bg-danger/10 p-3"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-danger" aria-hidden />
-          <Typography variant={TypographyVariant.BODY} className="text-navy-700">
+          <Typography variant={TypographyVariant.BODY} className="text-ink-700">
             {errorMessage}
           </Typography>
         </div>

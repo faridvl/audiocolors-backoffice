@@ -37,19 +37,19 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={`Vista previa de ${item.name}`}
-      className="fixed inset-0 z-50 flex flex-col bg-navy-900/80 p-3 sm:p-6"
+      className="fixed inset-0 z-50 flex flex-col bg-ink-900/80 p-3 sm:p-6"
       onClick={onClose}
     >
       <div
         className="mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-card bg-white"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-center justify-between gap-3 border-b border-navy-200 px-4 py-3">
+        <header className="flex items-center justify-between gap-3 border-b border-ink-200 px-4 py-3">
           <div className="flex min-w-0 flex-col">
-            <Typography variant={TypographyVariant.CARD_TITLE} className="truncate">
+            <Typography variant={TypographyVariant.ACCENT} className="truncate">
               {item.name}
             </Typography>
-            <Typography variant={TypographyVariant.CAPTION}>
+            <Typography variant={TypographyVariant.HELPER}>
               {item.categoryLabel} · {item.sizeLabel} · {item.uploadedAtLabel}
             </Typography>
           </div>
@@ -60,7 +60,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Abrir en pestana nueva"
-              className="rounded-lg p-2 text-navy-500 transition-colors hover:bg-navy-100 hover:text-navy-700"
+              className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700"
             >
               <ExternalLink className="h-4 w-4" aria-hidden />
             </a>
@@ -68,14 +68,14 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               type="button"
               onClick={onClose}
               aria-label="Cerrar vista previa"
-              className="rounded-lg p-2 text-navy-500 transition-colors hover:bg-navy-100 hover:text-navy-700"
+              className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700"
             >
               <X className="h-5 w-5" aria-hidden />
             </button>
           </div>
         </header>
 
-        <div className="flex flex-1 items-center justify-center overflow-auto bg-navy-100 p-3">
+        <div className="flex flex-1 items-center justify-center overflow-auto bg-ink-100 p-3">
           {item.kind === DocumentKind.IMAGE && (
             // Archivo servido desde R2: se usa <img> para no configurar
             // remotePatterns de next/image por cada dominio de storage.
@@ -93,7 +93,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
           {item.kind === DocumentKind.OTHER && (
             <div className="flex flex-col items-center gap-3 p-8 text-center">
-              <FileQuestion className="h-10 w-10 text-navy-400" aria-hidden />
+              <FileQuestion className="h-10 w-10 text-ink-400" aria-hidden />
               <Typography variant={TypographyVariant.BODY}>
                 Este tipo de archivo no se puede previsualizar aqui.
               </Typography>

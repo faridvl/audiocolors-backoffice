@@ -50,7 +50,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPreview, onDele
   const Icon = KIND_ICONS[document.kind];
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-card border border-navy-200 bg-white transition-shadow hover:shadow-md">
+    <div className="group relative flex flex-col overflow-hidden rounded-card border border-ink-200 bg-white transition-shadow hover:shadow-md">
       <button
         type="button"
         onClick={onPreview}
@@ -61,13 +61,13 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPreview, onDele
         </span>
 
         <span className="flex min-w-0 flex-col">
-          <Typography variant={TypographyVariant.BODY_STRONG} className="line-clamp-2 break-words">
+          <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="line-clamp-2 break-words">
             {document.name}
           </Typography>
-          <Typography variant={TypographyVariant.CAPTION} className="mt-1">
+          <Typography variant={TypographyVariant.HELPER} className="mt-1">
             {document.categoryLabel} &middot; {document.sizeLabel}
           </Typography>
-          <Typography variant={TypographyVariant.CAPTION}>{document.uploadedAtLabel}</Typography>
+          <Typography variant={TypographyVariant.HELPER}>{document.uploadedAtLabel}</Typography>
         </span>
       </button>
 
@@ -75,7 +75,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPreview, onDele
         type="button"
         onClick={onDelete}
         aria-label={`Eliminar ${document.name}`}
-        className="absolute right-2 top-2 rounded-lg p-1.5 text-navy-400 opacity-0 transition-opacity hover:bg-danger/10 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
+        className="absolute right-2 top-2 rounded-lg p-1.5 text-ink-400 opacity-0 transition-opacity hover:bg-danger/10 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
       >
         <Trash2 className="h-4 w-4" aria-hidden />
       </button>
@@ -118,8 +118,8 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Typography variant={TypographyVariant.SECTION_TITLE}>
-          Archivos {totalCount > 0 && <span className="text-navy-400">({totalCount})</span>}
+        <Typography variant={TypographyVariant.SUBTITLE}>
+          Archivos {totalCount > 0 && <span className="text-ink-400">({totalCount})</span>}
         </Typography>
 
         <Button
@@ -142,15 +142,15 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       {pendingFile && (
         <div className="flex flex-col gap-3 rounded-card border border-brand-200 bg-brand-50 p-4 sm:flex-row sm:items-end">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <Typography variant={TypographyVariant.CAPTION}>Archivo seleccionado</Typography>
-            <Typography variant={TypographyVariant.BODY_STRONG} className="truncate">
+            <Typography variant={TypographyVariant.HELPER}>Archivo seleccionado</Typography>
+            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
               {pendingFile.name}
             </Typography>
           </div>
 
           <div className="flex flex-col gap-1">
             <label htmlFor="document-category">
-              <Typography variant={TypographyVariant.CAPTION}>Categoria</Typography>
+              <Typography variant={TypographyVariant.HELPER}>Categoria</Typography>
             </label>
             <select
               id="document-category"
@@ -186,7 +186,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative sm:max-w-xs sm:flex-1">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-navy-400"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
               aria-hidden
             />
             <input
@@ -209,7 +209,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
                   'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
                   filter === option.value
                     ? 'bg-brand text-white'
-                    : 'border border-navy-200 bg-white text-navy-600 hover:bg-navy-50',
+                    : 'border border-ink-200 bg-white text-ink-600 hover:bg-ink-50',
                 )}
               >
                 {option.label}
@@ -220,16 +220,16 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       )}
 
       {isLoading && (
-        <div className="flex items-center justify-center gap-2 rounded-card border border-navy-200 bg-white py-14">
+        <div className="flex items-center justify-center gap-2 rounded-card border border-ink-200 bg-white py-14">
           <Loader2 className="h-5 w-5 animate-spin text-brand" aria-hidden />
           <Typography variant={TypographyVariant.BODY}>Cargando archivos...</Typography>
         </div>
       )}
 
       {isError && !isLoading && (
-        <div className="flex flex-col items-center gap-2 rounded-card border border-navy-200 bg-white py-14 text-center">
+        <div className="flex flex-col items-center gap-2 rounded-card border border-ink-200 bg-white py-14 text-center">
           <AlertTriangle className="h-8 w-8 text-danger" aria-hidden />
-          <Typography variant={TypographyVariant.CARD_TITLE}>
+          <Typography variant={TypographyVariant.ACCENT}>
             No se pudieron cargar los archivos
           </Typography>
           <Button variant={ButtonVariant.SECONDARY} onClick={() => refetch()} className="mt-2">
@@ -239,9 +239,9 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       )}
 
       {!isLoading && !isError && !documents.length && (
-        <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-navy-300 bg-white py-14 text-center">
-          <FolderOpen className="h-8 w-8 text-navy-300" aria-hidden />
-          <Typography variant={TypographyVariant.CARD_TITLE}>
+        <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-ink-300 bg-white py-14 text-center">
+          <FolderOpen className="h-8 w-8 text-ink-300" aria-hidden />
+          <Typography variant={TypographyVariant.ACCENT}>
             {totalCount ? 'Sin resultados' : 'Aun no hay archivos'}
           </Typography>
           <Typography variant={TypographyVariant.BODY}>
