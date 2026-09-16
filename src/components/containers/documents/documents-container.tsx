@@ -117,7 +117,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center justify-between gap-3">
         <Typography variant={TypographyVariant.SUBTITLE}>
           Archivos {totalCount > 0 && <span className="text-ink-400">({totalCount})</span>}
         </Typography>
@@ -126,8 +126,10 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
           variant={ButtonVariant.PRIMARY}
           onClick={openFilePicker}
           icon={<Upload className="h-4 w-4" aria-hidden />}
+          className="shrink-0"
         >
-          Subir archivo
+          <span className="hidden sm:inline">Subir archivo</span>
+          <span className="sm:hidden">Subir</span>
         </Button>
       </div>
 

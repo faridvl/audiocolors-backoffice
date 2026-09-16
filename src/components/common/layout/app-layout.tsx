@@ -82,6 +82,12 @@ interface AppLayoutProps {
   backHref?: string;
   /** Texto secundario junto al titulo (p.ej. el nombre de la seccion). */
   subtitle?: string;
+  /**
+   * Accion principal del registro (p.ej. "Editar"). Vive en el header, no en
+   * el contenido: es el patron de billo para paginas de detalle, y en movil
+   * evita que compita con los datos por el ancho.
+   */
+  action?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -89,6 +95,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   title,
   backHref,
   subtitle,
+  action,
   children,
 }) => {
   const router = useRouter();
@@ -164,7 +171,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             </div>
           </div>
 
-          <UserMenu />
+          <div className="flex shrink-0 items-center gap-1 md:gap-2">
+            {action}
+            <UserMenu />
+          </div>
         </header>
 
         <main className="flex-1 overflow-x-hidden px-4 py-5 pb-20 md:px-6 md:pb-6">{children}</main>
