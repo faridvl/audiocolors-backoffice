@@ -6,7 +6,7 @@ const DOTS = '...';
 
 /**
  * Rango de paginas con elipsis: siempre muestra primera, ultima, la actual y
- * un vecino a cada lado. Evita listar 40 numeros cuando hay muchas paginas.
+ * un vecino a cada lado. Evita listar 40 números cuando hay muchas paginas.
  */
 function buildPageRange(currentPage: number, totalPages: number): (number | typeof DOTS)[] {
   const siblingCount = 1;
@@ -61,11 +61,11 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <nav
-      aria-label="Paginacion"
+      aria-label="Paginación"
       className="mt-2 flex flex-col items-center justify-between gap-3 sm:flex-row"
     >
       <p className="text-xs text-ink-500 md:text-sm">
-        Pagina {page} de {totalPages} · {total} {total === 1 ? 'registro' : 'registros'}
+        Página {page} de {totalPages} · {total} {total === 1 ? 'registro' : 'registros'}
       </p>
 
       <div className="flex items-center gap-1">
@@ -73,7 +73,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          aria-label="Pagina anterior"
+          aria-label="Página anterior"
           className={arrowClasses}
         >
           <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -110,7 +110,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          aria-label="Pagina siguiente"
+          aria-label="Página siguiente"
           className={arrowClasses}
         >
           <ChevronRight className="h-4 w-4" aria-hidden />

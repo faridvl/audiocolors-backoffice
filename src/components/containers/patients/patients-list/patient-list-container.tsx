@@ -30,13 +30,13 @@ const columns: TableColumn<Patient>[] = [
   },
   {
     key: 'documentId',
-    header: 'Cedula',
+    header: 'Cédula',
     width: '18%',
     render: (patient) => patient.documentId || '—',
   },
   {
     key: 'phone',
-    header: 'Telefono',
+    header: 'Teléfono',
     width: '18%',
     render: (patient) => patient.phone || '—',
   },
@@ -105,7 +105,7 @@ export const PatientListContainer: React.FC = () => {
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Buscar por nombre o cedula"
+            placeholder="Buscar por nombre o cédula"
             aria-label="Buscar pacientes"
             className={tailwind(inputBaseClasses, 'pl-9')}
           />
@@ -151,11 +151,11 @@ export const PatientListContainer: React.FC = () => {
         onRetry={handleRetry}
         onRowClick={(patient) => navigateToDetail(patient.uuid)}
         errorTitle="No se pudieron cargar los pacientes"
-        emptyTitle="Aun no hay pacientes registrados"
+        emptyTitle="Aún no hay pacientes registrados"
         emptyDescription="Registra el primer paciente para comenzar."
         emptyAction={createButton}
-        noResultsTitle="Sin resultados para tu busqueda"
-        noResultsDescription="Prueba con otro nombre o cedula, o cambia el filtro de estado."
+        noResultsTitle="Sin resultados para tu búsqueda"
+        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de estado."
         rowActions={(patient) => (
           <Button
             variant={ButtonVariant.GHOST}

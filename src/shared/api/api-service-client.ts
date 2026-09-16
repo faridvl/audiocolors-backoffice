@@ -2,8 +2,8 @@ import { CookiesManager } from '@/shared/utils/cookies-manager';
 import { routesPublic } from '@/shared/navigation/routes';
 
 const NETWORK_ERROR_MESSAGE =
-  'No se pudo conectar con el servidor. Revisa tu conexion a internet.';
-const GENERIC_ERROR_MESSAGE = 'Ocurrio un error inesperado. Intenta de nuevo.';
+  'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
+const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
 interface ApiErrorBody {
   message?: string | string[];
@@ -63,11 +63,11 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
     // Con token, la sesion expiro y se cierra de verdad.
     if (token) {
       handleSessionExpired();
-      throw new Error('Tu sesion expiro. Inicia sesion de nuevo.');
+      throw new Error('Tu sesión expiró. Inicia sesión de nuevo.');
     }
 
     const errorBody = await parseJsonBody<ApiErrorBody>(response);
-    throw new Error(resolveErrorMessage(errorBody, 'Credenciales invalidas'));
+    throw new Error(resolveErrorMessage(errorBody, 'Credenciales inválidas'));
   }
 
   if (response.status === 204) return null as T;

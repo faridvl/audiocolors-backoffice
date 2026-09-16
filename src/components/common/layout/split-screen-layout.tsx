@@ -8,7 +8,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
  * Layout de pantalla partida para paginas publicas (login).
  *
  * El panel izquierdo muestra el LOGO en si, no una foto: las fotos del rotulo
- * de la clinica estan comprimidas a ~0.03 bytes/pixel y se ven blandas al
+ * de la clínica estan comprimidas a ~0.03 bytes/pixel y se ven blandas al
  * ampliarlas a pantalla completa. Asi es nitido en cualquier resolucion.
  */
 interface SplitScreenLayoutProps {
@@ -30,7 +30,7 @@ export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ children }
             variant={TypographyVariant.BODY}
             className="mt-8 max-w-sm text-center text-ink-500"
           >
-            Expedientes, recetas y audiometrias de tus pacientes, en un solo lugar.
+            Expedientes, recetas y audiometrías de tus pacientes, en un solo lugar.
           </Typography>
         </div>
       </div>

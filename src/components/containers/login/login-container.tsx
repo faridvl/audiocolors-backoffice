@@ -24,9 +24,9 @@ export const LoginContainer: React.FC = () => {
       </div>
 
       <div className="mt-10 md:mt-0">
-        <Typography variant={TypographyVariant.HEADER}>Iniciar sesion</Typography>
+        <Typography variant={TypographyVariant.HEADER}>Iniciar sesión</Typography>
         <Typography variant={TypographyVariant.BODY} className="mt-1">
-          Ingresa con la cuenta que te asigno la clinica.
+          Ingresa con la cuenta que te asigno la clínica.
         </Typography>
       </div>
 
@@ -34,7 +34,7 @@ export const LoginContainer: React.FC = () => {
         <div className="mt-5 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/10 p-3">
           <Clock className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden />
           <Typography variant={TypographyVariant.BODY} className="text-ink-700">
-            Tu sesion expiro por seguridad. Vuelve a ingresar.
+            Tu sesión expiró por seguridad. Vuelve a ingresar.
           </Typography>
         </div>
       )}
@@ -60,16 +60,16 @@ export const LoginContainer: React.FC = () => {
           <Form className="mt-6 flex flex-col gap-4">
             <FormField
               name="email"
-              label="Correo electronico"
+              label="Correo electrónico"
               type="email"
               placeholder="nombre@audiocolors.com"
               required
             />
             <FormField
               name="password"
-              label="Contrasena"
+              label="Contraseña"
               type="password"
-              placeholder="Tu contrasena"
+              placeholder="Tu contraseña"
               required
             />
 

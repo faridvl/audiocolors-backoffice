@@ -25,10 +25,10 @@ function resolveFieldError(message: string): { field: keyof PatientFormValues; t
   const normalized = message.toLowerCase();
 
   if (normalized.includes('cedula') || normalized.includes('documentid')) {
-    return { field: 'documentId', text: 'Esta cedula ya esta registrada' };
+    return { field: 'documentId', text: 'Esta cédula ya está registrada' };
   }
   if (normalized.includes('email') || normalized.includes('correo')) {
-    return { field: 'email', text: 'Este correo ya esta registrado' };
+    return { field: 'email', text: 'Este correo ya está registrado' };
   }
 
   return null;

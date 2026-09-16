@@ -20,7 +20,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    // Evita que la pagina de atras haga scroll mientras el visor esta abierto.
+    // Evita que la página de atras haga scroll mientras el visor esta abierto.
     const previousOverflow = window.document.body.style.overflow;
     window.document.body.style.overflow = 'hidden';
 
@@ -59,7 +59,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Abrir en pestana nueva"
+              aria-label="Abrir en pestaña nueva"
               className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700"
             >
               <ExternalLink className="h-4 w-4" aria-hidden />

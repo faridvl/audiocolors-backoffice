@@ -15,7 +15,7 @@ export enum DocumentType {
 }
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
-  [DocumentType.NATIONAL]: 'Cedula nacional',
+  [DocumentType.NATIONAL]: 'Cédula nacional',
   [DocumentType.DIMEX]: 'DIMEX',
   [DocumentType.PASSPORT]: 'Pasaporte',
 };

@@ -12,9 +12,9 @@ type SSRCallback = (
 ) => Promise<GetServerSidePropsResult<Record<string, unknown>>>;
 
 /**
- * Guard de pagina privada. Solo comprueba que exista la cookie de sesion:
+ * Guard de página privada. Solo comprueba que exista la cookie de sesión:
  * la validacion real de firma y expiracion la hace el API, y un 401 con
- * token presente cierra la sesion desde ApiServiceClient.
+ * token presente cierra la sesión desde ApiServiceClient.
  */
 export function authorizeServerSidePage(callback?: SSRCallback): GetServerSideProps {
   return async (context: GetServerSidePropsContext) => {

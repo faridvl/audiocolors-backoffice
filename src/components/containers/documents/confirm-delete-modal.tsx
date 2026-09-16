@@ -37,7 +37,7 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
             <Typography variant={TypographyVariant.ACCENT}>Eliminar archivo</Typography>
             <Typography variant={TypographyVariant.BODY} className="mt-1">
               Se eliminara <span className="font-medium text-ink-800">{fileName}</span> de forma
-              permanente. Esta accion no se puede deshacer.
+              permanente. Esta acción no se puede deshacer.
             </Typography>
           </div>
         </div>

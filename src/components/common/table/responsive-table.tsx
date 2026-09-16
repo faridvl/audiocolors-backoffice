@@ -8,7 +8,7 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
  * Tabla responsive.
  *
  * En movil NO hace scroll horizontal: renderiza cada fila como una tarjeta de
- * pares etiqueta/valor. Una tabla de 5 columnas en un telefono es ilegible, y
+ * pares etiqueta/valor. Una tabla de 5 columnas en un teléfono es ilegible, y
  * el scroll lateral esconde justo la columna que se necesita.
  */
 export interface TableColumn<T> {
@@ -37,7 +37,7 @@ interface ResponsiveTableProps<T> {
   getRowKey: (row: T) => string;
   isLoading?: boolean;
   isError?: boolean;
-  /** true cuando hay busqueda o filtros activos: cambia el estado vacio. */
+  /** true cuando hay búsqueda o filtros activos: cambia el estado vacio. */
   hasActiveFilters?: boolean;
   onRowClick?: (row: T) => void;
   onRetry?: () => void;
@@ -74,11 +74,11 @@ export function ResponsiveTable<T>({
   onRowClick,
   onRetry,
   rowActions,
-  emptyTitle = 'Aun no hay registros',
+  emptyTitle = 'Aún no hay registros',
   emptyDescription,
   emptyAction,
   noResultsTitle = 'Sin resultados',
-  noResultsDescription = 'Prueba con otros terminos o cambia los filtros.',
+  noResultsDescription = 'Prueba con otros términos o cambia los filtros.',
   errorTitle = 'No se pudieron cargar los datos',
 }: ResponsiveTableProps<T>) {
   const resolveState = (): TableState => {

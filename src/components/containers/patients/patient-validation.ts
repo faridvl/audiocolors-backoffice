@@ -27,14 +27,14 @@ export function formatPhone(value: string): string {
 const baseFields = {
   firstName: Yup.string()
     .matches(NAME_REGEX, 'Solo letras y espacios')
-    .max(60, 'Maximo 60 caracteres')
+    .max(60, 'Máximo 60 caracteres')
     .required('El nombre es obligatorio'),
   lastName: Yup.string()
     .matches(NAME_REGEX, 'Solo letras y espacios')
-    .max(60, 'Maximo 60 caracteres')
+    .max(60, 'Máximo 60 caracteres')
     .required('El apellido es obligatorio'),
-  documentId: Yup.string().max(20, 'Maximo 20 caracteres').required('La cedula es obligatoria'),
-  email: Yup.string().email('Correo invalido'),
+  documentId: Yup.string().max(20, 'Máximo 20 caracteres').required('La cédula es obligatoria'),
+  email: Yup.string().email('Correo inválido'),
   birthDate: Yup.string()
     .required('La fecha de nacimiento es obligatoria')
     .test('not-future', 'La fecha no puede ser futura', (value) => {
@@ -42,23 +42,23 @@ const baseFields = {
       const parsed = new Date(value);
       return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
     }),
-  address: Yup.string().max(240, 'Maximo 240 caracteres'),
-  gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opcion'),
+  address: Yup.string().max(240, 'Máximo 240 caracteres'),
+  gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opción'),
 };
 
 export const patientCreateValidationSchema = Yup.object({
   ...baseFields,
   phone: Yup.string()
     .matches(/^\d{4}-\d{4}$/, 'Formato: XXXX-XXXX')
-    .required('El telefono es obligatorio'),
+    .required('El teléfono es obligatorio'),
 });
 
 export const patientEditValidationSchema = Yup.object({
   ...baseFields,
   // Al editar, el telefono ya puede venir guardado como "+506 XXXX-XXXX".
   phone: Yup.string()
-    .matches(/^\+?[\d\s-]{7,20}$/, 'Telefono invalido')
-    .required('El telefono es obligatorio'),
+    .matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido')
+    .required('El teléfono es obligatorio'),
 });
 
 export interface PatientFormValues {

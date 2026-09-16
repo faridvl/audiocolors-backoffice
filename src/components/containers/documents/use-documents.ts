@@ -92,7 +92,7 @@ export function useDocuments(patientUuid: string) {
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      toast.error('El archivo supera el limite de 20 MB');
+      toast.error('El archivo supera el límite de 20 MB');
       return;
     }
 

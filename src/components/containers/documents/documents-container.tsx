@@ -150,7 +150,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
 
           <div className="flex flex-col gap-1">
             <label htmlFor="document-category">
-              <Typography variant={TypographyVariant.HELPER}>Categoria</Typography>
+              <Typography variant={TypographyVariant.HELPER}>Categoría</Typography>
             </label>
             <select
               id="document-category"
@@ -242,12 +242,12 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-ink-300 bg-white py-14 text-center">
           <FolderOpen className="h-8 w-8 text-ink-300" aria-hidden />
           <Typography variant={TypographyVariant.ACCENT}>
-            {totalCount ? 'Sin resultados' : 'Aun no hay archivos'}
+            {totalCount ? 'Sin resultados' : 'Aún no hay archivos'}
           </Typography>
           <Typography variant={TypographyVariant.BODY}>
             {totalCount
               ? 'Prueba con otro nombre o cambia el filtro.'
-              : 'Sube recetas, audiometrias, facturas o garantias del paciente.'}
+              : 'Sube recetas, audiometrías, facturas o garantias del paciente.'}
           </Typography>
         </div>
       )}

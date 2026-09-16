@@ -7,8 +7,8 @@ import { routesPrivate } from '@/shared/navigation/routes';
 import { LoginPayload } from '@/types/auth/auth';
 
 export const loginValidationSchema = Yup.object({
-  email: Yup.string().email('Correo invalido').required('El correo es obligatorio'),
-  password: Yup.string().required('La contrasena es obligatoria'),
+  email: Yup.string().email('Correo inválido').required('El correo es obligatorio'),
+  password: Yup.string().required('La contraseña es obligatoria'),
 });
 
 export const loginInitialValues: LoginPayload = { email: '', password: '' };
@@ -43,7 +43,7 @@ export function useLogin() {
         void router.push(routesPrivate.patients.index);
       },
       onError: (error: Error) => {
-        setErrorMessage(error.message || 'No se pudo iniciar sesion.');
+        setErrorMessage(error.message || 'No se pudo iniciar sesión.');
       },
     });
   };

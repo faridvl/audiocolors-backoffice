@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Menu, Transition } from '@headlessui/react';
-import { Users, LogOut, ChevronDown } from 'lucide-react';
+import { Users, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { useSession } from '@/hooks/use-session';
 import { useLogout } from '@/hooks/use-logout';
@@ -62,7 +62,7 @@ const UserMenu: React.FC = () => {
                 )}
               >
                 <LogOut className="h-4 w-4" aria-hidden />
-                Cerrar sesion
+                Cerrar sesión
               </button>
             )}
           </Menu.Item>
@@ -74,10 +74,23 @@ const UserMenu: React.FC = () => {
 
 interface AppLayoutProps {
   title: string;
+  /**
+   * Ruta de regreso. Cuando se pasa, el header muestra un chevron a la
+   * izquierda del titulo en vez de gastar una fila del contenido en un
+   * enlace "volver".
+   */
+  backHref?: string;
+  /** Texto secundario junto al titulo (p.ej. el nombre de la seccion). */
+  subtitle?: string;
   children: React.ReactNode;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({ title, children }) => {
+export const AppLayout: React.FC<AppLayoutProps> = ({
+  title,
+  backHref,
+  subtitle,
+  children,
+}) => {
   const router = useRouter();
 
   const isActiveRoute = (href: string) =>
@@ -123,14 +136,32 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ title, children }) => {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 py-3 md:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <BrandLogo height={28} className="shrink-0 md:hidden" />
-            <Typography
-              variant={TypographyVariant.HEADER}
-              className="truncate text-lg md:text-2xl"
-            >
-              {title}
-            </Typography>
+          <div className="flex min-w-0 items-center gap-2 md:gap-3">
+            {backHref ? (
+              <Link
+                href={backHref}
+                aria-label="Volver"
+                className="-ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
+              >
+                <ArrowLeft className="h-5 w-5" aria-hidden />
+              </Link>
+            ) : (
+              <BrandLogo height={28} className="shrink-0 md:hidden" />
+            )}
+
+            <div className="flex min-w-0 flex-col">
+              <Typography
+                variant={TypographyVariant.HEADER}
+                className="truncate text-lg md:text-2xl"
+              >
+                {title}
+              </Typography>
+              {subtitle && (
+                <Typography variant={TypographyVariant.HELPER} className="truncate">
+                  {subtitle}
+                </Typography>
+              )}
+            </div>
           </div>
 
           <UserMenu />

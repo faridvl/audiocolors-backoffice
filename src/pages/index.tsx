@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import { CookiesManager } from '@/shared/utils/cookies-manager';
 import { routesPrivate, routesPublic } from '@/shared/navigation/routes';
 
-/** Raiz: nunca se renderiza, solo enruta segun haya sesion o no. */
+/** Raiz: nunca se renderiza, solo enruta segun haya sesión o no. */
 export default function RootPage() {
   return null;
 }

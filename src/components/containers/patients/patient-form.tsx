@@ -21,7 +21,7 @@ interface PatientFormProps {
   submitLabel: string;
   isSubmitting: boolean;
   onCancel: () => void;
-  /** Al editar, el telefono ya viene con prefijo y no se re-enmascara. */
+  /** Al editar, el teléfono ya viene con prefijo y no se re-enmascara. */
   maskPhone?: boolean;
 }
 
@@ -69,7 +69,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 
           <FormField
             name="documentId"
-            label="Numero de documento"
+            label="Número de documento"
             placeholder={documentMask.placeholder}
             maxLength={documentMask.maxLength}
             onChange={handleDocumentChange}
@@ -78,7 +78,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 
           <FormField name="birthDate" label="Fecha de nacimiento" type="date" required />
 
-          <FormField name="gender" label="Genero" as="select">
+          <FormField name="gender" label="Género" as="select">
             <option value="">Sin especificar</option>
             {Object.values(PatientGender).map((gender) => (
               <option key={gender} value={gender}>
@@ -93,21 +93,21 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField
             name="phone"
-            label="Telefono"
+            label="Teléfono"
             placeholder={maskPhone ? '8888-8888' : '+506 8888-8888'}
             onChange={handlePhoneChange}
             required
           />
           <FormField
             name="email"
-            label="Correo electronico"
+            label="Correo electrónico"
             type="email"
             placeholder="paciente@correo.com"
             hint="Opcional"
           />
           <FormField
             name="address"
-            label="Direccion"
+            label="Dirección"
             as="textarea"
             maxLength={240}
             placeholder="Provincia, canton, senas exactas"
