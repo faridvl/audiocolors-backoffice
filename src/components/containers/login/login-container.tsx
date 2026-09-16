@@ -14,7 +14,7 @@ export const LoginContainer: React.FC = () => {
     <div className="w-full max-w-sm">
       {/* En md+ el logo ya preside el panel izquierdo; aqui solo hace falta en movil. */}
       <div className="flex flex-col items-center md:hidden">
-        <BrandLogo className="h-[52px] w-[128px]" priority />
+        <BrandLogo height={48} priority />
         <Typography
           variant={TypographyVariant.HELPER}
           className="mt-2 uppercase tracking-[0.2em] text-ink-400"

@@ -22,7 +22,7 @@ export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ children }
     <div className="flex min-h-0 flex-1">
       <div className="relative hidden w-1/2 shrink-0 items-center justify-center overflow-hidden border-r border-ink-200 bg-ink-50 md:flex">
         <div className="flex flex-col items-center px-10">
-          <BrandLogo className="h-[117px] w-[288px] lg:h-[146px] lg:w-[360px]" priority />
+          <BrandLogo height={132} priority />
 
           <RainbowStripe className="mt-8 w-24 overflow-hidden rounded-full" />
 

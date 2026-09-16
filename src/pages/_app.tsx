@@ -27,7 +27,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
           content="Sistema de expedientes y archivos de pacientes de AudioColors."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#f97316" />
+        <meta name="theme-color" content="#66ae36" />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
 

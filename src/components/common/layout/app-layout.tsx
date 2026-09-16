@@ -86,17 +86,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ title, children }) => {
   return (
     <div className="flex min-h-screen bg-ink-50">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-white px-3 py-5 md:flex">
-        <div className="px-2">
-          <BrandLogo className="h-11 w-[136px]" priority />
+        <div className="flex flex-col items-center border-b border-ink-100 px-2 pb-5">
+          <BrandLogo height={42} priority />
           <Typography
             variant={TypographyVariant.HELPER}
-            className="mt-1 block uppercase tracking-[0.18em] text-ink-400"
+            className="mt-1.5 block uppercase tracking-[0.18em] text-ink-400"
           >
             Expedientes
           </Typography>
         </div>
 
-        <nav className="mt-8 flex flex-col gap-1">
+        <nav className="mt-5 flex flex-col gap-1">
           {NAVIGATION.map((item) => {
             const isActive = isActiveRoute(item.href);
             const Icon = item.icon;
@@ -124,7 +124,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ title, children }) => {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 py-3 md:px-6">
           <div className="flex min-w-0 items-center gap-3">
-            <BrandLogo className="h-7 w-[86px] shrink-0 md:hidden" />
+            <BrandLogo height={28} className="shrink-0 md:hidden" />
             <Typography
               variant={TypographyVariant.HEADER}
               className="truncate text-lg md:text-2xl"
