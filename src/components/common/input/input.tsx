@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Field, ErrorMessage } from 'formik';
+import { Eye, EyeOff } from 'lucide-react';
 import { tailwind } from '@/utils/tailwind-utils';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
@@ -47,34 +48,61 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   onChange,
   inputMode,
-}) => (
-  <div className={tailwind('flex flex-col gap-1.5', className)}>
-    <label htmlFor={name}>
-      <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-        {label}
-        {required && <span className="ml-0.5 text-danger">*</span>}
-      </Typography>
-    </label>
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = as === 'input' && type === 'password';
+  const resolvedType = isPassword && showPassword ? 'text' : type;
 
-    <Field
-      id={name}
-      name={name}
-      as={as === 'input' ? undefined : as}
-      type={as === 'input' ? type : undefined}
-      placeholder={placeholder}
-      disabled={disabled}
-      maxLength={maxLength}
-      inputMode={inputMode}
-      className={tailwind(inputBaseClasses, as === 'textarea' && 'min-h-[88px] resize-none')}
-      {...(onChange ? { onChange } : {})}
-    >
-      {children}
-    </Field>
+  return (
+    <div className={tailwind('flex flex-col gap-1.5', className)}>
+      <label htmlFor={name}>
+        <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+          {label}
+          {required && <span className="ml-0.5 text-danger">*</span>}
+        </Typography>
+      </label>
 
-    {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
+      <div className="relative">
+        <Field
+          id={name}
+          name={name}
+          as={as === 'input' ? undefined : as}
+          type={as === 'input' ? resolvedType : undefined}
+          placeholder={placeholder}
+          disabled={disabled}
+          maxLength={maxLength}
+          inputMode={inputMode}
+          className={tailwind(
+            inputBaseClasses,
+            as === 'textarea' && 'min-h-[88px] resize-none',
+            isPassword && 'pr-11',
+          )}
+          {...(onChange ? { onChange } : {})}
+        >
+          {children}
+        </Field>
 
-    <ErrorMessage name={name}>
-      {(message) => <Typography variant={TypographyVariant.ERROR}>{message}</Typography>}
-    </ErrorMessage>
-  </div>
-);
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-400 hover:text-ink-600"
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" aria-hidden />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden />
+            )}
+          </button>
+        )}
+      </div>
+
+      {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
+
+      <ErrorMessage name={name}>
+        {(message) => <Typography variant={TypographyVariant.ERROR}>{message}</Typography>}
+      </ErrorMessage>
+    </div>
+  );
+};
