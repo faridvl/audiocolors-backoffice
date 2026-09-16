@@ -92,9 +92,23 @@ Convención: cada feature es `{feature}-container.tsx` (solo JSX) + `use-{featur
 
 ### Colores
 
-Definidos como tokens en `tailwind.config.js` (`brand` naranja `#f97316`, `navy`). **Nunca usar hex sueltos en el JSX** — Zynka acabó con dos paletas rivales y ~60 valores arbitrarios por saltarse esta regla.
+Definidos como tokens en `tailwind.config.js`: `brand` (verde `#66ae36`, la O del logo) como único acento, e `ink` como escala de grises neutros. **Nunca usar hex sueltos en el JSX** — Zynka acabó con dos paletas rivales y ~60 valores arbitrarios por saltarse esta regla.
+
+Los colores de marca están **medidos** del logo original, no estimados: ver [.claude/BRAND.md](.claude/BRAND.md).
 
 ---
+
+## Documentación
+
+| Archivo | Qué contiene |
+|---|---|
+| [CLAUDE.md](CLAUDE.md) | Índice y reglas que más se rompen |
+| [.claude/RULES.md](.claude/RULES.md) | Reglas duras del proyecto |
+| [.claude/STATUS.md](.claude/STATUS.md) | Estado actual y pendientes |
+| [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) | Estructura, auth, endpoints |
+| [.claude/DECISIONS.md](.claude/DECISIONS.md) | Decisiones y su porqué |
+| [.claude/BRAND.md](.claude/BRAND.md) | Identidad y regeneración de assets |
+| [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md) | Alta de la clínica y de usuarios |
 
 ## Roadmap
 
@@ -103,5 +117,6 @@ Definidos como tokens en `tailwind.config.js` (`brand` naranja `#f97316`, `navy`
 - [x] Autenticación y layout
 - [x] Pacientes: lista, alta, edición
 - [x] Expediente: datos + archivos con preview
-- [ ] Cambio de contraseñas antes de producción
-- [ ] Despliegue
+- [x] Estándares de UI y documentación del proyecto
+- [ ] Cambiar contraseñas temporales
+- [ ] Desplegar en `backoffice.audiocolorscr.com`
