@@ -20,23 +20,26 @@ export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ children }
     <BrandTopbar />
 
     <div className="flex min-h-0 flex-1">
-      <div className="relative hidden w-1/2 shrink-0 items-center justify-center overflow-hidden border-r border-ink-200 bg-ink-50 md:flex">
+      <div className="relative hidden w-1/2 shrink-0 items-center justify-center overflow-hidden bg-midnight md:flex">
         <div className="flex flex-col items-center px-10">
-          <BrandLogo height={132} priority />
+          <BrandLogo height={132} onDark priority />
 
           <RainbowStripe className="mt-8 w-24 overflow-hidden rounded-full" />
 
           <Typography
             variant={TypographyVariant.BODY}
-            className="mt-8 max-w-sm text-center text-ink-500"
+            className="mt-8 max-w-sm text-center text-ink-300"
           >
             Expedientes, recetas y audiometrías de tus pacientes, en un solo lugar.
           </Typography>
         </div>
       </div>
 
-      <div className="flex w-full flex-col overflow-y-auto md:w-1/2">
-        <div className="flex w-full flex-1 items-center justify-center px-5 py-10 sm:px-8">
+      <div className="flex w-full flex-col overflow-y-auto overscroll-y-contain md:w-1/2">
+        <div
+          className="flex w-full flex-1 items-center justify-center px-5 py-10 sm:px-8"
+          style={{ paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom))' }}
+        >
           {children}
         </div>
       </div>

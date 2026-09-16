@@ -28,7 +28,7 @@ const UserMenu: React.FC = () => {
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button className="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
+      <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
           {getInitials(user?.fullName)}
         </span>
@@ -142,13 +142,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 py-3 md:px-6">
+        <header
+          className="flex items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 py-3 md:px-6"
+          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+        >
           <div className="flex min-w-0 items-center gap-2 md:gap-3">
             {backHref ? (
               <Link
                 href={backHref}
                 aria-label="Volver"
-                className="-ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
+                className="-ml-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
               >
                 <ArrowLeft className="h-5 w-5" aria-hidden />
               </Link>
@@ -159,7 +162,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             <div className="flex min-w-0 flex-col">
               <Typography
                 variant={TypographyVariant.HEADER}
-                className="truncate text-lg md:text-2xl"
+                className={tailwind('truncate text-lg md:text-2xl', !backHref && 'hidden md:block')}
               >
                 {title}
               </Typography>
@@ -177,10 +180,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden px-4 py-5 pb-20 md:px-6 md:pb-6">{children}</main>
+        <main
+          className={tailwind(
+            'flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 py-5 md:px-6',
+            'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6',
+          )}
+        >
+          {children}
+        </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-ink-200 bg-white md:hidden">
+      <nav
+        className="fixed inset-x-0 bottom-0 z-10 flex border-t border-ink-200 bg-white md:hidden"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         {NAVIGATION.map((item) => {
           const isActive = isActiveRoute(item.href);
           const Icon = item.icon;
@@ -191,7 +204,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
               className={tailwind(
-                'flex flex-1 flex-col items-center gap-1 py-2.5 text-xs font-medium',
+                'flex min-h-[44px] flex-1 flex-col items-center justify-center gap-1 py-2.5 text-xs font-medium',
                 isActive ? 'text-brand-600' : 'text-ink-500',
               )}
             >

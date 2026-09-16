@@ -14,13 +14,13 @@ estimados a ojo. Una primera versión los estimó y los seis estaban mal.
 | Oreja (C) | `#e41e1e` | rojo — favicon |
 | O | `#ea7e2a` | naranja |
 | L | `#fccc30` | amarillo |
-| **O** | **`#66ae36`** | **verde — color de acento del sistema** |
-| R | `#1e6cae` | azul |
+| O | `#66ae36` | verde |
+| **R** | **`#1e6cae`** | **azul — color de acento del sistema** |
 | S | `#604290` | morado |
 
 Viven en `src/shared/design/tokens.ts` → `BRAND_COLORS`, y alimentan la franja.
 
-La escala `brand-50…900` de `tailwind.config.js` se derivó del verde `#66ae36`
+La escala `brand-50…900` de `tailwind.config.js` se derivó del azul `#1e6cae`
 variando la luminosidad y conservando tono y saturación.
 
 `success` es teal `#0d9488`, deliberadamente distinto del verde de marca.

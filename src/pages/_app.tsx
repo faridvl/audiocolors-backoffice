@@ -26,8 +26,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
           name="description"
           content="Sistema de expedientes y archivos de pacientes de AudioColors."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#66ae36" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="robots" content="noindex, nofollow" />
       </Head>
 

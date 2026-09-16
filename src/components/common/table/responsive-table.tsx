@@ -10,6 +10,14 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
  * En movil NO hace scroll horizontal: renderiza cada fila como una tarjeta de
  * pares etiqueta/valor. Una tabla de 5 columnas en un teléfono es ilegible, y
  * el scroll lateral esconde justo la columna que se necesita.
+ *
+ * PENDIENTE / deuda futura: hoy solo hay una tabla (pacientes) y las columnas
+ * caben bien en el `<table>` de escritorio. Si se agrega una tabla con muchas
+ * columnas, falta soporte para ocultar columnas por breakpoint intermedio
+ * (p.ej. una columna que solo se ve en xl pero no en md/lg) — hoy la unica
+ * variante es "en la tabla" vs "en la tarjeta movil" (hideOnCard). Ver
+ * magastore-backoffice: usa `className` por columna (ej. 'hidden lg:table-cell')
+ * para ese caso.
  */
 export interface TableColumn<T> {
   key: string;

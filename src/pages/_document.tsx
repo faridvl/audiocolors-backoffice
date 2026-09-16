@@ -1,15 +1,41 @@
-import Document, { Html, Head, Main, NextScript } from 'next/document';
+import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
 
-class MyDocument extends Document {
+interface MyDocumentProps {
+  isDev: boolean;
+}
+
+/**
+ * El apple-touch-icon (el que usa iOS al "Agregar a inicio") y el manifest
+ * cambian segun el host: dev-backoffice.audiocolors.com lleva fondo distinto
+ * al de produccion, para no confundir cual PWA se abrio. Mismo patron que
+ * magastore-backoffice.
+ */
+class MyDocument extends Document<MyDocumentProps> {
+  static async getInitialProps(ctx: DocumentContext) {
+    const initialProps = await Document.getInitialProps(ctx);
+    const host = ctx.req?.headers.host ?? '';
+    const isDev = host.includes('dev-backoffice') || host.includes('localhost') || host.includes('127.0.0.1');
+    return { ...initialProps, isDev };
+  }
+
   render() {
+    const iconSuffix = this.props.isDev ? '-dev' : '';
+    /** Azul de la R (produccion) vs morado de la S (desarrollo) — BRAND.md. */
+    const themeColor = this.props.isDev ? '#604290' : '#1e6cae';
+
     return (
       <Html lang="es">
         <Head>
           <link rel="icon" href="/favicon.ico" sizes="any" />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
-          <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
-          <link rel="manifest" href="/site.webmanifest" />
+          <link rel="apple-touch-icon" sizes="180x180" href={`/apple-touch-icon${iconSuffix}.png`} />
+          <link rel="manifest" href="/api/site.webmanifest" />
+          <meta name="theme-color" content={themeColor} />
+          <meta name="mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta name="apple-mobile-web-app-title" content={this.props.isDev ? '[DEV] AudioColors' : 'AudioColors'} />
 
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

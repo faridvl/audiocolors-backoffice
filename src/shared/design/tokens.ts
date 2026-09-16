@@ -8,7 +8,7 @@
  * Decisiones de la identidad:
  * - Interfaz CLARA. El logo es multicolor sobre blanco; un chrome oscuro
  *   competiria con el.
- * - `brand` (verde #66ae36, la O del logo) es el UNICO acento: accion
+ * - `brand` (azul #1e6cae, la R del logo) es el UNICO acento: accion
  *   primaria, estado activo y foco.
  * - `ink` es una escala de grises NEUTROS, sin tinte azul.
  * - La franja de 6 colores es un gesto de bienvenida: vive en el login, no en

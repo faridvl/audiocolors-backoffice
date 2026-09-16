@@ -1,9 +1,9 @@
 /**
  * Paleta AudioColors.
  *
- * `brand` (verde del logo) es el UNICO color de acento: acciones, estado
- * activo y foco. `ink` es una escala de grises NEUTROS — sin tinte azul, para
- * no competir con los colores del logo.
+ * `brand` (azul de la R del logo) es el UNICO color de acento: acciones,
+ * estado activo y foco. `ink` es una escala de grises NEUTROS — sin tinte
+ * azul, para no competir con los colores del logo.
  * Regla del proyecto: los colores se consumen SIEMPRE por token (bg-brand,
  * text-ink-700...), nunca como arbitrary value hex en el JSX. Zynka acabo con
  * dos paletas rivales y ~60 hex sueltos justamente por saltarse esto.
@@ -11,20 +11,34 @@
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
+    /**
+     * Breakpoints propios (no los de Tailwind por defecto). Se usa
+     * principalmente en iPhone (mobile) y desktop/laptop web.
+     * `lg` queda debajo del estandar (1024px) a proposito: si algun dia se
+     * usa en una tablet, el layout de escritorio entra antes de que se vea
+     * apretado. Referencia: magastore-backoffice.
+     */
+    screens: {
+      xs: '390px',
+      sm: '640px',
+      md: '768px',
+      lg: '924px',
+      xl: '1280px',
+    },
     extend: {
       colors: {
         brand: {
-          50: '#f4faef',
-          100: '#e3f3d8',
-          200: '#c7e7b1',
-          300: '#a5d882',
-          400: '#83ca54',
-          DEFAULT: '#66ae36',
-          500: '#66ae36',
-          600: '#54902d',
-          700: '#447524',
-          800: '#39611e',
-          900: '#2e4e18',
+          50: '#e9f3fb',
+          100: '#d3e7f8',
+          200: '#a8cff0',
+          300: '#74b2e7',
+          400: '#3b93dd',
+          DEFAULT: '#1e6cae',
+          500: '#1e6cae',
+          600: '#18568b',
+          700: '#124168',
+          800: '#0c2b46',
+          900: '#071827',
         },
         ink: {
           50: '#fafafa',
@@ -43,6 +57,8 @@ module.exports = {
         warning: '#f59e0b',
         danger: '#ef4444',
         info: '#3b82f6',
+        /** Azul oscuro de marca: fondo de la variante dark del logo (BRAND.md). */
+        midnight: '#1a1a2e',
       },
       fontFamily: {
         sans: ['Manrope', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],

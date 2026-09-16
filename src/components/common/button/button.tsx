@@ -37,7 +37,7 @@ export const Button: React.FC<ButtonProps> = ({
     type={type}
     disabled={disabled || isLoading}
     className={tailwind(
-      'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold',
+      'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold',
       'transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
       'disabled:cursor-not-allowed disabled:opacity-60',
       VARIANT_STYLES[variant],

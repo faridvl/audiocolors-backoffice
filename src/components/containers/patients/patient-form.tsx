@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, useFormikContext } from 'formik';
 import { Save, X } from 'lucide-react';
+import { tailwind } from '@/utils/tailwind-utils';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
 import { FormViewSection } from '@/components/common/form/form-view-section';
@@ -73,6 +74,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             placeholder={documentMask.placeholder}
             maxLength={documentMask.maxLength}
             onChange={handleDocumentChange}
+            inputMode={values.documentType === DocumentType.PASSPORT ? 'text' : 'numeric'}
             required
           />
 
@@ -96,6 +98,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             label="Teléfono"
             placeholder={maskPhone ? '8888-8888' : '+506 8888-8888'}
             onChange={handlePhoneChange}
+            inputMode="tel"
             required
           />
           <FormField
@@ -116,7 +119,20 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
         </div>
       </FormViewSection>
 
-      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-4">
+      {/*
+        Sticky en movil: en formularios largos los botones de guardar se
+        perdian al hacer scroll y quedaba "raro" no ver una accion visible.
+        Desde md vuelve a fluir con el contenido (ya no hace falta, el
+        formulario entra completo en pantalla).
+      */}
+      <div
+        className={tailwind(
+          'sticky bottom-0 -mx-4 mt-6 flex flex-col-reverse gap-3 border-t border-ink-200 bg-white/95',
+          'px-4 py-3 backdrop-blur-sm sm:flex-row sm:justify-end sm:gap-4',
+          'md:static md:mx-0 md:border-t-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none',
+        )}
+        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+      >
         <Button
           variant={ButtonVariant.SECONDARY}
           onClick={onCancel}
