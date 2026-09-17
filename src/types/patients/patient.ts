@@ -34,6 +34,8 @@ export interface Patient {
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;
+  /** Fecha ISO de la próxima cita CONFIRMED, o null si no tiene ninguna. */
+  nextAppointmentAt?: string | null;
 }
 
 export interface CreatePatientContactPayload {

@@ -13,13 +13,23 @@ export enum PatientStatusFilter {
 export const FETCH_PATIENTS_KEY = 'fetchPatients';
 
 const PatientsService = {
-  fetchAll: (page: number, limit: number, search: string, status: PatientStatusFilter) => {
+  fetchAll: (
+    page: number,
+    limit: number,
+    search: string,
+    status: PatientStatusFilter,
+    nextAppointmentMonth?: string,
+  ) => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (search.trim()) params.set('search', search.trim());
 
     // El API solo distingue activos de "activos + inactivos". Para ver los
     // inactivos hay que pedirlos todos y filtrarlos del lado del cliente.
     if (status !== PatientStatusFilter.ACTIVE) params.set('includeInactive', 'true');
+
+    // Filtro por próxima cita (YYYY-MM). Cuando se manda, el API ignora la
+    // paginación y devuelve todos los pacientes que coincidan en una sola página.
+    if (nextAppointmentMonth) params.set('nextAppointmentMonth', nextAppointmentMonth);
 
     return ApiServiceClient(env.API.MEDICAL_RECORDS_URL).get<PaginatedResponse<Patient>>(
       `/patients?${params.toString()}`,
@@ -32,11 +42,18 @@ export function usePatientsQuery(
   limit: number,
   search: string,
   status: PatientStatusFilter,
+  nextAppointmentMonth?: string,
 ) {
   return useQuery({
-    queryKey: [FETCH_PATIENTS_KEY, page, limit, search, status],
+    queryKey: [FETCH_PATIENTS_KEY, page, limit, search, status, nextAppointmentMonth],
     queryFn: async () => {
-      const response = await PatientsService.fetchAll(page, limit, search, status);
+      const response = await PatientsService.fetchAll(
+        page,
+        limit,
+        search,
+        status,
+        nextAppointmentMonth,
+      );
 
       if (status !== PatientStatusFilter.INACTIVE) return response;
 

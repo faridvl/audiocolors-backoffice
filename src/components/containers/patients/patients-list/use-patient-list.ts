@@ -3,12 +3,44 @@ import { usePatientsQuery, PatientStatusFilter } from '@/shared/api/querys/patie
 import { useNavigation } from '@/hooks/use-navigation';
 
 const PAGE_SIZE = 10;
+const ALL_VALUE = 'all';
 
 export const STATUS_FILTER_OPTIONS: { label: string; value: PatientStatusFilter }[] = [
   { label: 'Activos', value: PatientStatusFilter.ACTIVE },
   { label: 'Inactivos', value: PatientStatusFilter.INACTIVE },
   { label: 'Todos', value: PatientStatusFilter.ALL },
 ];
+
+export const MONTH_FILTER_OPTIONS: { label: string; value: string }[] = [
+  { label: 'Todos', value: ALL_VALUE },
+  { label: 'Enero', value: '01' },
+  { label: 'Febrero', value: '02' },
+  { label: 'Marzo', value: '03' },
+  { label: 'Abril', value: '04' },
+  { label: 'Mayo', value: '05' },
+  { label: 'Junio', value: '06' },
+  { label: 'Julio', value: '07' },
+  { label: 'Agosto', value: '08' },
+  { label: 'Septiembre', value: '09' },
+  { label: 'Octubre', value: '10' },
+  { label: 'Noviembre', value: '11' },
+  { label: 'Diciembre', value: '12' },
+];
+
+// Las citas son siempre futuras: alcanza con el año actual y unos pocos
+// próximos, no hace falta ofrecer años pasados.
+const YEARS_AHEAD = 3;
+
+function buildYearOptions(): { label: string; value: string }[] {
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: YEARS_AHEAD + 1 }, (_, index) =>
+    String(currentYear + index),
+  );
+
+  return [{ label: 'Todos', value: ALL_VALUE }, ...years.map((year) => ({ label: year, value: year }))];
+}
+
+export const YEAR_FILTER_OPTIONS = buildYearOptions();
 
 export function usePatientList() {
   const navigation = useNavigation();
@@ -18,6 +50,8 @@ export function usePatientList() {
   const [statusFilter, setStatusFilter] = useState<PatientStatusFilter>(
     PatientStatusFilter.ACTIVE,
   );
+  const [monthFilter, setMonthFilter] = useState<string>(ALL_VALUE);
+  const [yearFilter, setYearFilter] = useState<string>(ALL_VALUE);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,11 +62,17 @@ export function usePatientList() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const nextAppointmentMonth =
+    monthFilter !== ALL_VALUE && yearFilter !== ALL_VALUE
+      ? `${yearFilter}-${monthFilter}`
+      : undefined;
+
   const { data, isLoading, isError, refetch } = usePatientsQuery(
     page,
     PAGE_SIZE,
     debouncedSearch,
     statusFilter,
+    nextAppointmentMonth,
   );
 
   const handleStatusFilter = (value: PatientStatusFilter) => {
@@ -40,20 +80,38 @@ export function usePatientList() {
     setPage(1);
   };
 
+  const handleMonthFilter = (value: string) => {
+    setMonthFilter(value);
+    setPage(1);
+  };
+
+  const handleYearFilter = (value: string) => {
+    setYearFilter(value);
+    setPage(1);
+  };
+
   const hasActiveFilters =
-    debouncedSearch.trim().length > 0 || statusFilter !== PatientStatusFilter.ACTIVE;
+    debouncedSearch.trim().length > 0 ||
+    statusFilter !== PatientStatusFilter.ACTIVE ||
+    !!nextAppointmentMonth;
 
   return {
     patients: data?.data ?? [],
+    // Con el filtro de próxima cita, el API devuelve todo en una sola página
+    // (meta.totalPages: 1): la paginación se oculta sola porque totalPages <= 1.
     meta: data?.meta,
     searchTerm,
     statusFilter,
+    monthFilter,
+    yearFilter,
     isLoading,
     isError,
     page,
     hasActiveFilters,
     setSearchTerm,
     handleStatusFilter,
+    handleMonthFilter,
+    handleYearFilter,
     handlePageChange: setPage,
     handleRetry: refetch,
     navigateToCreate: navigation.patients.create,
