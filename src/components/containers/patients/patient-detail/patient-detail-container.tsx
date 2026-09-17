@@ -7,6 +7,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
+import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { calculateAge, formatDate } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -138,6 +139,8 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
       <PatientSummary patient={patient} />
 
       <PatientContactsContainer patientUuid={patient.uuid} />
+
+      <PatientNotesContainer patientUuid={patient.uuid} />
 
       <DocumentsContainer patientUuid={patient.uuid} />
     </div>
