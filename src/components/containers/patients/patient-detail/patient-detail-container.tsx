@@ -76,9 +76,13 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
     patient.createdAt
   );
 
+  const scheduleTitle = patient.nextAppointmentAt
+    ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
+    : 'Agendar próxima cita';
+
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-5">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
           <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
           <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
@@ -101,16 +105,15 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
           )}
         </div>
 
-        <Button
-          variant={ButtonVariant.SECONDARY}
+        <button
+          type="button"
           onClick={onScheduleAppointment}
-          icon={<CalendarClock className="h-4 w-4" aria-hidden />}
-          className="w-fit"
+          aria-label={scheduleTitle}
+          title={scheduleTitle}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-brand-700"
         >
-          {patient.nextAppointmentAt
-            ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
-            : 'Agendar próxima cita'}
-        </Button>
+          <CalendarClock className="h-5 w-5" aria-hidden />
+        </button>
       </div>
 
       {showAllData && (
