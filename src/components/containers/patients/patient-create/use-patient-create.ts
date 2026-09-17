@@ -19,6 +19,7 @@ export const patientCreateInitialValues: PatientFormValues = {
   email: '',
   address: '',
   branchUuid: '',
+  contacts: [],
 };
 
 /** Traduce errores del API a mensajes de campo cuando se puede identificar. */
@@ -57,6 +58,11 @@ export function usePatientCreate() {
       ...(values.gender && { gender: values.gender }),
       ...(values.address.trim() && { address: values.address.trim() }),
       ...(values.branchUuid && { branchUuid: values.branchUuid }),
+      ...(values.contacts.length > 0 && {
+        contacts: values.contacts
+          .filter((contact) => contact.name.trim() && contact.phone.trim())
+          .map((contact) => ({ name: contact.name.trim(), phone: contact.phone.trim() })),
+      }),
     };
 
     executeCreatePatient(payload, {

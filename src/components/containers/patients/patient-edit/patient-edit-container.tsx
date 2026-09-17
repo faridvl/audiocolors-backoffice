@@ -59,6 +59,7 @@ export const PatientEditContainer: React.FC<PatientEditContainerProps> = ({ uuid
           isSubmitting={isPending}
           onCancel={handleCancel}
           maskPhone={false}
+          showContacts
         />
       </Formik>
     </div>

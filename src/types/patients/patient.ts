@@ -36,6 +36,11 @@ export interface Patient {
   updatedAt?: string;
 }
 
+export interface CreatePatientContactPayload {
+  name: string;
+  phone: string;
+}
+
 export interface CreatePatientPayload {
   firstName: string;
   lastName: string;
@@ -46,6 +51,7 @@ export interface CreatePatientPayload {
   gender?: string;
   documentId?: string;
   branchUuid?: string | null;
+  contacts?: CreatePatientContactPayload[];
 }
 
 export type UpdatePatientPayload = Partial<CreatePatientPayload>;

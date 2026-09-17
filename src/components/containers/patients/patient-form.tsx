@@ -1,7 +1,6 @@
 import React from 'react';
-import { Form, useFormikContext } from 'formik';
-import { Save, X } from 'lucide-react';
-import { tailwind } from '@/utils/tailwind-utils';
+import { Form, useFormikContext, FieldArray } from 'formik';
+import { Save, X, Plus, Trash2 } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
 import { FormViewSection } from '@/components/common/form/form-view-section';
@@ -25,6 +24,8 @@ interface PatientFormProps {
   onCancel: () => void;
   /** Al editar, el teléfono ya viene con prefijo y no se re-enmascara. */
   maskPhone?: boolean;
+  /** Solo en alta: en edición los teléfonos adicionales se gestionan aparte, ya con el paciente creado. */
+  showContacts?: boolean;
 }
 
 export const PatientFormFields: React.FC<PatientFormProps> = ({
@@ -32,6 +33,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
   isSubmitting,
   onCancel,
   maskPhone = true,
+  showContacts = false,
 }) => {
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
@@ -127,23 +129,83 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             placeholder="Provincia, canton, senas exactas"
             className="sm:col-span-2"
           />
+
+          {showContacts && (
+            <div className="sm:col-span-2">
+              <FieldArray name="contacts">
+                {({ push, remove }) => {
+                  const lastContact = values.contacts[values.contacts.length - 1];
+                  const canAddAnother =
+                    values.contacts.length === 0 ||
+                    (!!lastContact?.name.trim() && !!lastContact?.phone.trim());
+
+                  return (
+                    <div className="flex flex-col gap-3">
+                      {values.contacts.map((contact, index) => {
+                        const hasData = !!contact.name.trim() || !!contact.phone.trim();
+
+                        return (
+                          <div
+                            key={index}
+                            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+                          >
+                            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                              <FormField
+                                name={`contacts.${index}.name`}
+                                label="Nombre de contacto adicional"
+                                placeholder="Ej. Juan (hijo)"
+                                maxLength={80}
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                              <FormField
+                                name={`contacts.${index}.phone`}
+                                label="Teléfono"
+                                placeholder="8888-8888"
+                                inputMode="tel"
+                                onChange={(event) =>
+                                  setFieldValue(
+                                    `contacts.${index}.phone`,
+                                    formatPhone(event.target.value),
+                                  )
+                                }
+                                className="sm:w-40"
+                              />
+                            </div>
+                            {(hasData || values.contacts.length > 1) && (
+                              <button
+                                type="button"
+                                onClick={() => remove(index)}
+                                aria-label="Quitar teléfono"
+                                className="mb-0.5 shrink-0 rounded-lg p-2.5 text-ink-400 transition-colors hover:bg-danger/10 hover:text-danger sm:mb-0"
+                              >
+                                <Trash2 className="h-4 w-4" aria-hidden />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+
+                      {canAddAnother && (
+                        <button
+                          type="button"
+                          onClick={() => push({ name: '', phone: '' })}
+                          className="flex w-fit items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
+                        >
+                          <Plus className="h-3.5 w-3.5" aria-hidden />
+                          {values.contacts.length === 0 ? 'Agregar contacto adicional' : 'Agregar otro'}
+                        </button>
+                      )}
+                    </div>
+                  );
+                }}
+              </FieldArray>
+            </div>
+          )}
         </div>
       </FormViewSection>
 
-      {/*
-        Sticky en movil: en formularios largos los botones de guardar se
-        perdian al hacer scroll y quedaba "raro" no ver una accion visible.
-        Desde md vuelve a fluir con el contenido (ya no hace falta, el
-        formulario entra completo en pantalla).
-      */}
-      <div
-        className={tailwind(
-          'sticky bottom-0 -mx-4 mt-6 flex flex-col-reverse gap-3 border-t border-ink-200 bg-white/95',
-          'px-4 py-3 backdrop-blur-sm sm:flex-row sm:justify-end sm:gap-4',
-          'md:static md:mx-0 md:border-t-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none',
-        )}
-        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
-      >
+      <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end sm:gap-4">
         <Button
           variant={ButtonVariant.SECONDARY}
           onClick={onCancel}

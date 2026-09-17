@@ -6,6 +6,7 @@ import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient'
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
+import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { calculateAge, formatDate } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -135,6 +136,8 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   return (
     <div className="flex flex-col gap-4">
       <PatientSummary patient={patient} />
+
+      <PatientContactsContainer patientUuid={patient.uuid} />
 
       <DocumentsContainer patientUuid={patient.uuid} />
     </div>
