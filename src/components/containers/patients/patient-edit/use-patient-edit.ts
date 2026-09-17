@@ -36,6 +36,7 @@ export function usePatientEdit(uuid: string) {
         phone: patient.phone ?? '',
         email: patient.email ?? '',
         address: patient.address ?? '',
+        branchUuid: patient.branchUuid ?? '',
       }
     : null;
 
@@ -51,6 +52,7 @@ export function usePatientEdit(uuid: string) {
       email: values.email.trim().toLowerCase(),
       gender: values.gender,
       address: values.address.trim(),
+      branchUuid: values.branchUuid || null,
     };
 
     executeUpdatePatient(

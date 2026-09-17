@@ -71,4 +71,5 @@ export interface PatientFormValues {
   phone: string;
   email: string;
   address: string;
+  branchUuid: string;
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Phone, Mail, IdCard, Cake, MapPin, Loader2, AlertTriangle } from 'lucide-react';
+import { Phone, Mail, IdCard, Cake, MapPin, Building2, Loader2, AlertTriangle } from 'lucide-react';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -35,6 +36,7 @@ const InlineDatum: React.FC<{
  */
 const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
   const [showAllData, setShowAllData] = useState(false);
+  const { data: branches } = useBranchesQuery();
 
   const age = calculateAge(patient.birthDate);
   const genderLabel = patient.gender
@@ -45,7 +47,11 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
     .filter(Boolean)
     .join(' · ');
 
-  const hasExtraData = !!(patient.email || patient.address || patient.birthDate);
+  const branchName = patient.branchUuid
+    ? branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null
+    : null;
+
+  const hasExtraData = !!(patient.email || patient.address || patient.birthDate || branchName);
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
@@ -80,6 +86,7 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
           />
           <InlineDatum icon={Mail} label="Correo" value={patient.email} />
           <InlineDatum icon={MapPin} label="Dirección" value={patient.address} />
+          <InlineDatum icon={Building2} label="Sede" value={branchName} />
         </div>
       )}
 

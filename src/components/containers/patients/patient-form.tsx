@@ -11,6 +11,7 @@ import {
   GENDER_LABELS,
   PatientGender,
 } from '@/types/patients/patient';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import {
   DOCUMENT_MASKS,
   formatNationalId,
@@ -34,6 +35,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 }) => {
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
+  const { data: branches } = useBranchesQuery();
 
   const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const raw = event.target.value;
@@ -85,6 +87,15 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             {Object.values(PatientGender).map((gender) => (
               <option key={gender} value={gender}>
                 {GENDER_LABELS[gender]}
+              </option>
+            ))}
+          </FormField>
+
+          <FormField name="branchUuid" label="Sede" as="select">
+            <option value="">Sin especificar</option>
+            {(branches ?? []).map((branch) => (
+              <option key={branch.uuid} value={branch.uuid}>
+                {branch.name}
               </option>
             ))}
           </FormField>

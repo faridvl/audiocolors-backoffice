@@ -30,6 +30,7 @@ export interface Patient {
   email?: string;
   gender?: string;
   documentId?: string;
+  branchUuid?: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;
@@ -44,6 +45,7 @@ export interface CreatePatientPayload {
   email?: string;
   gender?: string;
   documentId?: string;
+  branchUuid?: string | null;
 }
 
 export type UpdatePatientPayload = Partial<CreatePatientPayload>;
