@@ -89,24 +89,6 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
 
       {isAdding ? (
         <div className="flex flex-col gap-3 rounded-card border border-ink-200 bg-ink-50 p-4">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="note-text">
-              <Typography variant={TypographyVariant.HELPER}>Nota</Typography>
-            </label>
-            <textarea
-              id="note-text"
-              value={text}
-              onChange={(event) => handleTextChange(event.target.value)}
-              placeholder="Describe la evolución del paciente..."
-              rows={4}
-              autoFocus
-              className={tailwind(inputBaseClasses, 'resize-none')}
-            />
-            <Typography variant={TypographyVariant.HELPER} className="self-end">
-              {text.trim().length}/{PATIENT_NOTE_TEXT_MAX_LENGTH}
-            </Typography>
-          </div>
-
           <div className="flex flex-col gap-1 sm:w-56">
             <label htmlFor="note-category">
               <Typography variant={TypographyVariant.HELPER}>Categoría</Typography>
@@ -123,6 +105,24 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="note-text">
+              <Typography variant={TypographyVariant.HELPER}>Nota</Typography>
+            </label>
+            <textarea
+              id="note-text"
+              value={text}
+              onChange={(event) => handleTextChange(event.target.value)}
+              placeholder="Describe la evolución del paciente..."
+              rows={4}
+              autoFocus
+              className={tailwind(inputBaseClasses, 'resize-none')}
+            />
+            <Typography variant={TypographyVariant.HELPER} className="self-end">
+              {text.trim().length}/{PATIENT_NOTE_TEXT_MAX_LENGTH}
+            </Typography>
           </div>
 
           <div className="flex justify-end gap-2">
