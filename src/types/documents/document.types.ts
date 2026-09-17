@@ -1,14 +1,16 @@
 export enum DocumentCategory {
-  RECEIPT = 'RECEIPT',
+  EVOLUTION_CONTROL = 'EVOLUTION_CONTROL',
   WARRANTY = 'WARRANTY',
   EXTERNAL_TEST = 'EXTERNAL_TEST',
+  CLINICAL_HISTORY = 'CLINICAL_HISTORY',
   OTHER = 'OTHER',
 }
 
 export const DOCUMENT_CATEGORY_LABELS: Record<DocumentCategory, string> = {
-  [DocumentCategory.RECEIPT]: 'Recibos',
-  [DocumentCategory.WARRANTY]: 'Garantias',
-  [DocumentCategory.EXTERNAL_TEST]: 'Pruebas externas',
+  [DocumentCategory.EVOLUTION_CONTROL]: 'Control de evolución',
+  [DocumentCategory.WARRANTY]: 'Garantías',
+  [DocumentCategory.EXTERNAL_TEST]: 'Pruebas',
+  [DocumentCategory.CLINICAL_HISTORY]: 'Historia clínica',
   [DocumentCategory.OTHER]: 'Otros',
 };
 
