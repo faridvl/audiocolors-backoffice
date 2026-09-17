@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { Phone, Mail, IdCard, Cake, MapPin, Building2, CalendarPlus, Loader2, AlertTriangle } from 'lucide-react';
+import {
+  Phone,
+  Mail,
+  IdCard,
+  Cake,
+  MapPin,
+  Building2,
+  CalendarPlus,
+  CalendarClock,
+  Loader2,
+  AlertTriangle,
+} from 'lucide-react';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
@@ -8,6 +19,7 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
+import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { calculateAge, formatDate } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -36,7 +48,10 @@ const InlineDatum: React.FC<{
  * de pantalla. El nombre y la accion de editar viven en el header de la
  * pagina, no aqui.
  */
-const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
+const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => void }> = ({
+  patient,
+  onScheduleAppointment,
+}) => {
   const [showAllData, setShowAllData] = useState(false);
   const { data: branches } = useBranchesQuery();
 
@@ -63,26 +78,39 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
-        <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
-        <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
+      <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-5">
+        <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+          <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
+          <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
 
-        {demographics && (
-          <Typography variant={TypographyVariant.HELPER} inline>
-            {demographics}
-          </Typography>
-        )}
+          {demographics && (
+            <Typography variant={TypographyVariant.HELPER} inline>
+              {demographics}
+            </Typography>
+          )}
 
-        {!patient.isActive && (
-          <span
-            className={tailwind(
-              'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
-              STATUS_STYLES[StatusTone.INACTIVE],
-            )}
-          >
-            Inactivo
-          </span>
-        )}
+          {!patient.isActive && (
+            <span
+              className={tailwind(
+                'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
+                STATUS_STYLES[StatusTone.INACTIVE],
+              )}
+            >
+              Inactivo
+            </span>
+          )}
+        </div>
+
+        <Button
+          variant={ButtonVariant.SECONDARY}
+          onClick={onScheduleAppointment}
+          icon={<CalendarClock className="h-4 w-4" aria-hidden />}
+          className="w-fit"
+        >
+          {patient.nextAppointmentAt
+            ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
+            : 'Agendar próxima cita'}
+        </Button>
       </div>
 
       {showAllData && (
@@ -123,6 +151,7 @@ interface PatientDetailContainerProps {
 
 export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ uuid }) => {
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
+  const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
 
   if (isLoading) {
     return (
@@ -147,13 +176,23 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
 
   return (
     <div className="flex flex-col gap-4">
-      <PatientSummary patient={patient} />
+      <PatientSummary
+        patient={patient}
+        onScheduleAppointment={() => setIsSchedulingAppointment(true)}
+      />
 
       <PatientContactsContainer patientUuid={patient.uuid} />
 
       <PatientNotesContainer patientUuid={patient.uuid} />
 
       <DocumentsContainer patientUuid={patient.uuid} />
+
+      {isSchedulingAppointment && (
+        <ScheduleAppointmentModal
+          patientUuid={patient.uuid}
+          onClose={() => setIsSchedulingAppointment(false)}
+        />
+      )}
     </div>
   );
 };
