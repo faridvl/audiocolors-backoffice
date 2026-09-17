@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Mail, IdCard, Cake, MapPin, Building2, Loader2, AlertTriangle } from 'lucide-react';
+import { Phone, Mail, IdCard, Cake, MapPin, Building2, CalendarPlus, Loader2, AlertTriangle } from 'lucide-react';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
@@ -53,7 +53,13 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
     ? branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null
     : null;
 
-  const hasExtraData = !!(patient.email || patient.address || patient.birthDate || branchName);
+  const hasExtraData = !!(
+    patient.email ||
+    patient.address ||
+    patient.birthDate ||
+    branchName ||
+    patient.createdAt
+  );
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
@@ -89,6 +95,11 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
           <InlineDatum icon={Mail} label="Correo" value={patient.email} />
           <InlineDatum icon={MapPin} label="Dirección" value={patient.address} />
           <InlineDatum icon={Building2} label="Sede" value={branchName} />
+          <InlineDatum
+            icon={CalendarPlus}
+            label="Registro"
+            value={patient.createdAt ? formatDate(patient.createdAt) : null}
+          />
         </div>
       )}
 

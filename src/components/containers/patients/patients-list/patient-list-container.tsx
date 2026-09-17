@@ -41,12 +41,6 @@ const columns: TableColumn<Patient>[] = [
     render: (patient) => patient.phone || '—',
   },
   {
-    key: 'createdAt',
-    header: 'Registro',
-    width: '16%',
-    render: (patient) => formatDate(patient.createdAt),
-  },
-  {
     key: 'status',
     header: 'Estado',
     width: '12%',
