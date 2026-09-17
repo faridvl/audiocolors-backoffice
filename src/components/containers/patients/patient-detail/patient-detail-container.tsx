@@ -110,9 +110,14 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
           onClick={onScheduleAppointment}
           aria-label={scheduleTitle}
           title={scheduleTitle}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-brand-700"
+          className={tailwind(
+            'flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg text-ink-500',
+            'w-9 transition-colors hover:bg-ink-100 hover:text-brand-700',
+            'md:w-auto md:px-3 md:text-sm md:font-medium md:text-brand-700 md:hover:bg-brand-50',
+          )}
         >
-          <CalendarClock className="h-5 w-5" aria-hidden />
+          <CalendarClock className="h-5 w-5 shrink-0 md:h-4 md:w-4" aria-hidden />
+          <span className="hidden md:inline">{scheduleTitle}</span>
         </button>
       </div>
 
