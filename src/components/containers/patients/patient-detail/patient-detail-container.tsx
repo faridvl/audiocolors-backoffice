@@ -82,36 +82,12 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="mb-2">
+      <div className="mb-2 flex items-start justify-between gap-3">
         <InlineDatum
           icon={User}
           label="Nombre"
           value={getFullName(patient.firstName, patient.lastName)}
         />
-      </div>
-
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
-          <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
-          <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
-
-          {demographics && (
-            <Typography variant={TypographyVariant.HELPER} inline>
-              {demographics}
-            </Typography>
-          )}
-
-          {!patient.isActive && (
-            <span
-              className={tailwind(
-                'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
-                STATUS_STYLES[StatusTone.INACTIVE],
-              )}
-            >
-              Inactivo
-            </span>
-          )}
-        </div>
 
         <button
           type="button"
@@ -127,6 +103,28 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
           <CalendarClock className="h-5 w-5 shrink-0 md:h-4 md:w-4" aria-hidden />
           <span className="hidden md:inline">{scheduleTitle}</span>
         </button>
+      </div>
+
+      <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+        <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
+        <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
+
+        {demographics && (
+          <Typography variant={TypographyVariant.HELPER} inline>
+            {demographics}
+          </Typography>
+        )}
+
+        {!patient.isActive && (
+          <span
+            className={tailwind(
+              'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
+              STATUS_STYLES[StatusTone.INACTIVE],
+            )}
+          >
+            Inactivo
+          </span>
+        )}
       </div>
 
       {showAllData && (
