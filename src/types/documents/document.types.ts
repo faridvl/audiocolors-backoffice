@@ -31,6 +31,7 @@ export interface PatientDocument {
   category: DocumentCategory;
   uploadedAt: string;
   uploadedByUuid: string;
+  uploadedByName: string | null;
   size: number;
   url: string;
 }
@@ -45,6 +46,7 @@ export interface DocumentItem {
   kind: DocumentKind;
   uploadedAtLabel: string;
   uploadedByUuid: string;
+  uploadedByName: string | null;
   sizeLabel: string;
 }
 

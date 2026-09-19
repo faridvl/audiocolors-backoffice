@@ -68,19 +68,26 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
         onClick={onPreview}
         className="flex flex-1 flex-col items-start gap-3 p-4 text-left"
       >
-        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50">
-          <Icon className="h-5 w-5 text-brand-600" />
+        <span className="flex w-full items-center gap-2">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50">
+            <Icon className="h-4 w-4 text-brand-600" />
+          </span>
+          <Typography
+            variant={TypographyVariant.HELPER}
+            className="line-clamp-2 min-w-0 break-words text-ink-700"
+          >
+            {document.name}
+          </Typography>
         </span>
 
         <span className="flex min-w-0 flex-col">
-          <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="line-clamp-2 break-words">
-            {document.name}
-          </Typography>
-          <Typography variant={TypographyVariant.HELPER} className="mt-1">
+          <Typography variant={TypographyVariant.HELPER}>
             {document.categoryLabel} &middot; {document.sizeLabel}
           </Typography>
           <Typography variant={TypographyVariant.HELPER}>{document.uploadedAtLabel}</Typography>
-          <Typography variant={TypographyVariant.HELPER}>{authorLabel}</Typography>
+          <Typography variant={TypographyVariant.HELPER}>
+            Registrado por: <span className="italic">{authorLabel}</span>
+          </Typography>
         </span>
       </button>
 
@@ -295,7 +302,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
             <DocumentCard
               key={document.uuid}
               document={document}
-              authorLabel={resolveAuthorLabel(document.uploadedByUuid)}
+              authorLabel={resolveAuthorLabel(document.uploadedByUuid, document.uploadedByName)}
               onPreview={() => setPreviewDocument(document)}
               onRename={() => handleStartRename(document)}
               onDelete={() => setDocumentToDelete(document)}

@@ -64,6 +64,7 @@ function mapToDocumentItem(document: PatientDocument): DocumentItem {
     kind: resolveDocumentKind(document.url),
     uploadedAtLabel: formatDate(document.uploadedAt),
     uploadedByUuid: document.uploadedByUuid,
+    uploadedByName: document.uploadedByName,
     sizeLabel: formatFileSize(document.size),
   };
 }

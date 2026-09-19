@@ -54,7 +54,8 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               {item.name}
             </Typography>
             <Typography variant={TypographyVariant.HELPER} className="truncate">
-              {item.categoryLabel} · {item.sizeLabel} · {resolveAuthorLabel(item.uploadedByUuid)}
+              {item.categoryLabel} · {item.sizeLabel} · Registrado por:{' '}
+              <span className="italic">{resolveAuthorLabel(item.uploadedByUuid, item.uploadedByName)}</span>
             </Typography>
           </div>
 

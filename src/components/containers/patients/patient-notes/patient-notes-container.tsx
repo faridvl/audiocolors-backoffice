@@ -27,7 +27,9 @@ const NoteRow: React.FC<NoteRowProps> = ({ note, authorLabel }) => (
     <Typography variant={TypographyVariant.BODY} className="whitespace-pre-wrap">
       {note.text}
     </Typography>
-    <Typography variant={TypographyVariant.HELPER}>{authorLabel}</Typography>
+    <Typography variant={TypographyVariant.HELPER}>
+      Registrado por: <span className="italic">{authorLabel}</span>
+    </Typography>
   </div>
 );
 
@@ -137,7 +139,7 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
       {!isLoading && !isError && filteredCount > 0 && (
         <div className="flex flex-col gap-2">
           {notes.map((note) => (
-            <NoteRow key={note.uuid} note={note} authorLabel={resolveAuthorLabel(note.authorUuid)} />
+            <NoteRow key={note.uuid} note={note} authorLabel={resolveAuthorLabel(note.authorUuid, note.authorName)} />
           ))}
         </div>
       )}
