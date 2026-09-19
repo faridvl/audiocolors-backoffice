@@ -43,49 +43,47 @@ export const AddPatientNoteModal: React.FC<AddPatientNoteModalProps> = ({
         className="max-h-full w-full max-w-md overflow-y-auto rounded-card bg-white p-5"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50">
             <NotebookText className="h-5 w-5 text-brand-600" aria-hidden />
           </span>
-          <div className="min-w-0 flex-1">
-            <Typography variant={TypographyVariant.ACCENT}>Nueva nota de evolución</Typography>
+          <Typography variant={TypographyVariant.ACCENT}>Nueva nota de evolución</Typography>
+        </div>
 
-            <div className="mt-3 flex flex-col gap-1">
-              <label htmlFor="note-category">
-                <Typography variant={TypographyVariant.HELPER}>Categoría</Typography>
-              </label>
-              <select
-                id="note-category"
-                value={category}
-                onChange={(event) => onCategoryChange(event.target.value as DocumentCategory)}
-                className={inputBaseClasses}
-              >
-                {Object.values(DocumentCategory).map((value) => (
-                  <option key={value} value={value}>
-                    {DOCUMENT_CATEGORY_LABELS[value]}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="mt-4 flex flex-col gap-1">
+          <label htmlFor="note-category">
+            <Typography variant={TypographyVariant.HELPER}>Categoría</Typography>
+          </label>
+          <select
+            id="note-category"
+            value={category}
+            onChange={(event) => onCategoryChange(event.target.value as DocumentCategory)}
+            className={inputBaseClasses}
+          >
+            {Object.values(DocumentCategory).map((value) => (
+              <option key={value} value={value}>
+                {DOCUMENT_CATEGORY_LABELS[value]}
+              </option>
+            ))}
+          </select>
+        </div>
 
-            <div className="mt-3 flex flex-col gap-1">
-              <label htmlFor="note-text">
-                <Typography variant={TypographyVariant.HELPER}>Nota</Typography>
-              </label>
-              <textarea
-                id="note-text"
-                value={text}
-                onChange={(event) => onTextChange(event.target.value)}
-                placeholder="Describe la evolución del paciente..."
-                rows={4}
-                autoFocus
-                className={tailwind(inputBaseClasses, 'resize-none')}
-              />
-              <Typography variant={TypographyVariant.HELPER} className="self-end">
-                {text.trim().length}/{PATIENT_NOTE_TEXT_MAX_LENGTH}
-              </Typography>
-            </div>
-          </div>
+        <div className="mt-3 flex flex-col gap-1">
+          <label htmlFor="note-text">
+            <Typography variant={TypographyVariant.HELPER}>Nota</Typography>
+          </label>
+          <textarea
+            id="note-text"
+            value={text}
+            onChange={(event) => onTextChange(event.target.value)}
+            placeholder="Describe la evolución del paciente..."
+            rows={4}
+            autoFocus
+            className={tailwind(inputBaseClasses, 'resize-none')}
+          />
+          <Typography variant={TypographyVariant.HELPER} className="self-end">
+            {text.trim().length}/{PATIENT_NOTE_TEXT_MAX_LENGTH}
+          </Typography>
         </div>
 
         <div className="mt-5 flex justify-end gap-2">
