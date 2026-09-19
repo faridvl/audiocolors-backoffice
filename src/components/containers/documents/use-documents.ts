@@ -20,8 +20,13 @@ import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/dele
 import { useRenameDocumentMutation } from '@/shared/api/mutations/documents/rename-document-mutation';
 import { formatDate, formatFileSize } from '@/shared/utils/formatters';
 
-/** El API acepta imagenes y PDF, con un limite de 20 MB por archivo. */
-export const ACCEPTED_MIME_TYPES = 'image/*,application/pdf';
+/**
+ * Sin restriccion de tipo: los equipos de audiometria de cada clinica
+ * exportan en formatos distintos (PDF, imagen, o algo propio del
+ * fabricante) y no vale la pena bloquear al medico por un tipo que no se
+ * previsualiza — el visor ya cae con gracia a "Abrir archivo" para lo que
+ * no es imagen o PDF. Limite de tamano: 20 MB por archivo.
+ */
 const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];

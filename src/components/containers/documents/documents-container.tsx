@@ -24,7 +24,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { inputBaseClasses } from '@/components/common/input/input';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
-import { useDocuments, ACCEPTED_MIME_TYPES } from './use-documents';
+import { useDocuments } from './use-documents';
 import { DocumentPreviewModal } from './document-preview-modal';
 import { ConfirmDeleteModal } from './confirm-delete-modal';
 import { RenameDocumentModal } from './rename-document-modal';
@@ -167,7 +167,6 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       <input
         ref={fileInputRef}
         type="file"
-        accept={ACCEPTED_MIME_TYPES}
         className="hidden"
         onChange={(event) => handleFileSelected(event.target.files?.[0] ?? null)}
       />

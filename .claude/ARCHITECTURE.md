@@ -24,7 +24,7 @@ para poder entregar a un cliente real sin esperar a que Zynka esté completo.
 ## Stack
 
 Next.js 14 (Pages Router) · TypeScript · Tailwind · TanStack Query 5 ·
-Formik + Yup · Sonner · Manrope
+Formik + Yup · Sonner · Fira Sans
 
 Sin i18n, sin PDF, sin audiograma, sin inventario, sin citas.
 
@@ -34,7 +34,7 @@ Sin i18n, sin PDF, sin audiograma, sin inventario, sin citas.
 src/
 ├── pages/                    rutas (en español: /pacientes)
 │   ├── _app.tsx              QueryClient + Toaster + metadatos
-│   ├── _document.tsx         favicons + fuente Manrope
+│   ├── _document.tsx         favicons + fuente Fira Sans
 │   ├── index.tsx             redirige según haya sesión
 │   ├── login/
 │   └── pacientes/

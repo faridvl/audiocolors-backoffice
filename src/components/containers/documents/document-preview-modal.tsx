@@ -3,6 +3,7 @@ import { X, ExternalLink, FileQuestion } from 'lucide-react';
 import { DocumentItem, DocumentKind } from '@/types/documents/document.types';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
+import { tailwind } from '@/utils/tailwind-utils';
 
 interface DocumentPreviewModalProps {
   document: DocumentItem | null;
@@ -40,7 +41,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={`Vista previa de ${item.name}`}
-      className="fixed inset-0 z-50 flex flex-col bg-ink-900/80 p-3 sm:p-6"
+      className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-ink-900/80 p-3 sm:p-6"
       onClick={onClose}
     >
       <div
@@ -52,11 +53,8 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             <Typography variant={TypographyVariant.ACCENT} className="truncate">
               {item.name}
             </Typography>
-            <Typography variant={TypographyVariant.HELPER}>
-              {item.categoryLabel} · {item.sizeLabel} · {item.uploadedAtLabel}
-            </Typography>
-            <Typography variant={TypographyVariant.HELPER}>
-              {resolveAuthorLabel(item.uploadedByUuid)}
+            <Typography variant={TypographyVariant.HELPER} className="truncate">
+              {item.categoryLabel} · {item.sizeLabel} · {resolveAuthorLabel(item.uploadedByUuid)}
             </Typography>
           </div>
 
@@ -81,7 +79,12 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           </div>
         </header>
 
-        <div className="flex flex-1 items-center justify-center overflow-auto bg-ink-100 p-3">
+        <div
+          className={tailwind(
+            'flex flex-1 items-center justify-center overflow-auto',
+            item.kind === DocumentKind.PDF ? 'bg-white' : 'bg-ink-100 p-3',
+          )}
+        >
           {item.kind === DocumentKind.IMAGE && (
             // Archivo servido desde R2: se usa <img> para no configurar
             // remotePatterns de next/image por cada dominio de storage.
@@ -94,7 +97,35 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           )}
 
           {item.kind === DocumentKind.PDF && (
-            <iframe src={item.url} title={item.name} className="h-full w-full border-0 bg-white" />
+            <>
+              {/*
+                El visor de PDF nativo de iOS Safari ignora el ancho del
+                iframe y renderiza la pagina a su tamano real, cortandola.
+                En desktop (Chrome/Edge/Firefox) el iframe ajusta bien, asi
+                que ahi se mantiene; en mobile se ofrece abrir el archivo,
+                donde el navegador lo muestra a pantalla completa sin cortes.
+              */}
+              <iframe
+                src={item.url}
+                title={item.name}
+                className="hidden h-full w-full border-0 bg-white md:block"
+              />
+              <div className="flex flex-col items-center gap-3 p-8 text-center md:hidden">
+                <FileQuestion className="h-10 w-10 text-ink-400" aria-hidden />
+                <Typography variant={TypographyVariant.BODY}>
+                  Abre el archivo para verlo a pantalla completa.
+                </Typography>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden />
+                  Abrir archivo
+                </a>
+              </div>
+            </>
           )}
 
           {item.kind === DocumentKind.OTHER && (

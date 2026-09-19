@@ -54,10 +54,10 @@ print(f'opacos: {full} | basura: {junk}')   # basura debe ser ~0
 
 Y **mira el resultado** con la herramienta Read antes de darlo por bueno.
 
-## Colores de marca (medidos, no estimados)
+## Colores de marca (manual oficial, no estimados)
 
-`#e41e1e` rojo · `#ea7e2a` naranja · `#fccc30` amarillo · `#66ae36` verde ·
-`#1e6cae` azul · `#604290` morado
+`#e3211e` rojo · `#ef7f2b` naranja · `#ffce33` amarillo · `#66b335` verde ·
+`#1f6fb1` azul · `#613f90` morado
 
 Para medir uno nuevo: contar píxeles del JPEG original agrupando por color,
 descartando grises (`max-min < 60`) y casi-blancos.
@@ -67,7 +67,7 @@ descartando grises (`max-min < 60`) y casi-blancos.
 1. **Dos archivos, no un filtro CSS.** Fondo claro y fondo oscuro son variantes
    distintas del manual. `brightness-0 invert` aplana las letras de color.
 2. **El favicon es un símbolo**, no el logo entero: solo la oreja, sin los
-   puntos (ruido a 32px), fondo transparente, teñida de `#e41e1e`.
+   puntos (ruido a 32px), fondo transparente, teñida de `#e3211e`.
 3. **Ancho objetivo 1400px** para el logo — suficiente para retina sin pesar.
 4. Tras cambiar un asset, comprobar que `BrandLogo` sigue cuadrando: recibe
    solo la altura y usa `LOGO_ASPECT_RATIO`.

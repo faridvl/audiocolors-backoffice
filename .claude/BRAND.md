@@ -6,22 +6,33 @@ Identidad de AudioColors y cómo regenerar los assets.
 
 ## Colores
 
-**Medidos del archivo original** (`logo.jpeg`) contando píxeles por letra, no
-estimados a ojo. Una primera versión los estimó y los seis estaban mal.
+**Fuente de verdad: el manual de marca** (`Audio Colors Manual de Marca.pdf`,
+página "PALETA DE COLORES"), no valores estimados a ojo ni medidos por
+píxeles de un JPEG. Una primera versión los estimó a ojo y los seis estaban
+mal; una segunda los midió contando píxeles y quedaron cerca pero no exactos
+del manual oficial.
 
 | Letra | Hex | Rol |
 |---|---|---|
-| Oreja (C) | `#e41e1e` | rojo — favicon |
-| O | `#ea7e2a` | naranja |
-| L | `#fccc30` | amarillo |
-| O | `#66ae36` | verde |
-| **R** | **`#1e6cae`** | **azul — color de acento del sistema** |
-| S | `#604290` | morado |
+| Oreja (C) | `#e3211e` | rojo — color de la "C" en el wordmark. El isotipo suelto (oreja + puntos) lleva la oreja en gris/negro o blanco, no en este rojo — ver "Assets" |
+| O | `#ef7f2b` | naranja |
+| L | `#ffce33` | amarillo |
+| O | `#66b335` | verde |
+| **R** | **`#1f6fb1`** | **azul — color de acento del sistema** |
+| S | `#613f90` | morado |
+
+El manual también define dos colores fuera de las letras de "COLORS":
+`#5b5d5c` (gris del texto "audio" en el logo sobre fondo claro) y `#ffffff`
+(blanco). El gris de marca no está tokenizado aparte — la interfaz usa la
+escala `ink` (neutros) para texto y superficies.
 
 Viven en `src/shared/design/tokens.ts` → `BRAND_COLORS`, y alimentan la franja.
 
-La escala `brand-50…900` de `tailwind.config.js` se derivó del azul `#1e6cae`
+La escala `brand-50…900` de `tailwind.config.js` se derivó del azul `#1f6fb1`
 variando la luminosidad y conservando tono y saturación.
+
+El azul oscuro de fondo de la variante dark del logo (token `midnight`) es
+`#181d37` según el manual (antes se usaba `#1a1a2e`, estimado a ojo).
 
 `success` es teal `#0d9488`, deliberadamente distinto del verde de marca.
 
@@ -29,10 +40,15 @@ variando la luminosidad y conservando tono y saturación.
 
 ## Tipografía
 
-**Manrope** (Google Fonts), cargada en `_document.tsx`.
+**Fira Sans** (Google Fonts), cargada en `_document.tsx`. Es la tipografía de
+texto que especifica el manual de marca oficial.
 
-Coincide con el sitio público de AudioColors **y** con el sistema EDUS de la
-CCSS (`ccss.sa.cr/appedus`), que usa la misma familia.
+El manual también define **Champagne & Limousines** para el logo/wordmark
+("audio COLORS"), pero esa es la fuente del isotipo vectorial, no una
+tipografía de interfaz — no se carga en la app.
+
+Antes se usaba Manrope (coincide con el sitio público de AudioColors y con el
+sistema EDUS de la CCSS), pero el manual oficial no la especifica.
 
 ---
 
@@ -42,10 +58,37 @@ CCSS (`ccss.sa.cr/appedus`), que usa la misma familia.
 |---|---|
 | `public/logo-audiocolors.png` | Logo para fondo claro ("audio" gris), 1400px |
 | `public/logo-audiocolors-dark.png` | Para fondo oscuro ("audio" blanco) |
-| `public/favicon-{16,32,180}.png`, `favicon.ico` | La oreja sola, rojo, transparente |
+| `public/favicon-{16,32,180}.png`, `favicon.ico` | Isotipo reducido: **solo la oreja** (sin puntos), gris oscuro `#1e1e1e`, fondo transparente. Único, sin sufijo dev/prod |
+| `public/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` | Isotipo completo (oreja + 6 puntos), variante **positivo**: oreja gris oscuro, fondo blanco `#ffffff` — producción |
+| `public/apple-touch-icon-dev.png`, `icon-192-dev.png`, `icon-512-dev.png`, `icon-512-dev-maskable.png` | Isotipo completo, variante **negativo**: oreja blanca, fondo navy `#181d37` — desarrollo |
 
-Proporción del logo: **2.49:1**. El componente `BrandLogo` recibe solo la
-altura y calcula el ancho.
+Proporción del logo (wordmark completo): **2.49:1**. El componente `BrandLogo`
+recibe solo la altura y calcula el ancho.
+
+### El isotipo (oreja + 6 puntos)
+
+Según el manual de marca oficial (`Audio Colors Manual de Marca.pdf`, págs.
+2-5, "VARIANTES DEL LOGO"), el isotipo para usar sin el wordmark es la oreja
+**más una fila de 6 puntos de colores debajo** — no la oreja sola. La oreja
+va en gris oscuro/negro sólido (no rojo: el rojo `#e3211e` es solo el color
+de la "C" cuando forma parte del wordmark "audio COLORS" completo). Los 6
+puntos llevan siempre los mismos hex de la paleta, en ambas variantes de
+fondo:
+
+`#e3211e` `#ef7f2b` `#ffce33` `#66b335` `#1f6fb1` `#613f90`
+
+Dos variantes de fondo (iguales en ambas, solo cambia oreja y fondo):
+
+- **Positivo** (producción): oreja gris oscuro, fondo blanco `#ffffff`.
+- **Negativo** (desarrollo): oreja blanca, fondo navy `#181d37`.
+
+El favicon de pestaña del navegador (`favicon-16/32/180.png`, `favicon.ico`)
+es distinto: **solo la oreja, sin los 6 puntos** — a 16-32px los puntos se
+comprimen a un par de píxeles cada uno y se vuelven ruido de color sin forma
+reconocible, no información (se verificó renderizando y mirando el resultado
+antes de decidir esto). Va en gris oscuro sólido sobre fondo transparente,
+única para ambos entornos — el fondo casi siempre lo da la pestaña del
+navegador, que es clara en la gran mayoría de temas.
 
 ---
 
@@ -60,9 +103,14 @@ disponible en el entorno.
 |---|---|
 | 0 | Logo a color, fondo claro ← **el que se usa** |
 | 1 | Con tagline "ESPECIALIDADES AUDIOLÓGICAS" |
-| 4 | Isotipo: oreja + 6 puntos ← **base del favicon** |
-| 5 | Isotipo alternativo "AC" |
+| 4 | Isotipo oreja + 6 puntos, positivo (oreja gris, fondo blanco) ← **base del isotipo y del favicon** |
+| 5 | Isotipo alternativo "AC" (no se usa) |
 | 12 | Logo a color, fondo oscuro ← **variante dark** |
+| 16 | Isotipo oreja + 6 puntos, negativo (oreja blanca, fondo navy `#181d37`) ← **variante dev del isotipo** |
+
+La hoja de contacto tiene 4 filas × 6 columnas (24 páginas, índice = fila×6 +
+columna): fila 0 color/fondo claro, fila 1 monocromo, fila 2 sobre navy, fila
+3 sobre negro. El isotipo oreja+puntos es la columna 4 de cada fila.
 
 Las 24 se pueden inspeccionar generando una hoja de contacto (ver script abajo).
 
@@ -86,7 +134,7 @@ def build_logo(page_index, out_path, dark_variant=False, target_w=1400):
     pix = doc[page_index].get_pixmap(matrix=fitz.Matrix(8, 8), alpha=False)
     img = Image.frombytes('RGB', (pix.width, pix.height), pix.samples)
     px = img.load()
-    bg = (26, 26, 46) if dark_variant else (255, 255, 255)
+    bg = (24, 29, 55) if dark_variant else (255, 255, 255)
 
     def dist(r, g, b):
         return max(abs(r - bg[0]), abs(g - bg[1]), abs(b - bg[2]))
@@ -121,9 +169,53 @@ build_logo(0,  'public/logo-audiocolors.png')
 build_logo(12, 'public/logo-audiocolors-dark.png', dark_variant=True)
 ```
 
-Para el favicon: extraer la página 4, separar la oreja de los puntos buscando el
-hueco vertical (>40px sin tinta), teñirla de `#e41e1e` y generar 16/32/180 + ico
-con fondo transparente.
+### Isotipo (oreja + 6 puntos) y favicon de pestaña
+
+La página 4 (positivo) y la 16 (negativo) del `.ai` **ya traen el isotipo
+completo coloreado** — la oreja en gris/blanco sólido y los 6 puntos con sus
+hex de marca — así que no hace falta pintar nada a mano, solo separarlos y
+retintar con los hex oficiales del manual (más fiables que el valor con
+antialiasing del render).
+
+Procedimiento:
+
+1. Renderizar la página **sin alfa** sobre el fondo opaco correspondiente
+   (blanco para la 4, navy `(24,29,55)` para la 16), igual que `build_logo`.
+2. Encontrar el hueco vertical entre la oreja y la fila de puntos: recorrer
+   filas de píxeles, marcar cuáles tienen tinta (distancia al fondo > 24) y
+   ubicar el gap más grande entre dos filas con tinta. En el archivo actual
+   el gap ronda 200px (a 10x de escala) entre oreja y puntos.
+3. Construir la máscara alfa de cada región por distancia al fondo (mismo
+   criterio que `build_logo`: `alpha=0` si `d<=10`, `alpha=255` si `d>=45`,
+   interpolado entre medio) y teñir la oreja de gris oscuro `(30,30,30)`
+   (positivo) o blanco (negativo).
+4. Para los puntos: recortar la tira inferior a su propio bbox, encontrar las
+   6 columnas por huecos horizontales sin tinta (`split_dots`), y re-teñir
+   cada una con su hex de `DOT_COLORS = ['#e3211e','#ef7f2b','#ffce33',
+   '#66b335','#1f6fb1','#613f90']` en orden, preservando el alfa original de
+   cada píxel (no reemplazar RGB con alfa=0).
+5. Componer oreja + puntos re-teñidos en un único canvas RGBA transparente,
+   recortar a bbox y reescalar.
+
+Para el **favicon de pestaña** (`favicon-16/32/180.png`, `favicon.ico`): usar
+solo la región de la oreja (sin componer los puntos), teñida de gris oscuro
+`#1e1e1e`, fondo transparente. Se decidió así después de renderizar el
+isotipo completo a 16/32px y comprobar que los puntos se vuelven ruido de
+color sin forma reconocible a ese tamaño — la oreja sola sigue siendo
+legible. Para el `.ico`, pasar `sizes=[(16,16),(32,32),(48,48)]` y
+`append_images` con las tres resoluciones al guardar, si no PIL solo
+embebe un tamaño.
+
+Para **apple-touch-icon / icon-192 / icon-512 / icon-512-maskable**: usar el
+isotipo completo (oreja + 6 puntos), centrado sobre un canvas cuadrado con
+margen (~14% para los íconos normales, ~40% para los maskable por su
+"safe zone"), aplanado sobre fondo opaco blanco (prod) o navy `#181d37`
+(dev) — estos formatos no soportan transparencia real en la práctica (iOS y
+Android rellenan con negro si el PNG trae alfa).
+
+Verificar siempre el resultado con el chequeo de basura de bordes de la
+introducción de este documento antes de reemplazar los archivos en
+`public/`, y mirarlo con la herramienta Read.
 
 Hoja de contacto de las 24 variantes:
 

@@ -19,7 +19,7 @@ export const LoginContainer: React.FC = () => {
           variant={TypographyVariant.HELPER}
           className="mt-2 uppercase tracking-[0.2em] text-ink-400"
         >
-          Expedientes
+          Gestión Clínica
         </Typography>
       </div>
 

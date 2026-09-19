@@ -12,8 +12,8 @@ de estilo: romperlas reintroduce un defecto que ya se pagó.
 
 ```tsx
 // ❌ NUNCA
-<div className="bg-[#66ae36]">
-<span style={{ color: '#e41e1e' }}>
+<div className="bg-[#1f6fb1]">
+<span style={{ color: '#e3211e' }}>
 
 // ✅ SIEMPRE
 <div className="bg-brand">
@@ -34,16 +34,16 @@ grep -rEo "(bg|text|border)-\[#[0-9a-fA-F]{3,8}\]" src/ | wc -l   # debe dar 0
 
 ### 1.2 Los colores de marca se miden, no se estiman
 
-Los seis colores del logo salieron **contando píxeles del archivo original**, no
-mirando la imagen. La primera versión los estimó a ojo y **los seis estaban mal**
-(el verde era `#6cb33f` en vez de `#66ae36`).
+Los seis colores del logo son los del manual de marca oficial (`PALETA DE
+COLORES`). Una primera versión los estimó contando píxeles del JPEG original y
+los seis quedaron ligeramente distintos.
 
 Viven en `src/shared/design/tokens.ts` → `BRAND_COLORS`. Si hace falta uno nuevo,
 se mide del archivo de marca; no se inventa.
 
 ### 1.3 Un solo acento
 
-`brand` (verde `#66ae36`, la O del logo) es el **único** color de acento: acción
+`brand` (azul `#1f6fb1`, la R del logo) es el **único** color de acento: acción
 primaria, estado activo y foco. Los grises son `ink`, **neutros sin tinte azul** —
 un chrome azulado compite con un logo multicolor.
 

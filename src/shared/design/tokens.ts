@@ -8,26 +8,25 @@
  * Decisiones de la identidad:
  * - Interfaz CLARA. El logo es multicolor sobre blanco; un chrome oscuro
  *   competiria con el.
- * - `brand` (azul #1e6cae, la R del logo) es el UNICO acento: accion
+ * - `brand` (azul #1f6fb1, la R del logo) es el UNICO acento: accion
  *   primaria, estado activo y foco.
  * - `ink` es una escala de grises NEUTROS, sin tinte azul.
  * - La franja de 6 colores es un gesto de bienvenida: vive en el login, no en
  *   las pantallas de trabajo.
- * - Tipografia Manrope, la misma del sitio publico de AudioColors y del
- *   sistema EDUS de la CCSS.
+ * - Tipografia Fira Sans, la del manual de marca oficial.
  */
 
 /**
  * Colores de la marca: una letra de "COLORS" por color, en el orden del logo.
- * Medidos del archivo original (logo.jpeg), no estimados a ojo.
+ * Hex oficiales del manual de marca (PALETA DE COLORES), no estimados a ojo.
  */
 export const BRAND_COLORS = {
-  red: '#e41e1e',
-  orange: '#ea7e2a',
-  yellow: '#fccc30',
-  green: '#66ae36',
-  blue: '#1e6cae',
-  purple: '#604290',
+  red: '#e3211e',
+  orange: '#ef7f2b',
+  yellow: '#ffce33',
+  green: '#66b335',
+  blue: '#1f6fb1',
+  purple: '#613f90',
 } as const;
 
 /**

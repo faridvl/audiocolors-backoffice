@@ -21,7 +21,7 @@ class MyDocument extends Document<MyDocumentProps> {
   render() {
     const iconSuffix = this.props.isDev ? '-dev' : '';
     /** Azul de la R (produccion) vs morado de la S (desarrollo) — BRAND.md. */
-    const themeColor = this.props.isDev ? '#604290' : '#1e6cae';
+    const themeColor = this.props.isDev ? '#613f90' : '#1f6fb1';
 
     return (
       <Html lang="es">
@@ -40,7 +40,7 @@ class MyDocument extends Document<MyDocumentProps> {
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link
-            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap"
             rel="stylesheet"
           />
         </Head>

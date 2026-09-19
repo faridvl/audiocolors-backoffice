@@ -1,6 +1,6 @@
 # audiocolors-backoffice
 
-Back-office de **AudioColors · Expedientes** — gestión de pacientes y sus archivos clínicos (recetas, audiometrías, facturas, garantías).
+Back-office de **AudioColors · Gestión Clínica** — gestión de pacientes y sus archivos clínicos (recetas, audiometrías, facturas, garantías).
 
 Lo usa el personal de la clínica. No es un portal de pacientes: no hay registro público ni auto-servicio; las cuentas las crea el administrador.
 

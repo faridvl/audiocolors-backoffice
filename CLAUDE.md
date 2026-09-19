@@ -17,7 +17,7 @@ está como está.
 
 ## Qué es esto
 
-**AudioColors · Expedientes** — back-office de una clínica auditiva en Costa
+**AudioColors · Gestión Clínica** — back-office de una clínica auditiva en Costa
 Rica. Frontend únicamente. Alcance mínimo a propósito: **pacientes y sus
 archivos adjuntos**.
 

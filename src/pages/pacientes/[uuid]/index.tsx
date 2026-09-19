@@ -33,7 +33,7 @@ export default function PatientDetailPage() {
   return (
     <>
       <Head>
-        <title>{`${patientName} · AudioColors Expedientes`}</title>
+        <title>AudioColors · Gestión Clínica</title>
       </Head>
 
       <AppLayout
