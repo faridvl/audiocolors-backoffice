@@ -14,11 +14,7 @@ export default function PatientDetailPage() {
   const uuid = typeof router.query.uuid === 'string' ? router.query.uuid : '';
   const { data: patient } = usePatientQuery(uuid);
 
-  // El titulo del header es el nombre del paciente: hace de rastro de
-  // navegacion y evita repetirlo dentro del contenido.
-  const patientName = patient
-    ? getFullName(patient.firstName, patient.lastName)
-    : 'Gestión del paciente';
+  const patientName = patient ? getFullName(patient.firstName, patient.lastName) : undefined;
 
   const editAction = uuid ? (
     <Link
@@ -39,8 +35,8 @@ export default function PatientDetailPage() {
       </Head>
 
       <AppLayout
-        title={patientName}
-        subtitle="Gestión del paciente"
+        title="Gestión del paciente"
+        subtitle={patientName}
         backHref={routesPrivate.patients.index}
         action={editAction}
       >
