@@ -30,11 +30,15 @@ const InlineDatum: React.FC<{
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value?: string | null;
-}> = ({ icon: Icon, label, value }) => {
+  className?: string;
+}> = ({ icon: Icon, label, value, className }) => {
   if (!value) return null;
 
   return (
-    <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-600" title={label}>
+    <span
+      className={tailwind('flex min-w-0 items-center gap-1.5 text-sm text-ink-600', className)}
+      title={label}
+    >
       <Icon className="h-3.5 w-3.5 shrink-0 text-ink-400" aria-hidden />
       <span className="truncate">{value}</span>
     </span>
@@ -82,11 +86,12 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="mb-2 flex items-start justify-between gap-3">
+      <div className="mb-2 flex items-center justify-between gap-3">
         <InlineDatum
           icon={User}
           label="Nombre"
           value={getFullName(patient.firstName, patient.lastName)}
+          className="text-brand-700 [&_svg]:text-brand-500"
         />
 
         <button
