@@ -30,6 +30,7 @@ export interface PatientDocument {
   originalName: string;
   category: DocumentCategory;
   uploadedAt: string;
+  uploadedByUuid: string;
   size: number;
   url: string;
 }
@@ -43,5 +44,8 @@ export interface DocumentItem {
   categoryLabel: string;
   kind: DocumentKind;
   uploadedAtLabel: string;
+  uploadedByUuid: string;
   sizeLabel: string;
 }
+
+export const DOCUMENT_NAME_MAX_LENGTH = 255;

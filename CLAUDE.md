@@ -75,6 +75,7 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | `brand-assets` | Regenerar logo, favicon o variantes desde el manual vectorial |
 | `ui-audit` | Auditar la interfaz contra las reglas antes de un push |
 | `nueva-seccion` | Añadir un CRUD completo siguiendo los patrones del proyecto |
+| `commit` | Redactar el mensaje de commit (qué se hizo / qué se probó). Skill de usuario, no vive en este repo — aplica en cualquier proyecto de la cuenta |
 
 ## Al cerrar una etapa
 

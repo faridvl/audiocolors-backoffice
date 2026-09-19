@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { X, ExternalLink, FileQuestion } from 'lucide-react';
 import { DocumentItem, DocumentKind } from '@/types/documents/document.types';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 
 interface DocumentPreviewModalProps {
   document: DocumentItem | null;
@@ -12,6 +13,8 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   document: item,
   onClose,
 }) => {
+  const resolveAuthorLabel = useResolveAuthorLabel();
+
   useEffect(() => {
     if (!item) return undefined;
 
@@ -51,6 +54,9 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>
               {item.categoryLabel} · {item.sizeLabel} · {item.uploadedAtLabel}
+            </Typography>
+            <Typography variant={TypographyVariant.HELPER}>
+              {resolveAuthorLabel(item.uploadedByUuid)}
             </Typography>
           </div>
 
