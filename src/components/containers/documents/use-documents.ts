@@ -26,8 +26,14 @@ const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
 
-function resolveDocumentKind(name: string, url: string): DocumentKind {
-  const target = (name || url).toLowerCase();
+/**
+ * El tipo de archivo se decide por la URL (el archivo real en R2), nunca por
+ * `name`: el nombre se puede editar libremente y el archivo subyacente no
+ * cambia, así que basarse en el nombre rompería el preview en cuanto alguien
+ * renombrara un PDF sin dejarle la extensión .pdf.
+ */
+function resolveDocumentKind(url: string): DocumentKind {
+  const target = url.toLowerCase();
 
   if (target.endsWith('.pdf')) return DocumentKind.PDF;
   if (IMAGE_EXTENSIONS.some((extension) => target.endsWith(extension))) return DocumentKind.IMAGE;
@@ -46,7 +52,7 @@ function mapToDocumentItem(document: PatientDocument): DocumentItem {
     url: document.url,
     category,
     categoryLabel: DOCUMENT_CATEGORY_LABELS[category],
-    kind: resolveDocumentKind(document.originalName, document.url),
+    kind: resolveDocumentKind(document.url),
     uploadedAtLabel: formatDate(document.uploadedAt),
     uploadedByUuid: document.uploadedByUuid,
     sizeLabel: formatFileSize(document.size),
