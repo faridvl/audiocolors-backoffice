@@ -11,11 +11,11 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const isDev = host.includes('dev-backoffice') || host.includes('localhost') || host.includes('127.0.0.1');
   const iconSuffix = isDev ? '-dev' : '';
   /** Azul de la R (produccion) vs morado de la S (desarrollo) — BRAND.md. */
-  const themeColor = isDev ? '#604290' : '#1e6cae';
+  const themeColor = isDev ? '#613f90' : '#1f6fb1';
 
   const manifest = {
     id: '/',
-    name: isDev ? '[DEV] AudioColors · Expedientes' : 'AudioColors · Expedientes',
+    name: isDev ? '[DEV] AudioColors · Gestión Clínica' : 'AudioColors · Gestión Clínica',
     short_name: isDev ? '[DEV] AudioColors' : 'AudioColors',
     description: 'Sistema de expedientes y archivos de pacientes de AudioColors.',
     start_url: '/',
@@ -34,7 +34,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     ],
     theme_color: themeColor,
-    background_color: '#ffffff',
+    background_color: isDev ? '#181d37' : '#ffffff',
   };
 
   res.setHeader('Content-Type', 'application/manifest+json');

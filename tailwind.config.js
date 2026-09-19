@@ -29,16 +29,16 @@ module.exports = {
       colors: {
         brand: {
           50: '#e9f3fb',
-          100: '#d3e7f8',
+          100: '#d4e7f7',
           200: '#a8cff0',
-          300: '#74b2e7',
-          400: '#3b93dd',
-          DEFAULT: '#1e6cae',
-          500: '#1e6cae',
-          600: '#18568b',
+          300: '#74b3e7',
+          400: '#3b94dd',
+          DEFAULT: '#1f6fb1',
+          500: '#1f6fb1',
+          600: '#18578b',
           700: '#124168',
-          800: '#0c2b46',
-          900: '#071827',
+          800: '#0c2c46',
+          900: '#071927',
         },
         ink: {
           50: '#fafafa',
@@ -58,10 +58,12 @@ module.exports = {
         danger: '#ef4444',
         info: '#3b82f6',
         /** Azul oscuro de marca: fondo de la variante dark del logo (BRAND.md). */
-        midnight: '#1a1a2e',
+        midnight: '#181d37',
+        /** Morado de la S del logo: marca visual del entorno de desarrollo (BRAND.md). */
+        'dev-accent': '#613f90',
       },
       fontFamily: {
-        sans: ['Manrope', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Fira Sans', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
       },
       borderRadius: {
         card: '0.75rem',

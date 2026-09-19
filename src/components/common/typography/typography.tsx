@@ -4,7 +4,7 @@ import { tailwind } from '@/utils/tailwind-utils';
 /**
  * Escala tipografica unica. Toda variante define su salto responsive
  * (mobile -> desktop) aqui, para que ninguna pantalla improvise tamanos.
- * Fuente: Manrope (la misma del sitio publico y del EDUS de la CCSS).
+ * Fuente: Fira Sans (manual de marca oficial).
  */
 export enum TypographyVariant {
   /** Titulo de pagina. */
