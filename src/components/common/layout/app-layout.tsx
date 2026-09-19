@@ -50,14 +50,23 @@ const UserMenu: React.FC = () => {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-0 z-20 mt-2 w-52 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
+        <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
+          <div className="border-b border-ink-100 px-3 py-2 sm:hidden">
+            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
+              {user?.fullName ?? 'Cargando...'}
+            </Typography>
+            <Typography variant={TypographyVariant.HELPER} className="truncate">
+              {tenant?.businessName ?? ''}
+            </Typography>
+          </div>
+
           <Menu.Item>
             {({ active }) => (
               <button
                 type="button"
                 onClick={logout}
                 className={tailwind(
-                  'flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                  'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
                   active && 'bg-ink-50',
                 )}
               >
@@ -112,7 +121,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             variant={TypographyVariant.HELPER}
             className="mt-1.5 block uppercase tracking-[0.18em] text-ink-400"
           >
-            Expedientes
+            Gestión Clínica
           </Typography>
         </div>
 

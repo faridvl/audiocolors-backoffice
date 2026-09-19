@@ -7,7 +7,7 @@ export default function NewPatientPage() {
   return (
     <>
       <Head>
-        <title>Nuevo paciente · AudioColors Expedientes</title>
+        <title>Nuevo paciente · AudioColors Gestión Clínica</title>
       </Head>
 
       <AppLayout title="Nuevo paciente">

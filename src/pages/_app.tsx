@@ -21,7 +21,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
-        <title>AudioColors · Expedientes</title>
+        <title>AudioColors · Gestión Clínica</title>
         <meta
           name="description"
           content="Sistema de expedientes y archivos de pacientes de AudioColors."
