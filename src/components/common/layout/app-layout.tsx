@@ -155,14 +155,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
           className="flex items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 py-3 md:px-6"
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
         >
-          <div className="flex min-w-0 items-center gap-2 md:gap-3">
+          <div className="flex min-w-0 items-center gap-1 md:gap-2">
             {backHref ? (
               <Link
                 href={backHref}
                 aria-label="Volver"
-                className="-ml-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
+                className="-ml-2.5 flex h-11 w-11 shrink-0 items-center justify-center text-ink-500 transition-colors hover:text-ink-800"
               >
-                <ArrowLeft className="h-5 w-5" aria-hidden />
+                <ArrowLeft className="h-4 w-4" aria-hidden />
               </Link>
             ) : (
               <BrandLogo height={28} className="shrink-0 md:hidden" />

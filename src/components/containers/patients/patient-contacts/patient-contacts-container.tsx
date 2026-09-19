@@ -101,11 +101,13 @@ const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, 
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Ej. Juan (hijo)"
                 maxLength={80}
                 autoFocus
                 className={inputBaseClasses}
               />
+              <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
+                Incluí el parentesco, por ejemplo: Juan (hijo)
+              </Typography>
             </div>
 
             <div className="flex flex-col gap-1">
@@ -118,10 +120,12 @@ const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, 
                 inputMode="numeric"
                 value={phone}
                 onChange={(event) => handlePhoneChange(event.target.value)}
-                placeholder="XXXX-XXXX"
                 maxLength={20}
                 className={`${inputBaseClasses} sm:w-40`}
               />
+              <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
+                Formato: 8888-8888
+              </Typography>
             </div>
 
             <div className="flex shrink-0 gap-2">

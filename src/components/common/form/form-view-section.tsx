@@ -32,7 +32,9 @@ export const FormViewSection: React.FC<FormViewSectionProps> = ({
   >
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
-        <Typography variant={TypographyVariant.SUBTITLE}>{title}</Typography>
+        <Typography variant={TypographyVariant.SUBTITLE} className="text-lg md:text-xl">
+          {title}
+        </Typography>
         {caption && (
           <Typography variant={TypographyVariant.HELPER} className="mt-1">
             {caption}

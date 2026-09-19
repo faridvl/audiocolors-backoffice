@@ -55,14 +55,8 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
     <Form className="flex flex-col gap-6">
       <FormViewSection title="Datos personales">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField name="firstName" label="Nombre" placeholder="Maria" required maxLength={60} />
-          <FormField
-            name="lastName"
-            label="Apellidos"
-            placeholder="Rodriguez Solis"
-            required
-            maxLength={60}
-          />
+          <FormField name="firstName" label="Nombre" required maxLength={60} />
+          <FormField name="lastName" label="Apellidos" required maxLength={60} />
 
           <FormField name="documentType" label="Tipo de documento" as="select" required>
             {Object.values(DocumentType).map((type) => (
@@ -75,7 +69,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
           <FormField
             name="documentId"
             label="Número de documento"
-            placeholder={documentMask.placeholder}
+            hint={`Formato: ${documentMask.placeholder}`}
             maxLength={documentMask.maxLength}
             onChange={handleDocumentChange}
             inputMode={values.documentType === DocumentType.PASSPORT ? 'text' : 'numeric'}
@@ -84,7 +78,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 
           <FormField name="birthDate" label="Fecha de nacimiento" type="date" required />
 
-          <FormField name="gender" label="Género" as="select">
+          <FormField name="gender" label="Género" as="select" optional>
             <option value="">Sin especificar</option>
             {Object.values(PatientGender).map((gender) => (
               <option key={gender} value={gender}>
@@ -93,7 +87,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             ))}
           </FormField>
 
-          <FormField name="branchUuid" label="Sede" as="select">
+          <FormField name="branchUuid" label="Sede" as="select" optional>
             <option value="">Sin especificar</option>
             {(branches ?? []).map((branch) => (
               <option key={branch.uuid} value={branch.uuid}>
@@ -109,24 +103,19 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
           <FormField
             name="phone"
             label="Teléfono"
-            placeholder={maskPhone ? '8888-8888' : '+506 8888-8888'}
+            hint={maskPhone ? 'Formato: 8888-8888' : 'Formato: +506 8888-8888'}
             onChange={handlePhoneChange}
             inputMode="tel"
             required
           />
-          <FormField
-            name="email"
-            label="Correo electrónico"
-            type="email"
-            placeholder="paciente@correo.com"
-            hint="Opcional"
-          />
+          <FormField name="email" label="Correo electrónico" type="email" optional />
           <FormField
             name="address"
             label="Dirección"
             as="textarea"
             maxLength={240}
-            placeholder="Provincia, canton, senas exactas"
+            hint="Provincia, cantón y señas exactas"
+            optional
             className="sm:col-span-2"
           />
 
@@ -153,7 +142,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
                               <FormField
                                 name={`contacts.${index}.name`}
                                 label="Nombre de contacto adicional"
-                                placeholder="Ej. Juan (hijo)"
+                                hint="Incluí el parentesco, por ejemplo: Juan (hijo)"
                                 maxLength={80}
                               />
                             </div>
@@ -161,7 +150,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
                               <FormField
                                 name={`contacts.${index}.phone`}
                                 label="Teléfono"
-                                placeholder="8888-8888"
+                                hint="Formato: 8888-8888"
                                 inputMode="tel"
                                 onChange={(event) =>
                                   setFieldValue(

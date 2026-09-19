@@ -157,7 +157,7 @@ export function ResponsiveTable<T>({
                   key={column.key}
                   style={column.width?.includes('%') ? { width: column.width } : undefined}
                   className={tailwind(
-                    'px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-ink-500',
+                    'px-4 py-3 text-left text-sm font-bold uppercase tracking-wide text-ink-600',
                     column.width?.startsWith('w-') && column.width,
                   )}
                 >
@@ -174,7 +174,7 @@ export function ResponsiveTable<T>({
                 key={getRowKey(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={tailwind(
-                  'border-b border-ink-100 last:border-b-0 transition-colors',
+                  'border-b border-ink-200 last:border-b-0 transition-colors',
                   onRowClick && 'cursor-pointer hover:bg-ink-50',
                 )}
               >
@@ -219,7 +219,9 @@ export function ResponsiveTable<T>({
                 {detailColumns.map((column) => (
                   <div key={column.key} className="flex items-baseline justify-between gap-3">
                     <dt className="shrink-0">
-                      <Typography variant={TypographyVariant.HELPER}>{column.header}</Typography>
+                      <Typography variant={TypographyVariant.HELPER} className="font-bold">
+                        {column.header}
+                      </Typography>
                     </dt>
                     <dd className="min-w-0 text-right text-sm text-ink-700">
                       {column.render(row)}

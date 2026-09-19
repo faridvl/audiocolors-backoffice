@@ -24,7 +24,12 @@ export const patientCreateInitialValues: PatientFormValues = {
 
 /** Traduce errores del API a mensajes de campo cuando se puede identificar. */
 function resolveFieldError(message: string): { field: keyof PatientFormValues; text: string } | null {
-  const normalized = message.toLowerCase();
+  // El API responde con tildes ("cédula ya está registrada"): se normaliza
+  // quitando diacríticos para que el .includes() no falle por eso.
+  const normalized = message
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
 
   if (normalized.includes('cedula') || normalized.includes('documentid')) {
     return { field: 'documentId', text: 'Esta cédula ya está registrada' };
