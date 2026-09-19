@@ -86,7 +86,7 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="mb-2 flex items-center justify-between gap-3">
+      <div className="mb-3 flex items-center justify-between gap-3">
         <InlineDatum
           icon={User}
           label="Nombre"
@@ -100,9 +100,9 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
           aria-label={scheduleTitle}
           title={scheduleTitle}
           className={tailwind(
-            'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-ink-500',
-            'transition-colors hover:bg-ink-100 hover:text-brand-700',
-            'md:px-3 md:py-1.5 md:text-sm md:font-medium md:text-brand-700 md:hover:bg-brand-50',
+            'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
+            'transition-colors hover:bg-brand-50',
+            'md:px-3 md:py-1.5 md:text-sm md:font-medium',
           )}
         >
           <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
@@ -155,7 +155,7 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
           type="button"
           onClick={() => setShowAllData((previous) => !previous)}
           aria-expanded={showAllData}
-          className="mt-2 text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 hover:underline"
+          className="mt-3 text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 hover:underline"
         >
           {showAllData ? 'Ocultar datos' : 'Ver todos los datos'}
         </button>
