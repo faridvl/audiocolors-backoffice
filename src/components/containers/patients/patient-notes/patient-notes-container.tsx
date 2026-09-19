@@ -82,10 +82,15 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
               onChange={handleMonthFilterChange}
               ariaLabel="Filtrar notas por mes"
               placeholderLabel="Mes"
+              className="w-32 sm:w-auto"
             />
           )}
 
-          <Button variant={ButtonVariant.SECONDARY} onClick={handleStartAdding}>
+          <Button
+            variant={ButtonVariant.SECONDARY}
+            onClick={handleStartAdding}
+            className="shrink-0"
+          >
             Agregar nota
           </Button>
         </div>

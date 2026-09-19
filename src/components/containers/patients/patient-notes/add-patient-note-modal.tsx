@@ -88,7 +88,7 @@ export const AddPatientNoteModal: React.FC<AddPatientNoteModalProps> = ({
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <div className="mt-5 flex justify-end gap-2">
           <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} disabled={isCreating}>
             Cancelar
           </Button>
