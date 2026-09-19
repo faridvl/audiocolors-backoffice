@@ -219,7 +219,9 @@ export function ResponsiveTable<T>({
                 {detailColumns.map((column) => (
                   <div key={column.key} className="flex items-baseline justify-between gap-3">
                     <dt className="shrink-0">
-                      <Typography variant={TypographyVariant.HELPER}>{column.header}</Typography>
+                      <Typography variant={TypographyVariant.HELPER} className="font-bold">
+                        {column.header}
+                      </Typography>
                     </dt>
                     <dd className="min-w-0 text-right text-sm text-ink-700">
                       {column.render(row)}
