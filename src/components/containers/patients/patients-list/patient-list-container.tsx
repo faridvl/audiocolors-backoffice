@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Search, Pencil } from 'lucide-react';
 import { Patient } from '@/types/patients/patient';
+import { Branch } from '@/types/branches/branch';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -8,8 +9,8 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
 import { formatDate, getFullName } from '@/shared/utils/formatters';
-import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import {
   usePatientList,
   MONTH_FILTER_OPTIONS,
@@ -17,57 +18,51 @@ import {
   ALL_VALUE,
 } from './use-patient-list';
 
-const columns: TableColumn<Patient>[] = [
-  {
-    key: 'name',
-    header: 'Paciente',
-    width: '32%',
-    isCardTitle: true,
-    render: (patient) => (
-      <div className="flex flex-col">
-        <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-          {getFullName(patient.firstName, patient.lastName)}
-        </Typography>
-        {patient.email && (
-          <Typography variant={TypographyVariant.HELPER}>{patient.email}</Typography>
-        )}
-      </div>
-    ),
-  },
-  {
-    key: 'documentId',
-    header: 'Cédula',
-    width: '18%',
-    render: (patient) => patient.documentId || '—',
-  },
-  {
-    key: 'phone',
-    header: 'Teléfono',
-    width: '18%',
-    render: (patient) => patient.phone || '—',
-  },
-  {
-    key: 'nextAppointmentAt',
-    header: 'Próxima cita',
-    width: '15%',
-    render: (patient) => formatDate(patient.nextAppointmentAt ?? undefined),
-  },
-  {
-    key: 'status',
-    header: 'Estado',
-    width: '12%',
-    render: (patient) => (
-      <span
-        className={tailwind(
-          'inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
-          STATUS_STYLES[patient.isActive ? StatusTone.ACTIVE : StatusTone.INACTIVE],
-        )}
-      >
-        {patient.isActive ? 'Activo' : 'Inactivo'}
-      </span>
-    ),
-  },
-];
+function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
+  return [
+    {
+      key: 'name',
+      header: 'Paciente',
+      width: '32%',
+      isCardTitle: true,
+      render: (patient) => (
+        <div className="flex flex-col">
+          <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+            {getFullName(patient.firstName, patient.lastName)}
+          </Typography>
+          {patient.email && (
+            <Typography variant={TypographyVariant.HELPER}>{patient.email}</Typography>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'documentId',
+      header: 'Cédula',
+      width: '18%',
+      render: (patient) => patient.documentId || '—',
+    },
+    {
+      key: 'phone',
+      header: 'Teléfono',
+      width: '18%',
+      render: (patient) => patient.phone || '—',
+    },
+    {
+      key: 'branch',
+      header: 'Sede',
+      width: '17%',
+      render: (patient) =>
+        branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? '—',
+    },
+    {
+      key: 'nextAppointmentAt',
+      header: 'Próxima cita',
+      width: '15%',
+      render: (patient) => formatDate(patient.nextAppointmentAt ?? undefined),
+    },
+  ];
+}
 
 export const PatientListContainer: React.FC = () => {
   const {
@@ -89,6 +84,9 @@ export const PatientListContainer: React.FC = () => {
     navigateToDetail,
     navigateToEdit,
   } = usePatientList();
+
+  const { data: branches } = useBranchesQuery();
+  const columns = useMemo(() => buildColumns(branches), [branches]);
 
   const createButton = (
     <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate} className="w-full sm:w-auto">
