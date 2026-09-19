@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { usePatientsQuery, PatientStatusFilter } from '@/shared/api/querys/patients-query';
 import { useNavigation } from '@/hooks/use-navigation';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE_DEFAULT = 7;
+const PAGE_SIZE_FILTERED = 10;
 export const ALL_VALUE = 'all';
 
 export const MONTH_FILTER_OPTIONS: { label: string; value: string }[] = [
@@ -61,9 +62,12 @@ export function usePatientList() {
       ? `${yearFilter !== ALL_VALUE ? yearFilter : new Date().getFullYear()}-${monthFilter}`
       : undefined;
 
+  const hasActiveFilters = debouncedSearch.trim().length > 0 || !!nextAppointmentMonth;
+  const pageSize = hasActiveFilters ? PAGE_SIZE_FILTERED : PAGE_SIZE_DEFAULT;
+
   const { data, isLoading, isError, refetch } = usePatientsQuery(
     page,
-    PAGE_SIZE,
+    pageSize,
     debouncedSearch,
     PatientStatusFilter.ALL,
     nextAppointmentMonth,
@@ -78,8 +82,6 @@ export function usePatientList() {
     setYearFilter(value);
     setPage(1);
   };
-
-  const hasActiveFilters = debouncedSearch.trim().length > 0 || !!nextAppointmentMonth;
 
   return {
     patients: data?.data ?? [],
