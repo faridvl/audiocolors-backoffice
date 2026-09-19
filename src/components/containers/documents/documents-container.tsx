@@ -3,6 +3,7 @@ import {
   Search,
   Upload,
   Trash2,
+  Pencil,
   FileText,
   Image as ImageIcon,
   File as FileIcon,
@@ -22,9 +23,11 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
 import { tailwind } from '@/utils/tailwind-utils';
+import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useDocuments, ACCEPTED_MIME_TYPES } from './use-documents';
 import { DocumentPreviewModal } from './document-preview-modal';
 import { ConfirmDeleteModal } from './confirm-delete-modal';
+import { RenameDocumentModal } from './rename-document-modal';
 
 const KIND_ICONS: Record<DocumentKind, React.ComponentType<{ className?: string }>> = {
   [DocumentKind.IMAGE]: ImageIcon,
@@ -42,11 +45,19 @@ const FILTER_OPTIONS = [
 
 interface DocumentCardProps {
   document: DocumentItem;
+  authorLabel: string;
   onPreview: () => void;
+  onRename: () => void;
   onDelete: () => void;
 }
 
-const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPreview, onDelete }) => {
+const DocumentCard: React.FC<DocumentCardProps> = ({
+  document,
+  authorLabel,
+  onPreview,
+  onRename,
+  onDelete,
+}) => {
   const Icon = KIND_ICONS[document.kind];
 
   return (
@@ -68,17 +79,28 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPreview, onDele
             {document.categoryLabel} &middot; {document.sizeLabel}
           </Typography>
           <Typography variant={TypographyVariant.HELPER}>{document.uploadedAtLabel}</Typography>
+          <Typography variant={TypographyVariant.HELPER}>{authorLabel}</Typography>
         </span>
       </button>
 
-      <button
-        type="button"
-        onClick={onDelete}
-        aria-label={`Eliminar ${document.name}`}
-        className="absolute right-2 top-2 rounded-lg p-1.5 text-ink-400 opacity-0 transition-opacity hover:bg-danger/10 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-      >
-        <Trash2 className="h-4 w-4" aria-hidden />
-      </button>
+      <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
+        <button
+          type="button"
+          onClick={onRename}
+          aria-label={`Renombrar ${document.name}`}
+          className="rounded-lg p-1.5 text-ink-400 hover:bg-brand-50 hover:text-brand-600"
+        >
+          <Pencil className="h-4 w-4" aria-hidden />
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label={`Eliminar ${document.name}`}
+          className="rounded-lg p-1.5 text-ink-400 hover:bg-danger/10 hover:text-danger"
+        >
+          <Trash2 className="h-4 w-4" aria-hidden />
+        </button>
+      </div>
     </div>
   );
 };
@@ -113,7 +135,16 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
     setDocumentToDelete,
     handleConfirmDelete,
     isDeleting,
+    documentToRename,
+    renameValue,
+    handleStartRename,
+    handleCancelRename,
+    handleRenameValueChange,
+    handleConfirmRename,
+    isRenaming,
   } = useDocuments(patientUuid);
+
+  const resolveAuthorLabel = useResolveAuthorLabel();
 
   return (
     <section className="flex flex-col gap-4">
@@ -260,7 +291,9 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
             <DocumentCard
               key={document.uuid}
               document={document}
+              authorLabel={resolveAuthorLabel(document.uploadedByUuid)}
               onPreview={() => setPreviewDocument(document)}
+              onRename={() => handleStartRename(document)}
               onDelete={() => setDocumentToDelete(document)}
             />
           ))}
@@ -274,6 +307,15 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         isDeleting={isDeleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDocumentToDelete(null)}
+      />
+
+      <RenameDocumentModal
+        isOpen={!!documentToRename}
+        value={renameValue}
+        isRenaming={isRenaming}
+        onChange={handleRenameValueChange}
+        onConfirm={handleConfirmRename}
+        onCancel={handleCancelRename}
       />
     </section>
   );

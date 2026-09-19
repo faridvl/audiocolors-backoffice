@@ -8,6 +8,7 @@ import {
   DocumentItem,
   DocumentKind,
   DOCUMENT_CATEGORY_LABELS,
+  DOCUMENT_NAME_MAX_LENGTH,
   PatientDocument,
 } from '@/types/documents/document.types';
 import {
@@ -16,6 +17,7 @@ import {
 } from '@/shared/api/querys/patient-documents-query';
 import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/upload-document-mutation';
 import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/delete-document-mutation';
+import { useRenameDocumentMutation } from '@/shared/api/mutations/documents/rename-document-mutation';
 import { formatDate, formatFileSize } from '@/shared/utils/formatters';
 
 /** El API acepta imagenes y PDF, con un limite de 20 MB por archivo. */
@@ -24,8 +26,14 @@ const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
 
-function resolveDocumentKind(name: string, url: string): DocumentKind {
-  const target = (name || url).toLowerCase();
+/**
+ * El tipo de archivo se decide por la URL (el archivo real en R2), nunca por
+ * `name`: el nombre se puede editar libremente y el archivo subyacente no
+ * cambia, así que basarse en el nombre rompería el preview en cuanto alguien
+ * renombrara un PDF sin dejarle la extensión .pdf.
+ */
+function resolveDocumentKind(url: string): DocumentKind {
+  const target = url.toLowerCase();
 
   if (target.endsWith('.pdf')) return DocumentKind.PDF;
   if (IMAGE_EXTENSIONS.some((extension) => target.endsWith(extension))) return DocumentKind.IMAGE;
@@ -44,8 +52,9 @@ function mapToDocumentItem(document: PatientDocument): DocumentItem {
     url: document.url,
     category,
     categoryLabel: DOCUMENT_CATEGORY_LABELS[category],
-    kind: resolveDocumentKind(document.originalName, document.url),
+    kind: resolveDocumentKind(document.url),
     uploadedAtLabel: formatDate(document.uploadedAt),
+    uploadedByUuid: document.uploadedByUuid,
     sizeLabel: formatFileSize(document.size),
   };
 }
@@ -62,10 +71,13 @@ export function useDocuments(patientUuid: string) {
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [previewDocument, setPreviewDocument] = useState<DocumentItem | null>(null);
   const [documentToDelete, setDocumentToDelete] = useState<DocumentItem | null>(null);
+  const [documentToRename, setDocumentToRename] = useState<DocumentItem | null>(null);
+  const [renameValue, setRenameValue] = useState('');
 
   const { data, isLoading, isError, refetch } = usePatientDocumentsQuery(patientUuid);
   const { executeUploadDocument, isPending: isUploading } = useUploadDocumentMutation();
   const { executeDeleteDocument, isPending: isDeleting } = useDeleteDocumentMutation();
+  const { executeRenameDocument, isPending: isRenaming } = useRenameDocumentMutation();
 
   const documents = useMemo(() => (data ?? []).map(mapToDocumentItem), [data]);
 
@@ -142,6 +154,42 @@ export function useDocuments(patientUuid: string) {
     );
   };
 
+  const handleStartRename = (document: DocumentItem) => {
+    setDocumentToRename(document);
+    setRenameValue(document.name);
+  };
+
+  const handleCancelRename = () => {
+    setDocumentToRename(null);
+    setRenameValue('');
+  };
+
+  const handleRenameValueChange = (value: string) =>
+    setRenameValue(value.slice(0, DOCUMENT_NAME_MAX_LENGTH));
+
+  const handleConfirmRename = () => {
+    if (!documentToRename) return;
+
+    const trimmedName = renameValue.trim();
+
+    if (!trimmedName) {
+      toast.error('El nombre no puede estar vacío');
+      return;
+    }
+
+    executeRenameDocument(
+      { patientUuid, documentUuid: documentToRename.uuid, originalName: trimmedName },
+      {
+        onSuccess: () => {
+          toast.success('Archivo renombrado');
+          handleCancelRename();
+          void invalidateDocuments();
+        },
+        onError: (error: Error) => toast.error(error.message),
+      },
+    );
+  };
+
   return {
     documents: filteredDocuments,
     totalCount: documents.length,
@@ -167,5 +215,12 @@ export function useDocuments(patientUuid: string) {
     setDocumentToDelete,
     handleConfirmDelete,
     isDeleting,
+    documentToRename,
+    renameValue,
+    handleStartRename,
+    handleCancelRename,
+    handleRenameValueChange,
+    handleConfirmRename,
+    isRenaming,
   };
 }

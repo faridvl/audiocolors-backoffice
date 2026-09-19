@@ -61,6 +61,13 @@ export const patientEditValidationSchema = Yup.object({
     .required('El teléfono es obligatorio'),
 });
 
+export interface PatientContactFormValues {
+  /** Presente solo si el contacto ya existía al abrir el formulario. */
+  uuid?: string;
+  name: string;
+  phone: string;
+}
+
 export interface PatientFormValues {
   firstName: string;
   lastName: string;
@@ -71,4 +78,6 @@ export interface PatientFormValues {
   phone: string;
   email: string;
   address: string;
+  branchUuid: string;
+  contacts: PatientContactFormValues[];
 }

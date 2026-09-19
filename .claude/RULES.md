@@ -156,13 +156,28 @@ llegaron al texto visible. Hubo que corregir ~20 archivos después.
 **Al escribir texto visible en español, usar la herramienta Write o un script
 Python con `encoding='utf-8'`, no heredocs de bash.**
 
-### 5.2 Sin i18n
+### 5.2 i18n con `i18next` + `es.json`, patrón de Zynka
 
-Mono-idioma español, strings directos en el JSX. Zynka gasta ~61 KB en `es.json`
-+ `i18n.ts` para un solo idioma.
+**Decisión revertida (2026-09-16):** este proyecto declaraba "sin i18n,
+mono-idioma" — se revierte. Los textos hoy están hardcodeados directo en el
+JSX (~17 de 29 archivos `.tsx`); hay que migrar al mismo patrón que usa Zynka
+(`next-audiology-files`), que es la base de este repo y de billo/magastore:
 
-Esto **se aparta a propósito** de la regla 11 de `PATTERNS.md` de Zynka: aquella
-aplica a un SaaS multi-tenant; este es un back-office de una clínica.
+- `i18next` + `react-i18next`, inicializado por *side-effect import* en
+  `_app.tsx` (`import '@/shared/i18n/i18n';`), sin `I18nextProvider` explícito.
+- Keys tipadas en `src/static/texts/i18n.ts` — `export const TEXT = {...} as const`,
+  anidado por módulo (`PATIENTS.LIST.COLUMNS.NAME`, `AUTH.LOGIN.TITLE`, etc.).
+- Traducciones en `src/static/texts/es.json`, JSON anidado espejo de `TEXT`.
+- Uso: `const { t } = useTranslation()` en el componente, `t(TEXT.MODULO.CLAVE)`.
+  Interpolación con `{{variable}}` en el JSON y segundo argumento de `t()`
+  (ej. `t(TEXT.PATIENTS.DETAIL.COUNT, { count })`).
+
+**Ojo:** magastore-backoffice tiene esta infraestructura instalada pero con
+**0% de uso real** (es una copia sin terminar del setup de Zynka, incluso su
+`es.json` dice `"business.name": "Zynka"`). La referencia de patrón *en uso*
+real es Zynka (~30% de cobertura), no magastore.
+
+Ver pendiente en `STATUS.md` — no implementado todavía en esta sesión.
 
 ### 5.3 El texto sale de la variante tipográfica
 

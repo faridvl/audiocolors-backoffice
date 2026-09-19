@@ -104,7 +104,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     router.pathname === href || router.pathname.startsWith(`${href}/`);
 
   return (
-    <div className="flex min-h-screen bg-ink-50">
+    <div className="flex h-screen bg-ink-50">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-white px-3 py-5 md:flex">
         <div className="flex flex-col items-center border-b border-ink-100 px-2 pb-5">
           <BrandLogo height={42} priority />
@@ -141,7 +141,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </nav>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <header
           className="flex items-center justify-between gap-4 border-b border-ink-200 bg-white px-4 py-3 md:px-6"
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}

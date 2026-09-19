@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Pencil } from 'lucide-react';
+import { Search, Plus, Pencil, CalendarDays } from 'lucide-react';
 import { Patient } from '@/types/patients/patient';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
@@ -9,7 +9,12 @@ import { inputBaseClasses } from '@/components/common/input/input';
 import { formatDate, getFullName } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
-import { usePatientList, STATUS_FILTER_OPTIONS } from './use-patient-list';
+import {
+  usePatientList,
+  STATUS_FILTER_OPTIONS,
+  MONTH_FILTER_OPTIONS,
+  YEAR_FILTER_OPTIONS,
+} from './use-patient-list';
 
 const columns: TableColumn<Patient>[] = [
   {
@@ -41,10 +46,10 @@ const columns: TableColumn<Patient>[] = [
     render: (patient) => patient.phone || '—',
   },
   {
-    key: 'createdAt',
-    header: 'Registro',
-    width: '16%',
-    render: (patient) => formatDate(patient.createdAt),
+    key: 'nextAppointmentAt',
+    header: 'Próxima cita',
+    width: '15%',
+    render: (patient) => formatDate(patient.nextAppointmentAt ?? undefined),
   },
   {
     key: 'status',
@@ -69,12 +74,16 @@ export const PatientListContainer: React.FC = () => {
     meta,
     searchTerm,
     statusFilter,
+    monthFilter,
+    yearFilter,
     isLoading,
     isError,
     page,
     hasActiveFilters,
     setSearchTerm,
     handleStatusFilter,
+    handleMonthFilter,
+    handleYearFilter,
     handlePageChange,
     handleRetry,
     navigateToCreate,
@@ -131,6 +140,44 @@ export const PatientListContainer: React.FC = () => {
             ))}
           </div>
 
+          <div className="flex flex-col gap-1.5 sm:gap-1">
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="flex items-center gap-1 text-ink-500"
+            >
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden />
+              Próxima cita: mes y año
+            </Typography>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={monthFilter}
+                onChange={(event) => handleMonthFilter(event.target.value)}
+                aria-label="Filtrar por mes de próxima cita"
+                className={tailwind(inputBaseClasses, 'w-auto')}
+              >
+                {MONTH_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={yearFilter}
+                onChange={(event) => handleYearFilter(event.target.value)}
+                aria-label="Filtrar por año de próxima cita"
+                className={tailwind(inputBaseClasses, 'w-auto')}
+              >
+                {YEAR_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {createButton}
         </div>
       </div>
@@ -155,7 +202,7 @@ export const PatientListContainer: React.FC = () => {
         emptyDescription="Registra el primer paciente para comenzar."
         emptyAction={createButton}
         noResultsTitle="Sin resultados para tu búsqueda"
-        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de estado."
+        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de estado, mes o año."
         rowActions={(patient) => (
           <Button
             variant={ButtonVariant.GHOST}

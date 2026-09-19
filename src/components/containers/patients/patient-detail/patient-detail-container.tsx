@@ -1,10 +1,25 @@
 import React, { useState } from 'react';
-import { Phone, Mail, IdCard, Cake, MapPin, Loader2, AlertTriangle } from 'lucide-react';
+import {
+  Phone,
+  Mail,
+  IdCard,
+  Cake,
+  MapPin,
+  Building2,
+  CalendarPlus,
+  CalendarClock,
+  Loader2,
+  AlertTriangle,
+} from 'lucide-react';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
+import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
+import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
+import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { calculateAge, formatDate } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -33,8 +48,12 @@ const InlineDatum: React.FC<{
  * de pantalla. El nombre y la accion de editar viven en el header de la
  * pagina, no aqui.
  */
-const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
+const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => void }> = ({
+  patient,
+  onScheduleAppointment,
+}) => {
   const [showAllData, setShowAllData] = useState(false);
+  const { data: branches } = useBranchesQuery();
 
   const age = calculateAge(patient.birthDate);
   const genderLabel = patient.gender
@@ -45,30 +64,61 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
     .filter(Boolean)
     .join(' · ');
 
-  const hasExtraData = !!(patient.email || patient.address || patient.birthDate);
+  const branchName = patient.branchUuid
+    ? branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null
+    : null;
+
+  const hasExtraData = !!(
+    patient.email ||
+    patient.address ||
+    patient.birthDate ||
+    branchName ||
+    patient.createdAt
+  );
+
+  const scheduleTitle = patient.nextAppointmentAt
+    ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
+    : 'Agendar próxima cita';
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
-        <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
-        <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+          <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
+          <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
 
-        {demographics && (
-          <Typography variant={TypographyVariant.HELPER} inline>
-            {demographics}
-          </Typography>
-        )}
+          {demographics && (
+            <Typography variant={TypographyVariant.HELPER} inline>
+              {demographics}
+            </Typography>
+          )}
 
-        {!patient.isActive && (
-          <span
-            className={tailwind(
-              'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
-              STATUS_STYLES[StatusTone.INACTIVE],
-            )}
-          >
-            Inactivo
-          </span>
-        )}
+          {!patient.isActive && (
+            <span
+              className={tailwind(
+                'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
+                STATUS_STYLES[StatusTone.INACTIVE],
+              )}
+            >
+              Inactivo
+            </span>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={onScheduleAppointment}
+          aria-label={scheduleTitle}
+          title={scheduleTitle}
+          className={tailwind(
+            'flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg text-ink-500',
+            'w-9 transition-colors hover:bg-ink-100 hover:text-brand-700',
+            'md:w-auto md:px-3 md:text-sm md:font-medium md:text-brand-700 md:hover:bg-brand-50',
+          )}
+        >
+          <CalendarClock className="h-5 w-5 shrink-0 md:h-4 md:w-4" aria-hidden />
+          <span className="hidden md:inline">{scheduleTitle}</span>
+        </button>
       </div>
 
       {showAllData && (
@@ -80,6 +130,12 @@ const PatientSummary: React.FC<{ patient: Patient }> = ({ patient }) => {
           />
           <InlineDatum icon={Mail} label="Correo" value={patient.email} />
           <InlineDatum icon={MapPin} label="Dirección" value={patient.address} />
+          <InlineDatum icon={Building2} label="Sede" value={branchName} />
+          <InlineDatum
+            icon={CalendarPlus}
+            label="Registro"
+            value={patient.createdAt ? formatDate(patient.createdAt) : null}
+          />
         </div>
       )}
 
@@ -103,6 +159,7 @@ interface PatientDetailContainerProps {
 
 export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ uuid }) => {
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
+  const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
 
   if (isLoading) {
     return (
@@ -127,9 +184,23 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
 
   return (
     <div className="flex flex-col gap-4">
-      <PatientSummary patient={patient} />
+      <PatientSummary
+        patient={patient}
+        onScheduleAppointment={() => setIsSchedulingAppointment(true)}
+      />
+
+      <PatientContactsContainer patientUuid={patient.uuid} />
+
+      <PatientNotesContainer patientUuid={patient.uuid} />
 
       <DocumentsContainer patientUuid={patient.uuid} />
+
+      {isSchedulingAppointment && (
+        <ScheduleAppointmentModal
+          patientUuid={patient.uuid}
+          onClose={() => setIsSchedulingAppointment(false)}
+        />
+      )}
     </div>
   );
 };

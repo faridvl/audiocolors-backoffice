@@ -67,6 +67,7 @@ enlace "Ver todos los datos". Acentuación corregida en ~20 archivos.
 | P1-1 | Logo en SVG | El actual sale de vectores rasterizados a 1400px. Exportar SVG desde Illustrator da calidad infinita |
 | P1-2 | Limpiar el paciente inactivo huérfano | Requiere acceso a DB: el API no permite reactivar ni borrar del todo (ver D9) |
 | P1-3 | Paginación real del filtro "Inactivos" | Hoy filtra en cliente y su conteo no es exacto. Requiere cambio en el API |
+| P1-4 | **Migrar a i18n** (`i18next` + `es.json`, patrón de Zynka) | Revierte la regla anterior de "sin i18n" — ver RULES.md §5.2. Instalar `i18next`/`react-i18next`, crear `src/shared/i18n/i18n.ts` + `src/static/texts/i18n.ts` (`TEXT` const) + `es.json`, y migrar los ~17 archivos `.tsx` con strings hardcodeados. Magastore NO sirve de referencia de uso real (tiene el setup pero 0% adoptado); usar Zynka como modelo de convención de keys. |
 
 ### ⚪ Si el uso lo pide
 | # | Tarea | Notas |

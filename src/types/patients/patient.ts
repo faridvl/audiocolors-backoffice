@@ -30,9 +30,17 @@ export interface Patient {
   email?: string;
   gender?: string;
   documentId?: string;
+  branchUuid?: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt?: string;
+  /** Fecha ISO de la próxima cita CONFIRMED, o null si no tiene ninguna. */
+  nextAppointmentAt?: string | null;
+}
+
+export interface CreatePatientContactPayload {
+  name: string;
+  phone: string;
 }
 
 export interface CreatePatientPayload {
@@ -44,6 +52,8 @@ export interface CreatePatientPayload {
   email?: string;
   gender?: string;
   documentId?: string;
+  branchUuid?: string | null;
+  contacts?: CreatePatientContactPayload[];
 }
 
 export type UpdatePatientPayload = Partial<CreatePatientPayload>;

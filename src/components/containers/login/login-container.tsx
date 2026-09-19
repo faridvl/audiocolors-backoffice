@@ -69,7 +69,7 @@ export const LoginContainer: React.FC = () => {
               name="password"
               label="Contraseña"
               type="password"
-              placeholder="Tu contraseña"
+              placeholder="Contraseña"
               required
             />
 
