@@ -11,12 +11,7 @@ import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropd
 import { formatDate, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import {
-  usePatientList,
-  MONTH_FILTER_OPTIONS,
-  YEAR_FILTER_OPTIONS,
-  ALL_VALUE,
-} from './use-patient-list';
+import { usePatientList, ALL_VALUE } from './use-patient-list';
 
 function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
   return [
@@ -69,15 +64,14 @@ export const PatientListContainer: React.FC = () => {
     patients,
     meta,
     searchTerm,
-    monthFilter,
-    yearFilter,
+    appointmentMonthFilter,
+    appointmentMonthOptions,
     isLoading,
     isError,
     page,
     hasActiveFilters,
     setSearchTerm,
-    handleMonthFilter,
-    handleYearFilter,
+    handleAppointmentMonthFilter,
     handlePageChange,
     handleRetry,
     navigateToCreate,
@@ -118,25 +112,15 @@ export const PatientListContainer: React.FC = () => {
               Filtrar por próxima cita
             </Typography>
 
-            <div className="flex items-center gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
-              <FilterDropdown
-                value={monthFilter}
-                options={MONTH_FILTER_OPTIONS}
-                allValue={ALL_VALUE}
-                onChange={handleMonthFilter}
-                ariaLabel="Filtrar por mes de próxima cita"
-                placeholderLabel="Mes"
-              />
-
-              <FilterDropdown
-                value={yearFilter}
-                options={YEAR_FILTER_OPTIONS}
-                allValue={ALL_VALUE}
-                onChange={handleYearFilter}
-                ariaLabel="Filtrar por año de próxima cita"
-                placeholderLabel="Año"
-              />
-            </div>
+            <FilterDropdown
+              value={appointmentMonthFilter}
+              options={appointmentMonthOptions}
+              allValue={ALL_VALUE}
+              onChange={handleAppointmentMonthFilter}
+              ariaLabel="Filtrar por mes de próxima cita"
+              placeholderLabel="Mes"
+              className="w-full sm:w-auto"
+            />
           </div>
 
           {createButton}
@@ -163,7 +147,7 @@ export const PatientListContainer: React.FC = () => {
         emptyDescription="Registra el primer paciente para comenzar."
         emptyAction={createButton}
         noResultsTitle="Sin resultados para tu búsqueda"
-        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de mes o año."
+        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de próxima cita."
         rowActions={(patient) => (
           <Button
             variant={ButtonVariant.GHOST}
