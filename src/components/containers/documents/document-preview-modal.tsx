@@ -94,7 +94,14 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           )}
 
           {item.kind === DocumentKind.PDF && (
-            <iframe src={item.url} title={item.name} className="h-full w-full border-0 bg-white" />
+            // #view=FitH le pide al visor nativo de PDF ajustar la pagina al
+            // ancho disponible; sin esto, en mobile la pagina se muestra a su
+            // ancho real y queda cortada por el lado derecho.
+            <iframe
+              src={`${item.url}#view=FitH`}
+              title={item.name}
+              className="h-full w-full border-0 bg-white"
+            />
           )}
 
           {item.kind === DocumentKind.OTHER && (
