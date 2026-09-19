@@ -59,8 +59,14 @@ module.exports = {
         info: '#3b82f6',
         /** Azul oscuro de marca: fondo de la variante dark del logo (BRAND.md). */
         midnight: '#181d37',
-        /** Morado de la S del logo: marca visual del entorno de desarrollo (BRAND.md). */
-        'dev-accent': '#613f90',
+        /**
+         * Negro suavizado (no #000 puro, mas elegante en pantalla — estilo
+         * Uber): marca visual del entorno de desarrollo (BRAND.md). No es
+         * ninguno de los 6 colores del logo a proposito — un color de las
+         * letras (ej. el morado de la S) se pierde contra un fondo del mismo
+         * color, y el negro es neutro frente a las seis.
+         */
+        'dev-accent': '#0a0a0a',
       },
       fontFamily: {
         sans: ['Fira Sans', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],

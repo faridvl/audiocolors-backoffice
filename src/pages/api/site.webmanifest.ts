@@ -11,7 +11,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const isDev = host.includes('dev-backoffice') || host.includes('localhost') || host.includes('127.0.0.1');
   const iconSuffix = isDev ? '-dev' : '';
   /** Azul de la R (produccion) vs morado de la S (desarrollo) — BRAND.md. */
-  const themeColor = isDev ? '#613f90' : '#1f6fb1';
+  const themeColor = isDev ? '#0a0a0a' : '#1f6fb1';
 
   const manifest = {
     id: '/',
@@ -34,7 +34,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       },
     ],
     theme_color: themeColor,
-    background_color: isDev ? '#181d37' : '#ffffff',
+    background_color: isDev ? '#0a0a0a' : '#ffffff',
   };
 
   res.setHeader('Content-Type', 'application/manifest+json');

@@ -9,11 +9,20 @@ import { tailwind } from '@/utils/tailwind-utils';
 /**
  * Layout de pantalla partida para paginas publicas (login).
  *
- * En PRODUCCION, tanto el panel izquierdo (md+) como el fondo mobile
- * muestran una foto real de laboratorio (v2/laboratorio.jpeg) con overlay
- * navy, como el mockup del manual de marca. En DESARROLLO se usa el color
- * solido morado — asi el fondo tambien distingue el ambiente de un vistazo,
- * igual que favicons y theme-color.
+ * En PRODUCCION se usan DOS fotos reales de la clinica, una por formato —
+ * bg-cover con una sola imagen muy vertical (ideal en el telefono) recorta
+ * mal en el panel ancho de escritorio, y viceversa:
+ * - Panel izquierdo (md+, mas ancho que alto): laboratorio.jpeg, cuyo
+ *   contenido (manos + instrumental) esta repartido parejo, sin un punto
+ *   focal unico que se pueda perder al recortar.
+ * - Fondo mobile (retrato, igual de vertical que la foto): la nina con
+ *   audifono, tal como aparece en el material de marketing de la clinica.
+ * Ambas con el mismo tratamiento (blur leve + overlay navy). En DESARROLLO
+ * se usa negro solido en su lugar, con la leyenda "Ambiente de pruebas" — asi
+ * el fondo tambien distingue el ambiente de un vistazo, igual que favicons y
+ * theme-color. No se usa ninguno de los 6 colores de las letras del logo
+ * (p.ej. el morado de la S) porque esa letra perderia contraste contra un
+ * fondo del mismo color.
  *
  * En mobile el formulario vive en una card blanca elevada sobre ese fondo,
  * en vez de ocupar toda la pantalla en blanco liso: sin eso el login se veia
@@ -27,7 +36,7 @@ export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ children }
   const isDev = useIsDevEnvironment();
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden">
+    <div className="flex h-[100dvh] w-screen flex-col overflow-hidden">
       <BrandTopbar />
 
       <div className="flex min-h-0 flex-1">
@@ -36,10 +45,24 @@ export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ children }
             'relative hidden w-1/2 shrink-0 items-center justify-center overflow-hidden bg-cover bg-center md:flex',
             isDev ? 'bg-dev-accent' : 'bg-midnight',
           )}
-          style={isDev ? undefined : { backgroundImage: 'url(/login-bg.jpg)' }}
+          style={isDev ? undefined : { backgroundImage: 'url(/login-bg-desktop.jpg)' }}
         >
           <div className="flex flex-col items-center px-10">
             <BrandLogo height={132} onDark priority />
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="mt-2 uppercase tracking-[0.2em] text-ink-300"
+            >
+              Gestión Clínica
+            </Typography>
+            {isDev && (
+              <Typography
+                variant={TypographyVariant.HELPER}
+                className="mt-1 uppercase tracking-[0.2em] text-ink-400"
+              >
+                Ambiente de pruebas
+              </Typography>
+            )}
 
             <RainbowStripe className="mt-8 w-24 overflow-hidden rounded-full" />
 
@@ -60,6 +83,15 @@ export const SplitScreenLayout: React.FC<SplitScreenLayoutProps> = ({ children }
             )}
             style={!isDev ? { backgroundImage: 'url(/login-bg.jpg)' } : undefined}
           />
+
+          {isDev && (
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="relative mt-3 text-center uppercase tracking-[0.2em] text-ink-300 md:hidden"
+            >
+              Ambiente de pruebas
+            </Typography>
+          )}
 
           <div
             className="relative flex w-full flex-1 items-center justify-center px-5 py-10 sm:px-8"
