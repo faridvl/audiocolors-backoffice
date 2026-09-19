@@ -9,6 +9,7 @@ import {
   Building2,
   CalendarPlus,
   CalendarClock,
+  Pencil,
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
@@ -24,6 +25,7 @@ import { ScheduleAppointmentModal } from '@/components/containers/patients/sched
 import { calculateAge, formatDate, getFullName } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
+import { useNavigation } from '@/hooks/use-navigation';
 
 /** Dato en una linea: icono + valor. La etiqueta va en el title, no ocupa alto. */
 const InlineDatum: React.FC<{
@@ -50,12 +52,13 @@ const InlineDatum: React.FC<{
  *
  * Los documentos son lo que se consulta a diario, asi que los datos del
  * paciente se resumen en una franja: nunca deben empujar los archivos fuera
- * de pantalla. La accion de editar vive en el header de la pagina, no aqui.
+ * de pantalla.
  */
-const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => void }> = ({
-  patient,
-  onScheduleAppointment,
-}) => {
+const PatientSummary: React.FC<{
+  patient: Patient;
+  onScheduleAppointment: () => void;
+  onEdit: () => void;
+}> = ({ patient, onScheduleAppointment, onEdit }) => {
   const [showAllData, setShowAllData] = useState(false);
   const { data: branches } = useBranchesQuery();
 
@@ -72,13 +75,9 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
     ? branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null
     : null;
 
-  const hasExtraData = !!(
-    patient.email ||
-    patient.address ||
-    patient.birthDate ||
-    branchName ||
-    patient.createdAt
-  );
+  // Siempre true: aunque el paciente no tenga datos extra, el bloque expandido
+  // sigue dando acceso a gestionar sus telefonos adicionales.
+  const hasExtraData = true;
 
   const scheduleTitle = patient.nextAppointmentAt
     ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
@@ -94,20 +93,37 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
           className="text-brand-700 [&_svg]:text-brand-500"
         />
 
-        <button
-          type="button"
-          onClick={onScheduleAppointment}
-          aria-label={scheduleTitle}
-          title={scheduleTitle}
-          className={tailwind(
-            'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
-            'transition-colors hover:bg-brand-50',
-            'md:px-3 md:py-1.5 md:text-sm md:font-medium',
-          )}
-        >
-          <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
-          <span className="hidden md:inline">{scheduleTitle}</span>
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={onScheduleAppointment}
+            aria-label={scheduleTitle}
+            title={scheduleTitle}
+            className={tailwind(
+              'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
+              'transition-colors hover:bg-brand-50',
+              'md:px-3 md:py-1.5 md:text-sm md:font-medium',
+            )}
+          >
+            <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="hidden md:inline">{scheduleTitle}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label="Modificar paciente"
+            title="Modificar paciente"
+            className={tailwind(
+              'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
+              'transition-colors hover:bg-brand-50',
+              'md:px-3 md:py-1.5 md:text-sm md:font-medium',
+            )}
+          >
+            <Pencil className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="hidden md:inline">Modificar paciente</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
@@ -133,7 +149,7 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
       </div>
 
       {showAllData && (
-        <div className="mt-3 flex flex-col gap-y-2 border-t border-ink-100 pt-3 sm:flex-row sm:flex-wrap sm:gap-x-5">
+        <div className="mt-3 flex flex-col gap-y-2 border-t border-ink-100 pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
           <InlineDatum
             icon={Cake}
             label="Fecha de nacimiento"
@@ -147,6 +163,7 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
             label="Registro"
             value={patient.createdAt ? formatDate(patient.createdAt) : null}
           />
+          <PatientContactsContainer patientUuid={patient.uuid} />
         </div>
       )}
 
@@ -169,6 +186,7 @@ interface PatientDetailContainerProps {
 }
 
 export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ uuid }) => {
+  const navigation = useNavigation();
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
 
@@ -198,9 +216,8 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
       <PatientSummary
         patient={patient}
         onScheduleAppointment={() => setIsSchedulingAppointment(true)}
+        onEdit={() => navigation.patients.edit(patient.uuid)}
       />
-
-      <PatientContactsContainer patientUuid={patient.uuid} />
 
       <PatientNotesContainer patientUuid={patient.uuid} />
 

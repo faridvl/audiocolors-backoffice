@@ -21,7 +21,7 @@ export default function EditPatientPage() {
       </Head>
 
       <AppLayout
-        title="Editar paciente"
+        title="Modificar paciente"
         subtitle={patientName}
         backHref={uuid ? routesPrivate.patients.detail(uuid) : routesPrivate.patients.index}
       >

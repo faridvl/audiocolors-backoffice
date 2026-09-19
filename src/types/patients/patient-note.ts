@@ -7,6 +7,7 @@ export interface PatientNote {
   patientUuid: string;
   tenantUuid: string;
   authorUuid: string;
+  authorName: string | null;
   category: DocumentCategory;
   text: string;
   createdAt: string;
