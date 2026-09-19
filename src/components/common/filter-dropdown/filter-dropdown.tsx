@@ -53,13 +53,13 @@ export const FilterDropdown: React.FC<FilterDropdownProps> = ({
   const label = options.find((option) => option.value === value)?.label ?? '';
 
   return (
-    <span className="inline-flex items-center justify-center gap-1 rounded-lg border border-transparent bg-brand-50 px-3 py-2.5 text-base font-medium text-brand-700">
-      {label}
+    <span className="flex min-w-0 items-center justify-center gap-1 rounded-lg border border-transparent bg-brand-50 px-3 py-2.5 text-sm font-medium text-brand-700">
+      <span className="truncate">{label}</span>
       <button
         type="button"
         onClick={() => onChange(allValue)}
         aria-label={`Quitar filtro ${label}`}
-        className="rounded-full p-0.5 hover:bg-brand-100"
+        className="shrink-0 rounded-full p-0.5 hover:bg-brand-100"
       >
         <X className="h-3.5 w-3.5" aria-hidden />
       </button>
