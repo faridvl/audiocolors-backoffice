@@ -62,53 +62,50 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   const Icon = KIND_ICONS[document.kind];
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-card border border-ink-200 bg-white transition-shadow hover:shadow-md">
-      <button
-        type="button"
-        onClick={onPreview}
-        className="flex flex-1 flex-col items-start gap-3 p-4 text-left"
-      >
-        <span className="flex w-full items-center gap-2">
+    <div className="group flex flex-col overflow-hidden rounded-card border border-ink-200 bg-white transition-shadow hover:shadow-md">
+      <div className="flex items-start justify-between gap-3 p-4 pb-0">
+        <button
+          type="button"
+          onClick={onPreview}
+          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+        >
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50">
             <Icon className="h-4 w-4 text-brand-600" />
           </span>
-          <Typography
-            variant={TypographyVariant.HELPER}
-            className="line-clamp-2 min-w-0 break-words text-ink-700"
-          >
+          <Typography variant={TypographyVariant.HELPER} className="min-w-0 truncate text-ink-700">
             {document.name}
           </Typography>
-        </span>
-
-        <span className="flex min-w-0 flex-col">
-          <Typography variant={TypographyVariant.HELPER}>
-            {document.categoryLabel} &middot; {document.sizeLabel}
-          </Typography>
-          <Typography variant={TypographyVariant.HELPER}>{document.uploadedAtLabel}</Typography>
-          <Typography variant={TypographyVariant.HELPER}>
-            Registrado por: <span className="italic">{authorLabel}</span>
-          </Typography>
-        </span>
-      </button>
-
-      <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
-        <button
-          type="button"
-          onClick={onRename}
-          aria-label={`Renombrar ${document.name}`}
-          className="rounded-lg p-1.5 text-ink-400 hover:bg-brand-50 hover:text-brand-600"
-        >
-          <Pencil className="h-4 w-4" aria-hidden />
         </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          aria-label={`Eliminar ${document.name}`}
-          className="rounded-lg p-1.5 text-ink-400 hover:bg-danger/10 hover:text-danger"
-        >
-          <Trash2 className="h-4 w-4" aria-hidden />
-        </button>
+
+        <div className="flex shrink-0 items-center gap-0.5 -mr-1.5 -mt-1.5">
+          <button
+            type="button"
+            onClick={onRename}
+            aria-label={`Renombrar ${document.name}`}
+            className="rounded-lg p-1.5 text-ink-400 hover:bg-brand-50 hover:text-brand-600"
+          >
+            <Pencil className="h-4 w-4" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            aria-label={`Eliminar ${document.name}`}
+            className="rounded-lg p-1.5 text-ink-400 hover:bg-danger/10 hover:text-danger"
+          >
+            <Trash2 className="h-4 w-4" aria-hidden />
+          </button>
+        </div>
       </div>
+
+      <button type="button" onClick={onPreview} className="flex flex-1 flex-col items-start gap-1.5 p-4 pt-3 text-left">
+        <Typography variant={TypographyVariant.HELPER}>
+          {document.categoryLabel} &middot; {document.sizeLabel}
+        </Typography>
+        <Typography variant={TypographyVariant.HELPER}>{document.uploadedAtLabel}</Typography>
+        <Typography variant={TypographyVariant.HELPER}>
+          Registrado por: <span className="italic">{authorLabel}</span>
+        </Typography>
+      </button>
     </div>
   );
 };

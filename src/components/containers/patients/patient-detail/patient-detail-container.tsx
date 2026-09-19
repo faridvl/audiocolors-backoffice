@@ -75,13 +75,9 @@ const PatientSummary: React.FC<{
     ? branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null
     : null;
 
-  const hasExtraData = !!(
-    patient.email ||
-    patient.address ||
-    patient.birthDate ||
-    branchName ||
-    patient.createdAt
-  );
+  // Siempre true: aunque el paciente no tenga datos extra, el bloque expandido
+  // sigue dando acceso a gestionar sus telefonos adicionales.
+  const hasExtraData = true;
 
   const scheduleTitle = patient.nextAppointmentAt
     ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
@@ -153,7 +149,7 @@ const PatientSummary: React.FC<{
       </div>
 
       {showAllData && (
-        <div className="mt-3 flex flex-col gap-y-2 border-t border-ink-100 pt-3 sm:flex-row sm:flex-wrap sm:gap-x-5">
+        <div className="mt-3 flex flex-col gap-y-2 border-t border-ink-100 pt-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
           <InlineDatum
             icon={Cake}
             label="Fecha de nacimiento"
@@ -167,6 +163,7 @@ const PatientSummary: React.FC<{
             label="Registro"
             value={patient.createdAt ? formatDate(patient.createdAt) : null}
           />
+          <PatientContactsContainer patientUuid={patient.uuid} />
         </div>
       )}
 
@@ -221,8 +218,6 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         onScheduleAppointment={() => setIsSchedulingAppointment(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
       />
-
-      <PatientContactsContainer patientUuid={patient.uuid} />
 
       <PatientNotesContainer patientUuid={patient.uuid} />
 
