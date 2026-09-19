@@ -7,7 +7,7 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Iniciar sesión · AudioColors Expedientes</title>
+        <title>Iniciar sesión · AudioColors Gestión Clínica</title>
       </Head>
 
       <SplitScreenLayout>
