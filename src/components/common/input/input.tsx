@@ -23,6 +23,8 @@ interface FormFieldProps {
   type?: string;
   placeholder?: string;
   required?: boolean;
+  /** Marca el campo como "(Opcional)" junto al label, en vez de usar el placeholder para eso. */
+  optional?: boolean;
   disabled?: boolean;
   as?: 'input' | 'select' | 'textarea';
   maxLength?: number;
@@ -40,6 +42,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   type = 'text',
   placeholder,
   required = false,
+  optional = false,
   disabled = false,
   as = 'input',
   maxLength,
@@ -56,9 +59,10 @@ export const FormField: React.FC<FormFieldProps> = ({
   return (
     <div className={tailwind('flex flex-col gap-1.5', className)}>
       <label htmlFor={name}>
-        <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+        <Typography variant={TypographyVariant.BODY}>
           {label}
           {required && <span className="ml-0.5 text-danger">*</span>}
+          {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
         </Typography>
       </label>
 
