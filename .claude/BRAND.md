@@ -264,11 +264,26 @@ legible. Para el `.ico`, pasar `sizes=[(16,16),(32,32),(48,48)]` y
 embebe un tamaño.
 
 Para **apple-touch-icon / icon-192 / icon-512 / icon-512-maskable**: usar el
-isotipo completo (oreja + 6 puntos), centrado sobre un canvas cuadrado con
-margen (~14% para los íconos normales, ~40% para los maskable por su
-"safe zone"), aplanado sobre fondo opaco blanco (prod) o navy `#181d37`
-(dev) — estos formatos no soportan transparencia real en la práctica (iOS y
-Android rellenan con negro si el PNG trae alfa).
+isotipo completo (oreja + 6 puntos), centrado sobre un canvas cuadrado,
+aplanado sobre fondo opaco blanco (prod) o navy `#181d37` (dev) — estos
+formatos no soportan transparencia real en la práctica (iOS y Android
+rellenan con negro si el PNG trae alfa).
+
+**Margen para los no-maskable (apple-touch-icon, icon-192, icon-512):** el
+isotipo debe ocupar **~65-70% del ancho/alto del lienzo**, dejando **~15-17%
+de margen por lado** (contenido centrado). Una primera versión los generó al
+~86% del lienzo (~7% de margen) y el resultado se veía "pegado al borde"
+comparado con íconos reales de otras apps (se detectó comparando contra el
+ícono de Magastore en un iPhone real, que tiene bastante aire) — iOS aplica
+su propio recorte de esquina redondeada sobre el ícono cuadrado, y con tan
+poco margen el contenido queda visualmente apretado contra esa curva. El
+~67% usado en la práctica corresponde a redimensionar el isotipo para que su
+lado mayor mida `canvas_size * 0.67` antes de centrarlo.
+
+**Margen para los maskable (icon-512-maskable, icon-512-dev-maskable):** ya
+usan la "safe zone" estándar de Android (~40% de margen total, isotipo
+ocupando ~60% del lienzo) — medido y confirmado visualmente, no hace falta
+tocarlos.
 
 Verificar siempre el resultado con el chequeo de basura de bordes de la
 introducción de este documento antes de reemplazar los archivos en
