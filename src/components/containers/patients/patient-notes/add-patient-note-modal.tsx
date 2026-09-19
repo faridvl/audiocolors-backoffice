@@ -36,11 +36,11 @@ export const AddPatientNoteModal: React.FC<AddPatientNoteModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-ink-900/70 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
       onClick={onCancel}
     >
       <div
-        className="my-auto w-full max-w-md rounded-card bg-white p-5"
+        className="max-h-full w-full max-w-md overflow-y-auto rounded-card bg-white p-5"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start gap-3">
