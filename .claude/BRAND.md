@@ -61,9 +61,66 @@ sistema EDUS de la CCSS), pero el manual oficial no la especifica.
 | `public/favicon-{16,32,180}.png`, `favicon.ico` | Isotipo reducido: **solo la oreja** (sin puntos), gris oscuro `#1e1e1e`, fondo transparente. Único, sin sufijo dev/prod |
 | `public/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` | Isotipo completo (oreja + 6 puntos), variante **positivo**: oreja gris oscuro, fondo blanco `#ffffff` — producción |
 | `public/apple-touch-icon-dev.png`, `icon-192-dev.png`, `icon-512-dev.png`, `icon-512-dev-maskable.png` | Isotipo completo, variante **negativo**: oreja blanca, fondo navy `#181d37` — desarrollo |
+| `public/splash-{1290x2796,1179x2556,1170x2532,750x1334}.png` | Splash screen de iOS al abrir la PWA desde pantalla de inicio (producción) — fondo blanco `#ffffff`, wordmark a color |
+| `public/splash-{1290x2796,1179x2556,1170x2532,750x1334}-dev.png` | Mismos 4 tamaños, variante desarrollo — fondo casi negro `#0a0a0a`, wordmark a color completo (`logo-audiocolors-dark.png`: "audio" blanco + COLORS con sus 6 colores de marca) |
 
 Proporción del logo (wordmark completo): **2.49:1**. El componente `BrandLogo`
 recibe solo la altura y calcula el ancho.
+
+### Splash screens de iOS
+
+Sin un `<link rel="apple-touch-startup-image">` explícito por tamaño de
+pantalla, iOS Safari no genera un splash confiable a partir del
+`background_color` del manifest — muchas versiones caen a pantalla negra. Se
+declaran a mano en `_document.tsx`, un `<link>` por tamaño con `media` query
+(`device-width`/`device-height` en **CSS px**, no en los px reales del PNG,
+más `-webkit-device-pixel-ratio` y `orientation: portrait`), eligiendo sufijo
+`-dev` igual que `iconSuffix` para el `apple-touch-icon`.
+
+Cuatro tamaños cubiertos (los iPhone modernos más comunes en uso, portrait
+únicamente — no se cubre iPad ni landscape):
+
+| Archivo (px reales) | Dispositivo | CSS px @ DPR |
+|---|---|---|
+| `1290x2796` | 16/15/14 Pro Max | 430×932 @3x |
+| `1179x2556` | 16/15/14 Pro | 393×852 @3x |
+| `1170x2532` | 16/15/14/13 | 390×844 @3x |
+| `750x1334` | SE/8/7 | 375×667 @2x |
+
+Composición de cada splash, de arriba a abajo:
+
+1. Franja de 6 colores en el borde superior — la misma paleta y orden que
+   `RainbowStripe` (rojo, naranja, amarillo, verde, azul, morado), a todo el
+   ancho, grosor ~0.7% de la altura.
+2. Wordmark "audio COLORS" centrado, **50% del ancho** de la pantalla (grande
+   y protagonista, no un elemento chico perdido en el centro).
+3. "GESTIÓN CLÍNICA" debajo, versalitas con tracking moderado — mismo patrón
+   que el label bajo el logo en el sidebar y el login (`Typography` variante
+   `HELPER`, `uppercase`), pero con tamaño de fuente (~4.8% del ancho) y
+   tracking (10% del tamaño de fuente) ajustados para seguir siendo legible
+   reducido en pantalla de celular — el tracking amplio de la interfaz de
+   escritorio (`tracking-[0.2em]`) se vuelve manchas ilegibles a esta escala.
+   En las 8 variantes.
+4. "Ambiente de pruebas" debajo de eso, más chico (~3.4% del ancho) y
+   discreto (blanco semitransparente) — **solo** en las 4 variantes `-dev`.
+
+**Por qué fondo `#0a0a0a` (casi negro) en dev y no el morado que se usaba
+antes:** el morado `#613f90` es también el color de la "S" del wordmark —
+usarlo de fondo hace que esa letra se funda y pierda contraste (se verificó
+renderizando: la S se veía "lavada"). El casi-negro es neutro, tiene
+contraste de sobra con las 6 letras de marca (se midió: distancia mínima
+~144 con la S, el resto por encima de 177) y no compite con ninguna. Se usa
+`#0a0a0a` en vez de negro puro `#000000` por preferencia estética (menos
+duro en pantalla, mismo criterio que otras marcas). El wordmark en esta
+variante **sí conserva sus colores reales** (`logo-audiocolors-dark.png`:
+"audio" blanco + COLORS a color) — sobre `#0a0a0a` todas las letras
+contrastan bien, a diferencia de sobre morado.
+
+Este mismo `#0a0a0a` es ahora el color de "modo desarrollo" en toda la app,
+no solo en el splash: `theme-color` (meta tag de `_document.tsx`), el
+`theme_color`/`background_color` del manifest PWA (`site.webmanifest.ts`) y
+el token `dev-accent` de `tailwind.config.js` — todos alineados para que el
+morado deje de aparecer como fondo en ningún lado.
 
 ### El isotipo (oreja + 6 puntos)
 

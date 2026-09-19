@@ -113,7 +113,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     router.pathname === href || router.pathname.startsWith(`${href}/`);
 
   return (
-    <div className="flex h-screen bg-ink-50">
+    <div className="flex h-[100dvh] bg-ink-50">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-white px-3 py-5 md:flex">
         <div className="flex flex-col items-center border-b border-ink-100 px-2 pb-5">
           <BrandLogo height={42} priority />
