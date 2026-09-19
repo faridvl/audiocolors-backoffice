@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  User,
   Phone,
   Mail,
   IdCard,
@@ -81,9 +82,13 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <Typography variant={TypographyVariant.BODY} className="mb-2">
-        {getFullName(patient.firstName, patient.lastName)}
-      </Typography>
+      <div className="mb-2">
+        <InlineDatum
+          icon={User}
+          label="Nombre"
+          value={getFullName(patient.firstName, patient.lastName)}
+        />
+      </div>
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
