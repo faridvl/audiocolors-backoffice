@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Plus, Pencil } from 'lucide-react';
+import { Search, Plus, Pencil, CalendarDays } from 'lucide-react';
 import { Patient } from '@/types/patients/patient';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
@@ -140,32 +140,42 @@ export const PatientListContainer: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
-            <select
-              value={monthFilter}
-              onChange={(event) => handleMonthFilter(event.target.value)}
-              aria-label="Filtrar por mes de próxima cita"
-              className={tailwind(inputBaseClasses, 'w-auto')}
+          <div className="flex flex-col gap-1.5 sm:gap-1">
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="flex items-center gap-1 text-ink-500"
             >
-              {MONTH_FILTER_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden />
+              Próxima cita: mes y año
+            </Typography>
 
-            <select
-              value={yearFilter}
-              onChange={(event) => handleYearFilter(event.target.value)}
-              aria-label="Filtrar por año de próxima cita"
-              className={tailwind(inputBaseClasses, 'w-auto')}
-            >
-              {YEAR_FILTER_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center gap-2">
+              <select
+                value={monthFilter}
+                onChange={(event) => handleMonthFilter(event.target.value)}
+                aria-label="Filtrar por mes de próxima cita"
+                className={tailwind(inputBaseClasses, 'w-auto')}
+              >
+                {MONTH_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={yearFilter}
+                onChange={(event) => handleYearFilter(event.target.value)}
+                aria-label="Filtrar por año de próxima cita"
+                className={tailwind(inputBaseClasses, 'w-auto')}
+              >
+                {YEAR_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {createButton}
