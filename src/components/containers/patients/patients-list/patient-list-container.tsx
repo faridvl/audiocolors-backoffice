@@ -114,7 +114,7 @@ export const PatientListContainer: React.FC = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end xl:gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-end xl:gap-4">
           <div className="flex flex-col gap-1.5">
             <Typography variant={TypographyVariant.HELPER} className="text-ink-500">
               Filtrar por próxima cita
