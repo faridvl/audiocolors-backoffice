@@ -1,19 +1,20 @@
 import React from 'react';
-import { Search, Plus, Pencil, CalendarDays } from 'lucide-react';
+import { Search, Pencil } from 'lucide-react';
 import { Patient } from '@/types/patients/patient';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
+import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
 import { formatDate, getFullName } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
 import {
   usePatientList,
-  STATUS_FILTER_OPTIONS,
   MONTH_FILTER_OPTIONS,
   YEAR_FILTER_OPTIONS,
+  ALL_VALUE,
 } from './use-patient-list';
 
 const columns: TableColumn<Patient>[] = [
@@ -73,7 +74,6 @@ export const PatientListContainer: React.FC = () => {
     patients,
     meta,
     searchTerm,
-    statusFilter,
     monthFilter,
     yearFilter,
     isLoading,
@@ -81,7 +81,6 @@ export const PatientListContainer: React.FC = () => {
     page,
     hasActiveFilters,
     setSearchTerm,
-    handleStatusFilter,
     handleMonthFilter,
     handleYearFilter,
     handlePageChange,
@@ -92,12 +91,7 @@ export const PatientListContainer: React.FC = () => {
   } = usePatientList();
 
   const createButton = (
-    <Button
-      variant={ButtonVariant.PRIMARY}
-      onClick={navigateToCreate}
-      icon={<Plus className="h-4 w-4" aria-hidden />}
-      className="w-full sm:w-auto"
-    >
+    <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate} className="w-full sm:w-auto">
       Nuevo paciente
     </Button>
   );
@@ -120,61 +114,30 @@ export const PatientListContainer: React.FC = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between xl:justify-end xl:gap-4">
-          <div className="flex items-center gap-1" role="group" aria-label="Filtrar por estado">
-            {STATUS_FILTER_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                aria-pressed={statusFilter === option.value}
-                onClick={() => handleStatusFilter(option.value)}
-                className={tailwind(
-                  'rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                  statusFilter === option.value
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-ink-600 hover:bg-ink-100',
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-1.5 sm:gap-1">
-            <Typography
-              variant={TypographyVariant.HELPER}
-              className="flex items-center gap-1 text-ink-500"
-            >
-              <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-              Próxima cita: mes y año
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end xl:gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Typography variant={TypographyVariant.HELPER} className="text-ink-500">
+              Filtrar por próxima cita
             </Typography>
 
-            <div className="flex items-center gap-2">
-              <select
+            <div className="flex items-center gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
+              <FilterDropdown
                 value={monthFilter}
-                onChange={(event) => handleMonthFilter(event.target.value)}
-                aria-label="Filtrar por mes de próxima cita"
-                className={tailwind(inputBaseClasses, 'w-auto')}
-              >
-                {MONTH_FILTER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                options={MONTH_FILTER_OPTIONS}
+                allValue={ALL_VALUE}
+                onChange={handleMonthFilter}
+                ariaLabel="Filtrar por mes de próxima cita"
+                placeholderLabel="Mes"
+              />
 
-              <select
+              <FilterDropdown
                 value={yearFilter}
-                onChange={(event) => handleYearFilter(event.target.value)}
-                aria-label="Filtrar por año de próxima cita"
-                className={tailwind(inputBaseClasses, 'w-auto')}
-              >
-                {YEAR_FILTER_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                options={YEAR_FILTER_OPTIONS}
+                allValue={ALL_VALUE}
+                onChange={handleYearFilter}
+                ariaLabel="Filtrar por año de próxima cita"
+                placeholderLabel="Año"
+              />
             </div>
           </div>
 
@@ -202,7 +165,7 @@ export const PatientListContainer: React.FC = () => {
         emptyDescription="Registra el primer paciente para comenzar."
         emptyAction={createButton}
         noResultsTitle="Sin resultados para tu búsqueda"
-        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de estado, mes o año."
+        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de mes o año."
         rowActions={(patient) => (
           <Button
             variant={ButtonVariant.GHOST}

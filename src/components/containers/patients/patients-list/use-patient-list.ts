@@ -3,13 +3,7 @@ import { usePatientsQuery, PatientStatusFilter } from '@/shared/api/querys/patie
 import { useNavigation } from '@/hooks/use-navigation';
 
 const PAGE_SIZE = 10;
-const ALL_VALUE = 'all';
-
-export const STATUS_FILTER_OPTIONS: { label: string; value: PatientStatusFilter }[] = [
-  { label: 'Activos', value: PatientStatusFilter.ACTIVE },
-  { label: 'Inactivos', value: PatientStatusFilter.INACTIVE },
-  { label: 'Todos', value: PatientStatusFilter.ALL },
-];
+export const ALL_VALUE = 'all';
 
 export const MONTH_FILTER_OPTIONS: { label: string; value: string }[] = [
   { label: 'Todos', value: ALL_VALUE },
@@ -47,9 +41,6 @@ export function usePatientList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<PatientStatusFilter>(
-    PatientStatusFilter.ACTIVE,
-  );
   const [monthFilter, setMonthFilter] = useState<string>(ALL_VALUE);
   const [yearFilter, setYearFilter] = useState<string>(ALL_VALUE);
 
@@ -62,23 +53,21 @@ export function usePatientList() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Si se elige mes sin año, se asume el año actual sin reflejarlo en el
+  // selector: el usuario no lo eligió, así que no debe verse como un
+  // filtro activo (no se vuelve badge).
   const nextAppointmentMonth =
-    monthFilter !== ALL_VALUE && yearFilter !== ALL_VALUE
-      ? `${yearFilter}-${monthFilter}`
+    monthFilter !== ALL_VALUE
+      ? `${yearFilter !== ALL_VALUE ? yearFilter : new Date().getFullYear()}-${monthFilter}`
       : undefined;
 
   const { data, isLoading, isError, refetch } = usePatientsQuery(
     page,
     PAGE_SIZE,
     debouncedSearch,
-    statusFilter,
+    PatientStatusFilter.ALL,
     nextAppointmentMonth,
   );
-
-  const handleStatusFilter = (value: PatientStatusFilter) => {
-    setStatusFilter(value);
-    setPage(1);
-  };
 
   const handleMonthFilter = (value: string) => {
     setMonthFilter(value);
@@ -90,10 +79,7 @@ export function usePatientList() {
     setPage(1);
   };
 
-  const hasActiveFilters =
-    debouncedSearch.trim().length > 0 ||
-    statusFilter !== PatientStatusFilter.ACTIVE ||
-    !!nextAppointmentMonth;
+  const hasActiveFilters = debouncedSearch.trim().length > 0 || !!nextAppointmentMonth;
 
   return {
     patients: data?.data ?? [],
@@ -101,7 +87,6 @@ export function usePatientList() {
     // (meta.totalPages: 1): la paginación se oculta sola porque totalPages <= 1.
     meta: data?.meta,
     searchTerm,
-    statusFilter,
     monthFilter,
     yearFilter,
     isLoading,
@@ -109,7 +94,6 @@ export function usePatientList() {
     page,
     hasActiveFilters,
     setSearchTerm,
-    handleStatusFilter,
     handleMonthFilter,
     handleYearFilter,
     handlePageChange: setPage,
