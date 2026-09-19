@@ -1,19 +1,15 @@
 import React from 'react';
-import { NotebookText, Plus, Loader2, AlertTriangle } from 'lucide-react';
+import { NotebookText, Loader2, AlertTriangle } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
 import { Pagination } from '@/components/common/table/pagination';
-import { tailwind } from '@/utils/tailwind-utils';
-import {
-  DocumentCategory,
-  DOCUMENT_CATEGORY_LABELS,
-} from '@/types/documents/document.types';
-import { PatientNote, PATIENT_NOTE_TEXT_MAX_LENGTH } from '@/types/patients/patient-note';
+import { DOCUMENT_CATEGORY_LABELS } from '@/types/documents/document.types';
+import { PatientNote } from '@/types/patients/patient-note';
 import { formatDate } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { usePatientNotes, ALL_MONTHS_VALUE } from './use-patient-notes';
+import { AddPatientNoteModal } from './add-patient-note-modal';
 
 interface NoteRowProps {
   note: PatientNote;
@@ -40,11 +36,9 @@ interface PatientNotesContainerProps {
 }
 
 /**
- * Bitacora de evolucion del paciente. El historial se muestra siempre, pero el
- * formulario de alta es progresivo: por defecto solo hay un link "+ Agregar
- * nota" (mismo patron que "Agregar contacto adicional" en
- * patient-contacts-container.tsx). El formulario completo solo aparece al
- * hacer clic, y se colapsa de nuevo al guardar o cancelar.
+ * Bitacora de evolucion del paciente. El historial se muestra siempre; el
+ * formulario de alta vive en un modal aparte (AddPatientNoteModal) para no
+ * empujar la lista de notas hacia abajo al abrirse.
  */
 export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ patientUuid }) => {
   const {
@@ -76,84 +70,38 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
 
   return (
     <section className="flex flex-col gap-3 rounded-card border border-ink-200 bg-white p-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Typography variant={TypographyVariant.SUBTITLE}>Control de evolución</Typography>
 
-        {totalCount > 0 && (
-          <FilterDropdown
-            value={monthFilter}
-            options={monthOptions}
-            allValue={ALL_MONTHS_VALUE}
-            onChange={handleMonthFilterChange}
-            ariaLabel="Filtrar notas por mes"
-            placeholderLabel="Mes"
-          />
-        )}
+        <div className="flex items-center gap-2">
+          {totalCount > 0 && (
+            <FilterDropdown
+              value={monthFilter}
+              options={monthOptions}
+              allValue={ALL_MONTHS_VALUE}
+              onChange={handleMonthFilterChange}
+              ariaLabel="Filtrar notas por mes"
+              placeholderLabel="Mes"
+            />
+          )}
+
+          <Button variant={ButtonVariant.SECONDARY} onClick={handleStartAdding}>
+            Agregar nota
+          </Button>
+        </div>
       </div>
 
-      {isAdding ? (
-        <div className="flex flex-col gap-3 rounded-card border border-ink-200 bg-ink-50 p-4">
-          <div className="flex flex-col gap-1 sm:w-56">
-            <label htmlFor="note-category">
-              <Typography variant={TypographyVariant.HELPER}>Categoría</Typography>
-            </label>
-            <select
-              id="note-category"
-              value={category}
-              onChange={(event) => setCategory(event.target.value as DocumentCategory)}
-              className={inputBaseClasses}
-            >
-              {Object.values(DocumentCategory).map((value) => (
-                <option key={value} value={value}>
-                  {DOCUMENT_CATEGORY_LABELS[value]}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="note-text">
-              <Typography variant={TypographyVariant.HELPER}>Nota</Typography>
-            </label>
-            <textarea
-              id="note-text"
-              value={text}
-              onChange={(event) => handleTextChange(event.target.value)}
-              placeholder="Describe la evolución del paciente..."
-              rows={4}
-              autoFocus
-              className={tailwind(inputBaseClasses, 'resize-none')}
-            />
-            <Typography variant={TypographyVariant.HELPER} className="self-end">
-              {text.trim().length}/{PATIENT_NOTE_TEXT_MAX_LENGTH}
-            </Typography>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button variant={ButtonVariant.SECONDARY} onClick={handleCancelAdding}>
-              Cancelar
-            </Button>
-            <Button
-              variant={ButtonVariant.PRIMARY}
-              onClick={handleAddNote}
-              disabled={!canSubmit}
-              isLoading={isCreating}
-              icon={<Plus className="h-4 w-4" aria-hidden />}
-            >
-              Guardar
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={handleStartAdding}
-          className="flex w-fit items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
-        >
-          <Plus className="h-3.5 w-3.5" aria-hidden />
-          Agregar nota
-        </button>
-      )}
+      <AddPatientNoteModal
+        isOpen={isAdding}
+        text={text}
+        category={category}
+        isCreating={isCreating}
+        canSubmit={canSubmit}
+        onTextChange={handleTextChange}
+        onCategoryChange={setCategory}
+        onConfirm={handleAddNote}
+        onCancel={handleCancelAdding}
+      />
 
       {isLoading && (
         <div className="flex items-center justify-center gap-2 py-8">
