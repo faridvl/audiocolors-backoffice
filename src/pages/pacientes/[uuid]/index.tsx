@@ -6,15 +6,10 @@ import { AppLayout } from '@/components/common/layout/app-layout';
 import { PatientDetailContainer } from '@/components/containers/patients/patient-detail/patient-detail-container';
 import { authorizeServerSidePage } from '@/hocs/auth';
 import { routesPrivate } from '@/shared/navigation/routes';
-import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
-import { getFullName } from '@/shared/utils/formatters';
 
 export default function PatientDetailPage() {
   const router = useRouter();
   const uuid = typeof router.query.uuid === 'string' ? router.query.uuid : '';
-  const { data: patient } = usePatientQuery(uuid);
-
-  const patientName = patient ? getFullName(patient.firstName, patient.lastName) : undefined;
 
   const editAction = uuid ? (
     <Link
@@ -36,7 +31,6 @@ export default function PatientDetailPage() {
 
       <AppLayout
         title="Gestión del paciente"
-        subtitle={patientName}
         backHref={routesPrivate.patients.index}
         action={editAction}
       >

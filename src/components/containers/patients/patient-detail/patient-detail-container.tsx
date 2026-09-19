@@ -20,7 +20,7 @@ import { DocumentsContainer } from '@/components/containers/documents/documents-
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
-import { calculateAge, formatDate } from '@/shared/utils/formatters';
+import { calculateAge, formatDate, getFullName } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
 
@@ -45,8 +45,7 @@ const InlineDatum: React.FC<{
  *
  * Los documentos son lo que se consulta a diario, asi que los datos del
  * paciente se resumen en una franja: nunca deben empujar los archivos fuera
- * de pantalla. El nombre y la accion de editar viven en el header de la
- * pagina, no aqui.
+ * de pantalla. La accion de editar vive en el header de la pagina, no aqui.
  */
 const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => void }> = ({
   patient,
@@ -82,6 +81,10 @@ const PatientSummary: React.FC<{ patient: Patient; onScheduleAppointment: () => 
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
+      <Typography variant={TypographyVariant.BODY} className="mb-2">
+        {getFullName(patient.firstName, patient.lastName)}
+      </Typography>
+
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
           <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
