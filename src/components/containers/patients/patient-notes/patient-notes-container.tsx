@@ -3,6 +3,8 @@ import { NotebookText, Plus, Loader2, AlertTriangle } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
+import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
+import { Pagination } from '@/components/common/table/pagination';
 import { tailwind } from '@/utils/tailwind-utils';
 import {
   DocumentCategory,
@@ -11,7 +13,7 @@ import {
 import { PatientNote, PATIENT_NOTE_TEXT_MAX_LENGTH } from '@/types/patients/patient-note';
 import { formatDate } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
-import { usePatientNotes } from './use-patient-notes';
+import { usePatientNotes, ALL_MONTHS_VALUE } from './use-patient-notes';
 
 interface NoteRowProps {
   note: PatientNote;
@@ -47,6 +49,8 @@ interface PatientNotesContainerProps {
 export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ patientUuid }) => {
   const {
     notes,
+    totalCount,
+    filteredCount,
     isLoading,
     isError,
     refetch,
@@ -60,13 +64,32 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
     canSubmit,
     handleAddNote,
     isCreating,
+    monthFilter,
+    monthOptions,
+    handleMonthFilterChange,
+    page,
+    totalPages,
+    handlePageChange,
   } = usePatientNotes(patientUuid);
 
   const resolveAuthorLabel = useResolveAuthorLabel();
 
   return (
     <section className="flex flex-col gap-3 rounded-card border border-ink-200 bg-white p-4">
-      <Typography variant={TypographyVariant.SUBTITLE}>Control de evolución</Typography>
+      <div className="flex items-center justify-between gap-3">
+        <Typography variant={TypographyVariant.SUBTITLE}>Control de evolución</Typography>
+
+        {totalCount > 0 && (
+          <FilterDropdown
+            value={monthFilter}
+            options={monthOptions}
+            allValue={ALL_MONTHS_VALUE}
+            onChange={handleMonthFilterChange}
+            ariaLabel="Filtrar notas por mes"
+            placeholderLabel="Mes"
+          />
+        )}
+      </div>
 
       {isAdding ? (
         <div className="flex flex-col gap-3 rounded-card border border-ink-200 bg-ink-50 p-4">
@@ -149,23 +172,29 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
         </div>
       )}
 
-      {!isLoading && !isError && notes.length === 0 && (
+      {!isLoading && !isError && filteredCount === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-ink-300 py-8 text-center">
           <NotebookText className="h-8 w-8 text-ink-300" aria-hidden />
-          <Typography variant={TypographyVariant.ACCENT}>Sin notas registradas</Typography>
+          <Typography variant={TypographyVariant.ACCENT}>
+            {totalCount === 0 ? 'Sin notas registradas' : 'Sin notas en este mes'}
+          </Typography>
           <Typography variant={TypographyVariant.BODY}>
-            Agrega la primera nota de evolución de este paciente.
+            {totalCount === 0
+              ? 'Agrega la primera nota de evolución de este paciente.'
+              : 'Prueba con otro mes.'}
           </Typography>
         </div>
       )}
 
-      {!isLoading && !isError && notes.length > 0 && (
+      {!isLoading && !isError && filteredCount > 0 && (
         <div className="flex flex-col gap-2">
           {notes.map((note) => (
             <NoteRow key={note.uuid} note={note} authorLabel={resolveAuthorLabel(note.authorUuid)} />
           ))}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} total={filteredCount} onPageChange={handlePageChange} />
     </section>
   );
 };
