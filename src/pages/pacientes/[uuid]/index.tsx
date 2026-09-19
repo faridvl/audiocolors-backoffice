@@ -16,7 +16,9 @@ export default function PatientDetailPage() {
 
   // El titulo del header es el nombre del paciente: hace de rastro de
   // navegacion y evita repetirlo dentro del contenido.
-  const patientName = patient ? getFullName(patient.firstName, patient.lastName) : 'Expediente';
+  const patientName = patient
+    ? getFullName(patient.firstName, patient.lastName)
+    : 'Gestión del paciente';
 
   const editAction = uuid ? (
     <Link
@@ -38,7 +40,7 @@ export default function PatientDetailPage() {
 
       <AppLayout
         title={patientName}
-        subtitle="Expediente"
+        subtitle="Gestión del paciente"
         backHref={routesPrivate.patients.index}
         action={editAction}
       >
