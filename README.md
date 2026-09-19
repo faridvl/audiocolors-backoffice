@@ -100,23 +100,32 @@ Los colores de marca están **medidos** del logo original, no estimados: ver [.c
 
 ## Documentación
 
-| Archivo | Qué contiene |
-|---|---|
-| [CLAUDE.md](CLAUDE.md) | Índice y reglas que más se rompen |
-| [.claude/RULES.md](.claude/RULES.md) | Reglas duras del proyecto |
-| [.claude/STATUS.md](.claude/STATUS.md) | Estado actual y pendientes |
-| [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) | Estructura, auth, endpoints |
-| [.claude/DECISIONS.md](.claude/DECISIONS.md) | Decisiones y su porqué |
-| [.claude/BRAND.md](.claude/BRAND.md) | Identidad y regeneración de assets |
-| [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md) | Alta de la clínica y de usuarios |
+Antes de tocar código, conviene revisar:
 
-## Roadmap
+- [CLAUDE.md](CLAUDE.md) — índice general y las reglas que más se rompen.
+- [.claude/RULES.md](.claude/RULES.md) — reglas duras del proyecto.
+- [.claude/STATUS.md](.claude/STATUS.md) — estado actual y próximos pasos.
+- [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) — estructura, auth y endpoints.
+- [.claude/DECISIONS.md](.claude/DECISIONS.md) — decisiones tomadas y su porqué.
+- [.claude/BRAND.md](.claude/BRAND.md) — identidad visual y regeneración de assets.
+- [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md) — alta de la clínica y de usuarios.
 
-- [x] Scaffold + branding AudioColors
-- [x] Alta del tenant
-- [x] Autenticación y layout
-- [x] Pacientes: lista, alta, edición
-- [x] Expediente: datos + archivos con preview
-- [x] Estándares de UI y documentación del proyecto
-- [ ] Cambiar contraseñas temporales
-- [ ] Desplegar en `backoffice.audiocolorscr.com`
+---
+
+## Reglas de colaboración
+
+- **Todo cambio se hace en un branch dedicado**, nunca directo sobre `main` o `develop`.
+    - Ejemplo: `feature/filtro-citas`, `fix/preview-pdf`.
+- **Los cambios llegan a `main` por Pull Request.** `develop` es la rama de trabajo activo.
+- **Commits claros y descriptivos**, en español. Ejemplo: `fix(pacientes): agendar próxima cita como ícono`.
+- **Antes de cada commit:** `yarn lint && yarn typecheck` limpios. No se corre `next build` para validar cambios.
+- **El API no se toca** (`standard-saas-api`) — es compartido con Zynka; un cambio incompatible rompe el otro sitio.
+
+## Flujo de trabajo sugerido
+
+1. Cloná el repositorio y corré `yarn` para instalar dependencias.
+2. Creá una rama desde `develop`: `git checkout -b fix/mi-cambio`.
+3. Hacé tus cambios y confirmá con mensajes claros.
+4. Sincronizá seguido con `develop` para evitar conflictos grandes.
+5. Corré `yarn lint && yarn typecheck` antes de subir.
+6. Abrí un Pull Request hacia `develop` (o hacia `main` cuando se libera una entrega).
