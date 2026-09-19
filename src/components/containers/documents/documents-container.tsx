@@ -22,6 +22,7 @@ import {
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
+import { Pagination } from '@/components/common/table/pagination';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useDocuments } from './use-documents';
@@ -112,6 +113,7 @@ interface DocumentsContainerProps {
 export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientUuid }) => {
   const {
     documents,
+    filteredCount,
     totalCount,
     isLoading,
     isError,
@@ -142,6 +144,9 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
     handleRenameValueChange,
     handleConfirmRename,
     isRenaming,
+    page,
+    totalPages,
+    handlePageChange,
   } = useDocuments(patientUuid);
 
   const resolveAuthorLabel = useResolveAuthorLabel();
@@ -270,7 +275,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         </div>
       )}
 
-      {!isLoading && !isError && !documents.length && (
+      {!isLoading && !isError && !filteredCount && (
         <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-ink-300 bg-white py-14 text-center">
           <FolderOpen className="h-8 w-8 text-ink-300" aria-hidden />
           <Typography variant={TypographyVariant.ACCENT}>
@@ -284,7 +289,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         </div>
       )}
 
-      {!isLoading && !isError && documents.length > 0 && (
+      {!isLoading && !isError && filteredCount > 0 && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {documents.map((document) => (
             <DocumentCard
@@ -298,6 +303,8 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
           ))}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} total={filteredCount} onPageChange={handlePageChange} />
 
       <DocumentPreviewModal document={previewDocument} onClose={() => setPreviewDocument(null)} />
 

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -18,7 +18,11 @@ import {
 import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/upload-document-mutation';
 import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/delete-document-mutation';
 import { useRenameDocumentMutation } from '@/shared/api/mutations/documents/rename-document-mutation';
+import { useIsMobile } from '@/hooks/use-is-mobile';
 import { formatDate, formatFileSize } from '@/shared/utils/formatters';
+
+/** Solo se pagina en movil: el grid de escritorio ya muestra varias columnas a la vez. */
+const MOBILE_PAGE_SIZE = 5;
 
 /**
  * Sin restriccion de tipo: los equipos de audiometria de cada clinica
@@ -78,7 +82,9 @@ export function useDocuments(patientUuid: string) {
   const [documentToDelete, setDocumentToDelete] = useState<DocumentItem | null>(null);
   const [documentToRename, setDocumentToRename] = useState<DocumentItem | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [page, setPage] = useState(1);
 
+  const isMobile = useIsMobile();
   const { data, isLoading, isError, refetch } = usePatientDocumentsQuery(patientUuid);
   const { executeUploadDocument, isPending: isUploading } = useUploadDocumentMutation();
   const { executeDeleteDocument, isPending: isDeleting } = useDeleteDocumentMutation();
@@ -96,6 +102,21 @@ export function useDocuments(patientUuid: string) {
       return matchesFilter && matchesSearch;
     });
   }, [documents, filter, searchTerm]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, searchTerm, isMobile]);
+
+  const totalPages = isMobile
+    ? Math.max(1, Math.ceil(filteredDocuments.length / MOBILE_PAGE_SIZE))
+    : 1;
+  const currentPage = Math.min(page, totalPages);
+  const visibleDocuments = isMobile
+    ? filteredDocuments.slice(
+        (currentPage - 1) * MOBILE_PAGE_SIZE,
+        currentPage * MOBILE_PAGE_SIZE,
+      )
+    : filteredDocuments;
 
   const invalidateDocuments = () =>
     queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_DOCUMENTS_KEY, patientUuid] });
@@ -196,7 +217,8 @@ export function useDocuments(patientUuid: string) {
   };
 
   return {
-    documents: filteredDocuments,
+    documents: visibleDocuments,
+    filteredCount: filteredDocuments.length,
     totalCount: documents.length,
     isLoading,
     isError,
@@ -207,6 +229,9 @@ export function useDocuments(patientUuid: string) {
     setSearchTerm,
     selectedCategory,
     setSelectedCategory,
+    page: currentPage,
+    totalPages,
+    handlePageChange: setPage,
     pendingFile,
     handleFileSelected,
     clearPendingFile,
