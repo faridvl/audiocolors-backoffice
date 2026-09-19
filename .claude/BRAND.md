@@ -59,8 +59,8 @@ sistema EDUS de la CCSS), pero el manual oficial no la especifica.
 | `public/logo-audiocolors.png` | Logo para fondo claro ("audio" gris), 1400px |
 | `public/logo-audiocolors-dark.png` | Para fondo oscuro ("audio" blanco) |
 | `public/favicon-{16,32,180}.png`, `favicon.ico` | Isotipo reducido: **solo la oreja** (sin puntos), gris oscuro `#1e1e1e`, fondo transparente. Único, sin sufijo dev/prod |
-| `public/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` | Isotipo completo (oreja + 6 puntos), variante **positivo**: oreja gris oscuro, fondo blanco `#ffffff` — producción |
-| `public/apple-touch-icon-dev.png`, `icon-192-dev.png`, `icon-512-dev.png`, `icon-512-dev-maskable.png` | Isotipo completo, variante **negativo**: oreja blanca, fondo navy `#181d37` — desarrollo |
+| `public/apple-touch-icon.png` (512×512), `icon-192.png`, `icon-512.png`, `icon-512-maskable.png` | Isotipo completo (oreja + 6 puntos), variante **positivo**: oreja gris oscuro, fondo blanco `#ffffff` — producción |
+| `public/apple-touch-icon-dev.png` (512×512), `icon-192-dev.png`, `icon-512-dev.png`, `icon-512-dev-maskable.png` | Isotipo completo, variante **negativo**: oreja blanca, fondo navy `#181d37` — desarrollo |
 | `public/splash-{1290x2796,1179x2556,1170x2532,750x1334}.png` | Splash screen de iOS al abrir la PWA desde pantalla de inicio (producción) — fondo blanco `#ffffff`, wordmark a color |
 | `public/splash-{1290x2796,1179x2556,1170x2532,750x1334}-dev.png` | Mismos 4 tamaños, variante desarrollo — fondo casi negro `#0a0a0a`, wordmark a color completo (`logo-audiocolors-dark.png`: "audio" blanco + COLORS con sus 6 colores de marca) |
 
@@ -268,6 +268,25 @@ isotipo completo (oreja + 6 puntos), centrado sobre un canvas cuadrado,
 aplanado sobre fondo opaco blanco (prod) o navy `#181d37` (dev) — estos
 formatos no soportan transparencia real en la práctica (iOS y Android
 rellenan con negro si el PNG trae alfa).
+
+**`apple-touch-icon.png` / `apple-touch-icon-dev.png` se generan a 512×512,
+no a 180×180** (aunque `_document.tsx` siga declarando `sizes="180x180"`,
+que es el tamaño lógico de referencia de Apple — 60pt @3x — y no necesita
+coincidir con el archivo real; iOS escala el PNG referenciado al tamaño que
+necesite). Con solo 180px de lienzo el trazo curvo de la oreja quedaba
+notoriamente escalonado al hacer zoom (pantalla de inicio, spotlight): 180px
+es la resolución mínima que acepta `apple-touch-icon`, no la ideal, y
+generar directo a ese tamaño deja muy pocas muestras por curva para un buen
+antialiasing. La corrección: renderizar el `.ai` con supersampling **mucho
+más alto** (`fitz.Matrix(16, 16)` en vez de `(8, 8)`) y luego reducir a
+512×512 con `Image.LANCZOS` — el downscale desde una resolución muy alta es
+lo que produce un borde sólido y liso en vez de escalonado; generar directo
+al tamaño final con el mismo supersampling moderado que usan los demás
+assets no alcanza para esta curva en particular. Mismo criterio de margen
+(~67% del lienzo) y mismos fondos (blanco prod / navy dev) que la versión
+anterior — solo cambia la resolución de salida y el supersampling de origen.
+`icon-192`/`icon-512`/sus variantes maskable **no** se tocaron: ya estaban en
+su tamaño de manifest PWA estándar y no mostraban el mismo problema visible.
 
 **Margen para los no-maskable (apple-touch-icon, icon-192, icon-512):** el
 isotipo debe ocupar **~65-70% del ancho/alto del lienzo**, dejando **~15-17%
