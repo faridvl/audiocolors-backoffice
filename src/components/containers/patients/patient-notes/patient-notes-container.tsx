@@ -73,7 +73,7 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Typography variant={TypographyVariant.SUBTITLE}>Control de evolución</Typography>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 [&>*]:flex-1 sm:[&>*]:flex-none">
           {totalCount > 0 && (
             <FilterDropdown
               value={monthFilter}
@@ -82,15 +82,10 @@ export const PatientNotesContainer: React.FC<PatientNotesContainerProps> = ({ pa
               onChange={handleMonthFilterChange}
               ariaLabel="Filtrar notas por mes"
               placeholderLabel="Mes"
-              className="w-32 sm:w-auto"
             />
           )}
 
-          <Button
-            variant={ButtonVariant.SECONDARY}
-            onClick={handleStartAdding}
-            className="shrink-0"
-          >
+          <Button variant={ButtonVariant.PRIMARY} onClick={handleStartAdding}>
             Agregar nota
           </Button>
         </div>
