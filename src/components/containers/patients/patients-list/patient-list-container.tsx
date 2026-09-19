@@ -27,7 +27,7 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
       isCardTitle: true,
       render: (patient) => (
         <div className="flex flex-col">
-          <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+          <Typography variant={TypographyVariant.BODY}>
             {getFullName(patient.firstName, patient.lastName)}
           </Typography>
           {patient.email && (
