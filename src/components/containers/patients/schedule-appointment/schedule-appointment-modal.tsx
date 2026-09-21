@@ -8,6 +8,7 @@ import { inputBaseClasses } from '@/components/common/input/input';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
+import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-months-query';
 import { useCreateNextAppointmentMutation } from '@/shared/api/mutations/patients/create-next-appointment-mutation';
 
 interface ScheduleAppointmentModalProps {
@@ -67,6 +68,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
           toast.success('Cita agendada');
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_KEY, patientUuid] });
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENTS_KEY] });
+          // El mes de la cita recien agendada tiene que aparecer en el filtro de
+          // "proxima cita" del listado, que si no se queda con la lista anterior.
+          void queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_MONTHS_KEY] });
           onClose();
         },
         onError: (mutationError: Error) => toast.error(mutationError.message),
