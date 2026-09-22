@@ -80,55 +80,70 @@ const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, 
             Teléfonos adicionales{' '}
             {contacts.length > 0 && <span className="text-ink-400">({contacts.length})</span>}
           </Typography>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Cerrar"
-            className="shrink-0 rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-700"
-          >
-            <X className="h-5 w-5" aria-hidden />
-          </button>
+
+          <div className="flex shrink-0 items-center gap-2">
+            {!isAdding && (
+              <button
+                type="button"
+                onClick={handleStartAdding}
+                className="flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
+              >
+                <Plus className="h-3.5 w-3.5" aria-hidden />
+                Agregar contacto
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Cerrar"
+              className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-700"
+            >
+              <X className="h-5 w-5" aria-hidden />
+            </button>
+          </div>
         </div>
 
-        {isAdding ? (
-          <div className="flex flex-col gap-3 rounded-card border border-ink-200 bg-ink-50 p-4 sm:flex-row sm:items-end">
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <label htmlFor="contact-name">
-                <Typography variant={TypographyVariant.HELPER}>Nombre</Typography>
-              </label>
-              <input
-                id="contact-name"
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                maxLength={80}
-                autoFocus
-                className={inputBaseClasses}
-              />
-              <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
-                Incluí el parentesco, por ejemplo: Juan (hijo)
-              </Typography>
+        {isAdding && (
+          <div className="flex flex-col gap-3 rounded-card border border-ink-200 bg-ink-50 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+              <div className="flex min-w-0 flex-1 flex-col gap-1">
+                <label htmlFor="contact-name">
+                  <Typography variant={TypographyVariant.HELPER}>Nombre</Typography>
+                </label>
+                <input
+                  id="contact-name"
+                  type="text"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  maxLength={80}
+                  autoFocus
+                  className={inputBaseClasses}
+                />
+                <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
+                  Incluí el parentesco, por ejemplo: Juan (hijo)
+                </Typography>
+              </div>
+
+              <div className="flex flex-col gap-1 sm:w-40 sm:shrink-0">
+                <label htmlFor="contact-phone">
+                  <Typography variant={TypographyVariant.HELPER}>Teléfono</Typography>
+                </label>
+                <input
+                  id="contact-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  value={phone}
+                  onChange={(event) => handlePhoneChange(event.target.value)}
+                  maxLength={20}
+                  className={inputBaseClasses}
+                />
+                <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
+                  Formato: 8888-8888
+                </Typography>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label htmlFor="contact-phone">
-                <Typography variant={TypographyVariant.HELPER}>Teléfono</Typography>
-              </label>
-              <input
-                id="contact-phone"
-                type="tel"
-                inputMode="numeric"
-                value={phone}
-                onChange={(event) => handlePhoneChange(event.target.value)}
-                maxLength={20}
-                className={`${inputBaseClasses} sm:w-40`}
-              />
-              <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
-                Formato: 8888-8888
-              </Typography>
-            </div>
-
-            <div className="flex shrink-0 gap-2">
+            <div className="flex gap-2 sm:justify-end">
               <Button variant={ButtonVariant.SECONDARY} onClick={handleCancelAdding}>
                 Cancelar
               </Button>
@@ -143,15 +158,6 @@ const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, 
               </Button>
             </div>
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={handleStartAdding}
-            className="flex w-fit items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
-          >
-            <Plus className="h-3.5 w-3.5" aria-hidden />
-            Agregar contacto
-          </button>
         )}
 
         {isLoading && (
