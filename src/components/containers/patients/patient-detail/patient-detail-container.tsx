@@ -163,7 +163,9 @@ const PatientSummary: React.FC<{
             label="Registro"
             value={patient.createdAt ? formatDate(patient.createdAt) : null}
           />
-          <PatientContactsContainer patientUuid={patient.uuid} />
+          <div className="sm:w-full">
+            <PatientContactsContainer patientUuid={patient.uuid} />
+          </div>
         </div>
       )}
 
