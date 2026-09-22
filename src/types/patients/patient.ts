@@ -36,6 +36,8 @@ export interface Patient {
   updatedAt?: string;
   /** Fecha ISO de la próxima cita CONFIRMED, o null si no tiene ninguna. */
   nextAppointmentAt?: string | null;
+  /** Nombre del tipo de la próxima cita CONFIRMED (Cita, Control, Mantenimiento). */
+  nextAppointmentType?: string | null;
 }
 
 export interface CreatePatientContactPayload {

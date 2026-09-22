@@ -7,6 +7,8 @@ export interface CreateNextAppointmentPayload {
   date: string;
   /** UUID de sede. Si no se especifica, el backend decide. */
   branchUUID?: string;
+  /** UUID del tipo de cita. Si no se especifica, el backend usa el generico. */
+  typeUUID?: string;
 }
 
 interface CreateNextAppointmentVariables extends CreateNextAppointmentPayload {
@@ -14,8 +16,7 @@ interface CreateNextAppointmentVariables extends CreateNextAppointmentPayload {
 }
 
 /**
- * Agenda la proxima cita de un paciente. El tipo de cita y la especialidad
- * los resuelve el backend automaticamente; si el paciente ya tenia una cita
+ * Agenda la proxima cita de un paciente. Si el paciente ya tenia una cita
  * agendada, el backend la reemplaza (la marca como completada) de forma
  * transparente.
  */

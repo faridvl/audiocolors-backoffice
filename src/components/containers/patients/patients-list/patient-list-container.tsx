@@ -54,7 +54,18 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
       key: 'nextAppointmentAt',
       header: 'Próxima cita',
       width: '15%',
-      render: (patient) => formatDate(patient.nextAppointmentAt ?? undefined),
+      render: (patient) => (
+        <div className="flex flex-col">
+          <Typography variant={TypographyVariant.BODY}>
+            {formatDate(patient.nextAppointmentAt ?? undefined)}
+          </Typography>
+          {patient.nextAppointmentType && (
+            <Typography variant={TypographyVariant.HELPER}>
+              {patient.nextAppointmentType}
+            </Typography>
+          )}
+        </div>
+      ),
     },
   ];
 }

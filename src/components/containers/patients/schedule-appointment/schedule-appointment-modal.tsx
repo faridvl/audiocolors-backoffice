@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
+import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
@@ -23,9 +24,8 @@ function toDateMinimum(date: Date): string {
 }
 
 /**
- * Modal minimo para agendar la proxima cita de un paciente: solo el dia y la
- * sede, sin hora (la fija el backend). El tipo de cita y la especialidad los
- * resuelve el backend, y si el paciente ya tenia una cita agendada la
+ * Modal minimo para agendar la proxima cita de un paciente: dia, tipo y sede,
+ * sin hora (la fija el backend). Si el paciente ya tenia una cita agendada la
  * reemplaza sin que haga falta avisar ni confirmar nada extra aqui.
  */
 export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> = ({
@@ -34,9 +34,11 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
 }) => {
   const queryClient = useQueryClient();
   const { data: branches } = useBranchesQuery();
+  const { data: appointmentTypes } = useAppointmentTypesQuery();
   const { executeCreateNextAppointment, isPending } = useCreateNextAppointmentMutation();
 
   const [date, setDate] = useState('');
+  const [typeUuid, setTypeUuid] = useState('');
   const [branchUuid, setBranchUuid] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -55,12 +57,18 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
       return;
     }
 
+    if (!typeUuid) {
+      setError('El tipo de cita es obligatorio');
+      return;
+    }
+
     setError(null);
 
     executeCreateNextAppointment(
       {
         patientUuid,
         date,
+        typeUUID: typeUuid,
         ...(branchUuid ? { branchUUID: branchUuid } : {}),
       },
       {
@@ -96,7 +104,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
           <div className="min-w-0">
             <Typography variant={TypographyVariant.ACCENT}>Agendar próxima cita</Typography>
             <Typography variant={TypographyVariant.BODY} className="mt-1">
-              El tipo de cita lo asigna la clínica automáticamente.
+              La hora la asigna la clínica automáticamente.
             </Typography>
           </div>
         </div>
@@ -121,6 +129,32 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
               }}
               className={inputBaseClasses}
             />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="appointment-type">
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+                Tipo de cita
+                <span className="ml-0.5 text-danger">*</span>
+              </Typography>
+            </label>
+            <select
+              id="appointment-type"
+              required
+              value={typeUuid}
+              onChange={(event) => {
+                setTypeUuid(event.target.value);
+                setError(null);
+              }}
+              className={inputBaseClasses}
+            >
+              <option value="">Seleccione un tipo</option>
+              {(appointmentTypes ?? []).map((appointmentType) => (
+                <option key={appointmentType.uuid} value={appointmentType.uuid}>
+                  {appointmentType.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex flex-col gap-1.5">
