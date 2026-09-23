@@ -10,6 +10,7 @@ import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
 import { formatDate, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
+import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { usePatientList, ALL_VALUE } from './use-patient-list';
 
@@ -47,8 +48,24 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
       key: 'branch',
       header: 'Sede',
       width: '17%',
-      render: (patient) =>
-        branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? '—',
+      render: (patient) => {
+        const branchName = branches?.find((branch) => branch.uuid === patient.branchUuid)?.name;
+        if (!branchName) return '—';
+        const accentColor = getBranchStripeColor(branchName);
+        return (
+          <span
+            style={
+              accentColor ? { backgroundColor: `${accentColor}1a`, color: accentColor } : undefined
+            }
+            className={tailwind(
+              'inline-block rounded-full px-2.5 py-0.5 text-sm',
+              !accentColor && 'text-ink-700',
+            )}
+          >
+            {branchName}
+          </span>
+        );
+      },
     },
     {
       key: 'nextAppointmentAt',
@@ -81,6 +98,8 @@ export const PatientListContainer: React.FC = () => {
 
   const { data: branches } = useBranchesQuery();
   const columns = useMemo(() => buildColumns(branches), [branches]);
+  const getRowAccentColor = (patient: Patient) =>
+    getBranchStripeColor(branches?.find((branch) => branch.uuid === patient.branchUuid)?.name);
 
   const createButton = (
     <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate} className="w-full sm:w-auto">
@@ -142,6 +161,7 @@ export const PatientListContainer: React.FC = () => {
         hasActiveFilters={hasActiveFilters}
         onRetry={handleRetry}
         onRowClick={(patient) => navigateToDetail(patient.uuid)}
+        rowAccentColor={getRowAccentColor}
         errorTitle="No se pudieron cargar los pacientes"
         emptyTitle="Aún no hay pacientes registrados"
         emptyDescription="Registra el primer paciente para comenzar."

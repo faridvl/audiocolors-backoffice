@@ -31,6 +31,9 @@ export interface TableColumn<T> {
   isCardTitle?: boolean;
 }
 
+/** Color hex para la franja superior de la tarjeta movil (p.ej. sede del paciente). `undefined` no dibuja franja. */
+type RowAccentColor<T> = (row: T) => string | undefined;
+
 export enum TableState {
   LOADING = 'LOADING',
   ERROR = 'ERROR',
@@ -50,6 +53,8 @@ interface ResponsiveTableProps<T> {
   onRowClick?: (row: T) => void;
   onRetry?: () => void;
   rowActions?: (row: T) => React.ReactNode;
+  /** Color de acento en el borde superior de la tarjeta movil (p.ej. por sede). */
+  rowAccentColor?: RowAccentColor<T>;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyAction?: React.ReactNode;
@@ -82,6 +87,7 @@ export function ResponsiveTable<T>({
   onRowClick,
   onRetry,
   rowActions,
+  rowAccentColor,
   emptyTitle = 'Aún no hay registros',
   emptyDescription,
   emptyAction,
@@ -199,6 +205,11 @@ export function ResponsiveTable<T>({
         {rows.map((row) => (
           <div
             key={getRowKey(row)}
+            style={
+              rowAccentColor?.(row)
+                ? { boxShadow: `inset 0 3px 0 0 ${rowAccentColor(row)}` }
+                : undefined
+            }
             className="relative rounded-card border border-ink-200 bg-white p-4"
           >
             {rowActions && (
