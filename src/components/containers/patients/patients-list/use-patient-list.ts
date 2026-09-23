@@ -2,31 +2,11 @@ import { useMemo, useState, useEffect } from 'react';
 import { usePatientsQuery, PatientStatusFilter } from '@/shared/api/querys/patients-query';
 import { useAppointmentMonthsQuery } from '@/shared/api/querys/appointment-months-query';
 import { useNavigation } from '@/hooks/use-navigation';
+import { formatMonthLabel } from '@/shared/utils/formatters';
 
 const PAGE_SIZE_DEFAULT = 7;
 const PAGE_SIZE_FILTERED = 10;
 export const ALL_VALUE = 'all';
-
-const MONTH_LABELS = [
-  'enero',
-  'febrero',
-  'marzo',
-  'abril',
-  'mayo',
-  'junio',
-  'julio',
-  'agosto',
-  'septiembre',
-  'octubre',
-  'noviembre',
-  'diciembre',
-];
-
-function formatMonthLabel(monthKey: string): string {
-  const [year, month] = monthKey.split('-');
-  const label = MONTH_LABELS[Number(month) - 1] ?? month;
-  return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
-}
 
 export function usePatientList() {
   const navigation = useNavigation();

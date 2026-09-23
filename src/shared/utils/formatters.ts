@@ -11,6 +11,31 @@ export function formatDate(isoDate?: string): string {
   });
 }
 
+const MONTH_LABELS = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+];
+
+/** "2026-11" -> "Noviembre 2026". Devuelve '—' si el mes no es valido. */
+export function formatMonthLabel(monthKey?: string | null): string {
+  if (!monthKey) return '—';
+  const [year, month] = monthKey.split('-');
+  const label = MONTH_LABELS[Number(month) - 1];
+  if (!label || !year) return '—';
+
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
+}
+
 /** Edad en anios cumplidos a partir de la fecha de nacimiento. */
 export function calculateAge(birthDate?: string): number | null {
   if (!birthDate) return null;

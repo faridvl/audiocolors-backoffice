@@ -22,7 +22,7 @@ import { DocumentsContainer } from '@/components/containers/documents/documents-
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
-import { calculateAge, formatDate, getFullName } from '@/shared/utils/formatters';
+import { calculateAge, formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
 import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useNavigation } from '@/hooks/use-navigation';
@@ -79,9 +79,14 @@ const PatientSummary: React.FC<{
   // sigue dando acceso a gestionar sus telefonos adicionales.
   const hasExtraData = true;
 
-  const scheduleTitle = patient.nextAppointmentAt
-    ? `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`
-    : 'Agendar próxima cita';
+  // El mes tentativo se muestra distinto de la fecha confirmada: "(por
+  // confirmar)" avisa que ese paciente todavia hay que llamarlo.
+  let scheduleTitle = 'Agendar próxima cita';
+  if (patient.nextAppointmentAt) {
+    scheduleTitle = `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`;
+  } else if (patient.tentativeAppointmentMonth) {
+    scheduleTitle = `Próxima cita: ${formatMonthLabel(patient.tentativeAppointmentMonth)} (por confirmar)`;
+  }
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
@@ -228,6 +233,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
       {isSchedulingAppointment && (
         <ScheduleAppointmentModal
           patientUuid={patient.uuid}
+          tentativeMonth={patient.tentativeAppointmentMonth}
           onClose={() => setIsSchedulingAppointment(false)}
         />
       )}

@@ -1,0 +1,30 @@
+import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
+import { ApiServiceClient } from '@/shared/api/api-service-client';
+import { env } from '@/shared/api/config';
+
+interface SetTentativeMonthVariables {
+  patientUuid: string;
+  /** Mes tentativo en formato YYYY-MM. `null` lo limpia. */
+  month: string | null;
+}
+
+/**
+ * Anota el mes tentativo de la proxima cita, cuando todavia no hay dia
+ * confirmado. El backend cancela la cita agendada que el paciente tuviera:
+ * volver a "solo mes" significa que esa fecha dejo de valer.
+ */
+export function useSetTentativeMonthMutation() {
+  const { mutate: executeSetTentativeMonth, isPending } = useApiMutation<
+    unknown,
+    SetTentativeMonthVariables
+  >({
+    mutationKey: ['setTentativeMonth'],
+    mutationFn: ({ patientUuid, month }) =>
+      ApiServiceClient(env.API.MEDICAL_RECORDS_URL).put(
+        `/patients/${patientUuid}/next-appointment/tentative-month`,
+        { month },
+      ),
+  });
+
+  return { executeSetTentativeMonth, isPending };
+}
