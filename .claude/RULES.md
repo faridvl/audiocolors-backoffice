@@ -177,9 +177,62 @@ JSX (~17 de 29 archivos `.tsx`); hay que migrar al mismo patrón que usa Zynka
 `es.json` dice `"business.name": "Zynka"`). La referencia de patrón *en uso*
 real es Zynka (~30% de cobertura), no magastore.
 
-Ver pendiente en `STATUS.md` — no implementado todavía en esta sesión.
+Implementado (2026-09-24): `src/shared/i18n/i18n.ts` + `src/static/texts/`.
+Migración pantalla por pantalla, no de una vez — cada vez que se toca una
+pantalla se migran sus textos sueltos.
 
-### 5.3 El texto sale de la variante tipográfica
+### 5.3 Antes de agregar una key nueva a i18n
+
+1. Buscar si el texto ya existe en `TEXT.GENERAL` (botones, paginación,
+   mensajes de validación comunes tipo "Requerido", "Correo inválido").
+2. Si existe, reutilizar esa key — no crear una nueva con el mismo valor.
+3. Si el texto es genérico pero no está todavía (ej. "Reintentar",
+   "Guardando..."), agregarlo a `GENERAL` en vez de duplicarlo por módulo.
+4. Si es específico de una pantalla (un subtítulo, un placeholder con
+   contexto propio), va bajo su módulo (`AUTH.LOGIN`, `PATIENTS.LIST`).
+
+### 5.4 Siempre `t()` del hook — nunca `i18n.t()` importado directo
+
+```tsx
+// ✅ En un componente
+const { t } = useTranslation();
+<title>{t(TEXT.AUTH.LOGIN.PAGE_TITLE)}</title>
+
+// ✅ Schema de Yup usado por un solo hook — se arma DENTRO del hook con
+// useMemo para tener acceso a t(), no como constante de módulo
+export function useLogin() {
+  const { t } = useTranslation();
+  const loginValidationSchema = useMemo(
+    () => Yup.object({ email: Yup.string().required(t(TEXT.AUTH.LOGIN.VALIDATION.EMAIL_REQUIRED)) }),
+    [t],
+  );
+  return { loginValidationSchema, /* ... */ };
+}
+
+// ✅ Schema compartido por varios hooks (ej. patient-validation.ts, usado por
+// create Y edit) — se exporta una función factory que recibe `t`, cada hook
+// la llama dentro de su propio useMemo
+export function buildPatientCreateSchema(t: TFunction) {
+  return Yup.object({
+    firstName: Yup.string().required(t(TEXT.PATIENTS.VALIDATION.FIRST_NAME_REQUIRED)),
+  });
+}
+// en el hook: const schema = useMemo(() => buildPatientCreateSchema(t), [t]);
+
+// ❌ NUNCA import i18n from '@/shared/i18n/i18n' + i18n.t(...) para evitar
+// pasar por el hook — ni a nivel de módulo ni dentro de un componente
+// ❌ NUNCA un schema armado a nivel de módulo con t() de un useTranslation()
+// capturado fuera de cualquier función (no compila / no tiene t disponible)
+```
+
+**Por qué:** `i18n.t()` importado directo esquiva el ciclo de vida de React
+(no se recalcula si cambia el idioma, no reporta como dependencia de hooks).
+Un schema de validación a nivel de módulo no tiene acceso a `t()` porque
+`useTranslation()` es un hook — la solución nunca es importar `i18n` directo,
+sino mover el schema dentro del hook que lo usa (`useMemo`) o, si lo comparten
+varios hooks, exportarlo como función factory que recibe `t` como parámetro.
+
+### 5.5 El texto sale de la variante tipográfica
 
 ```tsx
 <Typography variant={TypographyVariant.HEADER}>        // ✅

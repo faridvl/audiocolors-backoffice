@@ -1,13 +1,17 @@
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import { useTranslation } from 'react-i18next';
 import { SplitScreenLayout } from '@/components/common/layout/split-screen-layout';
 import { LoginContainer } from '@/components/containers/login/login-container';
+import { TEXT } from '@/static/texts/i18n';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+
   return (
     <>
       <Head>
-        <title>Iniciar sesión · AudioColors Gestión Clínica</title>
+        <title>{t(TEXT.AUTH.LOGIN.PAGE_TITLE)}</title>
       </Head>
 
       <SplitScreenLayout>
@@ -17,10 +21,6 @@ export default function LoginPage() {
   );
 }
 
-/**
- * Sin data que buscar, pero forzar SSR: como pagina estatica (SSG), Vercel la
- * cachea en el Edge y sirve el mismo HTML para cualquier host — _document.tsx
- * detecta dev vs prod por el header `host`, y sin SSR ese chequeo solo corre
- * una vez en build time (queda "congelado" con un solo resultado).
- */
+// Sin data que buscar, pero forzar SSR: como página estática, Vercel la
+// cachea en el Edge y _document.tsx dejaría de distinguir dev vs prod por host.
 export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });
