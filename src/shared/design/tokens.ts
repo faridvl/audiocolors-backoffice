@@ -91,3 +91,41 @@ export const STATUS_STYLES: Record<StatusTone, string> = {
   [StatusTone.ACTIVE]: 'bg-success/10 text-success',
   [StatusTone.INACTIVE]: 'bg-ink-100 text-ink-500',
 };
+
+/**
+ * Color de marca por sede, para la franja de identificacion en la lista de
+ * pacientes (idea del login: cada row lleva "su" color, no las 6 juntas).
+ * Las sedes son un catalogo de solo lectura del API sin campo de color ni
+ * codigo/slug propio, solo `name` en texto libre (p.ej. "Centro Medico Yireh
+ * Río Claro", no solo "Río Claro") - el mapeo empareja por la ciudad que
+ * contiene el nombre, no por nombre exacto, para no depender del prefijo de
+ * cada sede (que puede cambiar).
+ */
+enum BranchCity {
+  RIO_CLARO = 'Río Claro',
+  QUEPOS = 'Quepos',
+  NEILY = 'Neily',
+  PEREZ_ZELEDON = 'Pérez Zeledón',
+  UVITA = 'Uvita',
+}
+
+const BRANCH_CITY_COLORS: Record<BranchCity, string> = {
+  [BranchCity.RIO_CLARO]: BRAND_COLORS.blue,
+  [BranchCity.QUEPOS]: BRAND_COLORS.yellow,
+  [BranchCity.NEILY]: BRAND_COLORS.red,
+  [BranchCity.PEREZ_ZELEDON]: BRAND_COLORS.orange,
+  [BranchCity.UVITA]: BRAND_COLORS.purple,
+};
+
+const normalize = (value: string): string =>
+  value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** Color de la franja para una sede, buscando la ciudad dentro del nombre; `undefined` si no hay match. */
+export function getBranchStripeColor(branchName: string | undefined): string | undefined {
+  if (!branchName) return undefined;
+  const normalizedName = normalize(branchName);
+  const city = Object.values(BranchCity).find((candidate) =>
+    normalizedName.includes(normalize(candidate)),
+  );
+  return city ? BRANCH_CITY_COLORS[city] : undefined;
+}
