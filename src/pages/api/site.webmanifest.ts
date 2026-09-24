@@ -1,16 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-/**
- * Manifest dinamico segun el host: dev-backoffice.audiocolors.com usa un
- * icono con fondo distinto al de backoffice.audiocolors.com (produccion),
- * para no confundir cual PWA se abrio en el home screen del iPhone.
- * Mismo patron que magastore-backoffice.
- */
+/** Manifest dinámico según el host: dev usa ícono y colores distintos de producción. */
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const host = req.headers.host ?? '';
   const isDev = host.includes('dev-backoffice') || host.includes('localhost') || host.includes('127.0.0.1');
   const iconSuffix = isDev ? '-dev' : '';
-  /** Azul de la R (produccion) vs morado de la S (desarrollo) — BRAND.md. */
   const themeColor = isDev ? '#0a0a0a' : '#1f6fb1';
 
   const manifest = {
