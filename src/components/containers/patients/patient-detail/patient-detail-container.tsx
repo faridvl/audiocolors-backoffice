@@ -85,7 +85,10 @@ const PatientSummary: React.FC<{
   if (patient.nextAppointmentAt) {
     scheduleTitle = `Próxima cita: ${formatDate(patient.nextAppointmentAt)} · Reagendar`;
   } else if (patient.tentativeAppointmentMonth) {
-    scheduleTitle = `Próxima cita: ${formatMonthLabel(patient.tentativeAppointmentMonth)} (por confirmar)`;
+    const tentativeType = patient.tentativeAppointmentTypeName
+      ? ` · ${patient.tentativeAppointmentTypeName}`
+      : '';
+    scheduleTitle = `Próxima cita: ${formatMonthLabel(patient.tentativeAppointmentMonth)}${tentativeType} (por confirmar)`;
   }
 
   return (
@@ -234,6 +237,8 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         <ScheduleAppointmentModal
           patientUuid={patient.uuid}
           tentativeMonth={patient.tentativeAppointmentMonth}
+          tentativeTypeUuid={patient.tentativeAppointmentTypeUuid}
+          branchUuid={patient.branchUuid}
           onClose={() => setIsSchedulingAppointment(false)}
         />
       )}

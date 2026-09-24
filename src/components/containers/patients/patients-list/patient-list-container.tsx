@@ -96,7 +96,11 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
               <Typography variant={TypographyVariant.BODY}>
                 {formatMonthLabel(patient.tentativeAppointmentMonth)}
               </Typography>
-              <Typography variant={TypographyVariant.HELPER}>Por confirmar</Typography>
+              <Typography variant={TypographyVariant.HELPER}>
+                {patient.tentativeAppointmentTypeName
+                  ? `${patient.tentativeAppointmentTypeName} · Por confirmar`
+                  : 'Por confirmar'}
+              </Typography>
             </div>
           );
         }

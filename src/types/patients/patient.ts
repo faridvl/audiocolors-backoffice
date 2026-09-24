@@ -45,6 +45,10 @@ export interface Patient {
    * la cita que hubiera.
    */
   tentativeAppointmentMonth?: string | null;
+  /** UUID del tipo anotado junto al mes tentativo, para precargarlo al confirmar. */
+  tentativeAppointmentTypeUuid?: string | null;
+  /** Nombre de ese tipo (Cita, Control, Mantenimiento), listo para mostrar. */
+  tentativeAppointmentTypeName?: string | null;
 }
 
 export interface CreatePatientContactPayload {

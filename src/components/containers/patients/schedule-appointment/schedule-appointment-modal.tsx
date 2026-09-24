@@ -6,7 +6,6 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
-import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-months-query';
@@ -22,6 +21,10 @@ interface ScheduleAppointmentModalProps {
   patientUuid: string;
   /** Mes tentativo ya anotado, para precargar el selector. */
   tentativeMonth?: string | null;
+  /** Tipo anotado junto a ese mes, para precargarlo en los dos modos. */
+  tentativeTypeUuid?: string | null;
+  /** Sede habitual del paciente. Se envia tal cual, no se elige en este modal. */
+  branchUuid?: string | null;
   onClose: () => void;
 }
 
@@ -51,11 +54,12 @@ function buildMonthOptions(count: number): string[] {
  * Modal de la proxima cita, con los dos momentos del flujo de la clinica:
  *
  * 1. **Solo el mes** — al cerrar una visita se anota el mes en que tocaria
- *    volver, sin dia. El paciente todavia no confirma nada, y por eso aqui no
- *    se pide tipo de cita: eso se decide cuando la cita se vuelve real.
+ *    volver y de que seria, sin dia. El paciente todavia no confirma nada.
  * 2. **Dia confirmado** — recepcion llama; si el paciente acepta se fija el
- *    dia, el tipo y la sede, y el mes tentativo se limpia. Si no acepta, se
- *    vuelve al modo mes con uno nuevo y el backend cancela la cita anterior.
+ *    dia, con el tipo ya precargado del apunte tentativo (se puede cambiar), y
+ *    el apunte se limpia. Si no acepta, se vuelve al modo mes con uno nuevo y
+ *    el backend cancela la cita anterior. La sede es siempre la habitual del
+ *    paciente, no se elige aqui.
  *
  * Los dos modos son excluyentes a proposito: un paciente no puede estar a la
  * vez con cita agendada y pendiente de confirmar. La hora la fija el backend.
@@ -63,10 +67,11 @@ function buildMonthOptions(count: number): string[] {
 export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> = ({
   patientUuid,
   tentativeMonth,
+  tentativeTypeUuid,
+  branchUuid,
   onClose,
 }) => {
   const queryClient = useQueryClient();
-  const { data: branches } = useBranchesQuery();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
   const { executeCreateNextAppointment, isPending: isSchedulingDay } =
     useCreateNextAppointmentMutation();
@@ -79,8 +84,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   );
   const [month, setMonth] = useState(tentativeMonth ?? '');
   const [date, setDate] = useState('');
-  const [typeUuid, setTypeUuid] = useState('');
-  const [branchUuid, setBranchUuid] = useState('');
+  // Compartido por los dos modos: lo que se anoto con el mes es lo que se
+  // propone al confirmar el dia, donde todavia se puede cambiar.
+  const [typeUuid, setTypeUuid] = useState(tentativeTypeUuid ?? '');
   const [error, setError] = useState<string | null>(null);
 
   const minDate = toDateMinimum(new Date());
@@ -109,10 +115,15 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
         return;
       }
 
+      if (!typeUuid) {
+        setError('El tipo de cita es obligatorio');
+        return;
+      }
+
       setError(null);
 
       executeSetTentativeMonth(
-        { patientUuid, month },
+        { patientUuid, month, typeUUID: typeUuid },
         {
           onSuccess: () => {
             toast.success(`Próxima cita tentativa: ${formatMonthLabel(month)}`);
@@ -187,7 +198,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
             <Typography variant={TypographyVariant.ACCENT}>Próxima cita</Typography>
             <Typography variant={TypographyVariant.BODY} className="mt-1">
               {mode === ScheduleMode.MONTH
-                ? 'Anota el mes en que le toca volver. El día se define cuando el paciente confirme.'
+                ? 'Anota el mes en que le toca volver y de qué es. El día se define cuando el paciente confirme.'
                 : 'La hora la asigna la clínica automáticamente.'}
             </Typography>
           </div>
@@ -239,72 +250,53 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
               </select>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="appointment-date">
-                  <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-                    Fecha
-                    <span className="ml-0.5 text-danger">*</span>
-                  </Typography>
-                </label>
-                <input
-                  id="appointment-date"
-                  type="date"
-                  min={minDate}
-                  value={date}
-                  onChange={(event) => {
-                    setDate(event.target.value);
-                    setError(null);
-                  }}
-                  className={inputBaseClasses}
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="appointment-type">
-                  <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-                    Tipo de cita
-                    <span className="ml-0.5 text-danger">*</span>
-                  </Typography>
-                </label>
-                <select
-                  id="appointment-type"
-                  value={typeUuid}
-                  onChange={(event) => {
-                    setTypeUuid(event.target.value);
-                    setError(null);
-                  }}
-                  className={inputBaseClasses}
-                >
-                  <option value="">Seleccione un tipo</option>
-                  {(appointmentTypes ?? []).map((appointmentType) => (
-                    <option key={appointmentType.uuid} value={appointmentType.uuid}>
-                      {appointmentType.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="appointment-branch">
-                  <Typography variant={TypographyVariant.BODY_SEMIBOLD}>Sede</Typography>
-                </label>
-                <select
-                  id="appointment-branch"
-                  value={branchUuid}
-                  onChange={(event) => setBranchUuid(event.target.value)}
-                  className={inputBaseClasses}
-                >
-                  <option value="">Sin especificar</option>
-                  {(branches ?? []).map((branch) => (
-                    <option key={branch.uuid} value={branch.uuid}>
-                      {branch.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="appointment-date">
+                <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+                  Fecha
+                  <span className="ml-0.5 text-danger">*</span>
+                </Typography>
+              </label>
+              <input
+                id="appointment-date"
+                type="date"
+                min={minDate}
+                value={date}
+                onChange={(event) => {
+                  setDate(event.target.value);
+                  setError(null);
+                }}
+                className={inputBaseClasses}
+              />
+            </div>
           )}
+
+          {/* El tipo va en los dos modos: de que es la cita se sabe desde que
+              se anota el mes, y al confirmar el dia llega ya precargado. */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="appointment-type">
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+                Tipo de cita
+                <span className="ml-0.5 text-danger">*</span>
+              </Typography>
+            </label>
+            <select
+              id="appointment-type"
+              value={typeUuid}
+              onChange={(event) => {
+                setTypeUuid(event.target.value);
+                setError(null);
+              }}
+              className={inputBaseClasses}
+            >
+              <option value="">Seleccione un tipo</option>
+              {(appointmentTypes ?? []).map((appointmentType) => (
+                <option key={appointmentType.uuid} value={appointmentType.uuid}>
+                  {appointmentType.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {error && <Typography variant={TypographyVariant.ERROR}>{error}</Typography>}
 
