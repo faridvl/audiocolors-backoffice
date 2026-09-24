@@ -1,18 +1,19 @@
 # CLAUDE.md
 
-Guía para Claude Code en este repositorio.
+Guía para Claude Code en este repositorio. Este archivo es un índice — el
+contenido detallado vive en los módulos de abajo, cargados automáticamente
+vía `@import`. Se edita ahí, no acá, para mantener las responsabilidades
+separadas.
 
-## Lectura obligatoria al iniciar sesión
+## Reglas permanentes (siempre activas)
 
-| Archivo | Qué contiene |
-|---|---|
-| [.claude/RULES.md](.claude/RULES.md) | **Reglas duras.** Cada una existe porque se rompió algo |
-| [.claude/STATUS.md](.claude/STATUS.md) | Estado actual, próximo paso, pendientes |
-| [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) | Estructura, auth, endpoints, multi-tenant |
-| [.claude/DECISIONS.md](.claude/DECISIONS.md) | Decisiones tomadas y su porqué |
-| [.claude/BRAND.md](.claude/BRAND.md) | Colores medidos, tipografía, cómo regenerar assets |
+@.claude/RULES.md
+@.claude/STATUS.md
+@.claude/ARCHITECTURE.md
+@.claude/DECISIONS.md
+@.claude/BRAND.md
 
-Sin leerlos no se sabe qué está decidido, qué está roto ni por qué el código
+Sin esto no se sabe qué está decidido, qué está roto ni por qué el código
 está como está.
 
 ## Qué es esto
@@ -76,6 +77,9 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | `ui-audit` | Auditar la interfaz contra las reglas antes de un push |
 | `nueva-seccion` | Añadir un CRUD completo siguiendo los patrones del proyecto |
 | `commit` | Redactar el mensaje de commit (qué se hizo / qué se probó). Skill de usuario, no vive en este repo — aplica en cualquier proyecto de la cuenta |
+
+No dupliques como skill algo que ya resuelve un comando o un agente existente
+en la cuenta — evita mecanismos redundantes para la misma tarea.
 
 ## Al cerrar una etapa
 

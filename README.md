@@ -1,12 +1,13 @@
-# audiocolors-backoffice
+# AudioColors · Gestión Clínica
 
-Back-office de **AudioColors · Gestión Clínica** — gestión de pacientes y sus archivos clínicos (recetas, audiometrías, facturas, garantías).
-
-Lo usa el personal de la clínica. No es un portal de pacientes: no hay registro público ni auto-servicio; las cuentas las crea el administrador.
+Back-office de la clínica auditiva **AudioColors**, para gestión de pacientes y sus archivos clínicos (recetas, audiometrías, facturas, garantías).
 
 ---
 
-## Qué hace
+## Resumen
+
+- **Alcance:** frontend únicamente, mínimo a propósito — pacientes y sus archivos adjuntos.
+- **Uso:** lo usa el personal de la clínica. No es un portal de pacientes: no hay registro público ni auto-servicio; las cuentas las crea el administrador.
 
 | Incluido | No incluido (por ahora) |
 |---|---|
@@ -18,7 +19,37 @@ Lo usa el personal de la clínica. No es un portal de pacientes: no hay registro
 
 ---
 
-## Arranque
+## Reglas de colaboración
+
+- **Todo cambio se hace en un branch dedicado**, nunca directo sobre `main` o `develop`.
+    - Ejemplo: `feature/filtro-citas`, `fix/preview-pdf`.
+- **Los cambios llegan a `main` por Pull Request.** `develop` es la rama de trabajo activo.
+- **Commits claros y descriptivos**, en español. Ejemplo: `fix(pacientes): agendar próxima cita como ícono`.
+- **Antes de cada commit:** `yarn lint && yarn typecheck` limpios. No se corre `next build` para validar cambios.
+- **El API no se toca** (`standard-saas-api`) — es compartido con Zynka; un cambio incompatible rompe el otro sitio. Si hace falta, se discute antes.
+- **Colores por token, nunca hex suelto.** `bg-brand`, no `bg-[#66ae36]`.
+
+---
+
+## Flujo de trabajo sugerido
+
+1. Cloná el repositorio y corré `yarn` para instalar dependencias.
+2. Creá una rama desde `develop`: `git checkout -b fix/mi-cambio`.
+3. Hacé tus cambios y confirmá con mensajes claros.
+4. Sincronizá seguido con `develop` para evitar conflictos grandes.
+5. Corré `yarn lint && yarn typecheck` antes de subir.
+6. Abrí un Pull Request hacia `develop` (o hacia `main` cuando se libera una entrega).
+
+---
+
+## Inicio rápido para nuevos desarrolladores
+
+### Requisitos previos
+
+- Node y Yarn instalados.
+- Acceso al API compartido (`standard-saas-api`) — corriendo local o apuntando al ambiente de pruebas.
+
+### Arranque
 
 ```bash
 yarn            # instalar dependencias
@@ -36,9 +67,7 @@ NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=https://medical-records-service-production.u
 
 Sin estas variables **todas las llamadas al API fallan** — no hay valores por defecto.
 
----
-
-## Backend
+### Backend
 
 Consume el mismo API que Zynka (`standard-saas-api`), **sin modificarlo**. AudioColors es un tenant más.
 
@@ -49,7 +78,7 @@ El aislamiento lo resuelve el JWT: cada endpoint del API lee `tenantUuid` del to
 | Identity | `POST /auth/login`, `GET /auth/me` |
 | Medical Records | `/patients`, `/patients/:uuid/documents` |
 
-### Tenant
+#### Tenant
 
 | Dato | Valor |
 |---|---|
@@ -57,21 +86,15 @@ El aislamiento lo resuelve el JWT: cada endpoint del API lee `tenantUuid` del to
 | `tenantId` | `12` |
 | businessType | `AUDIOLOGY` |
 
-Creado con `POST /auth/register` (ver `docs/ALTA-TENANT.md`). Las contraseñas se hashean con bcrypt — **nunca insertar usuarios directo en la base de datos**.
+Creado con `POST /auth/register` (ver [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md)). Las contraseñas se hashean con bcrypt — **nunca insertar usuarios directo en la base de datos**.
 
 > **Ambiente de pruebas.** Las credenciales actuales son temporales y deben cambiarse antes de entregar a la clínica.
 
----
-
-## Stack
+### Stack
 
 Next.js 14 (Pages Router) · TypeScript · Tailwind · TanStack Query 5 · Formik + Yup · Sonner
 
-Sin i18n: mono-idioma español, strings directos en el JSX.
-
----
-
-## Estructura
+### Estructura
 
 ```
 src/
@@ -98,34 +121,21 @@ Los colores de marca están **medidos** del logo original, no estimados: ver [.c
 
 ---
 
-## Documentación
+## Otras recomendaciones
 
-Antes de tocar código, conviene revisar:
-
-- [CLAUDE.md](CLAUDE.md) — índice general y las reglas que más se rompen.
-- [.claude/RULES.md](.claude/RULES.md) — reglas duras del proyecto.
-- [.claude/STATUS.md](.claude/STATUS.md) — estado actual y próximos pasos.
-- [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) — estructura, auth y endpoints.
-- [.claude/DECISIONS.md](.claude/DECISIONS.md) — decisiones tomadas y su porqué.
-- [.claude/BRAND.md](.claude/BRAND.md) — identidad visual y regeneración de assets.
-- [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md) — alta de la clínica y de usuarios.
+- Antes de un Pull Request, correr `yarn lint && yarn typecheck` limpios.
+- Seguir las convenciones de nombres y estructura de carpetas ya existentes.
+- Consultar la documentación del proyecto en caso de dudas sobre decisiones, estado o alcance:
+    - [CLAUDE.md](CLAUDE.md) — índice general y las reglas que más se rompen.
+    - [.claude/RULES.md](.claude/RULES.md) — reglas duras del proyecto.
+    - [.claude/STATUS.md](.claude/STATUS.md) — estado actual y próximos pasos.
+    - [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) — estructura, auth y endpoints.
+    - [.claude/DECISIONS.md](.claude/DECISIONS.md) — decisiones tomadas y su porqué.
+    - [.claude/BRAND.md](.claude/BRAND.md) — identidad visual y regeneración de assets.
+    - [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md) — alta de la clínica y de usuarios.
 
 ---
 
-## Reglas de colaboración
+## ¿Dudas o necesitas soporte?
 
-- **Todo cambio se hace en un branch dedicado**, nunca directo sobre `main` o `develop`.
-    - Ejemplo: `feature/filtro-citas`, `fix/preview-pdf`.
-- **Los cambios llegan a `main` por Pull Request.** `develop` es la rama de trabajo activo.
-- **Commits claros y descriptivos**, en español. Ejemplo: `fix(pacientes): agendar próxima cita como ícono`.
-- **Antes de cada commit:** `yarn lint && yarn typecheck` limpios. No se corre `next build` para validar cambios.
-- **El API no se toca** (`standard-saas-api`) — es compartido con Zynka; un cambio incompatible rompe el otro sitio.
-
-## Flujo de trabajo sugerido
-
-1. Cloná el repositorio y corré `yarn` para instalar dependencias.
-2. Creá una rama desde `develop`: `git checkout -b fix/mi-cambio`.
-3. Hacé tus cambios y confirmá con mensajes claros.
-4. Sincronizá seguido con `develop` para evitar conflictos grandes.
-5. Corré `yarn lint && yarn typecheck` antes de subir.
-6. Abrí un Pull Request hacia `develop` (o hacia `main` cuando se libera una entrega).
+Consultá con el responsable técnico del proyecto.
