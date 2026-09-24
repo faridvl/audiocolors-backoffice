@@ -91,7 +91,7 @@ sin los puntos de color (a ese tamaño son ruido) y con **fondo transparente**.
 
 ### 3.1 Las acciones de un registro van en el header
 
-Patrón de billo (`web-backoffice-comx`), verificado en producción:
+Patrón de un back-office de referencia, verificado en producción:
 
 | Contexto | Dónde |
 |---|---|
@@ -102,7 +102,7 @@ Patrón de billo (`web-backoffice-comx`), verificado en producción:
 **Por qué:** un enlace "volver" gasta una fila entera del contenido, y en móvil
 los botones dentro de una tarjeta compiten por el ancho con los datos.
 
-Regla de billo para el número de acciones: *1 en desktop → botón visible; más de
+Regla para el número de acciones: *1 en desktop → botón visible; más de
 1, o móvil → menú de tres puntos*.
 
 ### 3.2 El título del header es el nombre del registro
@@ -161,7 +161,7 @@ Python con `encoding='utf-8'`, no heredocs de bash.**
 **Decisión revertida (2026-09-16):** este proyecto declaraba "sin i18n,
 mono-idioma" — se revierte. Los textos hoy están hardcodeados directo en el
 JSX (~17 de 29 archivos `.tsx`); hay que migrar al mismo patrón que usa Zynka
-(`next-audiology-files`), que es la base de este repo y de billo/magastore:
+(`next-audiology-files`), que es la base de este repo y de magastore:
 
 - `i18next` + `react-i18next`, inicializado por *side-effect import* en
   `_app.tsx` (`import '@/shared/i18n/i18n';`), sin `I18nextProvider` explícito.

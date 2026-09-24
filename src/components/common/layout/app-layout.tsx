@@ -93,8 +93,7 @@ interface AppLayoutProps {
   subtitle?: string;
   /**
    * Accion principal del registro (p.ej. "Editar"). Vive en el header, no en
-   * el contenido: es el patron de billo para paginas de detalle, y en movil
-   * evita que compita con los datos por el ancho.
+   * el contenido, para que en movil no compita con los datos por el ancho.
    */
   action?: React.ReactNode;
   children: React.ReactNode;

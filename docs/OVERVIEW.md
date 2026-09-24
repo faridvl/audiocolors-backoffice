@@ -219,7 +219,7 @@ Toda lista resuelve: **cargando · error · vacío-sin-datos · vacío-por-filtr
 
 ### 6.3 Responsive sin scroll horizontal
 
-En móvil, `ResponsiveTable` renderiza tarjetas de pares etiqueta/valor en vez de una tabla con scroll lateral. Adoptado de billo (`web-backoffice-comx`), verificado en producción.
+En móvil, `ResponsiveTable` renderiza tarjetas de pares etiqueta/valor en vez de una tabla con scroll lateral. Adoptado de un back-office de referencia, verificado en producción.
 
 ### 6.4 Texto en español con tildes
 
@@ -350,7 +350,7 @@ Resumen de [.claude/DECISIONS.md](../.claude/DECISIONS.md) — el detalle comple
 | D5 | Sin i18n — **revertida el 2026-09-16**, ver §5.2 de RULES.md |
 | D6 | Detalle de paciente escrito de nuevo (~130 líneas) en vez de portar el de Zynka (1052 líneas, 6 queries) |
 | D7 | Acento único verde `#66ae36` con grises neutros, en vez de azul/naranja heredados |
-| D8 | Estándares de UI tomados de billo (`web-backoffice-comx`), con ajustes: page size 10, sidebar blanco, sin sistema `NewForm` |
+| D8 | Estándares de UI tomados de un back-office de referencia, con ajustes: page size 10, sidebar blanco, sin sistema `NewForm` |
 | D9 | Limitaciones del API (soft delete, filtro inactivos) no se arreglan en este repo — requieren cambio compartido con Zynka |
 
 ---

@@ -66,7 +66,6 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | API | `C:\Users\Personal\Desktop\standard-saas-api` | Backend compartido |
 | Zynka | `D:\Documentos\Proyectos\React\next-audiology-files` | Origen del código |
 | Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
-| Billo | `D:\Documentos\LDXLAB\web-backoffice-comx` | Referencia de estándares UI |
 | Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotografía |
 
 ## Agentes y skills

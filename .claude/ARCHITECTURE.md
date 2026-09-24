@@ -18,7 +18,6 @@ para poder entregar a un cliente real sin esperar a que Zynka esté completo.
 | API | `C:\Users\Personal\Desktop\standard-saas-api` | Backend compartido. **No se toca** |
 | Zynka | `D:\Documentos\Proyectos\React\next-audiology-files` | Origen del código |
 | Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
-| Billo | `D:\Documentos\LDXLAB\web-backoffice-comx` | Referencia de estándares UI |
 | Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotos |
 
 ## Stack
