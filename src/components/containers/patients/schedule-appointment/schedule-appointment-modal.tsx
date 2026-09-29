@@ -72,7 +72,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   onClose,
 }) => {
   const queryClient = useQueryClient();
-  const { data: appointmentTypes } = useAppointmentTypesQuery();
+  const { data: appointmentTypes, isSuccess: hasLoadedAppointmentTypes } =
+    useAppointmentTypesQuery();
+  const hasNoAppointmentTypes = hasLoadedAppointmentTypes && !appointmentTypes?.length;
   const { executeCreateNextAppointment, isPending: isSchedulingDay } =
     useCreateNextAppointmentMutation();
   const { executeSetTentativeMonth, isPending: isSavingMonth } = useSetTentativeMonthMutation();
@@ -296,6 +298,14 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
                 </option>
               ))}
             </select>
+            {/* El catalogo de tipos no se administra desde el backoffice: si
+                el tenant no tiene ninguno, sin este aviso el selector queda
+                vacio y no se entiende por que no se puede guardar. */}
+            {hasNoAppointmentTypes && (
+              <Typography variant={TypographyVariant.HELPER} className="text-danger">
+                No hay tipos de cita configurados. Pide a soporte que los agregue.
+              </Typography>
+            )}
           </div>
 
           {error && <Typography variant={TypographyVariant.ERROR}>{error}</Typography>}
