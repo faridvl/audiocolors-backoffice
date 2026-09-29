@@ -11,6 +11,8 @@ export interface PillSelectOption {
   shortLabel?: string;
   /** Encabezado bajo el que se agrupa la opción (p. ej. el año). */
   group?: string;
+  /** Color de la barra a la izquierda del texto (p. ej. el de cada sede). */
+  accentColor?: string;
 }
 
 interface PillSelectProps {
@@ -90,7 +92,16 @@ export const PillSelect: React.FC<PillSelectProps> = ({
                   !option.group && index === 0 && options.length > 1 && 'mb-1',
                 )}
               >
-                <span className="truncate">{option.shortLabel ?? option.label}</span>
+                <span className="flex min-w-0 items-center gap-2">
+                  {option.accentColor && (
+                    <span
+                      aria-hidden
+                      style={{ backgroundColor: option.accentColor }}
+                      className="h-4 w-1 shrink-0 rounded-full"
+                    />
+                  )}
+                  <span className="truncate">{option.shortLabel ?? option.label}</span>
+                </span>
                 <Check
                   className="invisible h-4 w-4 shrink-0 text-ink-900 group-data-[selected]:visible"
                   aria-hidden

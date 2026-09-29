@@ -20,6 +20,7 @@ import { PatientStatusFilter, usePatientsQuery } from '@/shared/api/querys/patie
 import { useUpdateAppointmentStatusMutation } from '@/shared/api/mutations/appointments/update-appointment-status-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
+import { getBranchStripeColor } from '@/shared/design/tokens';
 import { downloadCalendarEvent } from '@/shared/utils/calendar-file';
 import { formatMonthLabel } from '@/shared/utils/formatters';
 import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
@@ -216,7 +217,11 @@ export function useAgenda() {
   const branchOptions = useMemo(
     () => [
       { label: t(TEXT.AGENDA.FILTERS.ALL_BRANCHES), value: ALL_BRANCHES },
-      ...(branches ?? []).map((branch) => ({ label: branch.name, value: branch.uuid })),
+      ...(branches ?? []).map((branch) => ({
+        label: branch.name,
+        value: branch.uuid,
+        accentColor: getBranchStripeColor(branch.name),
+      })),
     ],
     [branches, t],
   );
