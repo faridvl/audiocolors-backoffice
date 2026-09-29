@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Menu, Transition } from '@headlessui/react';
-import { Users, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Users, History, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { useSession } from '@/hooks/use-session';
 import { useLogout } from '@/hooks/use-logout';
@@ -10,7 +10,10 @@ import { tailwind } from '@/utils/tailwind-utils';
 import { BrandLogo } from '@/components/common/brand/brand-logo';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
-const NAVIGATION = [{ label: 'Pacientes', href: routesPrivate.patients.index, icon: Users }];
+const NAVIGATION = [
+  { label: 'Pacientes', href: routesPrivate.patients.index, icon: Users },
+  { label: 'Bitácora', href: routesPrivate.activity.index, icon: History },
+];
 
 function getInitials(fullName?: string): string {
   if (!fullName) return 'AC';

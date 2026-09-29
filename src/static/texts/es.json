@@ -31,5 +31,84 @@
         "passwordRequired": "La contraseña es obligatoria"
       }
     }
+  },
+  "activity": {
+    "pageTitle": "Bitácora · AudioColors Gestión Clínica",
+    "title": "Bitácora",
+    "summary": {
+      "today": "Acciones hoy",
+      "todayEmpty": "Sin movimientos todavía",
+      "confirmedThisMonth": "Citas confirmadas este mes",
+      "tentativeThisMonth": "Citas tentativas este mes",
+      "newPatientsThisMonth": "Pacientes nuevos este mes",
+      "byActor": "{{name}} {{count}}"
+    },
+    "filters": {
+      "searchPlaceholder": "Buscar por nombre o cédula",
+      "searchAria": "Buscar en la bitácora",
+      "scopeAria": "Qué acciones mostrar",
+      "scopeAppointments": "Citas",
+      "scopeAll": "Todo",
+      "actorLabel": "Registrado por",
+      "actorAria": "Filtrar por quién registró",
+      "actionLabel": "Acción",
+      "actionAria": "Filtrar por acción",
+      "monthLabel": "Mes",
+      "monthAria": "Filtrar por mes",
+      "all": "Todos",
+      "allActions": "Todas"
+    },
+    "count_one": "{{count}} registro",
+    "count_other": "{{count}} registros",
+    "columns": {
+      "time": "Hora",
+      "patient": "Paciente",
+      "action": "Acción",
+      "detail": "Detalle",
+      "actor": "Registrado por"
+    },
+    "group": {
+      "today": "Hoy · {{date}}",
+      "yesterday": "Ayer · {{date}}"
+    },
+    "states": {
+      "emptyTitle": "Todavía no hay movimientos",
+      "emptyDescription": "Aquí aparecerá cada cita, nota, archivo o cambio que el equipo haga en un paciente.",
+      "noResultsTitle": "Sin resultados para estos filtros",
+      "noResultsDescription": "Prueba con otro nombre, otra persona u otro mes.",
+      "errorTitle": "No se pudo cargar la bitácora"
+    },
+    "unknownActor": "Sin registrar",
+    "actions": {
+      "PATIENT_CREATED": "Paciente registrado",
+      "PATIENT_UPDATED": "Datos modificados",
+      "CONTACT_ADDED": "Teléfono agregado",
+      "CONTACT_UPDATED": "Teléfono modificado",
+      "CONTACT_REMOVED": "Teléfono eliminado",
+      "NOTE_ADDED": "Nota agregada",
+      "DOCUMENT_UPLOADED": "Archivo subido",
+      "DOCUMENT_RENAMED": "Archivo renombrado",
+      "DOCUMENT_DELETED": "Archivo eliminado",
+      "APPOINTMENT_TENTATIVE": "Cita tentativa",
+      "APPOINTMENT_CONFIRMED": "Cita confirmada"
+    },
+    "detail": {
+      "filesUploaded": "{{count}} archivos subidos",
+      "more": "+{{count}} más",
+      "emptyValue": "vacío",
+      "byTentative": "por confirmar",
+      "fields": {
+        "firstName": "Nombre",
+        "lastName": "Apellidos",
+        "documentId": "Cédula",
+        "phone": "Teléfono",
+        "email": "Correo",
+        "address": "Dirección",
+        "gender": "Género",
+        "bloodType": "Tipo de sangre",
+        "occupation": "Ocupación",
+        "branchUuid": "Sede"
+      }
+    }
   }
 }
