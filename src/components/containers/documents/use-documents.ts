@@ -50,6 +50,18 @@ function resolveDocumentKind(url: string): DocumentKind {
   return DocumentKind.OTHER;
 }
 
+/**
+ * Separa el nombre de su extensión. Al subir solo se deja editar la base:
+ * el API arma la clave en R2 con la extensión del nombre recibido y el
+ * preview depende de ella, así que perderla rompería la vista del archivo.
+ */
+function splitFileName(fileName: string): { baseName: string; extension: string } {
+  const dotIndex = fileName.lastIndexOf('.');
+  if (dotIndex <= 0) return { baseName: fileName, extension: '' };
+
+  return { baseName: fileName.slice(0, dotIndex), extension: fileName.slice(dotIndex) };
+}
+
 function mapToDocumentItem(document: PatientDocument): DocumentItem {
   const category = DOCUMENT_CATEGORY_LABELS[document.category]
     ? document.category
@@ -79,6 +91,7 @@ export function useDocuments(patientUuid: string) {
     DocumentCategory.OTHER,
   );
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingFileBaseName, setPendingFileBaseName] = useState('');
   const [previewDocument, setPreviewDocument] = useState<DocumentItem | null>(null);
   const [documentToDelete, setDocumentToDelete] = useState<DocumentItem | null>(null);
   const [documentToRename, setDocumentToRename] = useState<DocumentItem | null>(null);
@@ -136,10 +149,17 @@ export function useDocuments(patientUuid: string) {
     }
 
     setPendingFile(file);
+    setPendingFileBaseName(splitFileName(file.name).baseName);
   };
+
+  const pendingFileExtension = pendingFile ? splitFileName(pendingFile.name).extension : '';
+
+  const handlePendingFileBaseNameChange = (value: string) =>
+    setPendingFileBaseName(value.slice(0, DOCUMENT_NAME_MAX_LENGTH - pendingFileExtension.length));
 
   const clearPendingFile = () => {
     setPendingFile(null);
+    setPendingFileBaseName('');
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -149,8 +169,20 @@ export function useDocuments(patientUuid: string) {
       return;
     }
 
+    const trimmedBaseName = pendingFileBaseName.trim();
+
+    if (!trimmedBaseName) {
+      toast.error('El nombre no puede estar vacío');
+      return;
+    }
+
     executeUploadDocument(
-      { patientUuid, file: pendingFile, category: selectedCategory },
+      {
+        patientUuid,
+        file: pendingFile,
+        category: selectedCategory,
+        fileName: `${trimmedBaseName}${pendingFileExtension}`,
+      },
       {
         onSuccess: () => {
           toast.success('Archivo subido');
@@ -234,6 +266,9 @@ export function useDocuments(patientUuid: string) {
     totalPages,
     handlePageChange: setPage,
     pendingFile,
+    pendingFileBaseName,
+    pendingFileExtension,
+    handlePendingFileBaseNameChange,
     handleFileSelected,
     clearPendingFile,
     fileInputRef,

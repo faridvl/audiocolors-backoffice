@@ -1,4 +1,5 @@
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
+import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { CookiesManager } from '@/shared/utils/cookies-manager';
 import { DocumentCategory, PatientDocument } from '@/types/documents/document.types';
@@ -7,6 +8,11 @@ export interface UploadDocumentPayload {
   patientUuid: string;
   file: File;
   category: DocumentCategory;
+  /**
+   * Nombre con el que se guarda el archivo. El API toma el nombre del
+   * multipart (`file.originalname`), así que basta con mandarlo acá.
+   */
+  fileName?: string;
 }
 
 /**
@@ -16,7 +22,7 @@ export interface UploadDocumentPayload {
 async function uploadDocument(payload: UploadDocumentPayload): Promise<PatientDocument> {
   const token = CookiesManager.getAccessToken();
   const formData = new FormData();
-  formData.append('file', payload.file);
+  formData.append('file', payload.file, payload.fileName ?? payload.file.name);
   formData.append('category', payload.category);
 
   const response = await fetch(
@@ -49,7 +55,23 @@ async function uploadDocument(payload: UploadDocumentPayload): Promise<PatientDo
     throw new Error(message);
   }
 
-  return (await response.json()) as PatientDocument;
+  const document = (await response.json()) as PatientDocument;
+  const expectedName = payload.fileName ?? payload.file.name;
+
+  // El API lee el nombre del multipart como latin1: "Audiometría" llega como
+  // "AudiometrÃ­a". El renombrado va por JSON y sí conserva UTF-8, así que se
+  // corrige apenas se sube. Si falla, el archivo ya quedó guardado y se puede
+  // renombrar a mano.
+  if (document.originalName === expectedName) return document;
+
+  try {
+    return await ApiServiceClient(env.API.MEDICAL_RECORDS_URL).patch<PatientDocument>(
+      `/patients/${payload.patientUuid}/documents/${document.uuid}`,
+      { originalName: expectedName },
+    );
+  } catch {
+    return document;
+  }
 }
 
 export function useUploadDocumentMutation() {

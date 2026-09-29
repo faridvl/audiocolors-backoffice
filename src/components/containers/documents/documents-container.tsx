@@ -129,6 +129,9 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
     selectedCategory,
     setSelectedCategory,
     pendingFile,
+    pendingFileBaseName,
+    pendingFileExtension,
+    handlePendingFileBaseNameChange,
     handleFileSelected,
     clearPendingFile,
     fileInputRef,
@@ -183,10 +186,27 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       {pendingFile && (
         <div className="flex flex-col gap-3 rounded-card border border-brand-200 bg-brand-50 p-4 sm:flex-row sm:items-end">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <Typography variant={TypographyVariant.HELPER}>Archivo seleccionado</Typography>
-            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
-              {pendingFile.name}
-            </Typography>
+            <label htmlFor="document-upload-name">
+              <Typography variant={TypographyVariant.HELPER}>Nombre del archivo</Typography>
+            </label>
+            <div className="flex min-w-0 items-center gap-2">
+              <input
+                id="document-upload-name"
+                type="text"
+                value={pendingFileBaseName}
+                onChange={(event) => handlePendingFileBaseNameChange(event.target.value)}
+                autoFocus
+                className={tailwind(inputBaseClasses, 'min-w-0 flex-1')}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' && !isUploading) handleUpload();
+                }}
+              />
+              {pendingFileExtension && (
+                <Typography variant={TypographyVariant.BODY} className="shrink-0 text-ink-500">
+                  {pendingFileExtension}
+                </Typography>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-1">
