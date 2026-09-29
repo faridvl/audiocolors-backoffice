@@ -9,6 +9,7 @@ import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-months-query';
+import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { useCreateNextAppointmentMutation } from '@/shared/api/mutations/patients/create-next-appointment-mutation';
 import { useSetTentativeMonthMutation } from '@/shared/api/mutations/patients/set-tentative-month-mutation';
 import { formatMonthLabel } from '@/shared/utils/formatters';
@@ -25,11 +26,17 @@ interface ScheduleAppointmentModalProps {
   tentativeTypeUuid?: string | null;
   /** Sede habitual del paciente. Se envia tal cual, no se elige en este modal. */
   branchUuid?: string | null;
+  /**
+   * Modo con el que abre. Sin él, abre en "dia" solo si ya hay mes anotado.
+   * La agenda lo fuerza a "dia" al reagendar, porque ahi ya se habla de una
+   * fecha concreta.
+   */
+  initialMode?: ScheduleMode;
   onClose: () => void;
 }
 
 /** Los dos momentos del flujo: primero se anota el mes, despues el dia. */
-enum ScheduleMode {
+export enum ScheduleMode {
   MONTH = 'month',
   DAY = 'day',
 }
@@ -69,6 +76,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   tentativeMonth,
   tentativeTypeUuid,
   branchUuid,
+  initialMode,
   onClose,
 }) => {
   const queryClient = useQueryClient();
@@ -82,7 +90,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   // Con un mes ya anotado el siguiente paso natural es confirmar el dia; sin
   // el, se empieza por el mes.
   const [mode, setMode] = useState<ScheduleMode>(
-    tentativeMonth ? ScheduleMode.DAY : ScheduleMode.MONTH,
+    initialMode ?? (tentativeMonth ? ScheduleMode.DAY : ScheduleMode.MONTH),
   );
   const [month, setMonth] = useState(tentativeMonth ?? '');
   const [date, setDate] = useState('');
@@ -101,6 +109,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
     // El mes de la cita recien agendada tiene que aparecer en el filtro de
     // "proxima cita" del listado, que si no se queda con la lista anterior.
     void queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_MONTHS_KEY] });
+    // La agenda lee las mismas citas: la nueva tiene que aparecer en su dia,
+    // y la anterior (cancelada por el API) desaparecer del suyo.
+    void queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENTS_KEY] });
   };
 
   const handleModeChange = (nextMode: ScheduleMode) => {

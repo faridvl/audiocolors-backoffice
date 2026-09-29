@@ -17,7 +17,7 @@ interface CreateNextAppointmentVariables extends CreateNextAppointmentPayload {
 
 /**
  * Agenda la proxima cita de un paciente. Si el paciente ya tenia una cita
- * agendada, el backend la reemplaza (la marca como completada) de forma
+ * agendada, el backend la reemplaza (la marca como cancelada) de forma
  * transparente.
  */
 export function useCreateNextAppointmentMutation() {

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Menu, Transition } from '@headlessui/react';
-import { Users, History, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
+import { Users, CalendarDays, History, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { useSession } from '@/hooks/use-session';
 import { useLogout } from '@/hooks/use-logout';
@@ -12,6 +12,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 
 const NAVIGATION = [
   { label: 'Pacientes', href: routesPrivate.patients.index, icon: Users },
+  { label: 'Agenda', href: routesPrivate.agenda.index, icon: CalendarDays },
   { label: 'Bitácora', href: routesPrivate.activity.index, icon: History },
 ];
 

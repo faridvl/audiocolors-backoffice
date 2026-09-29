@@ -2,6 +2,8 @@ import type { TFunction } from 'i18next';
 import {
   CalendarCheck,
   CalendarClock,
+  CircleCheck,
+  DoorOpen,
   FilePen,
   FileX,
   NotebookText,
@@ -42,6 +44,8 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: CalendarClock,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.APPOINTMENT_ARRIVED]: { icon: DoorOpen, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.APPOINTMENT_COMPLETED]: { icon: CircleCheck, tone: ActionTone.SUCCESS },
     [PatientActivityAction.PATIENT_CREATED]: { icon: UserPlus, tone: ActionTone.SUCCESS },
     [PatientActivityAction.PATIENT_UPDATED]: { icon: Pencil, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.CONTACT_ADDED]: { icon: Phone, tone: ActionTone.NEUTRAL },
@@ -194,6 +198,8 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       );
 
     case PatientActivityAction.APPOINTMENT_CONFIRMED:
+    case PatientActivityAction.APPOINTMENT_ARRIVED:
+    case PatientActivityAction.APPOINTMENT_COMPLETED:
       return joinParts(formatDayKey(detail.date), detail.typeName);
 
     case PatientActivityAction.STATUS_CHANGED: {

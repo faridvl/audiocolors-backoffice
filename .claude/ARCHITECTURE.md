@@ -25,7 +25,8 @@ para poder entregar a un cliente real sin esperar a que Zynka esté completo.
 Next.js 14 (Pages Router) · TypeScript · Tailwind · TanStack Query 5 ·
 Formik + Yup · Sonner · Fira Sans
 
-Sin i18n, sin PDF, sin audiograma, sin inventario, sin citas.
+Sin PDF, sin audiograma, sin inventario. Citas: próxima cita por paciente
+(mes tentativo → día confirmado) y la agenda del día en `/agenda`.
 
 ## Estructura
 
@@ -36,6 +37,8 @@ src/
 │   ├── _document.tsx         favicons + fuente Fira Sans
 │   ├── index.tsx             redirige según haya sesión
 │   ├── login/
+│   ├── agenda/               semana, citas del día y por confirmar
+│   ├── bitacora/
 │   └── pacientes/
 │       ├── index.tsx         lista
 │       ├── nuevo.tsx         alta

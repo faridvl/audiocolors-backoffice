@@ -13,12 +13,18 @@ export enum PatientActivityAction {
   DOCUMENT_DELETED = 'DOCUMENT_DELETED',
   APPOINTMENT_TENTATIVE = 'APPOINTMENT_TENTATIVE',
   APPOINTMENT_CONFIRMED = 'APPOINTMENT_CONFIRMED',
+  /** Marcado desde la agenda: el paciente llegó (cita en sala). */
+  APPOINTMENT_ARRIVED = 'APPOINTMENT_ARRIVED',
+  /** Marcado desde la agenda: la cita se dio por atendida. */
+  APPOINTMENT_COMPLETED = 'APPOINTMENT_COMPLETED',
   STATUS_CHANGED = 'STATUS_CHANGED',
 }
 
 export const APPOINTMENT_ACTIONS = [
   PatientActivityAction.APPOINTMENT_TENTATIVE,
   PatientActivityAction.APPOINTMENT_CONFIRMED,
+  PatientActivityAction.APPOINTMENT_ARRIVED,
+  PatientActivityAction.APPOINTMENT_COMPLETED,
 ];
 
 export interface PatientFieldChange {

@@ -51,6 +51,23 @@ Los documentos suben ~180px: "volver" y "editar" pasan al header, el nombre del
 paciente es el título del header, y los datos se resumen en una franja con
 enlace "Ver todos los datos". Acentuación corregida en ~20 archivos.
 
+### Etapa 5 — Agenda
+Pantalla `/agenda`: franja de la semana, calendario para saltar de mes, y dos
+pestañas — "Citas del día" (por llegar → en sala → atendidas, y "sin marcar"
+para las que el job venció) y "Por confirmar" (pacientes con mes tentativo).
+Cada fila abre una ficha con la acción principal y el resto (reagendar,
+WhatsApp, `.ics` de día completo, llamar, expediente). El día, la sede y la
+pestaña viven en la URL para que "atrás" desde un expediente no pierda la fecha.
+
+Cambios en el API (rama `feat/agenda-estados-cita`, ya en `develop`):
+reagendar **cancela** la cita vieja en vez de completarla, y `PATCH
+/appointments/:uuid` anota `APPOINTMENT_ARRIVED` / `APPOINTMENT_COMPLETED` en la
+bitácora. Las citas que el API viejo completó al reagendar se ocultan en la
+agenda (se reconocen porque se "completaron" antes de su propia fecha).
+
+Límites conocidos: el API no guarda la hora real (todas a las 08:00 UTC) ni el
+profesional que atiende; la fila muestra quién **agendó**.
+
 ---
 
 ## 📋 Pendientes

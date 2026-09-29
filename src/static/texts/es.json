@@ -43,6 +43,109 @@
       }
     }
   },
+  "agenda": {
+    "pageTitle": "Agenda · AudioColors Gestión Clínica",
+    "title": "Agenda",
+    "schedule": "Agendar",
+    "week": {
+      "aria": "Días de la semana",
+      "today": "Hoy",
+      "dayAria": "{{date}}, {{count}} citas"
+    },
+    "monthPicker": {
+      "open": "Ir a otra fecha",
+      "previous": "Mes anterior",
+      "next": "Mes siguiente",
+      "weekdays": "L M X J V S D"
+    },
+    "filters": {
+      "branchAria": "Filtrar por sede",
+      "allBranches": "Todas las sedes"
+    },
+    "day": {
+      "today": "Hoy · {{date}}",
+      "previous": "Día anterior",
+      "next": "Día siguiente"
+    },
+    "tabs": {
+      "aria": "Qué ver en la agenda",
+      "day": "Citas del día",
+      "pending": "Por confirmar"
+    },
+    "sections": {
+      "IN_ROOM": "En sala",
+      "UPCOMING": "Por llegar",
+      "SCHEDULED": "Agendadas",
+      "UNMARKED": "Sin marcar",
+      "DONE": "Atendidas"
+    },
+    "statuses": {
+      "IN_ROOM": "En sala",
+      "UPCOMING": "Por llegar",
+      "SCHEDULED": "Agendada",
+      "UNMARKED": "Sin marcar",
+      "DONE": "Atendida"
+    },
+    "unmarkedHint": "Nadie marcó si llegaron. Si se atendieron, márcalas como atendidas.",
+    "row": {
+      "markArrived": "Marcar que llegó",
+      "markDone": "Marcar como atendida",
+      "noType": "Sin tipo",
+      "scheduledBy": "Agendó {{name}}",
+      "scheduledByUnknown": "Agendó el equipo"
+    },
+    "menu": {
+      "viewPatient": "Ver expediente",
+      "reschedule": "Reagendar",
+      "whatsapp": "Recordar por WhatsApp",
+      "calendar": "Agregar a mi calendario",
+      "undoArrived": "Volver a por llegar"
+    },
+    "sheet": {
+      "close": "Cerrar",
+      "day": "Día",
+      "month": "Mes",
+      "type": "Tipo",
+      "branch": "Sede",
+      "phone": "Teléfono",
+      "scheduledBy": "Agendada por",
+      "scheduledByUnknown": "Sin registrar"
+    },
+    "toasts": {
+      "arrived": "{{name}} está en sala",
+      "done": "Cita de {{name}} atendida",
+      "undone": "{{name}} volvió a por llegar",
+      "noPhone": "El paciente no tiene un teléfono válido para WhatsApp",
+      "phoneError": "No se pudo cargar el teléfono del paciente"
+    },
+    "whatsappMessage": "Hola {{name}}, le recordamos su cita en AudioColors el {{date}}. ¡Le esperamos!",
+    "calendarEvent": {
+      "title": "Cita AudioColors · {{name}}",
+      "description": "{{type}}. Evento de día completo: la hora la confirma la clínica."
+    },
+    "states": {
+      "emptyTitle": "No hay citas este día",
+      "emptyDescription": "Agenda una cita nueva o elige otro día.",
+      "errorTitle": "No se pudo cargar la agenda",
+      "retry": "Reintentar"
+    },
+    "pending": {
+      "subtitle_one": "Vuelven en {{month}} y todavía no tienen día",
+      "subtitle_other": "Vuelven en {{month}} y todavía no tienen día",
+      "empty": "Nadie pendiente de confirmar día en {{month}}.",
+      "setDay": "Confirmar día de la cita",
+      "callShort": "Llamar"
+    },
+    "picker": {
+      "title": "Agendar cita",
+      "description": "Busca al paciente para fijar su próxima cita.",
+      "searchPlaceholder": "Nombre o cédula",
+      "searchAria": "Buscar paciente",
+      "hint": "Escribe al menos 2 letras del nombre o la cédula.",
+      "empty": "Ningún paciente coincide con esa búsqueda.",
+      "close": "Cerrar"
+    }
+  },
   "activity": {
     "pageTitle": "Bitácora · AudioColors Gestión Clínica",
     "title": "Bitácora",
@@ -107,6 +210,8 @@
       "DOCUMENT_DELETED": "Archivo eliminado",
       "APPOINTMENT_TENTATIVE": "Cita tentativa",
       "APPOINTMENT_CONFIRMED": "Cita confirmada",
+      "APPOINTMENT_ARRIVED": "Llegó a la cita",
+      "APPOINTMENT_COMPLETED": "Cita atendida",
       "STATUS_CHANGED": "Estado cambiado"
     },
     "detail": {
