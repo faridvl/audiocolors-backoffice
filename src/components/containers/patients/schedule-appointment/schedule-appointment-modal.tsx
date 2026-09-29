@@ -252,7 +252,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
                   setMonth(event.target.value);
                   setError(null);
                 }}
-                className={inputBaseClasses}
+                className={tailwind(inputBaseClasses, 'h-11')}
               >
                 <option value="">Elegir mes</option>
                 {monthOptions.map((monthKey) => (
@@ -279,7 +279,15 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
                   setDate(event.target.value);
                   setError(null);
                 }}
-                className={inputBaseClasses}
+                // Safari de iOS dibuja el input de fecha con su propio estilo:
+                // más alto que los demás, más ancho que el modal y centrado.
+                // Sin apariencia nativa y con la misma altura fija que los
+                // selectores del modal, quedan alineados.
+                className={tailwind(
+                  inputBaseClasses,
+                  'block h-11 min-w-0 appearance-none text-left',
+                  '[&::-webkit-date-and-time-value]:text-left',
+                )}
               />
             </div>
           )}
@@ -300,7 +308,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
                 setTypeUuid(event.target.value);
                 setError(null);
               }}
-              className={inputBaseClasses}
+              className={tailwind(inputBaseClasses, 'h-11')}
             >
               <option value="">Seleccione un tipo</option>
               {(appointmentTypes ?? []).map((appointmentType) => (

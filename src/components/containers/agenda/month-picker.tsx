@@ -47,8 +47,10 @@ export const MonthPicker: React.FC<MonthPickerProps> = ({
       </PopoverButton>
 
       <PopoverPanel
-        anchor="bottom start"
-        className="z-30 w-72 rounded-card border border-ink-200 bg-white p-3 shadow-lg [--anchor-gap:6px] focus:outline-none"
+        // Centrado bajo el botón y con margen contra los bordes: en móvil el
+        // botón está al centro y "bottom start" sacaba el panel por la derecha.
+        anchor={{ to: 'bottom', gap: 6, padding: 16 }}
+        className="z-30 w-72 rounded-card border border-ink-200 bg-white p-3 shadow-lg focus:outline-none"
       >
         {({ close }) => (
           <>
