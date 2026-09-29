@@ -1,0 +1,35 @@
+{
+  "common": {
+    "buttons": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "loading": "Cargando..."
+    },
+    "pagination": {
+      "showing": "Mostrando {{start}} a {{end}} de {{total}} registros"
+    }
+  },
+  "auth": {
+    "login": {
+      "pageTitle": "Iniciar sesión · AudioColors Gestión Clínica",
+      "tagline": "Gestión Clínica",
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa con la cuenta que te asignó la clínica.",
+      "sessionExpired": "Tu sesión expiró por seguridad. Vuelve a ingresar.",
+      "genericError": "No se pudo iniciar sesión.",
+      "form": {
+        "emailLabel": "Correo electrónico",
+        "emailPlaceholder": "nombre@audiocolors.com",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "Contraseña",
+        "submit": "Ingresar",
+        "submitting": "Ingresando..."
+      },
+      "validation": {
+        "emailInvalid": "Correo inválido",
+        "emailRequired": "El correo es obligatorio",
+        "passwordRequired": "La contraseña es obligatoria"
+      }
+    }
+  }
+}

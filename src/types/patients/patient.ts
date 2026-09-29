@@ -36,6 +36,19 @@ export interface Patient {
   updatedAt?: string;
   /** Fecha ISO de la próxima cita CONFIRMED, o null si no tiene ninguna. */
   nextAppointmentAt?: string | null;
+  /** Nombre del tipo de la próxima cita CONFIRMED (Cita, Control, Mantenimiento). */
+  nextAppointmentType?: string | null;
+  /**
+   * Mes tentativo de la próxima cita ("YYYY-MM"), cuando la clínica anotó el
+   * mes pero el paciente todavía no confirmó el día. Excluyente con
+   * `nextAppointmentAt`: confirmar un día lo limpia, y anotar un mes cancela
+   * la cita que hubiera.
+   */
+  tentativeAppointmentMonth?: string | null;
+  /** UUID del tipo anotado junto al mes tentativo, para precargarlo al confirmar. */
+  tentativeAppointmentTypeUuid?: string | null;
+  /** Nombre de ese tipo (Cita, Control, Mantenimiento), listo para mostrar. */
+  tentativeAppointmentTypeName?: string | null;
 }
 
 export interface CreatePatientContactPayload {

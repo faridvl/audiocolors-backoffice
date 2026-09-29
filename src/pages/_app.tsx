@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import '@/styles/globals.css';
+import '@/shared/i18n/i18n';
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   const [queryClient] = useState(

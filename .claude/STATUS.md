@@ -42,7 +42,7 @@ como acento, grises neutros, interfaz clara. Logo extraído de los vectores del
 manual de marca. Favicon: la oreja sola.
 
 ### Etapa 3 — Estándares de UI
-Adoptados de billo (`web-backoffice-comx`): `ResponsiveTable` con tarjetas en
+Adoptados de un back-office de referencia: `ResponsiveTable` con tarjetas en
 móvil, cuatro estados de lista, `FormViewSection`/`FormViewLabel`, paginación
 con elipsis, escala tipográfica de 9 variantes.
 

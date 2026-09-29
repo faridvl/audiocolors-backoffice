@@ -8,7 +8,7 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
-import { formatDate, getFullName } from '@/shared/utils/formatters';
+import { formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
@@ -71,7 +71,42 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
       key: 'nextAppointmentAt',
       header: 'Próxima cita',
       width: '15%',
-      render: (patient) => formatDate(patient.nextAppointmentAt ?? undefined),
+      // Con dia confirmado se muestra la fecha y debajo de que es la cita; si
+      // solo hay mes tentativo se muestra atenuado, para distinguir de un
+      // vistazo a quien todavia hay que llamar.
+      render: (patient) => {
+        if (patient.nextAppointmentAt) {
+          return (
+            <div className="flex flex-col">
+              <Typography variant={TypographyVariant.BODY}>
+                {formatDate(patient.nextAppointmentAt)}
+              </Typography>
+              {patient.nextAppointmentType && (
+                <Typography variant={TypographyVariant.HELPER}>
+                  {patient.nextAppointmentType}
+                </Typography>
+              )}
+            </div>
+          );
+        }
+
+        if (patient.tentativeAppointmentMonth) {
+          return (
+            <div className="flex flex-col text-ink-500">
+              <Typography variant={TypographyVariant.BODY}>
+                {formatMonthLabel(patient.tentativeAppointmentMonth)}
+              </Typography>
+              <Typography variant={TypographyVariant.HELPER}>
+                {patient.tentativeAppointmentTypeName
+                  ? `${patient.tentativeAppointmentTypeName} · Por confirmar`
+                  : 'Por confirmar'}
+              </Typography>
+            </div>
+          );
+        }
+
+        return '—';
+      },
     },
   ];
 }

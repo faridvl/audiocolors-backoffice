@@ -88,9 +88,9 @@ oscuro o azulado compite con él. El naranja saturaba como acento general.
 
 ---
 
-## D8 · Estándares de UI tomados de billo
+## D8 · Estándares de UI tomados de un back-office de referencia
 
-Se adoptaron de `web-backoffice-comx`, un back-office de producción maduro:
+Se adoptaron de un back-office de producción maduro:
 
 - Tabla → tarjetas en móvil (nunca scroll horizontal)
 - Cuatro estados de lista, con vacío-sin-datos ≠ vacío-por-filtros
