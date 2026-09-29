@@ -9,6 +9,7 @@ import {
   Pencil,
   Phone,
   PhoneOff,
+  UserCog,
   UserPlus,
   type LucideIcon,
 } from 'lucide-react';
@@ -50,6 +51,7 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     [PatientActivityAction.DOCUMENT_UPLOADED]: { icon: Paperclip, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.DOCUMENT_RENAMED]: { icon: FilePen, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.DOCUMENT_DELETED]: { icon: FileX, tone: ActionTone.DANGER },
+    [PatientActivityAction.STATUS_CHANGED]: { icon: UserCog, tone: ActionTone.NEUTRAL },
   };
 
 export function getActionLabel(t: TFunction, action: PatientActivityAction): string {
@@ -193,6 +195,18 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
 
     case PatientActivityAction.APPOINTMENT_CONFIRMED:
       return joinParts(formatDayKey(detail.date), detail.typeName);
+
+    case PatientActivityAction.STATUS_CHANGED: {
+      const statusLabel = (status?: string | { name: string; phone: string }) =>
+        typeof status === 'string'
+          ? context.t(`${TEXT.ACTIVITY.DETAIL.STATUS_PREFIX}.${status}`)
+          : '—';
+      return joinParts(
+        `${statusLabel(detail.before)} → ${statusLabel(detail.after)}`,
+        formatDayKey(detail.date ?? undefined) === '—' ? null : formatDayKey(detail.date),
+        detail.reason,
+      );
+    }
 
     case PatientActivityAction.PATIENT_CREATED:
     default:

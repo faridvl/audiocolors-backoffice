@@ -6,7 +6,7 @@ import { ResponsiveTable, TableColumn } from '@/components/common/table/responsi
 import { Pagination } from '@/components/common/table/pagination';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
-import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
+import { FilterBar, FilterBarField } from '@/components/common/filter-bar/filter-bar';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
 import { TEXT } from '@/static/texts/i18n';
@@ -108,6 +108,10 @@ export const PatientActivityContainer: React.FC = () => {
     actorOptions,
     actionOptions,
     monthOptions,
+    branchFilter,
+    branchOptions,
+    typeFilter,
+    typeOptions,
     todaySummary,
     monthSummary,
     resolveBranchName,
@@ -116,6 +120,8 @@ export const PatientActivityContainer: React.FC = () => {
     handleActorFilter,
     handleActionFilter,
     handleMonthFilter,
+    handleBranchFilter,
+    handleTypeFilter,
     handlePageChange,
     handleRetry,
     navigateToPatient,
@@ -181,36 +187,61 @@ export const PatientActivityContainer: React.FC = () => {
     { value: ActivityScope.ALL, label: t(TEXT.ACTIVITY.FILTERS.SCOPE_ALL) },
   ];
 
-  const filters = [
+  const filterFields: FilterBarField[] = [
     {
       key: 'actor',
       label: t(TEXT.ACTIVITY.FILTERS.ACTOR_LABEL),
-      ariaLabel: t(TEXT.ACTIVITY.FILTERS.ACTOR_ARIA),
       value: actorFilter,
       options: actorOptions,
+      allValue: ALL_VALUE,
       onChange: handleActorFilter,
     },
     {
       key: 'action',
       label: t(TEXT.ACTIVITY.FILTERS.ACTION_LABEL),
-      ariaLabel: t(TEXT.ACTIVITY.FILTERS.ACTION_ARIA),
       value: actionFilter,
       options: actionOptions,
+      allValue: ALL_VALUE,
       onChange: handleActionFilter,
     },
+    {
+      key: 'branch',
+      label: t(TEXT.ACTIVITY.FILTERS.BRANCH_LABEL),
+      value: branchFilter,
+      options: branchOptions,
+      allValue: ALL_VALUE,
+      onChange: handleBranchFilter,
+    },
+    // El tipo de cita solo existe en las acciones de cita.
+    ...(scope === ActivityScope.APPOINTMENTS
+      ? [
+          {
+            key: 'type',
+            label: t(TEXT.ACTIVITY.FILTERS.TYPE_LABEL),
+            value: typeFilter,
+            options: typeOptions,
+            allValue: ALL_VALUE,
+            onChange: handleTypeFilter,
+          },
+        ]
+      : []),
     {
       key: 'month',
       label: t(TEXT.ACTIVITY.FILTERS.MONTH_LABEL),
       ariaLabel: t(TEXT.ACTIVITY.FILTERS.MONTH_ARIA),
       value: monthFilter,
       options: monthOptions,
+      allValue: ALL_VALUE,
+      inline: true,
       onChange: handleMonthFilter,
     },
   ];
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-2 md:gap-3 xl:grid-cols-4">
+      {/* En móvil las tarjetas van en una fila con scroll lateral para no
+          ocupar media pantalla antes del primer registro. */}
+      <div className="-mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-4 md:gap-3 md:overflow-visible md:px-0 md:pb-0 [&>*]:min-w-[46%] [&>*]:snap-start md:[&>*]:min-w-0">
         <SummaryCard
           label={t(TEXT.ACTIVITY.SUMMARY.TODAY)}
           value={todaySummary?.total}
@@ -230,70 +261,52 @@ export const PatientActivityContainer: React.FC = () => {
         />
       </div>
 
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative sm:w-72">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder={t(TEXT.ACTIVITY.FILTERS.SEARCH_PLACEHOLDER)}
-              aria-label={t(TEXT.ACTIVITY.FILTERS.SEARCH_ARIA)}
-              className={tailwind(inputBaseClasses, 'pl-9')}
-            />
-          </div>
-
-          <div
-            role="radiogroup"
-            aria-label={t(TEXT.ACTIVITY.FILTERS.SCOPE_ARIA)}
-            className="flex rounded-lg bg-ink-100 p-1"
-          >
-            {scopeOptions.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                role="radio"
-                aria-checked={scope === option.value}
-                onClick={() => handleScopeChange(option.value)}
-                className={tailwind(
-                  'flex-1 rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
-                  scope === option.value
-                    ? 'bg-white text-ink-900 shadow-sm'
-                    : 'text-ink-500 hover:text-ink-800',
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-end xl:gap-4">
-          {filters.map((filter) => (
-            <div
-              key={filter.key}
-              className={tailwind(
-                'flex min-w-0 flex-col gap-1.5',
-                filter.key === 'month' && 'col-span-2 sm:col-span-1',
-              )}
-            >
-              <Typography variant={TypographyVariant.HELPER}>{filter.label}</Typography>
-              <FilterDropdown
-                value={filter.value}
-                options={filter.options}
-                allValue={ALL_VALUE}
-                onChange={filter.onChange}
-                ariaLabel={filter.ariaLabel}
-                className="w-full sm:w-auto"
+      <FilterBar
+        leading={
+          <>
+            <div className="relative w-full sm:w-72">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
+                aria-hidden
+              />
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder={t(TEXT.ACTIVITY.FILTERS.SEARCH_PLACEHOLDER)}
+                aria-label={t(TEXT.ACTIVITY.FILTERS.SEARCH_ARIA)}
+                className={tailwind(inputBaseClasses, 'pl-9')}
               />
             </div>
-          ))}
-        </div>
-      </div>
+
+            <div
+              role="radiogroup"
+              aria-label={t(TEXT.ACTIVITY.FILTERS.SCOPE_ARIA)}
+              className="flex rounded-lg bg-ink-100 p-1"
+            >
+              {scopeOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={scope === option.value}
+                  onClick={() => handleScopeChange(option.value)}
+                  className={tailwind(
+                    'flex-1 rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
+                    scope === option.value
+                      ? 'bg-white text-ink-900 shadow-sm'
+                      : 'text-ink-500 hover:text-ink-800',
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </>
+        }
+        fields={filterFields}
+        resultCount={meta?.total}
+      />
 
       {!isLoading && !isError && !!meta?.total && (
         <Typography variant={TypographyVariant.HELPER}>

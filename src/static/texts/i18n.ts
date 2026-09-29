@@ -8,6 +8,16 @@ export const TEXT = {
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
     },
+    FILTERS: {
+      TITLE: 'common.filters.title',
+      OPEN: 'common.filters.open',
+      CLOSE: 'common.filters.close',
+      CLEAR: 'common.filters.clear',
+      CLEAR_ALL: 'common.filters.clearAll',
+      SHOW_RESULTS: 'common.filters.showResults',
+      APPLY: 'common.filters.apply',
+      REMOVE: 'common.filters.remove',
+    },
   },
   AUTH: {
     LOGIN: {
@@ -57,8 +67,13 @@ export const TEXT = {
       ACTION_ARIA: 'activity.filters.actionAria',
       MONTH_LABEL: 'activity.filters.monthLabel',
       MONTH_ARIA: 'activity.filters.monthAria',
+      BRANCH_LABEL: 'activity.filters.branchLabel',
+      BRANCH_ARIA: 'activity.filters.branchAria',
+      TYPE_LABEL: 'activity.filters.typeLabel',
+      TYPE_ARIA: 'activity.filters.typeAria',
       ALL: 'activity.filters.all',
       ALL_ACTIONS: 'activity.filters.allActions',
+      ALL_MONTHS: 'activity.filters.allMonths',
     },
     COLUMNS: {
       TIME: 'activity.columns.time',
@@ -87,6 +102,8 @@ export const TEXT = {
       BY_TENTATIVE: 'activity.detail.byTentative',
       /** Prefijo: la etiqueta de cada campo es `${FIELD_PREFIX}.${campo}`. */
       FIELD_PREFIX: 'activity.detail.fields',
+      /** Prefijo: la etiqueta de cada estado es `${STATUS_PREFIX}.${PatientStatus}`. */
+      STATUS_PREFIX: 'activity.detail.statuses',
     },
   },
 } as const;

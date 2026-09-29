@@ -7,6 +7,17 @@
     },
     "pagination": {
       "showing": "Mostrando {{start}} a {{end}} de {{total}} registros"
+    },
+    "filters": {
+      "title": "Filtros",
+      "open": "Filtros",
+      "close": "Cerrar filtros",
+      "clear": "Limpiar",
+      "apply": "Ver resultados",
+      "remove": "Quitar filtro {{label}}",
+      "clearAll": "Limpiar todo",
+      "showResults_one": "Mostrar {{count}} resultado",
+      "showResults_other": "Mostrar {{count}} resultados"
     }
   },
   "auth": {
@@ -56,7 +67,12 @@
       "monthLabel": "Mes",
       "monthAria": "Filtrar por mes",
       "all": "Todos",
-      "allActions": "Todas"
+      "allActions": "Todas",
+      "branchLabel": "Sede",
+      "branchAria": "Filtrar por sede del paciente",
+      "typeLabel": "Tipo de cita",
+      "typeAria": "Filtrar por tipo de cita",
+      "allMonths": "Todos los meses"
     },
     "count_one": "{{count}} registro",
     "count_other": "{{count}} registros",
@@ -90,7 +106,8 @@
       "DOCUMENT_RENAMED": "Archivo renombrado",
       "DOCUMENT_DELETED": "Archivo eliminado",
       "APPOINTMENT_TENTATIVE": "Cita tentativa",
-      "APPOINTMENT_CONFIRMED": "Cita confirmada"
+      "APPOINTMENT_CONFIRMED": "Cita confirmada",
+      "STATUS_CHANGED": "Estado cambiado"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -108,6 +125,11 @@
         "bloodType": "Tipo de sangre",
         "occupation": "Ocupación",
         "branchUuid": "Sede"
+      },
+      "statuses": {
+        "ACTIVE": "Activo",
+        "INACTIVE": "Inactivo",
+        "DECEASED": "Fallecido"
       }
     }
   }

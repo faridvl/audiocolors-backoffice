@@ -10,12 +10,15 @@ import {
   CalendarPlus,
   CalendarClock,
   Pencil,
+  UserCog,
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
+import { GENDER_LABELS, Patient, PatientGender, PatientStatus } from '@/types/patients/patient';
+import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
+import { ChangePatientStatusModal } from '@/components/containers/patients/patient-status/change-patient-status-modal';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
@@ -58,14 +61,15 @@ const InlineDatum: React.FC<{
 const PatientSummary: React.FC<{
   patient: Patient;
   onScheduleAppointment: () => void;
+  onChangeStatus: () => void;
   onEdit: () => void;
-}> = ({ patient, onScheduleAppointment, onEdit }) => {
+}> = ({ patient, onScheduleAppointment, onChangeStatus, onEdit }) => {
   const [showAllData, setShowAllData] = useState(false);
   const { data: branches } = useBranchesQuery();
 
   const age = calculateAge(patient.birthDate);
   const genderLabel = patient.gender
-    ? GENDER_LABELS[patient.gender as PatientGender] ?? patient.gender
+    ? (GENDER_LABELS[patient.gender as PatientGender] ?? patient.gender)
     : null;
 
   const demographics = [age !== null ? `${age} años` : null, genderLabel]
@@ -73,8 +77,17 @@ const PatientSummary: React.FC<{
     .join(' · ');
 
   const branchName = patient.branchUuid
-    ? branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null
+    ? (branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null)
     : null;
+
+  // A un paciente fallecido no se le agendan citas (el API lo rechaza).
+  const isDeceased = patient.status === PatientStatus.DECEASED;
+  const statusDetail = [
+    patient.statusDate ? formatDate(patient.statusDate) : null,
+    patient.statusReason,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   // Siempre true: aunque el paciente no tenga datos extra, el bloque expandido
   // sigue dando acceso a gestionar sus telefonos adicionales.
@@ -95,27 +108,52 @@ const PatientSummary: React.FC<{
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <InlineDatum
-          icon={User}
-          label="Nombre"
-          value={getFullName(patient.firstName, patient.lastName)}
-          className="text-brand-700 [&_svg]:text-brand-500"
-        />
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+          <InlineDatum
+            icon={User}
+            label="Nombre"
+            value={getFullName(patient.firstName, patient.lastName)}
+            className="text-brand-700 [&_svg]:text-brand-500"
+          />
+          <PatientStatusPill status={patient.status} />
+          {statusDetail && (
+            <Typography variant={TypographyVariant.HELPER} inline className="truncate">
+              {statusDetail}
+            </Typography>
+          )}
+        </div>
 
         <div className="flex shrink-0 items-center gap-1">
+          {!isDeceased && (
+            <button
+              type="button"
+              onClick={onScheduleAppointment}
+              aria-label={scheduleTitle}
+              title={scheduleTitle}
+              className={tailwind(
+                'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
+                'transition-colors hover:bg-brand-50',
+                'md:px-3 md:py-1.5 md:text-sm md:font-medium',
+              )}
+            >
+              <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="hidden md:inline">{scheduleTitle}</span>
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={onScheduleAppointment}
-            aria-label={scheduleTitle}
-            title={scheduleTitle}
+            onClick={onChangeStatus}
+            aria-label="Cambiar estado"
+            title="Cambiar estado"
             className={tailwind(
               'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
               'transition-colors hover:bg-brand-50',
               'md:px-3 md:py-1.5 md:text-sm md:font-medium',
             )}
           >
-            <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
-            <span className="hidden md:inline">{scheduleTitle}</span>
+            <UserCog className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="hidden md:inline">Cambiar estado</span>
           </button>
 
           <button
@@ -203,6 +241,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   const navigation = useNavigation();
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
+  const [isChangingStatus, setIsChangingStatus] = useState(false);
 
   if (isLoading) {
     return (
@@ -230,12 +269,23 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
       <PatientSummary
         patient={patient}
         onScheduleAppointment={() => setIsSchedulingAppointment(true)}
+        onChangeStatus={() => setIsChangingStatus(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
       />
 
       <PatientNotesContainer patientUuid={patient.uuid} />
 
       <DocumentsContainer patientUuid={patient.uuid} />
+
+      {isChangingStatus && (
+        <ChangePatientStatusModal
+          patientUuid={patient.uuid}
+          currentStatus={patient.status ?? PatientStatus.ACTIVE}
+          currentReason={patient.statusReason}
+          currentDate={patient.statusDate}
+          onClose={() => setIsChangingStatus(false)}
+        />
+      )}
 
       {isSchedulingAppointment && (
         <ScheduleAppointmentModal

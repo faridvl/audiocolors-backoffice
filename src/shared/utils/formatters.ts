@@ -36,6 +36,21 @@ export function formatMonthLabel(monthKey?: string | null): string {
   return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
 }
 
+/**
+ * Opción de filtro para un mes "YYYY-MM": el botón muestra "Octubre 2026" y
+ * dentro de la lista, agrupada por año, basta con "Octubre".
+ */
+export function buildMonthOption(monthKey: string): {
+  value: string;
+  label: string;
+  shortLabel: string;
+  group: string;
+} {
+  const label = formatMonthLabel(monthKey);
+  const [year] = monthKey.split('-');
+  return { value: monthKey, label, shortLabel: label.replace(` ${year}`, ''), group: year };
+}
+
 /** Edad en anios cumplidos a partir de la fecha de nacimiento. */
 export function calculateAge(birthDate?: string): number | null {
   if (!birthDate) return null;

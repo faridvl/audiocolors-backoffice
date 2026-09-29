@@ -13,6 +13,7 @@ export enum PatientActivityAction {
   DOCUMENT_DELETED = 'DOCUMENT_DELETED',
   APPOINTMENT_TENTATIVE = 'APPOINTMENT_TENTATIVE',
   APPOINTMENT_CONFIRMED = 'APPOINTMENT_CONFIRMED',
+  STATUS_CHANGED = 'STATUS_CHANGED',
 }
 
 export const APPOINTMENT_ACTIONS = [
@@ -46,6 +47,8 @@ export interface PatientActivityDetail {
   typeUuid?: string | null;
   typeName?: string | null;
   appointmentUuid?: string;
+  /** STATUS_CHANGED: motivo libre. */
+  reason?: string | null;
 }
 
 export interface PatientActivity {
@@ -79,4 +82,6 @@ export interface PatientActivityFilters {
   actions?: PatientActivityAction[];
   from?: string;
   to?: string;
+  branchUuid?: string;
+  appointmentTypeUuid?: string;
 }

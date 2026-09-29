@@ -7,8 +7,9 @@ import {
   usePatientActivitySummaryQuery,
 } from '@/shared/api/querys/patient-activity-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { useNavigation } from '@/hooks/use-navigation';
-import { formatMonthLabel } from '@/shared/utils/formatters';
+import { buildMonthOption } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import {
   APPOINTMENT_ACTIONS,
@@ -48,6 +49,8 @@ export function usePatientActivity() {
   const [actorFilter, setActorFilter] = useState<string>(ALL_VALUE);
   const [actionFilter, setActionFilter] = useState<string>(ALL_VALUE);
   const [monthFilter, setMonthFilter] = useState<string>(ALL_VALUE);
+  const [branchFilter, setBranchFilter] = useState<string>(ALL_VALUE);
+  const [typeFilter, setTypeFilter] = useState<string>(ALL_VALUE);
   const [page, setPage] = useState(1);
 
   // "Hoy" y "este mes" se fijan al montar: los rangos de los resúmenes no
@@ -77,11 +80,16 @@ export function usePatientActivity() {
     actions,
     from: range?.from,
     to: range?.to,
+    branchUuid: branchFilter !== ALL_VALUE ? branchFilter : undefined,
+    // El tipo solo existe en las acciones de cita: fuera de "Citas" no aplica.
+    appointmentTypeUuid:
+      scope === ActivityScope.APPOINTMENTS && typeFilter !== ALL_VALUE ? typeFilter : undefined,
   });
 
   const { data: actors } = usePatientActivityActorsQuery();
   const { data: activeMonths } = usePatientActivityMonthsQuery();
   const { data: branches } = useBranchesQuery();
+  const { data: appointmentTypes } = useAppointmentTypesQuery();
 
   const todayRange = useMemo(
     () => ({
@@ -122,13 +130,26 @@ export function usePatientActivity() {
 
   const monthOptions = useMemo(
     () => [
-      { label: t(TEXT.ACTIVITY.FILTERS.ALL), value: ALL_VALUE },
-      ...(activeMonths?.months ?? []).map((monthKey) => ({
-        label: formatMonthLabel(monthKey),
-        value: monthKey,
-      })),
+      { label: t(TEXT.ACTIVITY.FILTERS.ALL_MONTHS), value: ALL_VALUE },
+      ...(activeMonths?.months ?? []).map(buildMonthOption),
     ],
     [activeMonths, t],
+  );
+
+  const branchOptions = useMemo(
+    () => [
+      { label: t(TEXT.ACTIVITY.FILTERS.ALL_ACTIONS), value: ALL_VALUE },
+      ...(branches ?? []).map((branch) => ({ label: branch.name, value: branch.uuid })),
+    ],
+    [branches, t],
+  );
+
+  const typeOptions = useMemo(
+    () => [
+      { label: t(TEXT.ACTIVITY.FILTERS.ALL), value: ALL_VALUE },
+      ...(appointmentTypes ?? []).map((type) => ({ label: type.name, value: type.uuid })),
+    ],
+    [appointmentTypes, t],
   );
 
   const rows = useMemo(() => groupConsecutiveUploads(data?.data ?? []), [data]);
@@ -140,8 +161,10 @@ export function usePatientActivity() {
 
   const handleScopeChange = (nextScope: ActivityScope) => {
     setScope(nextScope);
-    // Una acción elegida en "Todo" puede no existir en "Citas".
+    // Una acción elegida en "Todo" puede no existir en "Citas", y el tipo
+    // de cita solo aplica en "Citas".
     setActionFilter(ALL_VALUE);
+    setTypeFilter(ALL_VALUE);
     setPage(1);
   };
 
@@ -155,7 +178,9 @@ export function usePatientActivity() {
     scope !== ActivityScope.ALL ||
     actorFilter !== ALL_VALUE ||
     actionFilter !== ALL_VALUE ||
-    monthFilter !== ALL_VALUE;
+    monthFilter !== ALL_VALUE ||
+    branchFilter !== ALL_VALUE ||
+    typeFilter !== ALL_VALUE;
 
   return {
     rows,
@@ -173,6 +198,10 @@ export function usePatientActivity() {
     actorOptions,
     actionOptions,
     monthOptions,
+    branchFilter,
+    branchOptions,
+    typeFilter,
+    typeOptions,
     todaySummary,
     monthSummary,
     resolveBranchName,
@@ -181,6 +210,8 @@ export function usePatientActivity() {
     handleActorFilter: withPageReset(setActorFilter),
     handleActionFilter: withPageReset(setActionFilter),
     handleMonthFilter: withPageReset(setMonthFilter),
+    handleBranchFilter: withPageReset(setBranchFilter),
+    handleTypeFilter: withPageReset(setTypeFilter),
     handlePageChange: setPage,
     handleRetry: refetch,
     navigateToPatient: navigation.patients.detail,

@@ -8,6 +8,22 @@ export const GENDER_LABELS: Record<PatientGender, string> = {
   [PatientGender.FEMALE]: 'Femenino',
 };
 
+/**
+ * Estado del paciente para la clínica. No confundir con `isActive`, que es el
+ * borrado lógico ("registro eliminado") y no se puede revertir.
+ */
+export enum PatientStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DECEASED = 'DECEASED',
+}
+
+export const PATIENT_STATUS_LABELS: Record<PatientStatus, string> = {
+  [PatientStatus.ACTIVE]: 'Activo',
+  [PatientStatus.INACTIVE]: 'Inactivo',
+  [PatientStatus.DECEASED]: 'Fallecido',
+};
+
 export enum DocumentType {
   NATIONAL = 'national',
   DIMEX = 'dimex',
@@ -32,6 +48,12 @@ export interface Patient {
   documentId?: string;
   branchUuid?: string | null;
   isActive: boolean;
+  /** Estado para la clínica. Los pacientes previos al campo llegan como ACTIVE. */
+  status?: PatientStatus;
+  /** Motivo libre al pasar a inactivo o fallecido. */
+  statusReason?: string | null;
+  /** Fecha de fallecimiento (ISO), si se conoce. */
+  statusDate?: string | null;
   createdAt: string;
   updatedAt?: string;
   /** Fecha ISO de la próxima cita CONFIRMED, o null si no tiene ninguna. */

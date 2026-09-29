@@ -7,12 +7,13 @@ import { Pagination } from '@/components/common/table/pagination';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
-import { FilterDropdown } from '@/components/common/filter-dropdown/filter-dropdown';
+import { FilterBar } from '@/components/common/filter-bar/filter-bar';
+import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
 import { formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { usePatientList, ALL_VALUE } from './use-patient-list';
+import { usePatientList, ALL_VALUE, DEFAULT_STATUS_FILTER } from './use-patient-list';
 
 function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
   return [
@@ -23,9 +24,12 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
       isCardTitle: true,
       render: (patient) => (
         <div className="flex flex-col">
-          <Typography variant={TypographyVariant.BODY}>
-            {getFullName(patient.firstName, patient.lastName)}
-          </Typography>
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <Typography variant={TypographyVariant.BODY} inline>
+              {getFullName(patient.firstName, patient.lastName)}
+            </Typography>
+            <PatientStatusPill status={patient.status} />
+          </span>
           {patient.email && (
             <Typography variant={TypographyVariant.HELPER}>{patient.email}</Typography>
           )}
@@ -118,12 +122,21 @@ export const PatientListContainer: React.FC = () => {
     searchTerm,
     appointmentMonthFilter,
     appointmentMonthOptions,
+    statusFilter,
+    statusOptions,
+    branchFilter,
+    branchOptions,
+    appointmentTypeFilter,
+    appointmentTypeOptions,
     isLoading,
     isError,
     page,
     hasActiveFilters,
     setSearchTerm,
     handleAppointmentMonthFilter,
+    handleStatusFilter,
+    handleBranchFilter,
+    handleAppointmentTypeFilter,
     handlePageChange,
     handleRetry,
     navigateToCreate,
@@ -144,42 +157,63 @@ export const PatientListContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div className="relative xl:max-w-xs xl:flex-1">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
-            aria-hidden
-          />
-          <input
-            type="search"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Buscar por nombre o cédula"
-            aria-label="Buscar pacientes"
-            className={tailwind(inputBaseClasses, 'pl-9')}
-          />
-        </div>
-
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-end xl:gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Typography variant={TypographyVariant.HELPER} className="text-ink-500">
-              Filtrar por próxima cita
-            </Typography>
-
-            <FilterDropdown
-              value={appointmentMonthFilter}
-              options={appointmentMonthOptions}
-              allValue={ALL_VALUE}
-              onChange={handleAppointmentMonthFilter}
-              ariaLabel="Filtrar por mes de próxima cita"
-              placeholderLabel="Mes"
-              className="w-full sm:w-auto"
+      <FilterBar
+        leading={
+          <div className="relative w-full lg:w-72">
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
+              aria-hidden
+            />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Buscar por nombre o cédula"
+              aria-label="Buscar pacientes"
+              className={tailwind(inputBaseClasses, 'pl-9')}
             />
           </div>
-
-          {createButton}
-        </div>
-      </div>
+        }
+        fields={[
+          {
+            key: 'status',
+            label: 'Estado',
+            value: statusFilter,
+            options: statusOptions,
+            allValue: ALL_VALUE,
+            defaultValue: DEFAULT_STATUS_FILTER,
+            onChange: handleStatusFilter,
+          },
+          {
+            key: 'branch',
+            label: 'Sede',
+            value: branchFilter,
+            options: branchOptions,
+            allValue: ALL_VALUE,
+            onChange: handleBranchFilter,
+          },
+          {
+            key: 'appointmentType',
+            label: 'Tipo de cita',
+            value: appointmentTypeFilter,
+            options: appointmentTypeOptions,
+            allValue: ALL_VALUE,
+            onChange: handleAppointmentTypeFilter,
+          },
+          {
+            key: 'month',
+            label: 'Próxima cita',
+            ariaLabel: 'Filtrar por mes de próxima cita',
+            inline: true,
+            value: appointmentMonthFilter,
+            options: appointmentMonthOptions,
+            allValue: ALL_VALUE,
+            onChange: handleAppointmentMonthFilter,
+          },
+        ]}
+        trailing={createButton}
+        resultCount={meta?.total}
+      />
 
       {!isLoading && !isError && !!meta?.total && (
         <Typography variant={TypographyVariant.HELPER}>
@@ -202,7 +236,7 @@ export const PatientListContainer: React.FC = () => {
         emptyDescription="Registra el primer paciente para comenzar."
         emptyAction={createButton}
         noResultsTitle="Sin resultados para tu búsqueda"
-        noResultsDescription="Prueba con otro nombre o cédula, o cambia el filtro de próxima cita."
+        noResultsDescription="Prueba con otro nombre o cédula, o cambia los filtros."
         rowActions={(patient) => (
           <Button
             variant={ButtonVariant.GHOST}

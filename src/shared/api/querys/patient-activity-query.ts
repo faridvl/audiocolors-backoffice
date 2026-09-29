@@ -30,6 +30,10 @@ export function usePatientActivityQuery(filters: PatientActivityFilters) {
       if (filters.actions?.length) params.set('action', filters.actions.join(','));
       if (filters.from) params.set('from', filters.from);
       if (filters.to) params.set('to', filters.to);
+      if (filters.branchUuid) params.set('branchUuid', filters.branchUuid);
+      if (filters.appointmentTypeUuid) {
+        params.set('appointmentTypeUuid', filters.appointmentTypeUuid);
+      }
 
       return client().get<PaginatedResponse<PatientActivity>>(
         `/patient-activity?${params.toString()}`,
