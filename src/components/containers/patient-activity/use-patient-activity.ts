@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   usePatientActivityActorsQuery,
+  usePatientActivityMonthsQuery,
   usePatientActivityQuery,
   usePatientActivitySummaryQuery,
 } from '@/shared/api/querys/patient-activity-query';
@@ -17,8 +18,6 @@ import { getActionLabel, groupConsecutiveUploads } from './patient-activity-pres
 
 export const ALL_VALUE = 'all';
 const PAGE_SIZE = 20;
-/** Meses que ofrece el filtro, contando el actual hacia atrás. */
-const MONTHS_BACK = 12;
 
 /** Qué parte de la bitácora se ve: solo citas o todo. */
 export enum ActivityScope {
@@ -81,6 +80,7 @@ export function usePatientActivity() {
   });
 
   const { data: actors } = usePatientActivityActorsQuery();
+  const { data: activeMonths } = usePatientActivityMonthsQuery();
   const { data: branches } = useBranchesQuery();
 
   const todayRange = useMemo(
@@ -123,12 +123,12 @@ export function usePatientActivity() {
   const monthOptions = useMemo(
     () => [
       { label: t(TEXT.ACTIVITY.FILTERS.ALL), value: ALL_VALUE },
-      ...Array.from({ length: MONTHS_BACK }, (_, offset) => {
-        const monthKey = toMonthKey(new Date(now.getFullYear(), now.getMonth() - offset, 1));
-        return { label: formatMonthLabel(monthKey), value: monthKey };
-      }),
+      ...(activeMonths?.months ?? []).map((monthKey) => ({
+        label: formatMonthLabel(monthKey),
+        value: monthKey,
+      })),
     ],
-    [now, t],
+    [activeMonths, t],
   );
 
   const rows = useMemo(() => groupConsecutiveUploads(data?.data ?? []), [data]);

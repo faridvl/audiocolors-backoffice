@@ -12,6 +12,7 @@ import {
 export const FETCH_PATIENT_ACTIVITY_KEY = 'fetchPatientActivity';
 export const FETCH_PATIENT_ACTIVITY_ACTORS_KEY = 'fetchPatientActivityActors';
 export const FETCH_PATIENT_ACTIVITY_SUMMARY_KEY = 'fetchPatientActivitySummary';
+export const FETCH_PATIENT_ACTIVITY_MONTHS_KEY = 'fetchPatientActivityMonths';
 
 const client = () => ApiServiceClient(env.API.MEDICAL_RECORDS_URL);
 
@@ -56,5 +57,23 @@ export function usePatientActivitySummaryQuery(from: string, to: string) {
       return client().get<PatientActivitySummary>(`/patient-activity/summary?${params.toString()}`);
     },
     staleTime: 1000 * 60,
+  });
+}
+
+/**
+ * Meses (YYYY-MM) con al menos una acción en la bitácora: opciones del
+ * filtro "Mes". Se agrupan en la zona horaria del navegador (la de la
+ * clínica), la misma con la que se arma el rango al filtrar.
+ */
+export function usePatientActivityMonthsQuery() {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  return useQuery({
+    queryKey: [FETCH_PATIENT_ACTIVITY_MONTHS_KEY, timeZone],
+    queryFn: () => {
+      const params = new URLSearchParams({ timeZone });
+      return client().get<{ months: string[] }>(`/patient-activity/months?${params.toString()}`);
+    },
+    staleTime: 1000 * 60 * 2,
   });
 }
