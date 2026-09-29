@@ -3,9 +3,11 @@ import { Phone, Plus, Trash2, Loader2, AlertTriangle, Users, X } from 'lucide-re
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
+import { tailwind } from '@/utils/tailwind-utils';
 import { PatientContact } from '@/types/patients/patient-contact';
 import { usePatientContacts } from './use-patient-contacts';
 import { ConfirmDeleteContactModal } from './confirm-delete-contact-modal';
+import { PatientNameFillButton } from './patient-name-fill-button';
 
 interface ContactRowProps {
   contact: PatientContact;
@@ -39,10 +41,15 @@ const ContactRow: React.FC<ContactRowProps> = ({ contact, onDelete }) => (
 
 interface ManageContactsModalProps {
   patientUuid: string;
+  patientName: string;
   onClose: () => void;
 }
 
-const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, onClose }) => {
+const ManageContactsModal: React.FC<ManageContactsModalProps> = ({
+  patientUuid,
+  patientName,
+  onClose,
+}) => {
   const {
     contacts,
     isLoading,
@@ -110,15 +117,21 @@ const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, 
                 <label htmlFor="contact-name">
                   <Typography variant={TypographyVariant.HELPER}>Nombre</Typography>
                 </label>
-                <input
-                  id="contact-name"
-                  type="text"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  maxLength={80}
-                  autoFocus
-                  className={inputBaseClasses}
-                />
+                <div className="relative">
+                  <input
+                    id="contact-name"
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    maxLength={80}
+                    autoFocus
+                    className={tailwind(inputBaseClasses, 'pr-11')}
+                  />
+                  <PatientNameFillButton
+                    disabled={!patientName}
+                    onClick={() => setName(patientName.slice(0, 80))}
+                  />
+                </div>
                 <Typography variant={TypographyVariant.HELPER} className="text-ink-400">
                   Incluí el parentesco, por ejemplo: Juan (hijo)
                 </Typography>
@@ -214,6 +227,8 @@ const ManageContactsModal: React.FC<ManageContactsModalProps> = ({ patientUuid, 
 
 interface PatientContactsContainerProps {
   patientUuid: string;
+  /** Nombre completo del paciente, para el ícono que lo copia al campo "Nombre". */
+  patientName: string;
 }
 
 /**
@@ -223,6 +238,7 @@ interface PatientContactsContainerProps {
  */
 export const PatientContactsContainer: React.FC<PatientContactsContainerProps> = ({
   patientUuid,
+  patientName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -238,7 +254,11 @@ export const PatientContactsContainer: React.FC<PatientContactsContainerProps> =
       </button>
 
       {isOpen && (
-        <ManageContactsModal patientUuid={patientUuid} onClose={() => setIsOpen(false)} />
+        <ManageContactsModal
+          patientUuid={patientUuid}
+          patientName={patientName}
+          onClose={() => setIsOpen(false)}
+        />
       )}
     </div>
   );

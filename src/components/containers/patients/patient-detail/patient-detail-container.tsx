@@ -20,6 +20,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
+import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { calculateAge, formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
@@ -172,7 +173,10 @@ const PatientSummary: React.FC<{
             value={patient.createdAt ? formatDate(patient.createdAt) : null}
           />
           <div className="sm:w-full">
-            <PatientContactsContainer patientUuid={patient.uuid} />
+            <PatientContactsContainer
+              patientUuid={patient.uuid}
+              patientName={buildPatientFullName(patient.firstName, patient.lastName)}
+            />
           </div>
         </div>
       )}
