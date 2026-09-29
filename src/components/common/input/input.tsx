@@ -34,6 +34,8 @@ interface FormFieldProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   /** Teclado virtual correcto en iOS/Android para campos numéricos o de teléfono. */
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  /** Botón de ícono dentro del campo, a la derecha (posicionado `absolute`, ancho `w-11`). */
+  endAdornment?: React.ReactNode;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -51,6 +53,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   onChange,
   inputMode,
+  endAdornment,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = as === 'input' && type === 'password';
@@ -79,7 +82,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           className={tailwind(
             inputBaseClasses,
             as === 'textarea' && 'min-h-[88px] resize-none',
-            isPassword && 'pr-11',
+            (isPassword || endAdornment) && 'pr-11',
           )}
           {...(onChange ? { onChange } : {})}
         >
@@ -100,6 +103,8 @@ export const FormField: React.FC<FormFieldProps> = ({
             )}
           </button>
         )}
+
+        {!isPassword && endAdornment}
       </div>
 
       {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}

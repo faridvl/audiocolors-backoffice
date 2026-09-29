@@ -5,6 +5,10 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
 import { FormViewSection } from '@/components/common/form/form-view-section';
 import {
+  PatientNameFillButton,
+  buildPatientFullName,
+} from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
+import {
   DocumentType,
   DOCUMENT_TYPE_LABELS,
   GENDER_LABELS,
@@ -36,6 +40,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
   showContacts = false,
 }) => {
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
+  const patientFullName = buildPatientFullName(values.firstName, values.lastName);
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
   const { data: branches } = useBranchesQuery();
 
@@ -144,6 +149,17 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
                                 label="Nombre de contacto adicional"
                                 hint="Incluí el parentesco, por ejemplo: Juan (hijo)"
                                 maxLength={80}
+                                endAdornment={
+                                  <PatientNameFillButton
+                                    disabled={!patientFullName}
+                                    onClick={() =>
+                                      setFieldValue(
+                                        `contacts.${index}.name`,
+                                        patientFullName.slice(0, 80),
+                                      )
+                                    }
+                                  />
+                                }
                               />
                             </div>
                             <div className="flex flex-col gap-1.5">
