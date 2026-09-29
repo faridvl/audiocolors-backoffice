@@ -55,6 +55,12 @@ interface ResponsiveTableProps<T> {
   rowActions?: (row: T) => React.ReactNode;
   /** Color de acento en el borde superior de la tarjeta movil (p.ej. por sede). */
   rowAccentColor?: RowAccentColor<T>;
+  /**
+   * Etiqueta de grupo de cada fila (p.ej. el día). Cuando cambia respecto de
+   * la fila anterior se intercala un separador con esa etiqueta. Las filas
+   * deben venir ya ordenadas por grupo.
+   */
+  getRowGroup?: (row: T) => string;
   emptyTitle?: string;
   emptyDescription?: string;
   emptyAction?: React.ReactNode;
@@ -88,6 +94,7 @@ export function ResponsiveTable<T>({
   onRetry,
   rowActions,
   rowAccentColor,
+  getRowGroup,
   emptyTitle = 'Aún no hay registros',
   emptyDescription,
   emptyAction,
@@ -142,14 +149,19 @@ export function ResponsiveTable<T>({
       ),
     }[state];
 
-    return (
-      <div className="rounded-card border border-ink-200 bg-white">{stateContent}</div>
-    );
+    return <div className="rounded-card border border-ink-200 bg-white">{stateContent}</div>;
   }
 
   const cardColumns = columns.filter((column) => !column.hideOnCard);
   const titleColumn = columns.find((column) => column.isCardTitle) ?? columns[0];
   const detailColumns = cardColumns.filter((column) => column !== titleColumn);
+
+  /** Etiqueta del grupo si esta fila abre uno nuevo; null si sigue el anterior. */
+  const groupStartLabel = (index: number): string | null => {
+    if (!getRowGroup) return null;
+    const label = getRowGroup(rows[index]);
+    return index === 0 || getRowGroup(rows[index - 1]) !== label ? label : null;
+  };
 
   return (
     <>
@@ -175,26 +187,40 @@ export function ResponsiveTable<T>({
           </thead>
 
           <tbody>
-            {rows.map((row) => (
-              <tr
-                key={getRowKey(row)}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={tailwind(
-                  'border-b border-ink-200 last:border-b-0 transition-colors',
-                  onRowClick && 'cursor-pointer hover:bg-ink-50',
+            {rows.map((row, index) => (
+              <React.Fragment key={getRowKey(row)}>
+                {groupStartLabel(index) && (
+                  <tr className="border-b border-ink-200 bg-ink-50">
+                    <td
+                      colSpan={columns.length + (rowActions ? 1 : 0)}
+                      className="px-4 py-2 text-xs font-bold uppercase tracking-wide text-ink-500"
+                    >
+                      {groupStartLabel(index)}
+                    </td>
+                  </tr>
                 )}
-              >
-                {columns.map((column) => (
-                  <td key={column.key} className="px-4 py-3 align-middle text-sm text-ink-700">
-                    {column.render(row)}
-                  </td>
-                ))}
-                {rowActions && (
-                  <td className="px-4 py-3 text-right" onClick={(event) => event.stopPropagation()}>
-                    {rowActions(row)}
-                  </td>
-                )}
-              </tr>
+                <tr
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={tailwind(
+                    'border-b border-ink-200 last:border-b-0 transition-colors',
+                    onRowClick && 'cursor-pointer hover:bg-ink-50',
+                  )}
+                >
+                  {columns.map((column) => (
+                    <td key={column.key} className="px-4 py-3 align-middle text-sm text-ink-700">
+                      {column.render(row)}
+                    </td>
+                  ))}
+                  {rowActions && (
+                    <td
+                      className="px-4 py-3 text-right"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      {rowActions(row)}
+                    </td>
+                  )}
+                </tr>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -202,46 +228,58 @@ export function ResponsiveTable<T>({
 
       {/* Movil: una tarjeta por registro */}
       <div className="flex flex-col gap-2 md:hidden">
-        {rows.map((row) => (
-          <div
-            key={getRowKey(row)}
-            style={
-              rowAccentColor?.(row)
-                ? { boxShadow: `inset 0 3px 0 0 ${rowAccentColor(row)}` }
-                : undefined
-            }
-            className="relative rounded-card border border-ink-200 bg-white p-4"
-          >
-            {rowActions && (
-              <div className="absolute right-2 top-2" onClick={(event) => event.stopPropagation()}>
-                {rowActions(row)}
-              </div>
+        {rows.map((row, index) => (
+          <React.Fragment key={getRowKey(row)}>
+            {groupStartLabel(index) && (
+              <Typography
+                variant={TypographyVariant.HELPER}
+                className="mt-2 font-bold uppercase tracking-wide first:mt-0"
+              >
+                {groupStartLabel(index)}
+              </Typography>
             )}
-
-            <button
-              type="button"
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              disabled={!onRowClick}
-              className="flex w-full flex-col gap-3 text-left disabled:cursor-default"
+            <div
+              style={
+                rowAccentColor?.(row)
+                  ? { boxShadow: `inset 0 3px 0 0 ${rowAccentColor(row)}` }
+                  : undefined
+              }
+              className="relative rounded-card border border-ink-200 bg-white p-4"
             >
-              <div className="pr-8">{titleColumn.render(row)}</div>
+              {rowActions && (
+                <div
+                  className="absolute right-2 top-2"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {rowActions(row)}
+                </div>
+              )}
 
-              <dl className="flex flex-col gap-1.5 border-t border-ink-100 pt-3">
-                {detailColumns.map((column) => (
-                  <div key={column.key} className="flex items-baseline justify-between gap-3">
-                    <dt className="shrink-0">
-                      <Typography variant={TypographyVariant.HELPER} className="font-bold">
-                        {column.header}
-                      </Typography>
-                    </dt>
-                    <dd className="min-w-0 text-right text-sm text-ink-700">
-                      {column.render(row)}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                disabled={!onRowClick}
+                className="flex w-full flex-col gap-3 text-left disabled:cursor-default"
+              >
+                <div className="pr-8">{titleColumn.render(row)}</div>
+
+                <dl className="flex flex-col gap-1.5 border-t border-ink-100 pt-3">
+                  {detailColumns.map((column) => (
+                    <div key={column.key} className="flex items-baseline justify-between gap-3">
+                      <dt className="shrink-0">
+                        <Typography variant={TypographyVariant.HELPER} className="font-bold">
+                          {column.header}
+                        </Typography>
+                      </dt>
+                      <dd className="min-w-0 text-right text-sm text-ink-700">
+                        {column.render(row)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </button>
+            </div>
+          </React.Fragment>
         ))}
       </div>
     </>

@@ -8,6 +8,16 @@ export const TEXT = {
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
     },
+    FILTERS: {
+      TITLE: 'common.filters.title',
+      OPEN: 'common.filters.open',
+      CLOSE: 'common.filters.close',
+      CLEAR: 'common.filters.clear',
+      CLEAR_ALL: 'common.filters.clearAll',
+      SHOW_RESULTS: 'common.filters.showResults',
+      APPLY: 'common.filters.apply',
+      REMOVE: 'common.filters.remove',
+    },
   },
   AUTH: {
     LOGIN: {
@@ -30,6 +40,70 @@ export const TEXT = {
         EMAIL_REQUIRED: 'auth.login.validation.emailRequired',
         PASSWORD_REQUIRED: 'auth.login.validation.passwordRequired',
       },
+    },
+  },
+  ACTIVITY: {
+    PAGE_TITLE: 'activity.pageTitle',
+    TITLE: 'activity.title',
+    COUNT: 'activity.count',
+    UNKNOWN_ACTOR: 'activity.unknownActor',
+    SUMMARY: {
+      TODAY: 'activity.summary.today',
+      TODAY_EMPTY: 'activity.summary.todayEmpty',
+      CONFIRMED_THIS_MONTH: 'activity.summary.confirmedThisMonth',
+      TENTATIVE_THIS_MONTH: 'activity.summary.tentativeThisMonth',
+      NEW_PATIENTS_THIS_MONTH: 'activity.summary.newPatientsThisMonth',
+      BY_ACTOR: 'activity.summary.byActor',
+    },
+    FILTERS: {
+      SEARCH_PLACEHOLDER: 'activity.filters.searchPlaceholder',
+      SEARCH_ARIA: 'activity.filters.searchAria',
+      SCOPE_ARIA: 'activity.filters.scopeAria',
+      SCOPE_APPOINTMENTS: 'activity.filters.scopeAppointments',
+      SCOPE_ALL: 'activity.filters.scopeAll',
+      ACTOR_LABEL: 'activity.filters.actorLabel',
+      ACTOR_ARIA: 'activity.filters.actorAria',
+      ACTION_LABEL: 'activity.filters.actionLabel',
+      ACTION_ARIA: 'activity.filters.actionAria',
+      MONTH_LABEL: 'activity.filters.monthLabel',
+      MONTH_ARIA: 'activity.filters.monthAria',
+      BRANCH_LABEL: 'activity.filters.branchLabel',
+      BRANCH_ARIA: 'activity.filters.branchAria',
+      TYPE_LABEL: 'activity.filters.typeLabel',
+      TYPE_ARIA: 'activity.filters.typeAria',
+      ALL: 'activity.filters.all',
+      ALL_ACTIONS: 'activity.filters.allActions',
+      ALL_MONTHS: 'activity.filters.allMonths',
+    },
+    COLUMNS: {
+      TIME: 'activity.columns.time',
+      PATIENT: 'activity.columns.patient',
+      ACTION: 'activity.columns.action',
+      DETAIL: 'activity.columns.detail',
+      ACTOR: 'activity.columns.actor',
+    },
+    GROUP: {
+      TODAY: 'activity.group.today',
+      YESTERDAY: 'activity.group.yesterday',
+    },
+    STATES: {
+      EMPTY_TITLE: 'activity.states.emptyTitle',
+      EMPTY_DESCRIPTION: 'activity.states.emptyDescription',
+      NO_RESULTS_TITLE: 'activity.states.noResultsTitle',
+      NO_RESULTS_DESCRIPTION: 'activity.states.noResultsDescription',
+      ERROR_TITLE: 'activity.states.errorTitle',
+    },
+    /** Prefijo: la etiqueta de cada acción es `${ACTION_PREFIX}.${PatientActivityAction}`. */
+    ACTION_PREFIX: 'activity.actions',
+    DETAIL: {
+      FILES_UPLOADED: 'activity.detail.filesUploaded',
+      MORE: 'activity.detail.more',
+      EMPTY_VALUE: 'activity.detail.emptyValue',
+      BY_TENTATIVE: 'activity.detail.byTentative',
+      /** Prefijo: la etiqueta de cada campo es `${FIELD_PREFIX}.${campo}`. */
+      FIELD_PREFIX: 'activity.detail.fields',
+      /** Prefijo: la etiqueta de cada estado es `${STATUS_PREFIX}.${PatientStatus}`. */
+      STATUS_PREFIX: 'activity.detail.statuses',
     },
   },
 } as const;
