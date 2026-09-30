@@ -126,3 +126,31 @@ Ambas requieren cambio en el API, que se comparte con Zynka. Ver regla 7 de
    build, así que hay que redeployar si se añaden después).
 3. **Logo definitivo**: el actual sale de los vectores del `.ai` rasterizados a
    1400px. Exportar un SVG desde Illustrator daría calidad infinita.
+
+---
+
+## D10 · Agenda de escritorio: arrastrar es confirmar, sin tocar el API
+
+**Decisión:** en escritorio (`lg`) la agenda muestra el mes, los horarios del
+día (8:00 a 17:00, uno por hora) y "Por confirmar". Soltar un paciente en un
+horario confirma la cita sin modal; soltar una cita en "Por confirmar" la
+devuelve a mes tentativo. Un horario acepta varias citas. El celular se queda
+con la franja semanal y pestañas.
+
+**Cómo, con el API tal cual:** `POST next-appointment` solo recibe el día y
+guarda las 08:00 UTC; la hora se fija después con `PATCH /appointments/:uuid`
+(`date`, `startTime`, `endTime`). Volver a "por confirmar" es
+`PUT tentative-month` (que cancela la cita futura) y un `PATCH` a `CANCELLED`
+para la de hoy cuya hora ya pasó, que el API no cancela.
+
+**Por qué la hora es real (UTC-6) y no "flotante":** las 8:00 de la clínica
+se guardan como 14:00 UTC. Así el `.ics`, la cancelación de citas futuras y el
+job de medianoche ven la hora verdadera. Las citas confirmadas solo con día
+(08:00 UTC = 2:00 en Costa Rica) caen fuera de los horarios y se muestran en
+"Sin hora asignada", listas para arrastrar.
+
+**Cuándo deja de valer:** el API filtra `GET /appointments?date=` por día
+UTC. Un horario desde las 18:00 de Costa Rica cae en el día UTC siguiente y
+desaparecería de su día. Si la clínica atiende después de las 17:00, primero
+hay que filtrar por día local en el API.
+
