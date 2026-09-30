@@ -1,3 +1,6 @@
+/** Lo que se muestra cuando un dato no existe (un nombre o una sede que no llegó). */
+export const EMPTY_VALUE = '—';
+
 /** Formatea una fecha ISO como "12 mar 2026". Devuelve '—' si no es valida. */
 export function formatDate(isoDate?: string): string {
   if (!isoDate) return '—';

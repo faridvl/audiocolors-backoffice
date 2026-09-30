@@ -16,10 +16,11 @@ interface SetTentativeMonthVariables {
  * tuviera: volver a "solo mes" significa que esa fecha dejo de valer.
  */
 export function useSetTentativeMonthMutation() {
-  const { mutate: executeSetTentativeMonth, isPending } = useApiMutation<
-    unknown,
-    SetTentativeMonthVariables
-  >({
+  const {
+    mutate: executeSetTentativeMonth,
+    mutateAsync: executeSetTentativeMonthAsync,
+    isPending,
+  } = useApiMutation<unknown, SetTentativeMonthVariables>({
     mutationKey: ['setTentativeMonth'],
     mutationFn: ({ patientUuid, month, typeUUID }) =>
       ApiServiceClient(env.API.MEDICAL_RECORDS_URL).put(
@@ -28,5 +29,5 @@ export function useSetTentativeMonthMutation() {
       ),
   });
 
-  return { executeSetTentativeMonth, isPending };
+  return { executeSetTentativeMonth, executeSetTentativeMonthAsync, isPending };
 }

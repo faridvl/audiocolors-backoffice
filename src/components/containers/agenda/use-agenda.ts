@@ -9,6 +9,7 @@ import {
   useAppointmentsByDayQuery,
 } from '@/shared/api/querys/appointments-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
+import { useAppointmentMonthsQuery } from '@/shared/api/querys/appointment-months-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import {
@@ -22,7 +23,7 @@ import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { downloadCalendarEvent } from '@/shared/utils/calendar-file';
-import { formatMonthLabel } from '@/shared/utils/formatters';
+import { buildMonthOption, formatMonthLabel } from '@/shared/utils/formatters';
 import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
@@ -32,17 +33,15 @@ import {
   addDays,
   buildWeekDayKeys,
   capitalize,
-  DayTiming,
   formatLongDay,
   formatCompactDay,
   fromDayKey,
-  getDayTiming,
-  groupAppointments,
-  isVisibleInAgenda,
   startOfWeek,
   toDayKey,
   toMonthKey,
-} from './agenda-presenter';
+} from '@/shared/utils/dates';
+import { DayTiming, getDayTiming, groupAppointments, isVisibleInAgenda } from './agenda-presenter';
+import { useAgendaScheduling } from './use-agenda-scheduling';
 
 export const ALL_BRANCHES = 'all';
 
@@ -53,14 +52,17 @@ export const ALL_BRANCHES = 'all';
  */
 const DAY_PARAM = 'dia';
 const BRANCH_PARAM = 'sede';
+/** Mes de "Por confirmar" (filtro de escritorio). Sin él, sigue al mes del día elegido. */
+const PENDING_MONTH_PARAM = 'mes';
 const VIEW_PARAM = 'vista';
 const DAY_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const MONTH_KEY_PATTERN = /^\d{4}-\d{2}$/;
 
 function readParam(value: string | string[] | undefined): string | undefined {
   return typeof value === 'string' && value ? value : undefined;
 }
 
-/** Las dos tareas de la agenda, una a la vez: atender el día o llamar. */
+/** Las dos tareas de la agenda, una a la vez. "Por confirmar" es la principal: sin `?vista`, abre esa. */
 export enum AgendaView {
   DAY = 'dia',
   PENDING = 'por-confirmar',
@@ -94,13 +96,15 @@ export function useAgenda() {
   const selectedDayKey = dayParam && DAY_KEY_PATTERN.test(dayParam) ? dayParam : todayKey;
   const branchFilter = readParam(router.query[BRANCH_PARAM]) ?? ALL_BRANCHES;
   const view =
-    readParam(router.query[VIEW_PARAM]) === AgendaView.PENDING
-      ? AgendaView.PENDING
-      : AgendaView.DAY;
+    readParam(router.query[VIEW_PARAM]) === AgendaView.DAY ? AgendaView.DAY : AgendaView.PENDING;
   const weekStart = useMemo(() => startOfWeek(fromDayKey(selectedDayKey)), [selectedDayKey]);
 
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
   const [scheduleTarget, setScheduleTarget] = useState<ScheduleTarget | null>(null);
+  /** Paciente pendiente en la ficha de confirmar (calendario + horas). */
+  const [confirmTarget, setConfirmTarget] = useState<Patient | null>(null);
+  const scheduling = useAgendaScheduling();
   const [updatingAppointmentUuid, setUpdatingAppointmentUuid] = useState<string | null>(null);
   /** Ficha abierta: una cita del día o un paciente por confirmar. */
   const [openAppointmentUuid, setOpenAppointmentUuid] = useState<string | null>(null);
@@ -108,6 +112,11 @@ export function useAgenda() {
 
   const weekDayKeys = useMemo(() => buildWeekDayKeys(weekStart), [weekStart]);
   const selectedMonthKey = toMonthKey(selectedDayKey);
+  const pendingMonthParam = readParam(router.query[PENDING_MONTH_PARAM]);
+  const pendingMonthKey =
+    pendingMonthParam && MONTH_KEY_PATTERN.test(pendingMonthParam)
+      ? pendingMonthParam
+      : selectedMonthKey;
   const selectedTiming = getDayTiming(selectedDayKey, todayKey);
 
   const {
@@ -118,6 +127,7 @@ export function useAgenda() {
   } = useAppointmentsByDayQuery(weekDayKeys);
   const { data: appointmentTypes } = useAppointmentTypesQuery();
   const { data: branches } = useBranchesQuery();
+  const { data: scheduledMonths } = useAppointmentMonthsQuery();
   const { data: actors } = usePatientActivityActorsQuery();
   const { user } = useSession();
   const { data: monthPatients } = usePatientsQuery(
@@ -125,7 +135,7 @@ export function useAgenda() {
     PENDING_LIMIT,
     '',
     PatientStatusFilter.ACTIVE,
-    selectedMonthKey,
+    pendingMonthKey,
     { status: PatientStatus.ACTIVE },
   );
   const { executeUpdateAppointmentStatus } = useUpdateAppointmentStatusMutation();
@@ -189,8 +199,10 @@ export function useAgenda() {
       (monthPatients?.data ?? [])
         .filter(
           (patient) =>
-            patient.tentativeAppointmentMonth === selectedMonthKey &&
-            matchesBranch(patient.branchUuid),
+            patient.tentativeAppointmentMonth === pendingMonthKey &&
+            matchesBranch(patient.branchUuid) &&
+            // El que se está confirmando ya se muestra en su horario.
+            !scheduling.savingIds.has(patient.uuid),
         )
         .sort((first, second) =>
           `${first.firstName} ${first.lastName}`.localeCompare(
@@ -198,7 +210,7 @@ export function useAgenda() {
             'es',
           ),
         ),
-    [monthPatients, selectedMonthKey, matchesBranch],
+    [monthPatients, pendingMonthKey, matchesBranch, scheduling.savingIds],
   );
 
   const openAppointment = selectedAppointments.find(
@@ -213,6 +225,19 @@ export function useAgenda() {
       ) as Record<string, string | undefined>,
     [appointmentTypes],
   );
+
+  /**
+   * Meses del filtro de "Por confirmar": los que tienen citas o pacientes por
+   * confirmar, más el actual y el elegido, para que la opción marcada exista.
+   */
+  const monthOptions = useMemo(() => {
+    const monthKeys = new Set([
+      ...(scheduledMonths?.months ?? []),
+      toMonthKey(todayKey),
+      pendingMonthKey,
+    ]);
+    return [...monthKeys].sort().map(buildMonthOption);
+  }, [scheduledMonths, todayKey, pendingMonthKey]);
 
   const branchOptions = useMemo(
     () => [
@@ -249,10 +274,21 @@ export function useAgenda() {
     [resolveSchedulerName, t],
   );
 
+  const resolveTypeColor = useCallback(
+    (typeUuid?: string | null) => (typeUuid ? typeColors[typeUuid] : undefined),
+    [typeColors],
+  );
+
   const resolveBranchName = useCallback(
     (branchUuid?: string | null) =>
       branchUuid ? branches?.find((branch) => branch.uuid === branchUuid)?.name : undefined,
     [branches],
+  );
+
+  /** Color de marca de la sede de una cita, para los puntos del calendario. */
+  const resolveBranchColor = useCallback(
+    (branchUuid?: string | null) => getBranchStripeColor(resolveBranchName(branchUuid)),
+    [resolveBranchName],
   );
 
   /**
@@ -271,12 +307,26 @@ export function useAgenda() {
   const handleSelectDay = (dayKey: string) =>
     updateQuery({ [DAY_PARAM]: dayKey === todayKey ? undefined : dayKey });
 
+  /**
+   * Escritorio: elegir un día no mueve "Por confirmar". Se fija su mes en la
+   * URL en el mismo paso, para arrastrar a alguien de septiembre al 1 de
+   * octubre sin que la lista salte a octubre.
+   */
+  const handleSelectDayKeepingPending = (dayKey: string) =>
+    updateQuery({
+      [DAY_PARAM]: dayKey === todayKey ? undefined : dayKey,
+      [PENDING_MONTH_PARAM]: pendingMonthKey,
+    });
+
+  const handleSelectPendingMonth = (monthKey: string) =>
+    updateQuery({ [PENDING_MONTH_PARAM]: monthKey });
+
   const handlePreviousDay = () =>
     handleSelectDay(toDayKey(addDays(fromDayKey(selectedDayKey), -1)));
   const handleNextDay = () => handleSelectDay(toDayKey(addDays(fromDayKey(selectedDayKey), 1)));
 
   const handleViewChange = (nextView: AgendaView) =>
-    updateQuery({ [VIEW_PARAM]: nextView === AgendaView.DAY ? undefined : nextView });
+    updateQuery({ [VIEW_PARAM]: nextView === AgendaView.PENDING ? undefined : nextView });
 
   const handleBranchFilter = (branchUuid: string) =>
     updateQuery({ [BRANCH_PARAM]: branchUuid === ALL_BRANCHES ? undefined : branchUuid });
@@ -321,8 +371,21 @@ export function useAgenda() {
     });
   };
 
+  /** "Confirmar día": la ficha con calendario y horas, sin modal de formulario. */
   const handleSetPendingDay = (patient: Patient) => {
     setOpenPendingUuid(null);
+    setConfirmTarget(patient);
+  };
+
+  const handleConfirmAt = (dayKey: string, hour: number) => {
+    if (!confirmTarget) return;
+    void scheduling.confirmPending(confirmTarget, dayKey, hour);
+    setConfirmTarget(null);
+  };
+
+  /** Desde la ficha de confirmar: cambiar el tipo o anotar otro mes, con el formulario completo. */
+  const handleOpenScheduleOptions = (patient: Patient) => {
+    setConfirmTarget(null);
     setScheduleTarget({
       patientUuid: patient.uuid,
       tentativeMonth: patient.tentativeAppointmentMonth,
@@ -341,6 +404,12 @@ export function useAgenda() {
       branchUuid: patient.branchUuid,
       initialMode: ScheduleMode.DAY,
     });
+  };
+
+  /** Deshace la confirmación: vuelve a quedar solo el mes de la cita, con su tipo. */
+  const handleReturnToPending = (appointment: Appointment) => {
+    setOpenAppointmentUuid(null);
+    void scheduling.returnToPending(appointment, selectedDayKey, toMonthKey(selectedDayKey));
   };
 
   const handleCallPatient = (patient: Patient) => {
@@ -408,29 +477,39 @@ export function useAgenda() {
     weekDays,
     selectedDayKey,
     selectedTiming,
-    selectedMonthLabel: formatMonthLabel(selectedMonthKey),
+    pendingMonthKey,
+    pendingMonthLabel: formatMonthLabel(pendingMonthKey),
+    monthOptions,
     dayTitle,
     compactDayLabel,
     dayCount: selectedAppointments.length,
+    selectedAppointments,
     groups,
     isLoading,
     isError,
     branchFilter,
     branchOptions,
     hasBranches: (branches?.length ?? 0) > 1,
-    typeColors,
+    resolveTypeColor,
     resolveBranchName,
+    resolveBranchColor,
+    matchesBranch,
     resolveScheduledBy,
     resolveSchedulerName,
     pendingPatients,
     openAppointment,
     openPendingPatient,
     isPickerOpen,
+    isCalendarSyncOpen,
+    handleOpenCalendarSync: () => setIsCalendarSyncOpen(true),
+    handleCloseCalendarSync: () => setIsCalendarSyncOpen(false),
     scheduleTarget,
     updatingAppointmentUuid,
     handlePreviousDay,
     handleNextDay,
     handleSelectDay,
+    handleSelectDayKeepingPending,
+    handleSelectPendingMonth,
     handleViewChange,
     handleBranchFilter,
     handleOpenAppointment: setOpenAppointmentUuid,
@@ -446,6 +525,12 @@ export function useAgenda() {
     handleUndoArrived,
     handleReschedule,
     handleSetPendingDay,
+    confirmTarget,
+    handleConfirmAt,
+    handleCloseConfirm: () => setConfirmTarget(null),
+    handleOpenScheduleOptions,
+    handleReturnToPending,
+    scheduling,
     handleSendWhatsApp,
     handleCallPatient,
     handleAddToCalendar,
@@ -453,3 +538,5 @@ export function useAgenda() {
     navigateToPatient: navigation.patients.detail,
   };
 }
+
+export type AgendaState = ReturnType<typeof useAgenda>;

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, Search, UserRound, X } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { inputBaseClasses } from '@/components/common/input/input';
-import { formatMonthLabel, getFullName } from '@/shared/utils/formatters';
+import { EMPTY_VALUE, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
@@ -111,7 +111,7 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
                       : null,
                   ]
                     .filter(Boolean)
-                    .join(' · ') || '—'}
+                    .join(' · ') || EMPTY_VALUE}
                 </Typography>
               </span>
             </button>

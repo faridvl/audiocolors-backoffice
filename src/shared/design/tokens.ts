@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Design tokens de AudioColors — fuente unica de verdad para el estilo.
  *
@@ -128,4 +130,23 @@ export function getBranchStripeColor(branchName: string | undefined): string | u
     normalizedName.includes(normalize(candidate)),
   );
   return city ? BRANCH_CITY_COLORS[city] : undefined;
+}
+
+/** Opacidad en hex que se agrega a un color `#rrggbb`: fondo suave de una píldora. */
+export enum ColorAlpha {
+  /** ~10 %: fondo de una píldora con el texto en el color pleno. */
+  SOFT = '1a',
+}
+
+/** `#1f6fb1` + `ColorAlpha.SOFT` -> `#1f6fb11a`. */
+export function withAlpha(color: string, alpha: ColorAlpha): string {
+  return `${color}${alpha}`;
+}
+
+/** Grosor en px de la franja de color de la sede, arriba de una fila o tarjeta. */
+const TOP_STRIPE_WIDTH_PX = 3;
+
+/** Estilo de la franja superior de color (sede); sin color, ninguno. */
+export function topStripeStyle(color: string | undefined): CSSProperties | undefined {
+  return color ? { boxShadow: `inset 0 ${TOP_STRIPE_WIDTH_PX}px 0 0 ${color}` } : undefined;
 }
