@@ -154,3 +154,11 @@ UTC. Un horario desde las 18:00 de Costa Rica cae en el día UTC siguiente y
 desaparecería de su día. Si la clínica atiende después de las 17:00, primero
 hay que filtrar por día local en el API.
 
+## 2026-10-04 · `yarn dev` siempre en el puerto 3000
+
+El API solo acepta los orígenes de `ALLOWED_ORIGINS` (CORS). Si el 3000 estaba
+ocupado, Next levantaba solo en el 3001 y el login fallaba con "revisa tu
+conexión a internet", sin pista de la causa. Con `-p 3000` Next falla al
+arrancar si el puerto está tomado, y en desarrollo el error de red explica que
+el API rechaza otros puertos.
+
