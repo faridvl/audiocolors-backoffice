@@ -147,7 +147,6 @@ export const TEXT = {
       DESCRIPTION: 'agenda.calendarSync.description',
       CONNECT: 'agenda.calendarSync.connect',
       COLORS_HINT: 'agenda.calendarSync.colorsHint',
-      ALL_BRANCHES: 'agenda.calendarSync.allBranches',
       ADD: 'agenda.calendarSync.add',
       COPY: 'agenda.calendarSync.copy',
       PRIVACY: 'agenda.calendarSync.privacy',

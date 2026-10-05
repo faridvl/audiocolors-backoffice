@@ -13,15 +13,13 @@ import { getBranchStripeColor } from '@/shared/design/tokens';
 import { buildCalendarFeedUrl } from '@/shared/utils/calendar-feed';
 import { TEXT } from '@/static/texts/i18n';
 
-/** Un calendario que se puede agregar al teléfono: todas las sedes, o una con su color. */
+/** Un calendario que se puede agregar al teléfono: una sede con su color. */
 export interface CalendarSyncRowData {
   key: string;
   label: string;
   color?: string;
   url: string;
 }
-
-const ALL_BRANCHES_KEY = 'all';
 
 export function useCalendarSync() {
   const { t } = useTranslation();
@@ -34,12 +32,12 @@ export function useCalendarSync() {
   const token = feed?.token ?? null;
 
   /**
-   * Una fila por sede (cada una, su calendario con su color: el iPhone colorea
-   * calendarios enteros, no eventos sueltos) y al final todas juntas.
+   * Una fila por sede, sin la opción "todas juntas": el iPhone colorea
+   * calendarios enteros, así que un calendario único pierde el color de cada sede.
    */
   const rows: CalendarSyncRowData[] = useMemo(() => {
     if (!token) return [];
-    const branchRows = (branches ?? []).map((branch) => {
+    return (branches ?? []).map((branch) => {
       const color = getBranchStripeColor(branch.name);
       return {
         key: branch.uuid,
@@ -48,15 +46,7 @@ export function useCalendarSync() {
         url: buildCalendarFeedUrl(token, { branchUuid: branch.uuid, color }),
       };
     });
-    return [
-      ...branchRows,
-      {
-        key: ALL_BRANCHES_KEY,
-        label: t(TEXT.AGENDA.CALENDAR_SYNC.ALL_BRANCHES),
-        url: buildCalendarFeedUrl(token),
-      },
-    ];
-  }, [token, branches, t]);
+  }, [token, branches]);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: [FETCH_CALENDAR_FEED_KEY] });
 

@@ -188,7 +188,6 @@
       "description": "Las citas aparecen solas en el calendario de tu iPhone (también Outlook o Google). Se conecta una vez desde el teléfono y se actualiza cada pocos minutos.",
       "connect": "Crear mi enlace",
       "colorsHint": "Cada sede es un calendario con su color. Desde el iPhone, toca Agregar en las que quieras ver.",
-      "allBranches": "Todas las sedes",
       "add": "Agregar",
       "copy": "Copiar enlace",
       "privacy": "Los eventos muestran el nombre del paciente. Estos enlaces son personales: no los compartas.",
