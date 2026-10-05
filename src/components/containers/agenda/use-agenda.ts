@@ -136,7 +136,6 @@ export function useAgenda() {
     '',
     PatientStatusFilter.ACTIVE,
     pendingMonthKey,
-    { status: PatientStatus.ACTIVE },
   );
   const { executeUpdateAppointmentStatus } = useUpdateAppointmentStatusMutation();
 
@@ -200,6 +199,9 @@ export function useAgenda() {
         .filter(
           (patient) =>
             patient.tentativeAppointmentMonth === pendingMonthKey &&
+            // El expediente deja anotar el mes a un paciente inactivo (solo el
+            // fallecido queda fuera): si tiene mes, hay que llamarlo igual.
+            patient.status !== PatientStatus.DECEASED &&
             matchesBranch(patient.branchUuid) &&
             // El que se está confirmando ya se muestra en su horario.
             !scheduling.savingIds.has(patient.uuid),
