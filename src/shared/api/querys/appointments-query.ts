@@ -14,8 +14,9 @@ const DAY_LIMIT = 100;
 
 /**
  * Citas de varios días ("YYYY-MM-DD"), una petición por día. El API filtra
- * por día UTC; como guarda las citas a las 08:00 UTC, ese día coincide con el
- * de la clínica.
+ * por día UTC; las citas sin hora (08:00 UTC) y los horarios de la agenda
+ * (8:00 a 17:00 de Costa Rica, 14:00 a 23:00 UTC) caen en el mismo día UTC que
+ * el de la clínica.
  */
 export function useAppointmentsByDayQuery(dayKeys: string[]) {
   return useQuery({

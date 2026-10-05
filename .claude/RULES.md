@@ -260,6 +260,28 @@ rompe la escala.
 7. **Navegación** por `useNavigation()` o `<Link href={routesPrivate...}>`.
 8. **Errores de red → toast desde el hook**, no pantalla de error. Excepción:
    listas y detalle, que ofrecen "Reintentar".
+9. **Nada quemado.** Ni números mágicos ni strings sueltos: valores discretos
+   en enums, parámetros (horas, duraciones, límites, opacidades, locale) en
+   constantes con nombre, texto visible en i18n. Un `'es-CR'`, un `30` o un
+   `'1a'` en medio del código no dicen qué son ni dónde cambiarlos.
+10. **Lo reutilizable va a `utils` o a un helper.** Fechas, formatos y cálculos
+    genéricos → `src/shared/utils/`. Tokens de estilo (colores, opacidad,
+    franjas) → `src/shared/design/tokens.ts`. Mapas de estilo de un módulo
+    (`Record<Enum, string>`) → un archivo `{modulo}-styles.ts`, no dentro de
+    un componente ni de un hook.
+11. **Componentes, no archivos largos.** Un componente por archivo; el
+    container solo compone. Si un bloque de JSX tiene nombre propio (una
+    lista, una ficha, una fila), es un componente.
+12. **Componentes genéricos antes que etiquetas sueltas.** Texto con
+    `Typography`, acciones con `Button` (hay variante `CARD` para filas
+    clicables), píldoras con `Badge`/`BranchBadge`, puntos de color con
+    `ColorDot`. Un `<span>` o `<button>` con clases a mano repite estilos que
+    ya existen y se desalinea del resto. Si falta el genérico, se crea en
+    `src/components/common/`.
+
+**Por qué 9-12:** pedido explícito al construir la agenda de escritorio
+(2026-09-29): el mismo color de sede con `'1a'` estaba copiado en tres
+pantallas y el container de la agenda llegó a casi 600 líneas.
 
 ---
 

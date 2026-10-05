@@ -1,6 +1,7 @@
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
+import { Appointment } from '@/types/appointments/appointment';
 
 export interface CreateNextAppointmentPayload {
   /** Fecha de la cita, formato YYYY-MM-DD. La hora la fija el backend. */
@@ -21,17 +22,18 @@ interface CreateNextAppointmentVariables extends CreateNextAppointmentPayload {
  * transparente.
  */
 export function useCreateNextAppointmentMutation() {
-  const { mutate: executeCreateNextAppointment, isPending } = useApiMutation<
-    unknown,
-    CreateNextAppointmentVariables
-  >({
+  const {
+    mutate: executeCreateNextAppointment,
+    mutateAsync: executeCreateNextAppointmentAsync,
+    isPending,
+  } = useApiMutation<Appointment, CreateNextAppointmentVariables>({
     mutationKey: ['createNextAppointment'],
     mutationFn: ({ patientUuid, ...payload }) =>
-      ApiServiceClient(env.API.MEDICAL_RECORDS_URL).post(
+      ApiServiceClient(env.API.MEDICAL_RECORDS_URL).post<Appointment>(
         `/patients/${patientUuid}/next-appointment`,
         payload,
       ),
   });
 
-  return { executeCreateNextAppointment, isPending };
+  return { executeCreateNextAppointment, executeCreateNextAppointmentAsync, isPending };
 }

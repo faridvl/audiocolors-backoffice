@@ -8,6 +8,9 @@ export const TEXT = {
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
     },
+    ERRORS: {
+      UNEXPECTED: 'common.errors.unexpected',
+    },
     FILTERS: {
       TITLE: 'common.filters.title',
       OPEN: 'common.filters.open',
@@ -59,6 +62,7 @@ export const TEXT = {
     },
     FILTERS: {
       BRANCH_ARIA: 'agenda.filters.branchAria',
+      MONTH_ARIA: 'agenda.filters.monthAria',
       ALL_BRANCHES: 'agenda.filters.allBranches',
     },
     DAY: {
@@ -89,6 +93,7 @@ export const TEXT = {
       WHATSAPP: 'agenda.menu.whatsapp',
       CALENDAR: 'agenda.menu.calendar',
       UNDO_ARRIVED: 'agenda.menu.undoArrived',
+      RETURN_TO_PENDING: 'agenda.menu.returnToPending',
     },
     SHEET: {
       CLOSE: 'agenda.sheet.close',
@@ -132,6 +137,59 @@ export const TEXT = {
       HINT: 'agenda.picker.hint',
       EMPTY: 'agenda.picker.empty',
       CLOSE: 'agenda.picker.close',
+    },
+    /** Calendario suscrito: las citas aparecen solas en el calendario del teléfono. */
+    CALENDAR_SYNC: {
+      OPEN: 'agenda.calendarSync.open',
+      MENU_CONNECT: 'agenda.calendarSync.menuConnect',
+      MENU_DISCONNECT: 'agenda.calendarSync.menuDisconnect',
+      TITLE: 'agenda.calendarSync.title',
+      DESCRIPTION: 'agenda.calendarSync.description',
+      CONNECT: 'agenda.calendarSync.connect',
+      COLORS_HINT: 'agenda.calendarSync.colorsHint',
+      ALL_BRANCHES: 'agenda.calendarSync.allBranches',
+      ADD: 'agenda.calendarSync.add',
+      COPY: 'agenda.calendarSync.copy',
+      PRIVACY: 'agenda.calendarSync.privacy',
+      REGENERATE: 'agenda.calendarSync.regenerate',
+      DISCONNECT: 'agenda.calendarSync.disconnect',
+      TOASTS: {
+        CONNECTED: 'agenda.calendarSync.toasts.connected',
+        REGENERATED: 'agenda.calendarSync.toasts.regenerated',
+        DISCONNECTED: 'agenda.calendarSync.toasts.disconnected',
+        COPIED: 'agenda.calendarSync.toasts.copied',
+      },
+    },
+    /** Ficha para confirmar un pendiente eligiendo día y hora, sin formulario. */
+    CONFIRM_SHEET: {
+      STATUS: 'agenda.confirmSheet.status',
+      HOURS: 'agenda.confirmSheet.hours',
+      MORE_OPTIONS: 'agenda.confirmSheet.moreOptions',
+    },
+    /** Vista de escritorio: calendario del mes, horarios del día y arrastrar para confirmar. */
+    BOARD: {
+      COUNT: 'agenda.board.count',
+      NO_TIME: 'agenda.board.noTime',
+      NO_TIME_HINT: 'agenda.board.noTimeHint',
+      DROP_HERE: 'agenda.board.dropHere',
+      PAST_DAY: 'agenda.board.pastDay',
+      PENDING_HINT: 'agenda.board.pendingHint',
+      RETURN_HERE: 'agenda.board.returnHere',
+      SLOT_ARIA: 'agenda.board.slotAria',
+      SAVING: 'agenda.board.saving',
+      /** Tocar un paciente y después un horario: la alternativa al arrastre (dedo, iPad). */
+      SELECTION: {
+        TITLE: 'agenda.board.selection.title',
+        OPEN_DAY_HINT: 'agenda.board.selection.openDayHint',
+        VIEW_DETAILS: 'agenda.board.selection.viewDetails',
+        SCHEDULE_HERE: 'agenda.board.selection.scheduleHere',
+      },
+      TOASTS: {
+        CONFIRMED: 'agenda.board.toasts.confirmed',
+        MOVED: 'agenda.board.toasts.moved',
+        RETURNED: 'agenda.board.toasts.returned',
+        TIME_ERROR: 'agenda.board.toasts.timeError',
+      },
     },
   },
   ACTIVITY: {

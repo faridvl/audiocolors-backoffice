@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useEscapeKey } from '@/hooks/use-escape-key';
 import { useTranslation } from 'react-i18next';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -66,14 +67,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({ leading, fields, trailing,
   const activeFields = panelFields.filter(isFieldActive);
   const clearAll = () => panelFields.forEach((field) => field.onChange(fieldDefault(field)));
 
-  useEffect(() => {
-    if (!isPanelOpen) return undefined;
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsPanelOpen(false);
-    };
-    window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
-  }, [isPanelOpen]);
+  const closePanel = useCallback(() => setIsPanelOpen(false), []);
+  useEscapeKey(closePanel, isPanelOpen);
 
   return (
     <div className="flex flex-col gap-3">

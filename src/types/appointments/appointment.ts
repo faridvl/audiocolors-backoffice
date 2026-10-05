@@ -22,7 +22,10 @@ export interface Appointment {
   status: AppointmentStatus;
   schedule: {
     date: string;
-    /** ISO. Hoy el API la fija a las 08:00 UTC: no es una hora real de la cita. */
+    /**
+     * ISO. Confirmada solo con día queda a las 08:00 UTC (sin hora real); la
+     * agenda de escritorio le fija la hora del horario donde se suelta.
+     */
     startTime: string;
     endTime: string;
   };

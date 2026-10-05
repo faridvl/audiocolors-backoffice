@@ -23,6 +23,7 @@ import {
   getActionLabel,
 } from './patient-activity-presenter';
 import { ActivityScope, ALL_VALUE, usePatientActivity } from './use-patient-activity';
+import { BranchBadge } from '@/components/common/badge/branch-badge';
 
 const SummaryCard: React.FC<{ label: string; value?: number; hint?: string }> = ({
   label,
@@ -55,22 +56,6 @@ function formatActorBreakdown(t: TFunction, summary?: PatientActivitySummary): s
     )
     .join(' · ');
 }
-
-const BranchPill: React.FC<{ name?: string }> = ({ name }) => {
-  if (!name) return null;
-  const accentColor = getBranchStripeColor(name);
-  return (
-    <span
-      style={accentColor ? { backgroundColor: `${accentColor}1a`, color: accentColor } : undefined}
-      className={tailwind(
-        'mt-0.5 inline-block w-fit rounded-full px-2 py-0.5 text-xs',
-        !accentColor && 'bg-ink-100 text-ink-600',
-      )}
-    >
-      {name}
-    </span>
-  );
-};
 
 const ActionPill: React.FC<{ action: PatientActivityAction; label: string }> = ({
   action,
@@ -145,7 +130,7 @@ export const PatientActivityContainer: React.FC = () => {
         render: (row) => (
           <div className="flex flex-col">
             <Typography variant={TypographyVariant.BODY}>{row.activity.patientName}</Typography>
-            <BranchPill
+            <BranchBadge className="mt-0.5"
               name={
                 row.activity.patientBranchUuid
                   ? resolveBranchName(row.activity.patientBranchUuid)

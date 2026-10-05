@@ -13,10 +13,11 @@ interface UpdateAppointmentStatusVariables {
  * El API anota en la bitácora el paso a "en sala" y a "atendida".
  */
 export function useUpdateAppointmentStatusMutation() {
-  const { mutate: executeUpdateAppointmentStatus, isPending } = useApiMutation<
-    Appointment,
-    UpdateAppointmentStatusVariables
-  >({
+  const {
+    mutate: executeUpdateAppointmentStatus,
+    mutateAsync: executeUpdateAppointmentStatusAsync,
+    isPending,
+  } = useApiMutation<Appointment, UpdateAppointmentStatusVariables>({
     mutationKey: ['updateAppointmentStatus'],
     mutationFn: ({ appointmentUuid, status }) =>
       ApiServiceClient(env.API.MEDICAL_RECORDS_URL).patch<Appointment>(
@@ -25,5 +26,5 @@ export function useUpdateAppointmentStatusMutation() {
       ),
   });
 
-  return { executeUpdateAppointmentStatus, isPending };
+  return { executeUpdateAppointmentStatus, executeUpdateAppointmentStatusAsync, isPending };
 }

@@ -9,11 +9,13 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterBar } from '@/components/common/filter-bar/filter-bar';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
-import { formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
+import { EMPTY_VALUE, formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { usePatientList, ALL_VALUE, DEFAULT_STATUS_FILTER } from './use-patient-list';
+import { BranchBadge } from '@/components/common/badge/branch-badge';
+import { BadgeSize } from '@/components/common/badge/badge';
 
 function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
   return [
@@ -54,21 +56,8 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
       width: '17%',
       render: (patient) => {
         const branchName = branches?.find((branch) => branch.uuid === patient.branchUuid)?.name;
-        if (!branchName) return '—';
-        const accentColor = getBranchStripeColor(branchName);
-        return (
-          <span
-            style={
-              accentColor ? { backgroundColor: `${accentColor}1a`, color: accentColor } : undefined
-            }
-            className={tailwind(
-              'inline-block rounded-full px-2.5 py-0.5 text-sm',
-              !accentColor && 'text-ink-700',
-            )}
-          >
-            {branchName}
-          </span>
-        );
+        if (!branchName) return EMPTY_VALUE;
+        return <BranchBadge name={branchName} size={BadgeSize.REGULAR} />;
       },
     },
     {
