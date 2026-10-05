@@ -162,3 +162,27 @@ conexión a internet", sin pista de la causa. Con `-p 3000` Next falla al
 arrancar si el puerto está tomado, y en desarrollo el error de red explica que
 el API rechaza otros puertos.
 
+## 2026-10-04 · El estado del paciente es solo `status`, nunca `isActive`
+
+El paciente tiene dos campos que parecen lo mismo:
+
+- `status` (`ACTIVE` / `INACTIVE` / `DECEASED`): el estado para la clínica. Lo
+  cambia el modal "Estado del paciente" y lo filtra el listado.
+- `isActive` + `deletedAt`: el borrado lógico (`DELETE /patients/:uuid`), de
+  antes de que existiera `status`. El front ya no borra pacientes, pero quedan
+  registros viejos con `isActive = false` y `status = ACTIVE`.
+
+**El error:** la agenda pedía `PatientStatusFilter.ACTIVE` (solo
+`isActive = true`) y el expediente mostraba "Inactivo" por `!isActive`, mientras
+el listado y el modal decían "Activo". Un paciente así anotaba su mes "por
+confirmar" y no aparecía en la agenda: parecía intermitente porque dependía del
+paciente. Caso real: "Prueba SedeAuto" en el ambiente de pruebas.
+
+**La regla:** toda pantalla lee y filtra el estado por `status`. Las consultas
+de pacientes usan `PatientStatusFilter.ALL` (igual que el listado) y filtran con
+`filters.status` o en el cliente. No mostrar ni filtrar por `isActive`.
+
+**Pendiente:** decidir en el API si esos registros viejos se reactivan
+(`isActive = true`) o se pasan a `status = INACTIVE`, y que `PatientStatusFilter`
+deje de mezclar los dos conceptos.
+

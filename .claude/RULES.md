@@ -279,6 +279,12 @@ rompe la escala.
     ya existen y se desalinea del resto. Si falta el genérico, se crea en
     `src/components/common/`.
 
+13. **El estado del paciente es `status`, nunca `isActive`.** Las consultas de
+    pacientes van con `PatientStatusFilter.ALL` (como el listado) y filtran por
+    `filters.status`; ninguna pantalla muestra ni filtra por `isActive`, que es
+    el borrado lógico viejo. Mezclarlos escondía de la agenda a pacientes que
+    el resto de la app mostraba como activos (ver `DECISIONS.md`, 2026-10-04).
+
 **Por qué 9-12:** pedido explícito al construir la agenda de escritorio
 (2026-09-29): el mismo color de sede con `'1a'` estaba copiado en tres
 pantallas y el container de la agenda llegó a casi 600 líneas.
@@ -296,7 +302,12 @@ implementa por cuenta propia.
 ### Comportamientos verificados del API
 
 - `DELETE /patients/:uuid` es **soft delete** y `PATCH` **ignora `isActive`**:
-  un paciente eliminado **no se puede reactivar** desde el frontend.
+  un paciente eliminado **no se puede reactivar** desde el frontend. Quedan
+  registros viejos con `isActive = false` y `status = ACTIVE`: el listado los
+  muestra, así que se tratan por su `status`.
+- El CORS del API solo acepta los orígenes de `ALLOWED_ORIGINS`: en local la
+  app corre en `localhost:3000` (`yarn dev` lo fija). En otro puerto el login
+  falla como si no hubiera internet.
 - El upload va por `fetch` directo, no por `ApiServiceClient` — con `FormData`
   el navegador debe fijar el `Content-Type` con su boundary.
 - `response.json()` **debe** ir protegido: hay endpoints que responden 200 sin
