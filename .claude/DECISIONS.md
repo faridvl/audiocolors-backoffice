@@ -162,6 +162,18 @@ conexión a internet", sin pista de la causa. Con `-p 3000` Next falla al
 arrancar si el puerto está tomado, y en desarrollo el error de red explica que
 el API rechaza otros puertos.
 
+## 2026-10-04 · Calendario del teléfono: una sede por calendario, y "Quitar sede" lo deja vacío
+
+- Sin opción "Todas las sedes": el iPhone colorea calendarios enteros, así que
+  un calendario único pierde el color de cada sede. Se agrega sede por sede; iOS
+  no deja suscribir varios calendarios con un solo toque.
+- "Quitar sede" (`DELETE /calendar-feed/branches/:uuid`) no puede borrar la
+  suscripción del teléfono: el API publica ese calendario vacío. Para que
+  desaparezca del iPhone hay que eliminarlo desde Calendario.
+- No hay actualización instantánea: iOS consulta los calendarios suscritos cada
+  cierto tiempo (el API sugiere 15 minutos) y el servidor no puede avisarle. La
+  ficha explica cómo refrescar a mano.
+
 ## 2026-10-04 · El estado del paciente es solo `status`, nunca `isActive`
 
 El paciente tiene dos campos que parecen lo mismo:

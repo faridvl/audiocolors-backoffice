@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ import {
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useIssueCalendarFeedMutation } from '@/shared/api/mutations/calendar-feed/issue-calendar-feed-mutation';
 import { useRevokeCalendarFeedMutation } from '@/shared/api/mutations/calendar-feed/revoke-calendar-feed-mutation';
+import { useSetCalendarFeedBranchMutation } from '@/shared/api/mutations/calendar-feed/set-calendar-feed-branch-mutation';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { buildCalendarFeedUrl } from '@/shared/utils/calendar-feed';
 import { TEXT } from '@/static/texts/i18n';
@@ -19,6 +20,8 @@ export interface CalendarSyncRowData {
   label: string;
   color?: string;
   url: string;
+  /** Quitada desde aquí: el teléfono la muestra vacía. */
+  isRemoved: boolean;
 }
 
 export function useCalendarSync() {
@@ -28,8 +31,11 @@ export function useCalendarSync() {
   const { data: branches } = useBranchesQuery();
   const { executeIssueCalendarFeed, isPending: isIssuing } = useIssueCalendarFeedMutation();
   const { executeRevokeCalendarFeed, isPending: isRevoking } = useRevokeCalendarFeedMutation();
+  const { executeSetCalendarFeedBranch } = useSetCalendarFeedBranchMutation();
+  const [updatingBranchUuid, setUpdatingBranchUuid] = useState<string | null>(null);
 
   const token = feed?.token ?? null;
+  const removedBranchUuids = feed?.removedBranchUuids;
 
   /**
    * Una fila por sede, sin la opción "todas juntas": el iPhone colorea
@@ -44,9 +50,10 @@ export function useCalendarSync() {
         label: branch.name,
         color,
         url: buildCalendarFeedUrl(token, { branchUuid: branch.uuid, color }),
+        isRemoved: removedBranchUuids?.includes(branch.uuid) ?? false,
       };
     });
-  }, [token, branches]);
+  }, [token, branches, removedBranchUuids]);
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: [FETCH_CALENDAR_FEED_KEY] });
 
@@ -71,6 +78,28 @@ export function useCalendarSync() {
       onError: (error: Error) => toast.error(error.message),
     });
 
+  const setBranchRemoved = (row: CalendarSyncRowData, isRemoved: boolean) => {
+    setUpdatingBranchUuid(row.key);
+    executeSetCalendarFeedBranch(
+      { branchUuid: row.key, isRemoved },
+      {
+        onSuccess: () => {
+          toast.success(
+            t(
+              isRemoved
+                ? TEXT.AGENDA.CALENDAR_SYNC.TOASTS.BRANCH_REMOVED
+                : TEXT.AGENDA.CALENDAR_SYNC.TOASTS.BRANCH_RESTORED,
+              { branch: row.label },
+            ),
+          );
+          void refresh();
+        },
+        onError: (error: Error) => toast.error(error.message),
+        onSettled: () => setUpdatingBranchUuid(null),
+      },
+    );
+  };
+
   /** Desde la computadora: copiar el enlace para abrirlo en el teléfono. */
   const handleCopy = async (url: string) => {
     try {
@@ -91,5 +120,8 @@ export function useCalendarSync() {
     handleRegenerate,
     handleDisconnect,
     handleCopy,
+    updatingBranchUuid,
+    handleRemoveBranch: (row: CalendarSyncRowData) => setBranchRemoved(row, true),
+    handleRestoreBranch: (row: CalendarSyncRowData) => setBranchRemoved(row, false),
   };
 }

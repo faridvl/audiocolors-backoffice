@@ -193,10 +193,16 @@
       "privacy": "Los eventos muestran el nombre del paciente. Estos enlaces son personales: no los compartas.",
       "regenerate": "Generar enlaces nuevos",
       "disconnect": "Desconectar",
+      "remove": "Quitar sede",
+      "removed": "Quitada: en el iPhone queda sin citas. Para que desaparezca, elimínala desde Calendario.",
+      "restore": "Volver a agregar",
+      "refreshHint": "El iPhone revisa los cambios cada 15 minutos aproximadamente. Para verlos ya, en Calendario toca Calendarios y desliza hacia abajo.",
       "toasts": {
         "connected": "Enlace creado. Ahora agrega las sedes desde tu iPhone.",
         "regenerated": "Enlaces nuevos creados. Los anteriores dejaron de funcionar.",
         "disconnected": "Calendario desconectado",
+        "branchRemoved": "{{branch}} quitada del calendario",
+        "branchRestored": "{{branch}} agregada de nuevo al calendario",
         "copied": "Enlace copiado"
       }
     }

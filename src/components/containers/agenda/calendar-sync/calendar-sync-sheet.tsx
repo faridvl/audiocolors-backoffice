@@ -48,10 +48,17 @@ export const CalendarSyncSheet: React.FC<{ onClose: () => void }> = ({ onClose }
                 <CalendarSyncRow
                   key={row.key}
                   row={row}
+                  isUpdating={sync.updatingBranchUuid === row.key}
                   onCopy={(url) => void sync.handleCopy(url)}
+                  onRemove={sync.handleRemoveBranch}
+                  onRestore={sync.handleRestoreBranch}
                 />
               ))}
             </ul>
+
+            <Typography variant={TypographyVariant.HELPER} className="mt-3">
+              {t(TEXT.AGENDA.CALENDAR_SYNC.REFRESH_HINT)}
+            </Typography>
 
             <Typography
               variant={TypographyVariant.HELPER}
