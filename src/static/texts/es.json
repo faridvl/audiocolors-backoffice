@@ -182,6 +182,8 @@
     },
     "calendarSync": {
       "open": "Mi calendario",
+      "menuConnect": "Vincular calendario",
+      "menuDisconnect": "Desvincular calendario",
       "title": "Calendario del teléfono",
       "description": "Las citas aparecen solas en el calendario de tu iPhone (también Outlook o Google). Se conecta una vez desde el teléfono y se actualiza cada pocos minutos.",
       "connect": "Crear mi enlace",

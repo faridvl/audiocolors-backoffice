@@ -141,6 +141,8 @@ export const TEXT = {
     /** Calendario suscrito: las citas aparecen solas en el calendario del teléfono. */
     CALENDAR_SYNC: {
       OPEN: 'agenda.calendarSync.open',
+      MENU_CONNECT: 'agenda.calendarSync.menuConnect',
+      MENU_DISCONNECT: 'agenda.calendarSync.menuDisconnect',
       TITLE: 'agenda.calendarSync.title',
       DESCRIPTION: 'agenda.calendarSync.description',
       CONNECT: 'agenda.calendarSync.connect',
