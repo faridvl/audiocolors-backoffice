@@ -134,7 +134,9 @@ export function useAgenda() {
     1,
     PENDING_LIMIT,
     '',
-    PatientStatusFilter.ACTIVE,
+    // ALL como el listado: `isActive` es el borrado lógico de antes y dejaba
+    // fuera a pacientes que el resto de la app trata como activos.
+    PatientStatusFilter.ALL,
     pendingMonthKey,
   );
   const { executeUpdateAppointmentStatus } = useUpdateAppointmentStatusMutation();

@@ -27,7 +27,6 @@ import { buildPatientFullName } from '@/components/containers/patients/patient-c
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { calculateAge, formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
-import { STATUS_STYLES, StatusTone } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useNavigation } from '@/hooks/use-navigation';
 
@@ -181,17 +180,6 @@ const PatientSummary: React.FC<{
           <Typography variant={TypographyVariant.HELPER} inline>
             {demographics}
           </Typography>
-        )}
-
-        {!patient.isActive && (
-          <span
-            className={tailwind(
-              'w-fit rounded-full px-2 py-0.5 text-xs font-medium',
-              STATUS_STYLES[StatusTone.INACTIVE],
-            )}
-          >
-            Inactivo
-          </span>
         )}
       </div>
 
