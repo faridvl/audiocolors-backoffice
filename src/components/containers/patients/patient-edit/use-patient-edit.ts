@@ -11,7 +11,15 @@ import {
 import { useSyncPatientContactsMutation } from '@/shared/api/mutations/patients/sync-patient-contacts-mutation';
 import { useNavigation } from '@/hooks/use-navigation';
 import { DocumentType, UpdatePatientPayload } from '@/types/patients/patient';
-import { PatientFormValues } from '../patient-validation';
+import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
+import { PatientContact } from '@/types/patients/patient-contact';
+import {
+  isSamePhone,
+  PatientContactFormValues,
+  PatientFormValues,
+  resolveContactsForSave,
+  toContactPhone,
+} from '../patient-validation';
 
 /** La API no guarda el tipo de documento; se infiere del formato guardado. */
 function inferDocumentType(documentId?: string): DocumentType {
@@ -19,6 +27,28 @@ function inferDocumentType(documentId?: string): DocumentType {
   if (/^\d-\d{4}-\d{4}$/.test(documentId)) return DocumentType.NATIONAL;
   if (/^\d{11,12}$/.test(documentId)) return DocumentType.DIMEX;
   return DocumentType.PASSPORT;
+}
+
+/**
+ * El contacto con el teléfono del paciente va primero, porque el primero es el
+ * principal. Si ninguno lo tiene (pacientes de antes de los contactos), ese
+ * teléfono entra como primer contacto con el nombre del paciente.
+ */
+function buildInitialContacts(
+  contacts: PatientContact[],
+  patientPhone: string | undefined,
+  patientFullName: string,
+): PatientContactFormValues[] {
+  const formContacts = contacts.map(({ uuid, name, phone }) => ({ uuid, name, phone }));
+  if (!patientPhone) {
+    return formContacts.length > 0 ? formContacts : [{ name: '', phone: '' }];
+  }
+
+  const primary = formContacts.find((contact) => isSamePhone(contact.phone, patientPhone));
+  if (!primary) {
+    return [{ name: patientFullName, phone: toContactPhone(patientPhone) }, ...formContacts];
+  }
+  return [primary, ...formContacts.filter((contact) => contact !== primary)];
 }
 
 export function usePatientEdit(uuid: string) {
@@ -45,25 +75,28 @@ export function usePatientEdit(uuid: string) {
           // <input type="date"> exige exactamente YYYY-MM-DD.
           birthDate: patient.birthDate ? patient.birthDate.slice(0, 10) : '',
           gender: patient.gender ?? '',
-          phone: patient.phone ?? '',
           email: patient.email ?? '',
           address: patient.address ?? '',
           branchUuid: patient.branchUuid ?? '',
-          contacts: existingContacts.map((contact) => ({
-            uuid: contact.uuid,
-            name: contact.name,
-            phone: contact.phone,
-          })),
+          contacts: buildInitialContacts(
+            existingContacts,
+            patient.phone,
+            buildPatientFullName(patient.firstName, patient.lastName),
+          ),
         }
       : null;
 
   const handleSubmit = (values: PatientFormValues) => {
     setErrorMessage(null);
 
+    const { phone, contacts } = resolveContactsForSave(
+      values.contacts,
+      buildPatientFullName(values.firstName, values.lastName),
+    );
     const payload: UpdatePatientPayload = {
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
-      phone: values.phone.trim(),
+      phone,
       birthDate: values.birthDate,
       documentId: values.documentId.trim(),
       email: values.email.trim().toLowerCase(),
@@ -71,14 +104,6 @@ export function usePatientEdit(uuid: string) {
       address: values.address.trim(),
       branchUuid: values.branchUuid || null,
     };
-
-    const contacts = values.contacts
-      .filter((contact) => contact.name.trim() && contact.phone.trim())
-      .map((contact) => ({
-        ...(contact.uuid && { uuid: contact.uuid }),
-        name: contact.name.trim(),
-        phone: contact.phone.trim(),
-      }));
 
     executeUpdatePatient(
       { uuid, payload },

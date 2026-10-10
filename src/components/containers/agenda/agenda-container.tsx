@@ -47,6 +47,7 @@ export const AgendaContainer: React.FC = () => {
           tentativeMonth={scheduleTarget.tentativeMonth}
           tentativeTypeUuid={scheduleTarget.typeUuid}
           branchUuid={scheduleTarget.branchUuid}
+          nextAppointmentAt={scheduleTarget.nextAppointmentAt}
           initialMode={scheduleTarget.initialMode}
           onClose={agenda.handleCloseSchedule}
         />

@@ -30,6 +30,12 @@ const MONTH_LABELS = [
 ];
 
 /** "2026-11" -> "Noviembre 2026". Devuelve '—' si el mes no es valido. */
+/** Mes abreviado y con mayúscula para cuadrículas ("Ene", "Feb"…); `monthIndex` de 0 a 11. */
+export function formatShortMonth(monthIndex: number): string {
+  const label = MONTH_LABELS[monthIndex] ?? '';
+  return `${label.charAt(0).toUpperCase()}${label.slice(1, 3)}`;
+}
+
 export function formatMonthLabel(monthKey?: string | null): string {
   if (!monthKey) return '—';
   const [year, month] = monthKey.split('-');

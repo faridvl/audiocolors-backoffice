@@ -56,7 +56,8 @@ async function uploadDocument(payload: UploadDocumentPayload): Promise<PatientDo
   }
 
   const document = (await response.json()) as PatientDocument;
-  const expectedName = payload.fileName ?? payload.file.name;
+  // iPhone/Mac separan la tilde de la letra (NFD); el API guarda el nombre unido (NFC).
+  const expectedName = (payload.fileName ?? payload.file.name).normalize('NFC');
 
   // El API lee el nombre del multipart como latin1: "Audiometría" llega como
   // "AudiometrÃ­a". El renombrado va por JSON y sí conserva UTF-8, así que se

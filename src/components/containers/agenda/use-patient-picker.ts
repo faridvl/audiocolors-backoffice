@@ -25,7 +25,7 @@ export function usePatientPicker() {
     hasEnoughText ? debouncedSearch : '',
     PatientStatusFilter.ALL,
     undefined,
-    { status: PatientStatus.ACTIVE },
+    { statuses: [PatientStatus.ACTIVE] },
   );
 
   return {

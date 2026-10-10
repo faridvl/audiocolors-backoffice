@@ -218,6 +218,8 @@ export const TEXT = {
       ACTION_LABEL: 'activity.filters.actionLabel',
       ACTION_ARIA: 'activity.filters.actionAria',
       MONTH_LABEL: 'activity.filters.monthLabel',
+      FROM_LABEL: 'activity.filters.fromLabel',
+      TO_LABEL: 'activity.filters.toLabel',
       MONTH_ARIA: 'activity.filters.monthAria',
       BRANCH_LABEL: 'activity.filters.branchLabel',
       BRANCH_ARIA: 'activity.filters.branchAria',
@@ -256,6 +258,33 @@ export const TEXT = {
       FIELD_PREFIX: 'activity.detail.fields',
       /** Prefijo: la etiqueta de cada estado es `${STATUS_PREFIX}.${PatientStatus}`. */
       STATUS_PREFIX: 'activity.detail.statuses',
+      /** Prefijo: `${FLAG_ON_PREFIX}.${PatientActivityAction}` al prender un indicador. */
+      FLAG_ON_PREFIX: 'activity.detail.flagOn',
+      FLAG_OFF_PREFIX: 'activity.detail.flagOff',
+    },
+  },
+  PATIENTS: {
+    SUMMARY: {
+      TENTATIVE: 'patients.summary.tentative',
+      CONFIRMED: 'patients.summary.confirmed',
+      CONTROLS: 'patients.summary.controls',
+      HEARING_AIDS: 'patients.summary.hearingAids',
+    },
+    FLAGS: {
+      MENU: 'patients.flags.menu',
+      TITLE: 'patients.flags.title',
+      DESCRIPTION: 'patients.flags.description',
+      DONE: 'patients.flags.done',
+      SINCE: 'patients.flags.since',
+      /** Prefijos: `${LABEL_PREFIX}.${PatientFlag}`. */
+      LABEL_PREFIX: 'patients.flags.labels',
+      /** Columna de la lista y su valor cuando está prendido: `${COLUMN_PREFIX}.${PatientFlag}`. */
+      COLUMN_PREFIX: 'patients.flags.columns',
+      VALUE_PREFIX: 'patients.flags.values',
+      /** Texto del indicador apagado, solo los que se nombran así (`Sin garantía`). */
+      OFF_PREFIX: 'patients.flags.offValues',
+      TOAST_ON_PREFIX: 'patients.flags.toastsOn',
+      TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
     },
   },
 } as const;

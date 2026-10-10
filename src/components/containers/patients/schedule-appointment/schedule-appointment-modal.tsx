@@ -12,11 +12,11 @@ import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-mo
 import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { useCreateNextAppointmentMutation } from '@/shared/api/mutations/patients/create-next-appointment-mutation';
 import { useSetTentativeMonthMutation } from '@/shared/api/mutations/patients/set-tentative-month-mutation';
-import { formatMonthLabel } from '@/shared/utils/formatters';
+import { useClearNextAppointmentMutation } from '@/shared/api/mutations/patients/clear-next-appointment-mutation';
+import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
+import { resolveInitialConfirmDay, toDayKey, toMonthKey } from '@/shared/utils/dates';
+import { MonthGrid } from '@/components/common/month-grid/month-grid';
 import { tailwind } from '@/utils/tailwind-utils';
-
-/** Cuantos meses hacia adelante se ofrecen al anotar un mes tentativo. */
-const TENTATIVE_MONTHS_AHEAD = 12;
 
 interface ScheduleAppointmentModalProps {
   patientUuid: string;
@@ -26,6 +26,10 @@ interface ScheduleAppointmentModalProps {
   tentativeTypeUuid?: string | null;
   /** Sede habitual del paciente. Se envia tal cual, no se elige en este modal. */
   branchUuid?: string | null;
+  /** Fecha ISO de la cita agendada: precarga el día al reagendar y permite dejarlo "sin agendar". */
+  nextAppointmentAt?: string | null;
+  /** Tipo de la cita agendada; el API lo da por nombre. */
+  nextAppointmentTypeName?: string | null;
   /**
    * Modo con el que abre. Sin él, abre en "dia" solo si ya hay mes anotado.
    * La agenda lo fuerza a "dia" al reagendar, porque ahi ya se habla de una
@@ -39,22 +43,28 @@ interface ScheduleAppointmentModalProps {
 export enum ScheduleMode {
   MONTH = 'month',
   DAY = 'day',
+  /** Sin próxima cita: quita el mes tentativo y cancela la cita agendada. */
+  NONE = 'none',
 }
+
+const MODE_DESCRIPTIONS: Record<ScheduleMode, string> = {
+  [ScheduleMode.MONTH]:
+    'Anota el mes en que le toca volver y de qué es. El día se define cuando el paciente confirme.',
+  [ScheduleMode.DAY]: 'La hora la asigna la clínica automáticamente.',
+  [ScheduleMode.NONE]:
+    '¿Dejar al paciente sin próxima cita? Se quita el mes tentativo y se cancela la cita agendada.',
+};
+
+const SUBMIT_LABELS: Record<ScheduleMode, string> = {
+  [ScheduleMode.MONTH]: 'Guardar mes',
+  [ScheduleMode.DAY]: 'Agendar',
+  [ScheduleMode.NONE]: 'Dejar sin cita',
+};
 
 /** "2026-12-15" -> minimo aceptado por un input date. */
 function toDateMinimum(date: Date): string {
   const pad = (value: number) => String(value).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
-/** Los proximos N meses en formato YYYY-MM, empezando por el actual. */
-function buildMonthOptions(count: number): string[] {
-  const today = new Date();
-
-  return Array.from({ length: count }, (_, offset) => {
-    const month = new Date(today.getFullYear(), today.getMonth() + offset, 1);
-    return `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
-  });
 }
 
 /**
@@ -76,6 +86,8 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   tentativeMonth,
   tentativeTypeUuid,
   branchUuid,
+  nextAppointmentAt,
+  nextAppointmentTypeName,
   initialMode,
   onClose,
 }) => {
@@ -86,6 +98,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   const { executeCreateNextAppointment, isPending: isSchedulingDay } =
     useCreateNextAppointmentMutation();
   const { executeSetTentativeMonth, isPending: isSavingMonth } = useSetTentativeMonthMutation();
+  const { executeClearNextAppointment, isPending: isClearingAppointment } =
+    useClearNextAppointmentMutation();
+  const hasNextAppointment = Boolean(tentativeMonth || nextAppointmentAt);
 
   // Con un mes ya anotado el siguiente paso natural es confirmar el dia; sin
   // el, se empieza por el mes.
@@ -93,15 +108,38 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
     initialMode ?? (tentativeMonth ? ScheduleMode.DAY : ScheduleMode.MONTH),
   );
   const [month, setMonth] = useState(tentativeMonth ?? '');
-  const [date, setDate] = useState('');
+  // El día arranca dentro del mes anotado: el selector nativo no abre en un mes sin valor.
+  const [date, setDate] = useState(() => {
+    const todayKey = toDayKey(new Date());
+    if (tentativeMonth) return resolveInitialConfirmDay(tentativeMonth, todayKey);
+    if (!nextAppointmentAt) return '';
+    const scheduledDay = toDayKey(new Date(nextAppointmentAt));
+    return scheduledDay >= todayKey ? scheduledDay : todayKey;
+  });
   // Compartido por los dos modos: lo que se anoto con el mes es lo que se
   // propone al confirmar el dia, donde todavia se puede cambiar.
   const [typeUuid, setTypeUuid] = useState(tentativeTypeUuid ?? '');
   const [error, setError] = useState<string | null>(null);
 
+  // Al reagendar una cita confirmada el API da el tipo solo por nombre.
+  const selectedTypeUuid =
+    typeUuid || appointmentTypes?.find((type) => type.name === nextAppointmentTypeName)?.uuid || '';
+  const currentSummary = tentativeMonth
+    ? [
+        `Tentativo: ${formatMonthLabel(tentativeMonth)}`,
+        appointmentTypes?.find((type) => type.uuid === tentativeTypeUuid)?.name,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : nextAppointmentAt
+      ? [`Agendada: ${formatDate(nextAppointmentAt)}`, nextAppointmentTypeName]
+          .filter(Boolean)
+          .join(' · ')
+      : null;
+
   const minDate = toDateMinimum(new Date());
-  const monthOptions = useMemo(() => buildMonthOptions(TENTATIVE_MONTHS_AHEAD), []);
-  const isPending = isSchedulingDay || isSavingMonth;
+  const currentMonth = toMonthKey(toDayKey(new Date()));
+  const isPending = isSchedulingDay || isSavingMonth || isClearingAppointment;
 
   const refreshPatientData = () => {
     void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_KEY, patientUuid] });
@@ -122,13 +160,32 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
+    if (mode === ScheduleMode.NONE) {
+      executeClearNextAppointment(
+        { patientUuid, tentativeMonth, nextAppointmentAt },
+        {
+          onSuccess: () => {
+            toast.success('El paciente quedó sin cita');
+            refreshPatientData();
+            onClose();
+          },
+          onError: (mutationError: Error) => {
+            // Si falló a medias (cita cancelada, mes no), la pantalla queda como el API.
+            refreshPatientData();
+            toast.error(mutationError.message);
+          },
+        },
+      );
+      return;
+    }
+
     if (mode === ScheduleMode.MONTH) {
       if (!month) {
         setError('Elige el mes tentativo');
         return;
       }
 
-      if (!typeUuid) {
+      if (!selectedTypeUuid) {
         setError('El tipo de cita es obligatorio');
         return;
       }
@@ -136,7 +193,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
       setError(null);
 
       executeSetTentativeMonth(
-        { patientUuid, month, typeUUID: typeUuid },
+        { patientUuid, month, typeUUID: selectedTypeUuid },
         {
           onSuccess: () => {
             toast.success(`Próxima cita tentativa: ${formatMonthLabel(month)}`);
@@ -159,7 +216,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
       return;
     }
 
-    if (!typeUuid) {
+    if (!selectedTypeUuid) {
       setError('El tipo de cita es obligatorio');
       return;
     }
@@ -170,7 +227,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
       {
         patientUuid,
         date,
-        typeUUID: typeUuid,
+        typeUUID: selectedTypeUuid,
         ...(branchUuid ? { branchUUID: branchUuid } : {}),
       },
       {
@@ -186,21 +243,22 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
 
   const modeTabClasses = (tabMode: ScheduleMode) =>
     tailwind(
-      'flex-1 rounded-lg px-3 py-2 text-sm transition-colors',
-      mode === tabMode
-        ? 'bg-brand font-medium text-white'
-        : 'bg-ink-50 text-ink-700 hover:bg-ink-100',
+      'flex-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+      mode === tabMode ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-800',
     );
+  const isConfirmingClear = mode === ScheduleMode.NONE;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
+      // En el celular sube desde abajo y se desplaza solo: más alto que la pantalla se cortaba arriba.
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/70 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-card bg-white p-5"
+        className="max-h-[92dvh] w-full max-w-md overflow-y-auto rounded-t-card bg-white p-5 sm:rounded-card sm:p-6"
+        style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start gap-3">
@@ -210,59 +268,68 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
           <div className="min-w-0">
             <Typography variant={TypographyVariant.ACCENT}>Próxima cita</Typography>
             <Typography variant={TypographyVariant.BODY} className="mt-1">
-              {mode === ScheduleMode.MONTH
-                ? 'Anota el mes en que le toca volver y de qué es. El día se define cuando el paciente confirme.'
-                : 'La hora la asigna la clínica automáticamente.'}
+              {MODE_DESCRIPTIONS[mode]}
             </Typography>
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2" role="group" aria-label="Tipo de agendamiento">
-          <button
-            type="button"
-            onClick={() => handleModeChange(ScheduleMode.MONTH)}
-            aria-pressed={mode === ScheduleMode.MONTH}
-            className={modeTabClasses(ScheduleMode.MONTH)}
+        {!isConfirmingClear && (
+          <div
+            className="mt-5 flex rounded-lg bg-ink-100 p-1"
+            role="group"
+            aria-label="Tipo de agendamiento"
           >
-            Solo el mes
-          </button>
-          <button
-            type="button"
-            onClick={() => handleModeChange(ScheduleMode.DAY)}
-            aria-pressed={mode === ScheduleMode.DAY}
-            className={modeTabClasses(ScheduleMode.DAY)}
-          >
-            Día confirmado
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => handleModeChange(ScheduleMode.MONTH)}
+              aria-pressed={mode === ScheduleMode.MONTH}
+              className={modeTabClasses(ScheduleMode.MONTH)}
+            >
+              Solo el mes
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange(ScheduleMode.DAY)}
+              aria-pressed={mode === ScheduleMode.DAY}
+              className={modeTabClasses(ScheduleMode.DAY)}
+            >
+              Día confirmado
+            </button>
+          </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
-          {mode === ScheduleMode.MONTH ? (
+        {mode !== ScheduleMode.NONE && currentSummary && (
+          <Typography
+            variant={TypographyVariant.HELPER}
+            className="mt-4 rounded-lg bg-ink-50 px-3 py-2"
+          >
+            {currentSummary}
+          </Typography>
+        )}
+
+        <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-5">
+          {mode === ScheduleMode.MONTH && (
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="appointment-month">
-                <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-                  Mes tentativo
-                  <span className="ml-0.5 text-danger">*</span>
-                </Typography>
-              </label>
-              <select
-                id="appointment-month"
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
+                Mes tentativo
+                <span className="ml-0.5 text-danger">*</span>
+                {month && (
+                  <span className="ml-2 font-normal text-ink-500">{formatMonthLabel(month)}</span>
+                )}
+              </Typography>
+              <MonthGrid
                 value={month}
-                onChange={(event) => {
-                  setMonth(event.target.value);
+                minMonth={currentMonth}
+                onChange={(monthKey) => {
+                  setMonth(monthKey);
                   setError(null);
                 }}
-                className={tailwind(inputBaseClasses, 'h-11')}
-              >
-                <option value="">Elegir mes</option>
-                {monthOptions.map((monthKey) => (
-                  <option key={monthKey} value={monthKey}>
-                    {formatMonthLabel(monthKey)}
-                  </option>
-                ))}
-              </select>
+                previousYearLabel="Año anterior"
+                nextYearLabel="Año siguiente"
+              />
             </div>
-          ) : (
+          )}
+          {mode === ScheduleMode.DAY && (
             <div className="flex flex-col gap-1.5">
               <label htmlFor="appointment-date">
                 <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
@@ -294,52 +361,72 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentModalProps> =
 
           {/* El tipo va en los dos modos: de que es la cita se sabe desde que
               se anota el mes, y al confirmar el dia llega ya precargado. */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="appointment-type">
-              <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-                Tipo de cita
-                <span className="ml-0.5 text-danger">*</span>
-              </Typography>
-            </label>
-            <select
-              id="appointment-type"
-              value={typeUuid}
-              onChange={(event) => {
-                setTypeUuid(event.target.value);
-                setError(null);
-              }}
-              className={tailwind(inputBaseClasses, 'h-11')}
-            >
-              <option value="">Seleccione un tipo</option>
-              {(appointmentTypes ?? []).map((appointmentType) => (
-                <option key={appointmentType.uuid} value={appointmentType.uuid}>
-                  {appointmentType.name}
-                </option>
-              ))}
-            </select>
-            {/* El catalogo de tipos no se administra desde el backoffice: si
+          {mode !== ScheduleMode.NONE && (
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="appointment-type">
+                <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+                  Tipo de cita
+                  <span className="ml-0.5 text-danger">*</span>
+                </Typography>
+              </label>
+              <select
+                id="appointment-type"
+                value={selectedTypeUuid}
+                onChange={(event) => {
+                  setTypeUuid(event.target.value);
+                  setError(null);
+                }}
+                className={tailwind(inputBaseClasses, 'h-11')}
+              >
+                <option value="">Seleccione un tipo</option>
+                {(appointmentTypes ?? []).map((appointmentType) => (
+                  <option key={appointmentType.uuid} value={appointmentType.uuid}>
+                    {appointmentType.name}
+                  </option>
+                ))}
+              </select>
+              {/* El catalogo de tipos no se administra desde el backoffice: si
                 el tenant no tiene ninguno, sin este aviso el selector queda
                 vacio y no se entiende por que no se puede guardar. */}
-            {hasNoAppointmentTypes && (
-              <Typography variant={TypographyVariant.HELPER} className="text-danger">
-                No hay tipos de cita configurados. Pide a soporte que los agregue.
-              </Typography>
-            )}
-          </div>
+              {hasNoAppointmentTypes && (
+                <Typography variant={TypographyVariant.HELPER} className="text-danger">
+                  No hay tipos de cita configurados. Pide a soporte que los agregue.
+                </Typography>
+              )}
+            </div>
+          )}
 
           {error && <Typography variant={TypographyVariant.ERROR}>{error}</Typography>}
 
-          <div className="mt-1 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <div className="mt-1 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+            {/* Quitar la cita es poco frecuente: un enlace discreto, no otra pestaña. */}
+            {hasNextAppointment && !isConfirmingClear && (
+              <button
+                type="button"
+                onClick={() => handleModeChange(ScheduleMode.NONE)}
+                className="py-2 text-sm font-medium text-ink-500 hover:text-danger hover:underline sm:mr-auto"
+              >
+                Dejar sin cita
+              </button>
+            )}
             <Button
               type="button"
               variant={ButtonVariant.SECONDARY}
-              onClick={onClose}
+              onClick={
+                isConfirmingClear
+                  ? () => handleModeChange(tentativeMonth ? ScheduleMode.DAY : ScheduleMode.MONTH)
+                  : onClose
+              }
               disabled={isPending}
             >
-              Cancelar
+              {isConfirmingClear ? 'Volver' : 'Cancelar'}
             </Button>
-            <Button type="submit" variant={ButtonVariant.PRIMARY} isLoading={isPending}>
-              {mode === ScheduleMode.MONTH ? 'Guardar mes' : 'Agendar'}
+            <Button
+              type="submit"
+              variant={mode === ScheduleMode.NONE ? ButtonVariant.DANGER : ButtonVariant.PRIMARY}
+              isLoading={isPending}
+            >
+              {SUBMIT_LABELS[mode]}
             </Button>
           </div>
         </form>

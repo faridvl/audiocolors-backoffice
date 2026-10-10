@@ -39,6 +39,18 @@ export function firstDayOfMonth(monthKey: string): string {
   return `${monthKey}-01`;
 }
 
+/**
+ * Día que propone la ficha de confirmar para un mes tentativo: hoy si el mes
+ * es el actual o ya pasó (no se agenda hacia atrás); si es futuro, su día 1.
+ */
+export function resolveInitialConfirmDay(
+  monthKey: string | null | undefined,
+  todayKey: string,
+): string {
+  if (!monthKey || monthKey <= toMonthKey(todayKey)) return todayKey;
+  return firstDayOfMonth(monthKey);
+}
+
 export function isSameYear(dayKey: string, otherDayKey: string): boolean {
   return dayKey.slice(0, KeyLength.YEAR) === otherDayKey.slice(0, KeyLength.YEAR);
 }

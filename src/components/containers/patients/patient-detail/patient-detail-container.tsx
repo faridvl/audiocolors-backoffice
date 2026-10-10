@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { Menu } from '@headlessui/react';
 import {
   User,
-  Phone,
   Mail,
   IdCard,
   Cake,
@@ -11,6 +11,8 @@ import {
   CalendarClock,
   Pencil,
   UserCog,
+  MoreHorizontal,
+  Ear,
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
@@ -18,12 +20,15 @@ import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { GENDER_LABELS, Patient, PatientGender, PatientStatus } from '@/types/patients/patient';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
+import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
+import { PatientFlagsModal } from '@/components/containers/patients/patient-flags/patient-flags-modal';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 import { ChangePatientStatusModal } from '@/components/containers/patients/patient-status/change-patient-status-modal';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
-import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { calculateAge, formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
@@ -50,6 +55,50 @@ const InlineDatum: React.FC<{
   );
 };
 
+/** Acciones poco frecuentes del paciente: en un menú para no competir con los datos. */
+const PatientActionsMenu: React.FC<{
+  onEdit: () => void;
+  onChangeStatus: () => void;
+  onEditFlags: () => void;
+}> = ({ onEdit, onChangeStatus, onEditFlags }) => {
+  const { t } = useTranslation();
+  const items = [
+    { label: 'Modificar paciente', icon: Pencil, onClick: onEdit },
+    { label: 'Cambiar estado', icon: UserCog, onClick: onChangeStatus },
+    { label: t(TEXT.PATIENTS.FLAGS.MENU), icon: Ear, onClick: onEditFlags },
+  ];
+
+  return (
+    <Menu as="div" className="relative shrink-0">
+      <Menu.Button
+        aria-label="Más acciones"
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
+      >
+        <MoreHorizontal className="h-5 w-5" aria-hidden />
+      </Menu.Button>
+      <Menu.Items className="absolute right-0 z-20 mt-1 w-52 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
+        {items.map((item) => (
+          <Menu.Item key={item.label}>
+            {({ active }) => (
+              <button
+                type="button"
+                onClick={item.onClick}
+                className={tailwind(
+                  'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                  active && 'bg-ink-50',
+                )}
+              >
+                <item.icon className="h-4 w-4 text-ink-500" aria-hidden />
+                {item.label}
+              </button>
+            )}
+          </Menu.Item>
+        ))}
+      </Menu.Items>
+    </Menu>
+  );
+};
+
 /**
  * Barra de datos del expediente.
  *
@@ -61,8 +110,9 @@ const PatientSummary: React.FC<{
   patient: Patient;
   onScheduleAppointment: () => void;
   onChangeStatus: () => void;
+  onEditFlags: () => void;
   onEdit: () => void;
-}> = ({ patient, onScheduleAppointment, onChangeStatus, onEdit }) => {
+}> = ({ patient, onScheduleAppointment, onChangeStatus, onEditFlags, onEdit }) => {
   const [showAllData, setShowAllData] = useState(false);
   const { data: branches } = useBranchesQuery();
 
@@ -88,10 +138,6 @@ const PatientSummary: React.FC<{
     .filter(Boolean)
     .join(' · ');
 
-  // Siempre true: aunque el paciente no tenga datos extra, el bloque expandido
-  // sigue dando acceso a gestionar sus telefonos adicionales.
-  const hasExtraData = true;
-
   // El mes tentativo se muestra distinto de la fecha confirmada: "(por
   // confirmar)" avisa que ese paciente todavia hay que llamarlo.
   let scheduleTitle = 'Agendar próxima cita';
@@ -106,15 +152,17 @@ const PatientSummary: React.FC<{
 
   return (
     <section className="rounded-card border border-ink-200 bg-white px-4 py-3">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-          <InlineDatum
-            icon={User}
-            label="Nombre"
-            value={getFullName(patient.firstName, patient.lastName)}
-            className="text-brand-700 [&_svg]:text-brand-500"
-          />
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 pt-1.5">
+          <Typography
+            variant={TypographyVariant.ACCENT}
+            className="flex min-w-0 items-center gap-1.5 break-words text-brand-700"
+          >
+            <User className="h-4 w-4 shrink-0 text-brand-500" aria-hidden />
+            {getFullName(patient.firstName, patient.lastName)}
+          </Typography>
           <PatientStatusPill status={patient.status} />
+          <PatientFlagPills patient={patient} onClick={onEditFlags} />
           {statusDetail && (
             <Typography variant={TypographyVariant.HELPER} inline className="truncate">
               {statusDetail}
@@ -122,65 +170,41 @@ const PatientSummary: React.FC<{
           )}
         </div>
 
-        <div className="flex shrink-0 items-center gap-1">
-          {!isDeceased && (
-            <button
-              type="button"
-              onClick={onScheduleAppointment}
-              aria-label={scheduleTitle}
-              title={scheduleTitle}
-              className={tailwind(
-                'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
-                'transition-colors hover:bg-brand-50',
-                'md:px-3 md:py-1.5 md:text-sm md:font-medium',
-              )}
-            >
-              <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
-              <span className="hidden md:inline">{scheduleTitle}</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={onChangeStatus}
-            aria-label="Cambiar estado"
-            title="Cambiar estado"
-            className={tailwind(
-              'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
-              'transition-colors hover:bg-brand-50',
-              'md:px-3 md:py-1.5 md:text-sm md:font-medium',
-            )}
-          >
-            <UserCog className="h-4 w-4 shrink-0" aria-hidden />
-            <span className="hidden md:inline">Cambiar estado</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onEdit}
-            aria-label="Modificar paciente"
-            title="Modificar paciente"
-            className={tailwind(
-              'flex shrink-0 items-center justify-center gap-1.5 rounded-lg p-1 text-brand-700',
-              'transition-colors hover:bg-brand-50',
-              'md:px-3 md:py-1.5 md:text-sm md:font-medium',
-            )}
-          >
-            <Pencil className="h-4 w-4 shrink-0" aria-hidden />
-            <span className="hidden md:inline">Modificar paciente</span>
-          </button>
-        </div>
+        <PatientActionsMenu
+          onEdit={onEdit}
+          onChangeStatus={onChangeStatus}
+          onEditFlags={onEditFlags}
+        />
       </div>
+
+      {!isDeceased && (
+        <button
+          type="button"
+          onClick={onScheduleAppointment}
+          className="mb-3 mt-1 flex items-start gap-1.5 text-left text-sm font-medium text-brand-700 hover:underline"
+        >
+          <CalendarClock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          {scheduleTitle}
+        </button>
+      )}
+      {isDeceased && <div className="mb-3" />}
 
       <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
         <InlineDatum icon={IdCard} label="Cédula" value={patient.documentId} />
-        <InlineDatum icon={Phone} label="Teléfono" value={patient.phone} />
 
         {demographics && (
           <Typography variant={TypographyVariant.HELPER} inline>
             {demographics}
           </Typography>
         )}
+      </div>
+
+      <div className="mt-2">
+        <PatientContactsContainer
+          patientUuid={patient.uuid}
+          patientPhone={patient.phone}
+          onEdit={onEdit}
+        />
       </div>
 
       {showAllData && (
@@ -198,25 +222,17 @@ const PatientSummary: React.FC<{
             label="Registro"
             value={patient.createdAt ? formatDate(patient.createdAt) : null}
           />
-          <div className="sm:w-full">
-            <PatientContactsContainer
-              patientUuid={patient.uuid}
-              patientName={buildPatientFullName(patient.firstName, patient.lastName)}
-            />
-          </div>
         </div>
       )}
 
-      {hasExtraData && (
-        <button
-          type="button"
-          onClick={() => setShowAllData((previous) => !previous)}
-          aria-expanded={showAllData}
-          className="mt-3 text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 hover:underline"
-        >
-          {showAllData ? 'Ocultar datos' : 'Ver todos los datos'}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={() => setShowAllData((previous) => !previous)}
+        aria-expanded={showAllData}
+        className="mt-3 text-sm font-medium text-brand-700 transition-colors hover:text-brand-800 hover:underline"
+      >
+        {showAllData ? 'Ocultar datos' : 'Ver todos los datos'}
+      </button>
     </section>
   );
 };
@@ -230,6 +246,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const [isEditingFlags, setIsEditingFlags] = useState(false);
 
   if (isLoading) {
     return (
@@ -258,6 +275,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         patient={patient}
         onScheduleAppointment={() => setIsSchedulingAppointment(true)}
         onChangeStatus={() => setIsChangingStatus(true)}
+        onEditFlags={() => setIsEditingFlags(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
       />
 
@@ -275,12 +293,18 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         />
       )}
 
+      {isEditingFlags && (
+        <PatientFlagsModal patient={patient} onClose={() => setIsEditingFlags(false)} />
+      )}
+
       {isSchedulingAppointment && (
         <ScheduleAppointmentModal
           patientUuid={patient.uuid}
           tentativeMonth={patient.tentativeAppointmentMonth}
           tentativeTypeUuid={patient.tentativeAppointmentTypeUuid}
           branchUuid={patient.branchUuid}
+          nextAppointmentAt={patient.nextAppointmentAt}
+          nextAppointmentTypeName={patient.nextAppointmentType}
           onClose={() => setIsSchedulingAppointment(false)}
         />
       )}

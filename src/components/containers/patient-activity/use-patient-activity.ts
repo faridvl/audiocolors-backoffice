@@ -2,14 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   usePatientActivityActorsQuery,
-  usePatientActivityMonthsQuery,
   usePatientActivityQuery,
-  usePatientActivitySummaryQuery,
 } from '@/shared/api/querys/patient-activity-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { useNavigation } from '@/hooks/use-navigation';
-import { buildMonthOption } from '@/shared/utils/formatters';
+import { useRememberedState } from '@/hooks/use-remembered-state';
+import { addDays, fromDayKey, toDayKey } from '@/shared/utils/dates';
 import { TEXT } from '@/static/texts/i18n';
 import {
   APPOINTMENT_ACTIONS,
@@ -18,7 +17,11 @@ import {
 import { getActionLabel, groupConsecutiveUploads } from './patient-activity-presenter';
 
 export const ALL_VALUE = 'all';
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 7;
+/** El rango arranca en la última semana: hasta hoy, desde 7 días atrás. */
+const DEFAULT_RANGE_DAYS = 7;
+const SEARCH_DEBOUNCE_MS = 300;
+const MEMORY_KEY = 'activity';
 
 /** Qué parte de la bitácora se ve: solo citas o todo. */
 export enum ActivityScope {
@@ -26,16 +29,11 @@ export enum ActivityScope {
   ALL = 'all',
 }
 
-function toMonthKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-}
-
-/** Rango [inicio, fin) de un mes "YYYY-MM" en hora local, en ISO para el API. */
-function monthRange(monthKey: string): { from: string; to: string } {
-  const [year, month] = monthKey.split('-').map(Number);
+/** Días "YYYY-MM-DD" (hora local) -> rango [desde 00:00, día siguiente a hasta) en ISO. */
+function dayRange(fromDay: string, toDay: string): { from?: string; to?: string } {
   return {
-    from: new Date(year, month - 1, 1).toISOString(),
-    to: new Date(year, month, 1).toISOString(),
+    from: fromDay ? fromDayKey(fromDay).toISOString() : undefined,
+    to: toDay ? addDays(fromDayKey(toDay), 1).toISOString() : undefined,
   };
 }
 
@@ -48,20 +46,25 @@ export function usePatientActivity() {
   const [scope, setScope] = useState<ActivityScope>(ActivityScope.ALL);
   const [actorFilter, setActorFilter] = useState<string>(ALL_VALUE);
   const [actionFilter, setActionFilter] = useState<string>(ALL_VALUE);
-  const [monthFilter, setMonthFilter] = useState<string>(ALL_VALUE);
+  const todayKey = useMemo(() => toDayKey(new Date()), []);
+  const defaultFromDay = useMemo(
+    () => toDayKey(addDays(fromDayKey(todayKey), -DEFAULT_RANGE_DAYS)),
+    [todayKey],
+  );
+  const [fromDay, setFromDay] = useRememberedState(`${MEMORY_KEY}.from`, defaultFromDay);
+  const [toDay, setToDay] = useRememberedState(`${MEMORY_KEY}.to`, todayKey);
   const [branchFilter, setBranchFilter] = useState<string>(ALL_VALUE);
   const [typeFilter, setTypeFilter] = useState<string>(ALL_VALUE);
   const [page, setPage] = useState(1);
 
-  // "Hoy" y "este mes" se fijan al montar: los rangos de los resúmenes no
-  // deben cambiar (ni volver a pedirse) en cada render.
+  // Se fija al montar: agrupa las filas en "Hoy", "Ayer"…
   const now = useMemo(() => new Date(), []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
       setPage(1);
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
@@ -70,7 +73,7 @@ export function usePatientActivity() {
     return scope === ActivityScope.APPOINTMENTS ? APPOINTMENT_ACTIONS : undefined;
   }, [actionFilter, scope]);
 
-  const range = monthFilter !== ALL_VALUE ? monthRange(monthFilter) : undefined;
+  const range = dayRange(fromDay, toDay);
 
   const { data, isLoading, isError, refetch } = usePatientActivityQuery({
     page,
@@ -78,8 +81,8 @@ export function usePatientActivity() {
     search: debouncedSearch,
     actorUuid: actorFilter !== ALL_VALUE ? actorFilter : undefined,
     actions,
-    from: range?.from,
-    to: range?.to,
+    from: range.from,
+    to: range.to,
     branchUuid: branchFilter !== ALL_VALUE ? branchFilter : undefined,
     // El tipo solo existe en las acciones de cita: fuera de "Citas" no aplica.
     appointmentTypeUuid:
@@ -87,24 +90,8 @@ export function usePatientActivity() {
   });
 
   const { data: actors } = usePatientActivityActorsQuery();
-  const { data: activeMonths } = usePatientActivityMonthsQuery();
   const { data: branches } = useBranchesQuery();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
-
-  const todayRange = useMemo(
-    () => ({
-      from: new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString(),
-      to: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString(),
-    }),
-    [now],
-  );
-  const currentMonthRange = useMemo(() => monthRange(toMonthKey(now)), [now]);
-
-  const { data: todaySummary } = usePatientActivitySummaryQuery(todayRange.from, todayRange.to);
-  const { data: monthSummary } = usePatientActivitySummaryQuery(
-    currentMonthRange.from,
-    currentMonthRange.to,
-  );
 
   const actorOptions = useMemo(
     () => [
@@ -127,14 +114,6 @@ export function usePatientActivity() {
       ...available.map((action) => ({ label: getActionLabel(t, action), value: action })),
     ];
   }, [scope, t]);
-
-  const monthOptions = useMemo(
-    () => [
-      { label: t(TEXT.ACTIVITY.FILTERS.ALL_MONTHS), value: ALL_VALUE },
-      ...(activeMonths?.months ?? []).map(buildMonthOption),
-    ],
-    [activeMonths, t],
-  );
 
   const branchOptions = useMemo(
     () => [
@@ -178,7 +157,8 @@ export function usePatientActivity() {
     scope !== ActivityScope.ALL ||
     actorFilter !== ALL_VALUE ||
     actionFilter !== ALL_VALUE ||
-    monthFilter !== ALL_VALUE ||
+    fromDay !== defaultFromDay ||
+    toDay !== todayKey ||
     branchFilter !== ALL_VALUE ||
     typeFilter !== ALL_VALUE;
 
@@ -194,22 +174,22 @@ export function usePatientActivity() {
     scope,
     actorFilter,
     actionFilter,
-    monthFilter,
+    fromDay,
+    toDay,
+    todayKey,
     actorOptions,
     actionOptions,
-    monthOptions,
     branchFilter,
     branchOptions,
     typeFilter,
     typeOptions,
-    todaySummary,
-    monthSummary,
     resolveBranchName,
     setSearchTerm,
     handleScopeChange,
     handleActorFilter: withPageReset(setActorFilter),
     handleActionFilter: withPageReset(setActionFilter),
-    handleMonthFilter: withPageReset(setMonthFilter),
+    handleFromDayChange: withPageReset(setFromDay),
+    handleToDayChange: withPageReset(setToDay),
     handleBranchFilter: withPageReset(setBranchFilter),
     handleTypeFilter: withPageReset(setTypeFilter),
     handlePageChange: setPage,

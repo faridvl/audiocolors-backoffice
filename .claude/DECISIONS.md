@@ -215,3 +215,12 @@ de pacientes usan `PatientStatusFilter.ALL` (igual que el listado) y filtran con
 (`isActive = true`) o se pasan a `status = INACTIVE`, y que `PatientStatusFilter`
 deje de mezclar los dos conceptos.
 
+
+## 2026-10-10 · Resumen de pacientes: "Controles" se busca por nombre
+
+Las tarjetas de la pantalla de pacientes (solo escritorio) cuentan y filtran
+con los mismos filtros de la lista. La de "Controles este mes" necesita el
+tipo de cita "Control", que es un dato de la clínica y no tiene una marca en
+el API. Se busca por nombre (`CONTROL_TYPE_NAME` en `use-patient-summary.ts`);
+si la clínica no tiene ese tipo, la tarjeta no se muestra. Si algún día los
+tipos tienen una categoría en el API, usarla en lugar del nombre.

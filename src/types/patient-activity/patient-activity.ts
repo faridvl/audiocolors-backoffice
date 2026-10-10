@@ -18,6 +18,9 @@ export enum PatientActivityAction {
   /** Marcado desde la agenda: la cita se dio por atendida. */
   APPOINTMENT_COMPLETED = 'APPOINTMENT_COMPLETED',
   STATUS_CHANGED = 'STATUS_CHANGED',
+  HEARING_AIDS_LAB_CHANGED = 'HEARING_AIDS_LAB_CHANGED',
+  WARRANTY_CHANGED = 'WARRANTY_CHANGED',
+  VIDEO_CANDIDATE_CHANGED = 'VIDEO_CANDIDATE_CHANGED',
 }
 
 export const APPOINTMENT_ACTIONS = [
@@ -55,6 +58,8 @@ export interface PatientActivityDetail {
   appointmentUuid?: string;
   /** STATUS_CHANGED: motivo libre. */
   reason?: string | null;
+  /** Indicadores (audífonos, garantía): true al prenderlo, false al apagarlo. */
+  isOn?: boolean;
 }
 
 export interface PatientActivity {

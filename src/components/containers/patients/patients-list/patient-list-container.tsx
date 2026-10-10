@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react';
 import { Search, Pencil } from 'lucide-react';
-import { Patient } from '@/types/patients/patient';
+import { Patient, PatientFlag } from '@/types/patients/patient';
+import { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 import { Branch } from '@/types/branches/branch';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
@@ -9,15 +12,23 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterBar } from '@/components/common/filter-bar/filter-bar';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
+import {
+  PatientFlagPills,
+  PatientFlagValue,
+} from '@/components/containers/patients/patient-flags/patient-flag-pills';
 import { EMPTY_VALUE, formatDate, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { usePatientList, ALL_VALUE, DEFAULT_STATUS_FILTER } from './use-patient-list';
+import { PatientSummaryCards } from './patient-summary-cards';
 import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { BadgeSize } from '@/components/common/badge/badge';
 
-function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
+/** Indicadores que la lista muestra como chip bajo el nombre (la garantía es columna). */
+const CHIP_FLAGS = [PatientFlag.HEARING_AIDS_IN_LAB, PatientFlag.VIDEO_CANDIDATE];
+
+function buildColumns(branches: Branch[] | undefined, t: TFunction): TableColumn<Patient>[] {
   return [
     {
       key: 'name',
@@ -32,28 +43,31 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
             </Typography>
             <PatientStatusPill status={patient.status} />
           </span>
-          {patient.email && (
-            <Typography variant={TypographyVariant.HELPER}>{patient.email}</Typography>
+          {/* La cédula va bajo el nombre: así no ocupa una columna propia. */}
+          {(patient.documentId || patient.email) && (
+            <Typography variant={TypographyVariant.HELPER} className="break-words">
+              {[patient.documentId, patient.email].filter(Boolean).join(' · ')}
+            </Typography>
+          )}
+          {/* Audífonos y video no son columna: chips en su propia línea, solo si aplican. */}
+          {(patient.hearingAidsInLabSince || patient.videoCandidateSince) && (
+            <span className="mt-1.5 flex flex-wrap gap-1.5">
+              <PatientFlagPills patient={patient} flags={CHIP_FLAGS} />
+            </span>
           )}
         </div>
       ),
     },
     {
-      key: 'documentId',
-      header: 'Cédula',
-      width: '18%',
-      render: (patient) => patient.documentId || '—',
-    },
-    {
       key: 'phone',
       header: 'Teléfono',
-      width: '18%',
+      width: '16%',
       render: (patient) => patient.phone || '—',
     },
     {
       key: 'branch',
       header: 'Sede',
-      width: '17%',
+      width: '16%',
       render: (patient) => {
         const branchName = branches?.find((branch) => branch.uuid === patient.branchUuid)?.name;
         if (!branchName) return EMPTY_VALUE;
@@ -63,7 +77,7 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
     {
       key: 'nextAppointmentAt',
       header: 'Próxima cita',
-      width: '15%',
+      width: '22%',
       // Con dia confirmado se muestra la fecha y debajo de que es la cita; si
       // solo hay mes tentativo se muestra atenuado, para distinguir de un
       // vistazo a quien todavia hay que llamar.
@@ -101,6 +115,14 @@ function buildColumns(branches: Branch[] | undefined): TableColumn<Patient>[] {
         return '—';
       },
     },
+    {
+      key: PatientFlag.ACTIVE_WARRANTY,
+      header: t(`${TEXT.PATIENTS.FLAGS.COLUMN_PREFIX}.${PatientFlag.ACTIVE_WARRANTY}`),
+      width: '14%',
+      render: (patient: Patient) => (
+        <PatientFlagValue patient={patient} flag={PatientFlag.ACTIVE_WARRANTY} />
+      ),
+    },
   ];
 }
 
@@ -109,7 +131,7 @@ export const PatientListContainer: React.FC = () => {
     patients,
     meta,
     searchTerm,
-    appointmentMonthFilter,
+    monthFilter,
     appointmentMonthOptions,
     statusFilter,
     statusOptions,
@@ -117,15 +139,23 @@ export const PatientListContainer: React.FC = () => {
     branchOptions,
     appointmentTypeFilter,
     appointmentTypeOptions,
+    flagFilter,
+    flagOptions,
+    kindFilter,
+    kindOptions,
     isLoading,
     isError,
     page,
     hasActiveFilters,
     setSearchTerm,
-    handleAppointmentMonthFilter,
+    handleMonthFilter,
     handleStatusFilter,
     handleBranchFilter,
     handleAppointmentTypeFilter,
+    handleFlagFilter,
+    handleKindFilter,
+    applyPreset,
+    isPresetActive,
     handlePageChange,
     handleRetry,
     navigateToCreate,
@@ -134,7 +164,8 @@ export const PatientListContainer: React.FC = () => {
   } = usePatientList();
 
   const { data: branches } = useBranchesQuery();
-  const columns = useMemo(() => buildColumns(branches), [branches]);
+  const { t } = useTranslation();
+  const columns = useMemo(() => buildColumns(branches, t), [branches, t]);
   const getRowAccentColor = (patient: Patient) =>
     getBranchStripeColor(branches?.find((branch) => branch.uuid === patient.branchUuid)?.name);
 
@@ -146,6 +177,8 @@ export const PatientListContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      <PatientSummaryCards isPresetActive={isPresetActive} onSelectPreset={applyPreset} />
+
       <FilterBar
         leading={
           <div className="relative w-full lg:w-72">
@@ -167,37 +200,53 @@ export const PatientListContainer: React.FC = () => {
           {
             key: 'status',
             label: 'Estado',
-            value: statusFilter,
+            values: statusFilter,
+            defaultValues: DEFAULT_STATUS_FILTER,
             options: statusOptions,
             allValue: ALL_VALUE,
-            defaultValue: DEFAULT_STATUS_FILTER,
-            onChange: handleStatusFilter,
+            onValuesChange: handleStatusFilter,
           },
           {
             key: 'branch',
             label: 'Sede',
-            value: branchFilter,
+            values: branchFilter,
             options: branchOptions,
             allValue: ALL_VALUE,
-            onChange: handleBranchFilter,
+            onValuesChange: handleBranchFilter,
           },
           {
             key: 'appointmentType',
             label: 'Tipo de cita',
-            value: appointmentTypeFilter,
+            values: appointmentTypeFilter,
             options: appointmentTypeOptions,
             allValue: ALL_VALUE,
-            onChange: handleAppointmentTypeFilter,
+            onValuesChange: handleAppointmentTypeFilter,
+          },
+          {
+            key: 'kind',
+            label: 'Próxima cita',
+            values: kindFilter,
+            options: kindOptions,
+            allValue: ALL_VALUE,
+            onValuesChange: handleKindFilter,
+          },
+          {
+            key: 'flags',
+            label: 'Indicadores',
+            values: flagFilter,
+            options: flagOptions,
+            allValue: ALL_VALUE,
+            onValuesChange: handleFlagFilter,
           },
           {
             key: 'month',
             label: 'Próxima cita',
             ariaLabel: 'Filtrar por mes de próxima cita',
             inline: true,
-            value: appointmentMonthFilter,
+            values: monthFilter,
             options: appointmentMonthOptions,
             allValue: ALL_VALUE,
-            onChange: handleAppointmentMonthFilter,
+            onValuesChange: handleMonthFilter,
           },
         ]}
         trailing={createButton}

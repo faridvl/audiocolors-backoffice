@@ -218,18 +218,6 @@ export function resolveDayPanelSide(dayKey: string): DayPanelSide {
 }
 
 /**
- * Día que propone la ficha de confirmar para un mes tentativo: hoy si el mes
- * es el actual o ya pasó (no se agenda hacia atrás); si es futuro, su día 1.
- */
-export function resolveInitialConfirmDay(
-  monthKey: string | null | undefined,
-  todayKey: string,
-): string {
-  if (!monthKey || monthKey <= toMonthKey(todayKey)) return todayKey;
-  return firstDayOfMonth(monthKey);
-}
-
-/**
  * Un color por sede distinta con citas ese día (una sede con cinco citas es un
  * solo punto). `resolveColor` da el color de marca de la sede, o undefined si
  * no tiene: ese punto sale gris.

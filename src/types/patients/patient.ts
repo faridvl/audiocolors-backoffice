@@ -42,6 +42,10 @@ export interface Patient {
   lastName: string;
   phone?: string;
   address?: string;
+  /** Indicadores (ver `PatientFlag`): desde cuándo (ISO) están prendidos, null si no. */
+  hearingAidsInLabSince?: string | null;
+  warrantyActiveSince?: string | null;
+  videoCandidateSince?: string | null;
   birthDate: string;
   email?: string;
   gender?: string;
@@ -92,3 +96,20 @@ export interface CreatePatientPayload {
 }
 
 export type UpdatePatientPayload = Partial<CreatePatientPayload>;
+
+/** Indicadores que se prenden y apagan desde el expediente. El valor es la clave del API. */
+export enum PatientFlag {
+  HEARING_AIDS_IN_LAB = 'hearingAidsInLab',
+  ACTIVE_WARRANTY = 'hasActiveWarranty',
+  VIDEO_CANDIDATE = 'isVideoCandidate',
+}
+
+/** Campo del paciente que guarda desde cuándo está prendido cada indicador. */
+export const PATIENT_FLAG_SINCE_FIELDS: Record<
+  PatientFlag,
+  'hearingAidsInLabSince' | 'warrantyActiveSince' | 'videoCandidateSince'
+> = {
+  [PatientFlag.HEARING_AIDS_IN_LAB]: 'hearingAidsInLabSince',
+  [PatientFlag.ACTIVE_WARRANTY]: 'warrantyActiveSince',
+  [PatientFlag.VIDEO_CANDIDATE]: 'videoCandidateSince',
+};

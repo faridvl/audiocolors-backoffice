@@ -80,6 +80,7 @@ export interface ScheduleTarget {
   tentativeMonth?: string | null;
   typeUuid?: string | null;
   branchUuid?: string | null;
+  nextAppointmentAt?: string | null;
   initialMode: ScheduleMode;
 }
 
@@ -138,7 +139,7 @@ export function useAgenda() {
     // ALL como el listado: `isActive` es el borrado lógico de antes y dejaba
     // fuera a pacientes que el resto de la app trata como activos.
     PatientStatusFilter.ALL,
-    pendingMonthKey,
+    [pendingMonthKey],
   );
   const { executeUpdateAppointmentStatus } = useUpdateAppointmentStatusMutation();
 
@@ -375,6 +376,8 @@ export function useAgenda() {
       patientUuid: appointment.patientUUID,
       typeUuid: appointment.typeUUID,
       branchUuid: appointment.branchUUID,
+      nextAppointmentAt:
+        appointment.status === AppointmentStatus.CONFIRMED ? appointment.schedule.startTime : null,
       initialMode: ScheduleMode.DAY,
     });
   };
@@ -409,6 +412,7 @@ export function useAgenda() {
       tentativeMonth: patient.tentativeAppointmentMonth,
       typeUuid: patient.tentativeAppointmentTypeUuid,
       branchUuid: patient.branchUuid,
+      nextAppointmentAt: patient.nextAppointmentAt,
       initialMode: ScheduleMode.DAY,
     });
   };
@@ -420,6 +424,7 @@ export function useAgenda() {
       tentativeMonth: patient.tentativeAppointmentMonth,
       typeUuid: patient.tentativeAppointmentTypeUuid,
       branchUuid: patient.branchUuid,
+      nextAppointmentAt: patient.nextAppointmentAt,
       initialMode: ScheduleMode.DAY,
     });
   };

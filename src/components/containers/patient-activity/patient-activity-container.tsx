@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 import { Search } from 'lucide-react';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
@@ -10,10 +9,7 @@ import { FilterBar, FilterBarField } from '@/components/common/filter-bar/filter
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { tailwind } from '@/utils/tailwind-utils';
 import { TEXT } from '@/static/texts/i18n';
-import {
-  PatientActivityAction,
-  PatientActivitySummary,
-} from '@/types/patient-activity/patient-activity';
+import { PatientActivityAction } from '@/types/patient-activity/patient-activity';
 import {
   ACTION_STYLES,
   ActivityRow,
@@ -25,37 +21,37 @@ import {
 import { ActivityScope, ALL_VALUE, usePatientActivity } from './use-patient-activity';
 import { BranchBadge } from '@/components/common/badge/branch-badge';
 
-const SummaryCard: React.FC<{ label: string; value?: number; hint?: string }> = ({
-  label,
-  value,
-  hint,
-}) => (
-  <div className="rounded-card border border-ink-200 bg-white px-4 py-3">
-    <Typography variant={TypographyVariant.HELPER}>{label}</Typography>
-    <Typography variant={TypographyVariant.HEADER} as="p">
-      {value ?? '—'}
+const DateField: React.FC<{
+  label: string;
+  value: string;
+  min?: string;
+  max?: string;
+  onChange: (value: string) => void;
+}> = ({ label, value, min, max, onChange }) => (
+  // Desde `sm` la etiqueta sube por encima de la fila: el campo queda a la altura del buscador.
+  <label className="relative flex min-w-0 flex-col gap-1 sm:w-40">
+    <Typography
+      variant={TypographyVariant.HELPER}
+      as="span"
+      className="sm:absolute sm:bottom-full sm:mb-0.5"
+    >
+      {label}
     </Typography>
-    {hint && (
-      <Typography variant={TypographyVariant.HELPER} className="truncate">
-        {hint}
-      </Typography>
-    )}
-  </div>
+    <input
+      type="date"
+      value={value}
+      min={min}
+      max={max}
+      onChange={(event) => onChange(event.target.value)}
+      // Safari de iOS dibuja el input de fecha más alto y centrado: sin apariencia nativa se alinea.
+      className={tailwind(
+        inputBaseClasses,
+        'block h-11 min-w-0 appearance-none text-left sm:h-[46px]',
+        '[&::-webkit-date-and-time-value]:text-left',
+      )}
+    />
+  </label>
 );
-
-/** "María 5 · Matthew 3": solo el primer nombre, para que quepa en la tarjeta. */
-function formatActorBreakdown(t: TFunction, summary?: PatientActivitySummary): string | undefined {
-  if (!summary) return undefined;
-  if (summary.total === 0) return t(TEXT.ACTIVITY.SUMMARY.TODAY_EMPTY);
-  return summary.byActor
-    .map((actor) =>
-      t(TEXT.ACTIVITY.SUMMARY.BY_ACTOR, {
-        name: actor.actorName?.split(' ')[0] ?? t(TEXT.ACTIVITY.UNKNOWN_ACTOR),
-        count: actor.count,
-      }),
-    )
-    .join(' · ');
-}
 
 const ActionPill: React.FC<{ action: PatientActivityAction; label: string }> = ({
   action,
@@ -89,22 +85,22 @@ export const PatientActivityContainer: React.FC = () => {
     scope,
     actorFilter,
     actionFilter,
-    monthFilter,
+    fromDay,
+    toDay,
+    todayKey,
     actorOptions,
     actionOptions,
-    monthOptions,
     branchFilter,
     branchOptions,
     typeFilter,
     typeOptions,
-    todaySummary,
-    monthSummary,
     resolveBranchName,
     setSearchTerm,
     handleScopeChange,
     handleActorFilter,
     handleActionFilter,
-    handleMonthFilter,
+    handleFromDayChange,
+    handleToDayChange,
     handleBranchFilter,
     handleTypeFilter,
     handlePageChange,
@@ -130,7 +126,8 @@ export const PatientActivityContainer: React.FC = () => {
         render: (row) => (
           <div className="flex flex-col">
             <Typography variant={TypographyVariant.BODY}>{row.activity.patientName}</Typography>
-            <BranchBadge className="mt-0.5"
+            <BranchBadge
+              className="mt-0.5"
               name={
                 row.activity.patientBranchUuid
                   ? resolveBranchName(row.activity.patientBranchUuid)
@@ -210,42 +207,11 @@ export const PatientActivityContainer: React.FC = () => {
           },
         ]
       : []),
-    {
-      key: 'month',
-      label: t(TEXT.ACTIVITY.FILTERS.MONTH_LABEL),
-      ariaLabel: t(TEXT.ACTIVITY.FILTERS.MONTH_ARIA),
-      value: monthFilter,
-      options: monthOptions,
-      allValue: ALL_VALUE,
-      inline: true,
-      onChange: handleMonthFilter,
-    },
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* En móvil las tarjetas van en una fila con scroll lateral para no
-          ocupar media pantalla antes del primer registro. */}
-      <div className="-mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-4 md:gap-3 md:overflow-visible md:px-0 md:pb-0 [&>*]:min-w-[46%] [&>*]:snap-start md:[&>*]:min-w-0">
-        <SummaryCard
-          label={t(TEXT.ACTIVITY.SUMMARY.TODAY)}
-          value={todaySummary?.total}
-          hint={formatActorBreakdown(t, todaySummary)}
-        />
-        <SummaryCard
-          label={t(TEXT.ACTIVITY.SUMMARY.CONFIRMED_THIS_MONTH)}
-          value={monthSummary ? (monthSummary.byAction.APPOINTMENT_CONFIRMED ?? 0) : undefined}
-        />
-        <SummaryCard
-          label={t(TEXT.ACTIVITY.SUMMARY.TENTATIVE_THIS_MONTH)}
-          value={monthSummary ? (monthSummary.byAction.APPOINTMENT_TENTATIVE ?? 0) : undefined}
-        />
-        <SummaryCard
-          label={t(TEXT.ACTIVITY.SUMMARY.NEW_PATIENTS_THIS_MONTH)}
-          value={monthSummary ? (monthSummary.byAction.PATIENT_CREATED ?? 0) : undefined}
-        />
-      </div>
-
+    // `sm:pt-5`: lugar para las etiquetas Desde/Hasta, que desde `sm` quedan sobre la fila.
+    <div className="flex flex-col gap-4 sm:pt-5">
       <FilterBar
         leading={
           <>
@@ -261,6 +227,23 @@ export const PatientActivityContainer: React.FC = () => {
                 placeholder={t(TEXT.ACTIVITY.FILTERS.SEARCH_PLACEHOLDER)}
                 aria-label={t(TEXT.ACTIVITY.FILTERS.SEARCH_ARIA)}
                 className={tailwind(inputBaseClasses, 'pl-9')}
+              />
+            </div>
+
+            {/* Desde/hasta: en el celular lado a lado, cada uno la mitad. */}
+            <div className="grid grid-cols-2 gap-2 sm:flex">
+              <DateField
+                label={t(TEXT.ACTIVITY.FILTERS.FROM_LABEL)}
+                value={fromDay}
+                max={toDay || todayKey}
+                onChange={handleFromDayChange}
+              />
+              <DateField
+                label={t(TEXT.ACTIVITY.FILTERS.TO_LABEL)}
+                value={toDay}
+                min={fromDay}
+                max={todayKey}
+                onChange={handleToDayChange}
               />
             </div>
 

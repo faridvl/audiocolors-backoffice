@@ -233,7 +233,9 @@
       "branchAria": "Filtrar por sede del paciente",
       "typeLabel": "Tipo de cita",
       "typeAria": "Filtrar por tipo de cita",
-      "allMonths": "Todos los meses"
+      "allMonths": "Todos los meses",
+      "fromLabel": "Desde",
+      "toLabel": "Hasta"
     },
     "count_one": "{{count}} registro",
     "count_other": "{{count}} registros",
@@ -270,7 +272,10 @@
       "APPOINTMENT_CONFIRMED": "Cita confirmada",
       "APPOINTMENT_ARRIVED": "Llegó a la cita",
       "APPOINTMENT_COMPLETED": "Cita atendida",
-      "STATUS_CHANGED": "Estado cambiado"
+      "STATUS_CHANGED": "Estado cambiado",
+      "HEARING_AIDS_LAB_CHANGED": "Audífonos en laboratorio",
+      "WARRANTY_CHANGED": "Garantía",
+      "VIDEO_CANDIDATE_CHANGED": "Candidato a video"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -293,6 +298,59 @@
         "ACTIVE": "Activo",
         "INACTIVE": "Inactivo",
         "DECEASED": "Fallecido"
+      },
+      "flagOn": {
+        "HEARING_AIDS_LAB_CHANGED": "Enviados al laboratorio",
+        "WARRANTY_CHANGED": "Garantía activada",
+        "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato"
+      },
+      "flagOff": {
+        "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
+        "WARRANTY_CHANGED": "Garantía desactivada",
+        "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato"
+      }
+    }
+  },
+  "patients": {
+    "summary": {
+      "tentative": "Citas tentativas este mes",
+      "confirmed": "Citas confirmadas este mes",
+      "controls": "Controles este mes",
+      "hearingAids": "Audífonos en laboratorio"
+    },
+    "flags": {
+      "menu": "Indicadores",
+      "title": "Indicadores del paciente",
+      "description": "Se guarda al tocar cada opción.",
+      "done": "Listo",
+      "since": "desde el {{date}}",
+      "labels": {
+        "hearingAidsInLab": "Audífonos en laboratorio",
+        "hasActiveWarranty": "Garantía activa",
+        "isVideoCandidate": "Candidato a video"
+      },
+      "toastsOn": {
+        "hearingAidsInLab": "Audífonos marcados en laboratorio",
+        "hasActiveWarranty": "Garantía activada",
+        "isVideoCandidate": "Marcado como candidato a video"
+      },
+      "toastsOff": {
+        "hearingAidsInLab": "Audífonos devueltos al paciente",
+        "hasActiveWarranty": "Garantía desactivada",
+        "isVideoCandidate": "Ya no es candidato a video"
+      },
+      "columns": {
+        "hearingAidsInLab": "Audífonos",
+        "hasActiveWarranty": "Garantía",
+        "isVideoCandidate": "Video"
+      },
+      "values": {
+        "hearingAidsInLab": "En laboratorio",
+        "hasActiveWarranty": "Activa",
+        "isVideoCandidate": "Candidato"
+      },
+      "offValues": {
+        "hasActiveWarranty": "Sin garantía"
       }
     }
   }
