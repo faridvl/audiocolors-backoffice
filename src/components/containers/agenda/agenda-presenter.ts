@@ -105,6 +105,8 @@ export enum AppointmentAction {
   MARK_ARRIVED = 'MARK_ARRIVED',
   MARK_DONE = 'MARK_DONE',
   UNDO_ARRIVED = 'UNDO_ARRIVED',
+  /** Poner o cambiar la hora: en el celular no hay horarios para arrastrar. */
+  SET_TIME = 'SET_TIME',
   RESCHEDULE = 'RESCHEDULE',
   WHATSAPP = 'WHATSAPP',
   CALENDAR = 'CALENDAR',
@@ -121,11 +123,13 @@ export function resolveAppointmentActions(
   appointment: Appointment,
   timing: DayTiming,
 ): { primary: AppointmentAction | null; secondary: AppointmentAction[] } {
+  const canMove = canMoveAppointment(appointment, timing);
   const contactActions = [
+    ...(canMove ? [AppointmentAction.SET_TIME] : []),
     AppointmentAction.RESCHEDULE,
     AppointmentAction.WHATSAPP,
     AppointmentAction.CALENDAR,
-    ...(canMoveAppointment(appointment, timing) ? [AppointmentAction.RETURN_TO_PENDING] : []),
+    ...(canMove ? [AppointmentAction.RETURN_TO_PENDING] : []),
   ];
 
   if (appointment.status === AppointmentStatus.COMPLETED) return { primary: null, secondary: [] };

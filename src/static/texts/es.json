@@ -104,6 +104,8 @@
       "whatsapp": "Recordar por WhatsApp",
       "calendar": "Agregar a mi calendario",
       "undoArrived": "Volver a por llegar",
+      "setTime": "Poner hora",
+      "changeTime": "Cambiar hora",
       "returnToPending": "Volver a por confirmar"
     },
     "sheet": {
@@ -111,6 +113,7 @@
       "day": "Día",
       "month": "Mes",
       "type": "Tipo",
+      "time": "Hora",
       "branch": "Sede",
       "phone": "Teléfono",
       "scheduledBy": "Agendada por",
@@ -180,6 +183,9 @@
       "hours": "Hora",
       "moreOptions": "Cambiar tipo de cita o mes"
     },
+    "timeSheet": {
+      "status": "Elige la hora de la cita"
+    },
     "calendarSync": {
       "menu": "Calendario del teléfono",
       "title": "Calendario del iPhone",
@@ -190,13 +196,11 @@
       "add": "Agregar",
       "onPhone": "En tu iPhone",
       "remove": "Quitar",
-      "removed": "Quitado: queda vacío en el iPhone. Para que desaparezca, elimínalo desde Calendario.",
-      "restore": "Volver a mostrar",
+      "removed": "Quitado: ya no recibe citas. Si todavía lo ves en el iPhone, elimínalo desde Calendario.",
       "refreshHint": "El iPhone revisa los cambios cada 15 minutos aproximadamente. Para verlos ya, en Calendario toca Calendarios y desliza hacia abajo.",
       "privacy": "Los eventos muestran el nombre del paciente: este calendario es solo tuyo.",
       "toasts": {
-        "removed": "{{name}}: quitado del iPhone",
-        "restored": "{{name}}: se vuelve a mostrar en el iPhone"
+        "removed": "{{name}}: quitado del iPhone"
       }
     }
   },

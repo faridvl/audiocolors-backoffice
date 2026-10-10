@@ -146,14 +146,14 @@ export function useCalendarSync() {
     });
   }, [feed, token, grouping, branches, appointmentTypes]);
 
-  const setVisibility = (row: CalendarSyncRowData, isRemoved: boolean, successText: string) => {
+  const handleRemove = (row: CalendarSyncRowData) => {
     setUpdatingKey(row.key);
     executeSetCalendarVisibility(
-      { branchUuid: row.branchUuid, typeUuid: row.typeUuid, isRemoved },
+      { branchUuid: row.branchUuid, typeUuid: row.typeUuid, isRemoved: true },
       {
         onSuccess: (status) => {
           saveStatus(status);
-          toast.success(t(successText, { name: row.label }));
+          toast.success(t(TEXT.AGENDA.CALENDAR_SYNC.TOASTS.REMOVED, { name: row.label }));
         },
         onError: (error: Error) => toast.error(error.message),
         onSettled: () => setUpdatingKey(null),
@@ -163,7 +163,7 @@ export function useCalendarSync() {
 
   /**
    * "Agregar" abre el enlace `webcal://` por sí mismo. Si ese calendario estaba
-   * quitado, además se vuelve a mostrar para que no llegue vacío.
+   * quitado, además se vuelve a publicar con citas para que no llegue vacío.
    */
   const handleAdd = (row: CalendarSyncRowData) => {
     if (!feed?.removedCalendarKeys.includes(row.key)) return;
@@ -183,9 +183,6 @@ export function useCalendarSync() {
     updatingKey,
     handleGroupingChange: setChosenGrouping,
     handleAdd,
-    handleRemove: (row: CalendarSyncRowData) =>
-      setVisibility(row, true, TEXT.AGENDA.CALENDAR_SYNC.TOASTS.REMOVED),
-    handleRestore: (row: CalendarSyncRowData) =>
-      setVisibility(row, false, TEXT.AGENDA.CALENDAR_SYNC.TOASTS.RESTORED),
+    handleRemove,
   };
 }

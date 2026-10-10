@@ -63,7 +63,6 @@ export const CalendarSyncSheet: React.FC<{ onClose: () => void }> = ({ onClose }
                       isUpdating={sync.updatingKey === row.key}
                       onAdd={sync.handleAdd}
                       onRemove={sync.handleRemove}
-                      onRestore={sync.handleRestore}
                     />
                   ))}
                 </ul>

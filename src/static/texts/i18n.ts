@@ -93,6 +93,8 @@ export const TEXT = {
       WHATSAPP: 'agenda.menu.whatsapp',
       CALENDAR: 'agenda.menu.calendar',
       UNDO_ARRIVED: 'agenda.menu.undoArrived',
+      SET_TIME: 'agenda.menu.setTime',
+      CHANGE_TIME: 'agenda.menu.changeTime',
       RETURN_TO_PENDING: 'agenda.menu.returnToPending',
     },
     SHEET: {
@@ -100,6 +102,7 @@ export const TEXT = {
       DAY: 'agenda.sheet.day',
       MONTH: 'agenda.sheet.month',
       TYPE: 'agenda.sheet.type',
+      TIME: 'agenda.sheet.time',
       BRANCH: 'agenda.sheet.branch',
       PHONE: 'agenda.sheet.phone',
       SCHEDULED_BY: 'agenda.sheet.scheduledBy',
@@ -150,12 +153,10 @@ export const TEXT = {
       ON_PHONE: 'agenda.calendarSync.onPhone',
       REMOVE: 'agenda.calendarSync.remove',
       REMOVED: 'agenda.calendarSync.removed',
-      RESTORE: 'agenda.calendarSync.restore',
       REFRESH_HINT: 'agenda.calendarSync.refreshHint',
       PRIVACY: 'agenda.calendarSync.privacy',
       TOASTS: {
         REMOVED: 'agenda.calendarSync.toasts.removed',
-        RESTORED: 'agenda.calendarSync.toasts.restored',
       },
     },
     /** Ficha para confirmar un pendiente eligiendo día y hora, sin formulario. */
@@ -163,6 +164,9 @@ export const TEXT = {
       STATUS: 'agenda.confirmSheet.status',
       HOURS: 'agenda.confirmSheet.hours',
       MORE_OPTIONS: 'agenda.confirmSheet.moreOptions',
+    },
+    TIME_SHEET: {
+      STATUS: 'agenda.timeSheet.status',
     },
     /** Vista de escritorio: calendario del mes, horarios del día y arrastrar para confirmar. */
     BOARD: {

@@ -6,6 +6,7 @@ import { AppointmentSheet } from './appointment-sheet';
 import { ConfirmDaySheet } from './confirm-day-sheet';
 import { PatientPickerModal } from './patient-picker-modal';
 import { PendingSheet } from './pending-sheet';
+import { TimeSheet } from './time-sheet';
 import { useAgenda } from './use-agenda';
 
 /**
@@ -16,7 +17,8 @@ import { useAgenda } from './use-agenda';
  */
 export const AgendaContainer: React.FC = () => {
   const agenda = useAgenda();
-  const { openAppointment, openPendingPatient, confirmTarget, scheduleTarget } = agenda;
+  const { openAppointment, openPendingPatient, confirmTarget, scheduleTarget, timeAppointment } =
+    agenda;
 
   return (
     <>
@@ -28,6 +30,8 @@ export const AgendaContainer: React.FC = () => {
       </div>
 
       {openAppointment && <AppointmentSheet agenda={agenda} appointment={openAppointment} />}
+
+      {timeAppointment && <TimeSheet agenda={agenda} appointment={timeAppointment} />}
 
       {openPendingPatient && <PendingSheet agenda={agenda} patient={openPendingPatient} />}
 

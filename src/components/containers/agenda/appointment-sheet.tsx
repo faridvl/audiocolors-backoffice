@@ -4,6 +4,7 @@ import {
   CalendarPlus,
   CalendarX2,
   CircleCheck,
+  Clock,
   DoorOpen,
   MessageCircle,
   RotateCcw,
@@ -13,15 +14,22 @@ import {
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment } from '@/types/appointments/appointment';
-import { AppointmentAction, resolveAppointmentActions, resolveSection } from './agenda-presenter';
+import {
+  AppointmentAction,
+  resolveAppointmentActions,
+  resolveSection,
+  resolveSlotHour,
+} from './agenda-presenter';
 import { ActionSheet, SheetAction } from './action-sheet';
 import { AgendaState } from './use-agenda';
 import { EMPTY_VALUE } from '@/shared/utils/formatters';
+import { formatHour } from '@/shared/utils/dates';
 
 const ACTION_ICONS: Record<AppointmentAction, LucideIcon> = {
   [AppointmentAction.MARK_ARRIVED]: DoorOpen,
   [AppointmentAction.MARK_DONE]: CircleCheck,
   [AppointmentAction.UNDO_ARRIVED]: RotateCcw,
+  [AppointmentAction.SET_TIME]: Clock,
   [AppointmentAction.RESCHEDULE]: CalendarX2,
   [AppointmentAction.WHATSAPP]: MessageCircle,
   [AppointmentAction.CALENDAR]: CalendarPlus,
@@ -32,6 +40,7 @@ const ACTION_LABELS: Record<AppointmentAction, string> = {
   [AppointmentAction.MARK_ARRIVED]: TEXT.AGENDA.ROW.MARK_ARRIVED,
   [AppointmentAction.MARK_DONE]: TEXT.AGENDA.ROW.MARK_DONE,
   [AppointmentAction.UNDO_ARRIVED]: TEXT.AGENDA.MENU.UNDO_ARRIVED,
+  [AppointmentAction.SET_TIME]: TEXT.AGENDA.MENU.SET_TIME,
   [AppointmentAction.RESCHEDULE]: TEXT.AGENDA.MENU.RESCHEDULE,
   [AppointmentAction.WHATSAPP]: TEXT.AGENDA.MENU.WHATSAPP,
   [AppointmentAction.CALENDAR]: TEXT.AGENDA.MENU.CALENDAR,
@@ -45,6 +54,7 @@ export const AppointmentSheet: React.FC<{ agenda: AgendaState; appointment: Appo
   const { t } = useTranslation();
   const { primary, secondary } = resolveAppointmentActions(appointment, agenda.selectedTiming);
   const section = resolveSection(appointment, agenda.selectedTiming);
+  const slotHour = resolveSlotHour(appointment);
 
   const runAction = (action: AppointmentAction) => {
     switch (action) {
@@ -54,6 +64,8 @@ export const AppointmentSheet: React.FC<{ agenda: AgendaState; appointment: Appo
         return agenda.handleMarkDone(appointment);
       case AppointmentAction.UNDO_ARRIVED:
         return agenda.handleUndoArrived(appointment);
+      case AppointmentAction.SET_TIME:
+        return agenda.handleOpenTime(appointment);
       case AppointmentAction.RESCHEDULE:
         return agenda.handleReschedule(appointment);
       case AppointmentAction.WHATSAPP:
@@ -66,7 +78,11 @@ export const AppointmentSheet: React.FC<{ agenda: AgendaState; appointment: Appo
   };
 
   const toSheetAction = (action: AppointmentAction): SheetAction => ({
-    label: t(ACTION_LABELS[action]),
+    label: t(
+      action === AppointmentAction.SET_TIME && slotHour !== null
+        ? TEXT.AGENDA.MENU.CHANGE_TIME
+        : ACTION_LABELS[action],
+    ),
     icon: ACTION_ICONS[action],
     onClick: () => runAction(action),
   });
@@ -77,6 +93,10 @@ export const AppointmentSheet: React.FC<{ agenda: AgendaState; appointment: Appo
       status={t(`${TEXT.AGENDA.STATUS_PREFIX}.${section}`)}
       details={[
         { label: t(TEXT.AGENDA.SHEET.DAY), value: agenda.dayTitle },
+        {
+          label: t(TEXT.AGENDA.SHEET.TIME),
+          value: slotHour === null ? t(TEXT.AGENDA.BOARD.NO_TIME) : formatHour(slotHour),
+        },
         {
           label: t(TEXT.AGENDA.SHEET.TYPE),
           value: appointment.typeName ?? t(TEXT.AGENDA.ROW.NO_TYPE),

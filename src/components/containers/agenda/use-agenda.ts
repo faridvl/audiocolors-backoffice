@@ -108,6 +108,8 @@ export function useAgenda() {
   /** Ficha abierta: una cita del día o un paciente por confirmar. */
   const [openAppointmentUuid, setOpenAppointmentUuid] = useState<string | null>(null);
   const [openPendingUuid, setOpenPendingUuid] = useState<string | null>(null);
+  /** Cita en la ficha de horas (poner o cambiar la hora desde el celular). */
+  const [timeAppointmentUuid, setTimeAppointmentUuid] = useState<string | null>(null);
 
   const weekDayKeys = useMemo(() => buildWeekDayKeys(weekStart), [weekStart]);
   const selectedMonthKey = toMonthKey(selectedDayKey);
@@ -220,6 +222,9 @@ export function useAgenda() {
     (appointment) => appointment.id === openAppointmentUuid,
   );
   const openPendingPatient = pendingPatients.find((patient) => patient.uuid === openPendingUuid);
+  const timeAppointment = selectedAppointments.find(
+    (appointment) => appointment.id === timeAppointmentUuid,
+  );
 
   const typeColors = useMemo(
     () =>
@@ -372,6 +377,16 @@ export function useAgenda() {
       branchUuid: appointment.branchUUID,
       initialMode: ScheduleMode.DAY,
     });
+  };
+
+  const handleOpenTime = (appointment: Appointment) => {
+    setOpenAppointmentUuid(null);
+    setTimeAppointmentUuid(appointment.id);
+  };
+
+  const handleSetTimeAt = (appointment: Appointment, hour: number) => {
+    setTimeAppointmentUuid(null);
+    void scheduling.moveAppointment(appointment, selectedDayKey, hour);
   };
 
   /** "Confirmar día": la ficha con calendario y horas, sin modal de formulario. */
@@ -530,6 +545,10 @@ export function useAgenda() {
     handleCloseConfirm: () => setConfirmTarget(null),
     handleOpenScheduleOptions,
     handleReturnToPending,
+    timeAppointment,
+    handleOpenTime,
+    handleSetTimeAt,
+    handleCloseTime: () => setTimeAppointmentUuid(null),
     scheduling,
     handleSendWhatsApp,
     handleCallPatient,

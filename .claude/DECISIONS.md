@@ -184,7 +184,9 @@ como "(RC) Controles", "(RC) Citas", "(PZ) Recetas"…
   agregar otra sede cualquier día sin tocar las anteriores.
 - **"Quitar"** no puede borrar la suscripción del teléfono: el API publica ese
   calendario vacío. Para que desaparezca del iPhone hay que eliminarlo desde
-  Calendario.
+  Calendario. Un calendario quitado vuelve a ofrecer "Agregar", igual que uno
+  nuevo (no "Volver a mostrar"): si ya se borró del iPhone, solo el enlace
+  `webcal://` lo vuelve a suscribir. Agregar le devuelve las citas.
 - **No hay actualización instantánea**: iOS consulta los calendarios suscritos
   cuando quiere (el API sugiere 15 minutos) y el servidor no puede avisarle. La
   ficha explica cómo refrescar a mano.

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarCheck, CalendarMinus, CalendarPlus, Undo2 } from 'lucide-react';
+import { CalendarCheck, CalendarMinus, CalendarPlus } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ButtonLink } from '@/components/common/button/button-link';
 import { ColorDot } from '@/components/common/color-dot/color-dot';
@@ -15,16 +15,14 @@ interface CalendarSyncRowProps {
   isUpdating: boolean;
   onAdd: (row: CalendarSyncRowData) => void;
   onRemove: (row: CalendarSyncRowData) => void;
-  onRestore: (row: CalendarSyncRowData) => void;
 }
 
-/** Un calendario: "Agregar", o si el teléfono ya lo lee, "Quitar" (y quitado, "Volver a mostrar"). */
+/** Un calendario: "Agregar", o si el teléfono ya lo lee, "Quitar". Uno quitado se vuelve a agregar igual que uno nuevo. */
 export const CalendarSyncRow: React.FC<CalendarSyncRowProps> = ({
   row,
   isUpdating,
   onAdd,
   onRemove,
-  onRestore,
 }) => {
   const { t } = useTranslation();
   const isRemoved = row.state === CalendarState.REMOVED;
@@ -52,7 +50,7 @@ export const CalendarSyncRow: React.FC<CalendarSyncRowProps> = ({
         )}
       </span>
 
-      {row.state === CalendarState.NOT_ADDED && (
+      {row.state !== CalendarState.ON_PHONE && (
         <ButtonLink
           href={row.url}
           onClick={() => onAdd(row)}
@@ -72,17 +70,6 @@ export const CalendarSyncRow: React.FC<CalendarSyncRowProps> = ({
           className="min-h-[40px] shrink-0 px-3 text-danger hover:bg-danger/10"
         >
           {t(TEXT.AGENDA.CALENDAR_SYNC.REMOVE)}
-        </Button>
-      )}
-      {isRemoved && (
-        <Button
-          variant={ButtonVariant.SECONDARY}
-          onClick={() => onRestore(row)}
-          isLoading={isUpdating}
-          icon={<Undo2 className="h-4 w-4" aria-hidden />}
-          className="min-h-[40px] shrink-0 px-3"
-        >
-          {t(TEXT.AGENDA.CALENDAR_SYNC.RESTORE)}
         </Button>
       )}
     </li>

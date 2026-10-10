@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { formatHour, formatLongDay, toMonthKey } from '@/shared/utils/dates';
+import { formatLongDay, toMonthKey } from '@/shared/utils/dates';
 import { getFullName } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
-import {
-  buildSlotHours,
-  DayTiming,
-  getDayTiming,
-  resolveInitialConfirmDay,
-} from './agenda-presenter';
+import { DayTiming, getDayTiming, resolveInitialConfirmDay } from './agenda-presenter';
+import { HourGrid } from './hour-grid';
 import { MonthCalendar } from './month-calendar';
 import { SheetDialog } from './sheet-dialog';
 import { AgendaState } from './use-agenda';
@@ -74,18 +70,7 @@ export const ConfirmDaySheet: React.FC<ConfirmDaySheetProps> = ({ agenda, patien
             {t(TEXT.AGENDA.BOARD.PAST_DAY)}
           </Typography>
         ) : (
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            {buildSlotHours().map((hour) => (
-              <Button
-                key={hour}
-                variant={ButtonVariant.SECONDARY}
-                onClick={() => agenda.handleConfirmAt(dayKey, hour)}
-                className="px-2"
-              >
-                {formatHour(hour)}
-              </Button>
-            ))}
-          </div>
+          <HourGrid onSelectHour={(hour) => agenda.handleConfirmAt(dayKey, hour)} />
         )}
       </div>
 
