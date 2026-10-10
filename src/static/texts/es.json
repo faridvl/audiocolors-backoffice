@@ -181,29 +181,22 @@
       "moreOptions": "Cambiar tipo de cita o mes"
     },
     "calendarSync": {
-      "open": "Mi calendario",
-      "menuConnect": "Vincular calendario",
-      "menuDisconnect": "Desvincular calendario",
-      "title": "Calendario del teléfono",
-      "description": "Las citas aparecen solas en el calendario de tu iPhone (también Outlook o Google). Se conecta una vez desde el teléfono y se actualiza cada pocos minutos.",
-      "connect": "Crear mi enlace",
-      "colorsHint": "Cada sede es un calendario con su color. Desde el iPhone, toca Agregar en las que quieras ver.",
+      "menu": "Calendario del teléfono",
+      "title": "Calendario del iPhone",
+      "description": "Las citas aparecen solas en el Calendario. Agrega los calendarios que quieras, cuando quieras: cada uno tiene su color.",
+      "byBranch": "Por sede",
+      "byBranchAndType": "Por sede y tipo",
+      "groupingAria": "Cómo repartir las citas en calendarios",
       "add": "Agregar",
-      "copy": "Copiar enlace",
-      "privacy": "Los eventos muestran el nombre del paciente. Estos enlaces son personales: no los compartas.",
-      "regenerate": "Generar enlaces nuevos",
-      "disconnect": "Desconectar",
-      "remove": "Quitar sede",
-      "removed": "Quitada: en el iPhone queda sin citas. Para que desaparezca, elimínala desde Calendario.",
-      "restore": "Volver a agregar",
+      "onPhone": "En tu iPhone",
+      "remove": "Quitar",
+      "removed": "Quitado: queda vacío en el iPhone. Para que desaparezca, elimínalo desde Calendario.",
+      "restore": "Volver a mostrar",
       "refreshHint": "El iPhone revisa los cambios cada 15 minutos aproximadamente. Para verlos ya, en Calendario toca Calendarios y desliza hacia abajo.",
+      "privacy": "Los eventos muestran el nombre del paciente: este calendario es solo tuyo.",
       "toasts": {
-        "connected": "Enlace creado. Ahora agrega las sedes desde tu iPhone.",
-        "regenerated": "Enlaces nuevos creados. Los anteriores dejaron de funcionar.",
-        "disconnected": "Calendario desconectado",
-        "branchRemoved": "{{branch}} quitada del calendario",
-        "branchRestored": "{{branch}} agregada de nuevo al calendario",
-        "copied": "Enlace copiado"
+        "removed": "{{name}}: quitado del iPhone",
+        "restored": "{{name}}: se vuelve a mostrar en el iPhone"
       }
     }
   },

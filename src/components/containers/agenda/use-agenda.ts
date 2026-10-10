@@ -100,7 +100,6 @@ export function useAgenda() {
   const weekStart = useMemo(() => startOfWeek(fromDayKey(selectedDayKey)), [selectedDayKey]);
 
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
   const [scheduleTarget, setScheduleTarget] = useState<ScheduleTarget | null>(null);
   /** Paciente pendiente en la ficha de confirmar (calendario + horas). */
   const [confirmTarget, setConfirmTarget] = useState<Patient | null>(null);
@@ -504,9 +503,6 @@ export function useAgenda() {
     openAppointment,
     openPendingPatient,
     isPickerOpen,
-    isCalendarSyncOpen,
-    handleOpenCalendarSync: () => setIsCalendarSyncOpen(true),
-    handleCloseCalendarSync: () => setIsCalendarSyncOpen(false),
     scheduleTarget,
     updatingAppointmentUuid,
     handlePreviousDay,

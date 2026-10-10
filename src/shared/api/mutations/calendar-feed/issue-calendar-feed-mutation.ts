@@ -3,7 +3,7 @@ import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { CalendarFeedStatus } from '@/types/calendar-feed/calendar-feed';
 
-/** Crea el enlace de calendario, o lo regenera: el anterior deja de funcionar. */
+/** Crea el enlace de calendario; si ya existe, el API devuelve el mismo. */
 export function useIssueCalendarFeedMutation() {
   const { mutate: executeIssueCalendarFeed, isPending } = useApiMutation<CalendarFeedStatus, void>({
     mutationKey: ['issueCalendarFeed'],

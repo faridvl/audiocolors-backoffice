@@ -162,16 +162,31 @@ conexión a internet", sin pista de la causa. Con `-p 3000` Next falla al
 arrancar si el puerto está tomado, y en desarrollo el error de red explica que
 el API rechaza otros puertos.
 
-## 2026-10-04 · Calendario del teléfono: una sede por calendario, y "Quitar sede" lo deja vacío
+## 2026-10-09 · Calendario del iPhone: por sede o por sede y tipo, cada calendario por separado
 
-- Sin opción "Todas las sedes": el iPhone colorea calendarios enteros, así que
-  un calendario único pierde el color de cada sede. Se agrega sede por sede; iOS
-  no deja suscribir varios calendarios con un solo toque.
-- "Quitar sede" (`DELETE /calendar-feed/branches/:uuid`) no puede borrar la
-  suscripción del teléfono: el API publica ese calendario vacío. Para que
-  desaparezca del iPhone hay que eliminarlo desde Calendario.
-- No hay actualización instantánea: iOS consulta los calendarios suscritos cada
-  cierto tiempo (el API sugiere 15 minutos) y el servidor no puede avisarle. La
+Se rehízo después de probarlo con la clínica, que ya organiza su calendario
+como "(RC) Controles", "(RC) Citas", "(PZ) Recetas"…
+
+- **Solo en iPhone**, desde el menú del usuario ("Calendario del teléfono"). En
+  computadora y Android no aparece: la suscripción `webcal://` es para el
+  Calendario de iOS.
+- **Un calendario = una sede, o una sede y un tipo de cita**, cada uno con su
+  color (el iPhone colorea calendarios enteros, no eventos). Sin "Todas las
+  sedes": un único calendario pierde los colores. En "por sede y tipo" el
+  evento muestra solo el paciente, como lo usa la clínica.
+- **Sin pasos de enlace a la vista**: el enlace se crea solo al abrir la ficha y
+  `POST /calendar-feed` ya no lo cambia. Se sacaron "Crear mi enlace",
+  "Copiar enlace", "Generar enlaces nuevos" y "Desconectar": cambiar el token
+  dejaba sin citas todo lo ya agregado.
+- **"En tu iPhone"**: el servidor no puede saber qué agregó el teléfono, pero
+  anota cuándo pidió cada calendario (`fetchedCalendars`). Si lo pidió en los
+  últimos 3 días, la fila ofrece "Quitar"; si no, "Agregar". Así se puede
+  agregar otra sede cualquier día sin tocar las anteriores.
+- **"Quitar"** no puede borrar la suscripción del teléfono: el API publica ese
+  calendario vacío. Para que desaparezca del iPhone hay que eliminarlo desde
+  Calendario.
+- **No hay actualización instantánea**: iOS consulta los calendarios suscritos
+  cuando quiere (el API sugiere 15 minutos) y el servidor no puede avisarle. La
   ficha explica cómo refrescar a mano.
 
 ## 2026-10-04 · El estado del paciente es solo `status`, nunca `isActive`

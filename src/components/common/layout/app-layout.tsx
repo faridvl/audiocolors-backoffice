@@ -11,12 +11,11 @@ import {
   LogOut,
   ChevronDown,
   ArrowLeft,
-  Unlink,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
-import { useCalendarSync } from '@/components/containers/agenda/calendar-sync/use-calendar-sync';
 import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
+import { useIsIphone } from '@/hooks/use-is-iphone';
 import { useSession } from '@/hooks/use-session';
 import { useLogout } from '@/hooks/use-logout';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -43,7 +42,7 @@ const UserMenu: React.FC = () => {
   const { user, tenant } = useSession();
   const logout = useLogout();
   const { t } = useTranslation();
-  const calendarSync = useCalendarSync();
+  const isIphone = useIsIphone();
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
 
   return (
@@ -81,32 +80,20 @@ const UserMenu: React.FC = () => {
               </Typography>
             </div>
 
-            {!calendarSync.isLoading && (
+            {/* La suscripción webcal solo la abre bien el Calendario del iPhone. */}
+            {isIphone && (
               <Menu.Item>
                 {({ active }) => (
                   <button
                     type="button"
-                    onClick={
-                      calendarSync.isConnected
-                        ? calendarSync.handleDisconnect
-                        : () => setIsCalendarSyncOpen(true)
-                    }
-                    disabled={calendarSync.isRevoking}
+                    onClick={() => setIsCalendarSyncOpen(true)}
                     className={tailwind(
                       'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
                       active && 'bg-ink-50',
                     )}
                   >
-                    {calendarSync.isConnected ? (
-                      <Unlink className="h-4 w-4" aria-hidden />
-                    ) : (
-                      <CalendarSync className="h-4 w-4" aria-hidden />
-                    )}
-                    {t(
-                      calendarSync.isConnected
-                        ? TEXT.AGENDA.CALENDAR_SYNC.MENU_DISCONNECT
-                        : TEXT.AGENDA.CALENDAR_SYNC.MENU_CONNECT,
-                    )}
+                    <CalendarSync className="h-4 w-4" aria-hidden />
+                    {t(TEXT.AGENDA.CALENDAR_SYNC.MENU)}
                   </button>
                 )}
               </Menu.Item>

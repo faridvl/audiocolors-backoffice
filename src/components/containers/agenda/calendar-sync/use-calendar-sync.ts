@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -6,122 +6,186 @@ import {
   FETCH_CALENDAR_FEED_KEY,
   useCalendarFeedQuery,
 } from '@/shared/api/querys/calendar-feed-query';
+import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useIssueCalendarFeedMutation } from '@/shared/api/mutations/calendar-feed/issue-calendar-feed-mutation';
-import { useRevokeCalendarFeedMutation } from '@/shared/api/mutations/calendar-feed/revoke-calendar-feed-mutation';
-import { useSetCalendarFeedBranchMutation } from '@/shared/api/mutations/calendar-feed/set-calendar-feed-branch-mutation';
+import { useSetCalendarVisibilityMutation } from '@/shared/api/mutations/calendar-feed/set-calendar-visibility-mutation';
 import { getBranchStripeColor } from '@/shared/design/tokens';
-import { buildCalendarFeedUrl } from '@/shared/utils/calendar-feed';
+import { buildCalendarFeedUrl, buildCalendarKey } from '@/shared/utils/calendar-feed';
 import { TEXT } from '@/static/texts/i18n';
+import {
+  CalendarFeedStatus,
+  CalendarGrouping,
+  CalendarState,
+} from '@/types/calendar-feed/calendar-feed';
 
-/** Un calendario que se puede agregar al teléfono: una sede con su color. */
+/**
+ * Días sin que el teléfono pida un calendario para darlo por borrado de ahí.
+ * iOS a veces tarda horas en actualizar, así que el margen es amplio.
+ */
+const PHONE_ACTIVE_DAYS = 3;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
 export interface CalendarSyncRowData {
   key: string;
+  branchUuid: string;
+  typeUuid?: string;
   label: string;
   color?: string;
   url: string;
-  /** Quitada desde aquí: el teléfono la muestra vacía. */
-  isRemoved: boolean;
+  state: CalendarState;
+}
+
+/** Una sede con sus calendarios. En el modo "por sede" hay un solo grupo, sin título. */
+export interface CalendarSyncGroup {
+  key: string;
+  title?: string;
+  color?: string;
+  rows: CalendarSyncRowData[];
+}
+
+const SINGLE_GROUP_KEY = 'all';
+
+function resolveState(feed: CalendarFeedStatus, key: string, now: number): CalendarState {
+  const fetchedAt = feed.fetchedCalendars[key];
+  const isOnPhone =
+    fetchedAt !== undefined && now - new Date(fetchedAt).getTime() < PHONE_ACTIVE_DAYS * MS_PER_DAY;
+  if (!isOnPhone) return CalendarState.NOT_ADDED;
+  return feed.removedCalendarKeys.includes(key) ? CalendarState.REMOVED : CalendarState.ON_PHONE;
+}
+
+/** Si el teléfono ya lee calendarios por tipo, la ficha abre en ese modo. */
+function inferGrouping(feed: CalendarFeedStatus | undefined): CalendarGrouping {
+  const hasTypeCalendar = Object.keys(feed?.fetchedCalendars ?? {}).some((key) =>
+    key.includes(':'),
+  );
+  return hasTypeCalendar ? CalendarGrouping.BRANCH_AND_TYPE : CalendarGrouping.BRANCH;
 }
 
 export function useCalendarSync() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { data: feed, isLoading } = useCalendarFeedQuery();
+  const { data: feed, isLoading, isSuccess } = useCalendarFeedQuery();
   const { data: branches } = useBranchesQuery();
-  const { executeIssueCalendarFeed, isPending: isIssuing } = useIssueCalendarFeedMutation();
-  const { executeRevokeCalendarFeed, isPending: isRevoking } = useRevokeCalendarFeedMutation();
-  const { executeSetCalendarFeedBranch } = useSetCalendarFeedBranchMutation();
-  const [updatingBranchUuid, setUpdatingBranchUuid] = useState<string | null>(null);
+  const { data: appointmentTypes } = useAppointmentTypesQuery();
+  const { executeIssueCalendarFeed } = useIssueCalendarFeedMutation();
+  const { executeSetCalendarVisibility, executeSetCalendarVisibilityAsync } =
+    useSetCalendarVisibilityMutation();
 
+  const [chosenGrouping, setChosenGrouping] = useState<CalendarGrouping | null>(null);
+  const [updatingKey, setUpdatingKey] = useState<string | null>(null);
+  const hasRequestedToken = useRef(false);
+
+  const saveStatus = (status: CalendarFeedStatus) =>
+    queryClient.setQueryData([FETCH_CALENDAR_FEED_KEY], status);
+
+  // El enlace se crea solo la primera vez que se abre la ficha: no hay un paso
+  // "conectar" aparte.
+  const hasToken = Boolean(feed?.token);
+  useEffect(() => {
+    if (!isSuccess || hasToken || hasRequestedToken.current) return;
+    hasRequestedToken.current = true;
+    executeIssueCalendarFeed(undefined, {
+      onSuccess: (status) => queryClient.setQueryData([FETCH_CALENDAR_FEED_KEY], status),
+      onError: (error: Error) => toast.error(error.message),
+    });
+  }, [isSuccess, hasToken, executeIssueCalendarFeed, queryClient]);
+
+  const grouping = chosenGrouping ?? inferGrouping(feed);
   const token = feed?.token ?? null;
-  const removedBranchUuids = feed?.removedBranchUuids;
 
-  /**
-   * Una fila por sede, sin la opción "todas juntas": el iPhone colorea
-   * calendarios enteros, así que un calendario único pierde el color de cada sede.
-   */
-  const rows: CalendarSyncRowData[] = useMemo(() => {
-    if (!token) return [];
+  const groups: CalendarSyncGroup[] = useMemo(() => {
+    if (!feed || !token) return [];
+    const now = Date.now();
+
+    const buildRow = (
+      branchUuid: string,
+      label: string,
+      color: string | undefined,
+      typeUuid?: string,
+    ): CalendarSyncRowData => {
+      const key = buildCalendarKey(branchUuid, typeUuid);
+      return {
+        key,
+        branchUuid,
+        typeUuid,
+        label,
+        color,
+        url: buildCalendarFeedUrl(token, { branchUuid, typeUuid, color }),
+        state: resolveState(feed, key, now),
+      };
+    };
+
+    if (grouping === CalendarGrouping.BRANCH) {
+      return [
+        {
+          key: SINGLE_GROUP_KEY,
+          rows: (branches ?? []).map((branch) =>
+            buildRow(branch.uuid, branch.name, getBranchStripeColor(branch.name)),
+          ),
+        },
+      ];
+    }
+
     return (branches ?? []).map((branch) => {
-      const color = getBranchStripeColor(branch.name);
+      const branchColor = getBranchStripeColor(branch.name);
       return {
         key: branch.uuid,
-        label: branch.name,
-        color,
-        url: buildCalendarFeedUrl(token, { branchUuid: branch.uuid, color }),
-        isRemoved: removedBranchUuids?.includes(branch.uuid) ?? false,
+        title: branch.name,
+        color: branchColor,
+        rows: (appointmentTypes ?? []).map((type) =>
+          buildRow(
+            branch.uuid,
+            type.name,
+            type.color && HEX_COLOR.test(type.color) ? type.color : branchColor,
+            type.uuid,
+          ),
+        ),
       };
     });
-  }, [token, branches, removedBranchUuids]);
+  }, [feed, token, grouping, branches, appointmentTypes]);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: [FETCH_CALENDAR_FEED_KEY] });
-
-  const issue = (successText: string) =>
-    executeIssueCalendarFeed(undefined, {
-      onSuccess: () => {
-        toast.success(t(successText));
-        void refresh();
-      },
-      onError: (error: Error) => toast.error(error.message),
-    });
-
-  const handleConnect = () => issue(TEXT.AGENDA.CALENDAR_SYNC.TOASTS.CONNECTED);
-  const handleRegenerate = () => issue(TEXT.AGENDA.CALENDAR_SYNC.TOASTS.REGENERATED);
-
-  const handleDisconnect = () =>
-    executeRevokeCalendarFeed(undefined, {
-      onSuccess: () => {
-        toast.success(t(TEXT.AGENDA.CALENDAR_SYNC.TOASTS.DISCONNECTED));
-        void refresh();
-      },
-      onError: (error: Error) => toast.error(error.message),
-    });
-
-  const setBranchRemoved = (row: CalendarSyncRowData, isRemoved: boolean) => {
-    setUpdatingBranchUuid(row.key);
-    executeSetCalendarFeedBranch(
-      { branchUuid: row.key, isRemoved },
+  const setVisibility = (row: CalendarSyncRowData, isRemoved: boolean, successText: string) => {
+    setUpdatingKey(row.key);
+    executeSetCalendarVisibility(
+      { branchUuid: row.branchUuid, typeUuid: row.typeUuid, isRemoved },
       {
-        onSuccess: () => {
-          toast.success(
-            t(
-              isRemoved
-                ? TEXT.AGENDA.CALENDAR_SYNC.TOASTS.BRANCH_REMOVED
-                : TEXT.AGENDA.CALENDAR_SYNC.TOASTS.BRANCH_RESTORED,
-              { branch: row.label },
-            ),
-          );
-          void refresh();
+        onSuccess: (status) => {
+          saveStatus(status);
+          toast.success(t(successText, { name: row.label }));
         },
         onError: (error: Error) => toast.error(error.message),
-        onSettled: () => setUpdatingBranchUuid(null),
+        onSettled: () => setUpdatingKey(null),
       },
     );
   };
 
-  /** Desde la computadora: copiar el enlace para abrirlo en el teléfono. */
-  const handleCopy = async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success(t(TEXT.AGENDA.CALENDAR_SYNC.TOASTS.COPIED));
-    } catch {
-      toast.error(t(TEXT.GENERAL.ERRORS.UNEXPECTED));
-    }
+  /**
+   * "Agregar" abre el enlace `webcal://` por sí mismo. Si ese calendario estaba
+   * quitado, además se vuelve a mostrar para que no llegue vacío.
+   */
+  const handleAdd = (row: CalendarSyncRowData) => {
+    if (!feed?.removedCalendarKeys.includes(row.key)) return;
+    void executeSetCalendarVisibilityAsync({
+      branchUuid: row.branchUuid,
+      typeUuid: row.typeUuid,
+      isRemoved: false,
+    })
+      .then(saveStatus)
+      .catch((error: Error) => toast.error(error.message));
   };
 
   return {
-    isLoading,
-    isConnected: Boolean(token),
-    rows,
-    isIssuing,
-    isRevoking,
-    handleConnect,
-    handleRegenerate,
-    handleDisconnect,
-    handleCopy,
-    updatingBranchUuid,
-    handleRemoveBranch: (row: CalendarSyncRowData) => setBranchRemoved(row, true),
-    handleRestoreBranch: (row: CalendarSyncRowData) => setBranchRemoved(row, false),
+    isLoading: isLoading || (isSuccess && !token),
+    grouping,
+    groups,
+    updatingKey,
+    handleGroupingChange: setChosenGrouping,
+    handleAdd,
+    handleRemove: (row: CalendarSyncRowData) =>
+      setVisibility(row, true, TEXT.AGENDA.CALENDAR_SYNC.TOASTS.REMOVED),
+    handleRestore: (row: CalendarSyncRowData) =>
+      setVisibility(row, false, TEXT.AGENDA.CALENDAR_SYNC.TOASTS.RESTORED),
   };
 }

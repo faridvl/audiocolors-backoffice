@@ -3,7 +3,6 @@ import { ScheduleAppointmentModal } from '@/components/containers/patients/sched
 import { AgendaMobile } from './agenda-mobile';
 import { AgendaDesktop } from './desktop/agenda-desktop';
 import { AppointmentSheet } from './appointment-sheet';
-import { CalendarSyncSheet } from './calendar-sync/calendar-sync-sheet';
 import { ConfirmDaySheet } from './confirm-day-sheet';
 import { PatientPickerModal } from './patient-picker-modal';
 import { PendingSheet } from './pending-sheet';
@@ -33,8 +32,6 @@ export const AgendaContainer: React.FC = () => {
       {openPendingPatient && <PendingSheet agenda={agenda} patient={openPendingPatient} />}
 
       {confirmTarget && <ConfirmDaySheet agenda={agenda} patient={confirmTarget} />}
-
-      {agenda.isCalendarSyncOpen && <CalendarSyncSheet onClose={agenda.handleCloseCalendarSync} />}
 
       {agenda.isPickerOpen && (
         <PatientPickerModal onPick={agenda.handlePickPatient} onClose={agenda.handleClosePicker} />
