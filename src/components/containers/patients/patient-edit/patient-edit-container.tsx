@@ -27,9 +27,7 @@ export const PatientEditContainer: React.FC<PatientEditContainerProps> = ({ uuid
     return (
       <div className="flex flex-col items-center gap-2 py-20 text-center">
         <AlertCircle className="h-8 w-8 text-danger" aria-hidden />
-        <Typography variant={TypographyVariant.ACCENT}>
-          No se pudo cargar el paciente
-        </Typography>
+        <Typography variant={TypographyVariant.ACCENT}>No se pudo cargar el paciente</Typography>
       </div>
     );
   }
@@ -58,8 +56,6 @@ export const PatientEditContainer: React.FC<PatientEditContainerProps> = ({ uuid
           submitLabel="Guardar cambios"
           isSubmitting={isPending}
           onCancel={handleCancel}
-          maskPhone={false}
-          showContacts
         />
       </Formik>
     </div>

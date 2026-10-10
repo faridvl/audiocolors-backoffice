@@ -2,6 +2,8 @@ import type { TFunction } from 'i18next';
 import {
   CalendarCheck,
   CalendarClock,
+  CircleCheck,
+  DoorOpen,
   FilePen,
   FileX,
   NotebookText,
@@ -12,6 +14,9 @@ import {
   UserCog,
   UserPlus,
   type LucideIcon,
+  Ear,
+  ShieldCheck,
+  Video,
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { DOCUMENT_CATEGORY_LABELS } from '@/types/documents/document.types';
@@ -22,6 +27,7 @@ import {
   PatientFieldChange,
 } from '@/types/patient-activity/patient-activity';
 import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
+import { repairFileName } from '@/shared/utils/file-name';
 
 enum ActionTone {
   ACCENT = 'bg-brand-50 text-brand-700',
@@ -42,6 +48,8 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: CalendarClock,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.APPOINTMENT_ARRIVED]: { icon: DoorOpen, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.APPOINTMENT_COMPLETED]: { icon: CircleCheck, tone: ActionTone.SUCCESS },
     [PatientActivityAction.PATIENT_CREATED]: { icon: UserPlus, tone: ActionTone.SUCCESS },
     [PatientActivityAction.PATIENT_UPDATED]: { icon: Pencil, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.CONTACT_ADDED]: { icon: Phone, tone: ActionTone.NEUTRAL },
@@ -52,6 +60,9 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     [PatientActivityAction.DOCUMENT_RENAMED]: { icon: FilePen, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.DOCUMENT_DELETED]: { icon: FileX, tone: ActionTone.DANGER },
     [PatientActivityAction.STATUS_CHANGED]: { icon: UserCog, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.HEARING_AIDS_LAB_CHANGED]: { icon: Ear, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.WARRANTY_CHANGED]: { icon: ShieldCheck, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.VIDEO_CANDIDATE_CHANGED]: { icon: Video, tone: ActionTone.NEUTRAL },
   };
 
 export function getActionLabel(t: TFunction, action: PatientActivityAction): string {
@@ -175,16 +186,21 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       if (groupedFiles.length > 1) {
         return joinParts(
           context.t(TEXT.ACTIVITY.DETAIL.FILES_UPLOADED, { count: groupedFiles.length }),
-          groupedFiles.map((file) => file.detail?.originalName).join(', '),
+          groupedFiles.map((file) => repairFileName(file.detail?.originalName ?? '')).join(', '),
         );
       }
-      return joinParts(categoryLabel, detail.originalName);
+      return joinParts(categoryLabel, repairFileName(detail.originalName ?? ''));
 
     case PatientActivityAction.DOCUMENT_DELETED:
-      return joinParts(categoryLabel, detail.originalName);
+      return joinParts(categoryLabel, repairFileName(detail.originalName ?? ''));
 
-    case PatientActivityAction.DOCUMENT_RENAMED:
-      return typeof detail.before === 'string' ? `${detail.before} → ${detail.after}` : '—';
+    case PatientActivityAction.DOCUMENT_RENAMED: {
+      if (typeof detail.before !== 'string') return '—';
+      const before = repairFileName(detail.before);
+      const after = repairFileName(detail.after ?? '');
+      // El renombrado automático que corregía las tildes queda igual al reparar: solo el nombre.
+      return before === after ? after : `${before} → ${after}`;
+    }
 
     case PatientActivityAction.APPOINTMENT_TENTATIVE:
       return joinParts(
@@ -194,6 +210,8 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       );
 
     case PatientActivityAction.APPOINTMENT_CONFIRMED:
+    case PatientActivityAction.APPOINTMENT_ARRIVED:
+    case PatientActivityAction.APPOINTMENT_COMPLETED:
       return joinParts(formatDayKey(detail.date), detail.typeName);
 
     case PatientActivityAction.STATUS_CHANGED: {
@@ -207,6 +225,13 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
         detail.reason,
       );
     }
+
+    case PatientActivityAction.HEARING_AIDS_LAB_CHANGED:
+    case PatientActivityAction.WARRANTY_CHANGED:
+    case PatientActivityAction.VIDEO_CANDIDATE_CHANGED:
+      return context.t(
+        `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
+      );
 
     case PatientActivityAction.PATIENT_CREATED:
     default:

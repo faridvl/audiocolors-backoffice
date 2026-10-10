@@ -32,7 +32,6 @@ export const PatientCreateContainer: React.FC = () => {
           submitLabel="Registrar paciente"
           isSubmitting={isPending}
           onCancel={handleCancel}
-          showContacts
         />
       </Formik>
     </div>

@@ -11,17 +11,39 @@ export interface PillSelectOption {
   shortLabel?: string;
   /** Encabezado bajo el que se agrupa la opción (p. ej. el año). */
   group?: string;
+  /** Color de la barra a la izquierda del texto (p. ej. el de cada sede). */
+  accentColor?: string;
 }
 
+export enum PillSelectVariant {
+  /** Píldora de la barra de filtros. */
+  PILL = 'PILL',
+  /** Mismo alto, borde y texto que un campo de formulario. */
+  FIELD = 'FIELD',
+}
+
+const BUTTON_VARIANT_STYLES: Record<PillSelectVariant, string> = {
+  [PillSelectVariant.PILL]:
+    'min-h-[44px] rounded-full pl-5 text-sm font-semibold text-ink-700 hover:bg-ink-50',
+  [PillSelectVariant.FIELD]:
+    'rounded-lg pl-3 text-base text-ink-800 data-[open]:border-brand data-[open]:ring-2 data-[open]:ring-brand/20',
+};
+
 interface PillSelectProps {
-  value: string;
+  value?: string;
   options: PillSelectOption[];
-  onChange: (value: string) => void;
+  onChange?: (value: string) => void;
+  /** Selección múltiple: con `values` la lista marca varias opciones y no se cierra al tocar. */
+  values?: string[];
+  onValuesChange?: (values: string[]) => void;
   ariaLabel: string;
   /** Texto del botón en lugar de la opción elegida (p. ej. "Mes" sin filtro aplicado). */
   buttonLabel?: string;
   /** Marca el borde oscuro de "filtro aplicado". */
   isActive?: boolean;
+  variant?: PillSelectVariant;
+  /** Texto en gris cuando ninguna opción está elegida. */
+  placeholder?: string;
   className?: string;
 }
 
@@ -36,25 +58,46 @@ export const PillSelect: React.FC<PillSelectProps> = ({
   value,
   options,
   onChange,
+  values,
+  onValuesChange,
   ariaLabel,
   buttonLabel,
   isActive = false,
+  variant = PillSelectVariant.PILL,
+  placeholder,
   className,
 }) => {
-  const selected = options.find((option) => option.value === value);
+  const isMultiple = values !== undefined;
+  const selectedLabel = isMultiple
+    ? options
+        .filter((option) => values.includes(option.value))
+        .map((option) => option.label)
+        .join(', ')
+    : options.find((option) => option.value === value)?.label;
+  const handleChange = (next: string | string[]) => {
+    if (Array.isArray(next)) onValuesChange?.(next);
+    else onChange?.(next);
+  };
 
   return (
-    <Listbox value={value} onChange={onChange}>
+    <Listbox
+      value={isMultiple ? values : (value ?? '')}
+      onChange={handleChange}
+      multiple={isMultiple}
+    >
       <ListboxButton
         aria-label={ariaLabel}
         className={tailwind(
-          'group relative flex min-h-[44px] w-full items-center rounded-full border bg-white py-2.5 pl-5 pr-11 text-left text-sm font-semibold text-ink-700',
-          'transition-colors hover:bg-ink-50 focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-brand',
+          'group relative flex w-full items-center border bg-white py-2.5 pr-11 text-left',
+          'transition-colors focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-brand',
+          BUTTON_VARIANT_STYLES[variant],
           isActive ? 'border-ink-800' : 'border-ink-200',
           className,
         )}
       >
-        <span className="truncate">{buttonLabel ?? selected?.label}</span>
+        <span className={tailwind('truncate', !selectedLabel && !buttonLabel && 'text-ink-400')}>
+          {buttonLabel ?? (selectedLabel || placeholder)}
+        </span>
         <ChevronDown
           className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500 transition-transform group-data-[open]:rotate-180"
           aria-hidden
@@ -90,7 +133,16 @@ export const PillSelect: React.FC<PillSelectProps> = ({
                   !option.group && index === 0 && options.length > 1 && 'mb-1',
                 )}
               >
-                <span className="truncate">{option.shortLabel ?? option.label}</span>
+                <span className="flex min-w-0 items-center gap-2">
+                  {option.accentColor && (
+                    <span
+                      aria-hidden
+                      style={{ backgroundColor: option.accentColor }}
+                      className="h-4 w-1 shrink-0 rounded-full"
+                    />
+                  )}
+                  <span className="truncate">{option.shortLabel ?? option.label}</span>
+                </span>
                 <Check
                   className="invisible h-4 w-4 shrink-0 text-ink-900 group-data-[selected]:visible"
                   aria-hidden

@@ -20,6 +20,7 @@ import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/dele
 import { useRenameDocumentMutation } from '@/shared/api/mutations/documents/rename-document-mutation';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { formatDate, formatFileSize } from '@/shared/utils/formatters';
+import { repairFileName } from '@/shared/utils/file-name';
 
 /** Solo se pagina en movil: el grid de escritorio ya muestra varias columnas a la vez. */
 const MOBILE_PAGE_SIZE = 5;
@@ -69,7 +70,7 @@ function mapToDocumentItem(document: PatientDocument): DocumentItem {
 
   return {
     uuid: document.uuid,
-    name: document.originalName,
+    name: repairFileName(document.originalName),
     url: document.url,
     category,
     categoryLabel: DOCUMENT_CATEGORY_LABELS[category],
@@ -126,10 +127,7 @@ export function useDocuments(patientUuid: string) {
     : 1;
   const currentPage = Math.min(page, totalPages);
   const visibleDocuments = isMobile
-    ? filteredDocuments.slice(
-        (currentPage - 1) * MOBILE_PAGE_SIZE,
-        currentPage * MOBILE_PAGE_SIZE,
-      )
+    ? filteredDocuments.slice((currentPage - 1) * MOBILE_PAGE_SIZE, currentPage * MOBILE_PAGE_SIZE)
     : filteredDocuments;
 
   const invalidateDocuments = () =>

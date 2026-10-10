@@ -5,6 +5,9 @@ export const routesPrivate = {
     detail: (uuid: string) => `/pacientes/${uuid}`,
     edit: (uuid: string) => `/pacientes/${uuid}/editar`,
   },
+  agenda: {
+    index: '/agenda',
+  },
   activity: {
     index: '/bitacora',
   },

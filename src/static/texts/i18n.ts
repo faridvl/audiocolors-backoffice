@@ -8,6 +8,9 @@ export const TEXT = {
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
     },
+    ERRORS: {
+      UNEXPECTED: 'common.errors.unexpected',
+    },
     FILTERS: {
       TITLE: 'common.filters.title',
       OPEN: 'common.filters.open',
@@ -42,6 +45,155 @@ export const TEXT = {
       },
     },
   },
+  AGENDA: {
+    PAGE_TITLE: 'agenda.pageTitle',
+    TITLE: 'agenda.title',
+    SCHEDULE: 'agenda.schedule',
+    WEEK: {
+      ARIA: 'agenda.week.aria',
+      TODAY: 'agenda.week.today',
+      DAY_ARIA: 'agenda.week.dayAria',
+    },
+    MONTH_PICKER: {
+      OPEN: 'agenda.monthPicker.open',
+      PREVIOUS: 'agenda.monthPicker.previous',
+      NEXT: 'agenda.monthPicker.next',
+      WEEKDAYS: 'agenda.monthPicker.weekdays',
+    },
+    FILTERS: {
+      BRANCH_ARIA: 'agenda.filters.branchAria',
+      MONTH_ARIA: 'agenda.filters.monthAria',
+      ALL_BRANCHES: 'agenda.filters.allBranches',
+    },
+    DAY: {
+      TODAY: 'agenda.day.today',
+      PREVIOUS: 'agenda.day.previous',
+      NEXT: 'agenda.day.next',
+    },
+    TABS: {
+      ARIA: 'agenda.tabs.aria',
+      DAY: 'agenda.tabs.day',
+      PENDING: 'agenda.tabs.pending',
+    },
+    /** Prefijo: el título de cada grupo del día es `${SECTION_PREFIX}.${AgendaSection}`. */
+    SECTION_PREFIX: 'agenda.sections',
+    /** Prefijo: el estado de una cita, en singular, es `${STATUS_PREFIX}.${AgendaSection}`. */
+    STATUS_PREFIX: 'agenda.statuses',
+    UNMARKED_HINT: 'agenda.unmarkedHint',
+    ROW: {
+      MARK_ARRIVED: 'agenda.row.markArrived',
+      MARK_DONE: 'agenda.row.markDone',
+      NO_TYPE: 'agenda.row.noType',
+      SCHEDULED_BY: 'agenda.row.scheduledBy',
+      SCHEDULED_BY_UNKNOWN: 'agenda.row.scheduledByUnknown',
+    },
+    MENU: {
+      VIEW_PATIENT: 'agenda.menu.viewPatient',
+      RESCHEDULE: 'agenda.menu.reschedule',
+      WHATSAPP: 'agenda.menu.whatsapp',
+      CALENDAR: 'agenda.menu.calendar',
+      UNDO_ARRIVED: 'agenda.menu.undoArrived',
+      SET_TIME: 'agenda.menu.setTime',
+      CHANGE_TIME: 'agenda.menu.changeTime',
+      RETURN_TO_PENDING: 'agenda.menu.returnToPending',
+    },
+    SHEET: {
+      CLOSE: 'agenda.sheet.close',
+      DAY: 'agenda.sheet.day',
+      MONTH: 'agenda.sheet.month',
+      TYPE: 'agenda.sheet.type',
+      TIME: 'agenda.sheet.time',
+      BRANCH: 'agenda.sheet.branch',
+      PHONE: 'agenda.sheet.phone',
+      SCHEDULED_BY: 'agenda.sheet.scheduledBy',
+      SCHEDULED_BY_UNKNOWN: 'agenda.sheet.scheduledByUnknown',
+    },
+    TOASTS: {
+      ARRIVED: 'agenda.toasts.arrived',
+      DONE: 'agenda.toasts.done',
+      UNDONE: 'agenda.toasts.undone',
+      NO_PHONE: 'agenda.toasts.noPhone',
+      PHONE_ERROR: 'agenda.toasts.phoneError',
+    },
+    WHATSAPP_MESSAGE: 'agenda.whatsappMessage',
+    CALENDAR_EVENT: {
+      TITLE: 'agenda.calendarEvent.title',
+      DESCRIPTION: 'agenda.calendarEvent.description',
+    },
+    STATES: {
+      EMPTY_TITLE: 'agenda.states.emptyTitle',
+      EMPTY_DESCRIPTION: 'agenda.states.emptyDescription',
+      ERROR_TITLE: 'agenda.states.errorTitle',
+      RETRY: 'agenda.states.retry',
+    },
+    PENDING: {
+      SUBTITLE: 'agenda.pending.subtitle',
+      EMPTY: 'agenda.pending.empty',
+      SET_DAY: 'agenda.pending.setDay',
+      CALL_SHORT: 'agenda.pending.callShort',
+    },
+    PICKER: {
+      TITLE: 'agenda.picker.title',
+      DESCRIPTION: 'agenda.picker.description',
+      SEARCH_PLACEHOLDER: 'agenda.picker.searchPlaceholder',
+      SEARCH_ARIA: 'agenda.picker.searchAria',
+      HINT: 'agenda.picker.hint',
+      EMPTY: 'agenda.picker.empty',
+      CLOSE: 'agenda.picker.close',
+    },
+    /** Calendario suscrito: las citas aparecen solas en el calendario del teléfono. */
+    CALENDAR_SYNC: {
+      MENU: 'agenda.calendarSync.menu',
+      TITLE: 'agenda.calendarSync.title',
+      DESCRIPTION: 'agenda.calendarSync.description',
+      BY_BRANCH: 'agenda.calendarSync.byBranch',
+      BY_BRANCH_AND_TYPE: 'agenda.calendarSync.byBranchAndType',
+      GROUPING_ARIA: 'agenda.calendarSync.groupingAria',
+      ADD: 'agenda.calendarSync.add',
+      ON_PHONE: 'agenda.calendarSync.onPhone',
+      REMOVE: 'agenda.calendarSync.remove',
+      REMOVED: 'agenda.calendarSync.removed',
+      REFRESH_HINT: 'agenda.calendarSync.refreshHint',
+      PRIVACY: 'agenda.calendarSync.privacy',
+      TOASTS: {
+        REMOVED: 'agenda.calendarSync.toasts.removed',
+      },
+    },
+    /** Ficha para confirmar un pendiente eligiendo día y hora, sin formulario. */
+    CONFIRM_SHEET: {
+      STATUS: 'agenda.confirmSheet.status',
+      HOURS: 'agenda.confirmSheet.hours',
+      MORE_OPTIONS: 'agenda.confirmSheet.moreOptions',
+    },
+    TIME_SHEET: {
+      STATUS: 'agenda.timeSheet.status',
+    },
+    /** Vista de escritorio: calendario del mes, horarios del día y arrastrar para confirmar. */
+    BOARD: {
+      COUNT: 'agenda.board.count',
+      NO_TIME: 'agenda.board.noTime',
+      NO_TIME_HINT: 'agenda.board.noTimeHint',
+      DROP_HERE: 'agenda.board.dropHere',
+      PAST_DAY: 'agenda.board.pastDay',
+      PENDING_HINT: 'agenda.board.pendingHint',
+      RETURN_HERE: 'agenda.board.returnHere',
+      SLOT_ARIA: 'agenda.board.slotAria',
+      SAVING: 'agenda.board.saving',
+      /** Tocar un paciente y después un horario: la alternativa al arrastre (dedo, iPad). */
+      SELECTION: {
+        TITLE: 'agenda.board.selection.title',
+        OPEN_DAY_HINT: 'agenda.board.selection.openDayHint',
+        VIEW_DETAILS: 'agenda.board.selection.viewDetails',
+        SCHEDULE_HERE: 'agenda.board.selection.scheduleHere',
+      },
+      TOASTS: {
+        CONFIRMED: 'agenda.board.toasts.confirmed',
+        MOVED: 'agenda.board.toasts.moved',
+        RETURNED: 'agenda.board.toasts.returned',
+        TIME_ERROR: 'agenda.board.toasts.timeError',
+      },
+    },
+  },
   ACTIVITY: {
     PAGE_TITLE: 'activity.pageTitle',
     TITLE: 'activity.title',
@@ -66,6 +218,8 @@ export const TEXT = {
       ACTION_LABEL: 'activity.filters.actionLabel',
       ACTION_ARIA: 'activity.filters.actionAria',
       MONTH_LABEL: 'activity.filters.monthLabel',
+      FROM_LABEL: 'activity.filters.fromLabel',
+      TO_LABEL: 'activity.filters.toLabel',
       MONTH_ARIA: 'activity.filters.monthAria',
       BRANCH_LABEL: 'activity.filters.branchLabel',
       BRANCH_ARIA: 'activity.filters.branchAria',
@@ -104,6 +258,33 @@ export const TEXT = {
       FIELD_PREFIX: 'activity.detail.fields',
       /** Prefijo: la etiqueta de cada estado es `${STATUS_PREFIX}.${PatientStatus}`. */
       STATUS_PREFIX: 'activity.detail.statuses',
+      /** Prefijo: `${FLAG_ON_PREFIX}.${PatientActivityAction}` al prender un indicador. */
+      FLAG_ON_PREFIX: 'activity.detail.flagOn',
+      FLAG_OFF_PREFIX: 'activity.detail.flagOff',
+    },
+  },
+  PATIENTS: {
+    SUMMARY: {
+      TENTATIVE: 'patients.summary.tentative',
+      CONFIRMED: 'patients.summary.confirmed',
+      CONTROLS: 'patients.summary.controls',
+      HEARING_AIDS: 'patients.summary.hearingAids',
+    },
+    FLAGS: {
+      MENU: 'patients.flags.menu',
+      TITLE: 'patients.flags.title',
+      DESCRIPTION: 'patients.flags.description',
+      DONE: 'patients.flags.done',
+      SINCE: 'patients.flags.since',
+      /** Prefijos: `${LABEL_PREFIX}.${PatientFlag}`. */
+      LABEL_PREFIX: 'patients.flags.labels',
+      /** Columna de la lista y su valor cuando está prendido: `${COLUMN_PREFIX}.${PatientFlag}`. */
+      COLUMN_PREFIX: 'patients.flags.columns',
+      VALUE_PREFIX: 'patients.flags.values',
+      /** Texto del indicador apagado, solo los que se nombran así (`Sin garantía`). */
+      OFF_PREFIX: 'patients.flags.offValues',
+      TOAST_ON_PREFIX: 'patients.flags.toastsOn',
+      TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
     },
   },
 } as const;

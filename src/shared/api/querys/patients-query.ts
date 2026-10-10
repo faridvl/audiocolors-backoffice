@@ -14,12 +14,27 @@ export const FETCH_PATIENTS_KEY = 'fetchPatients';
 
 /** Filtros del listado que viajan tal cual al API; ausentes = sin filtrar. */
 export interface PatientListFilters {
-  /** Estado para la clínica (activo, inactivo, fallecido). */
-  status?: PatientStatus;
-  branchUuid?: string;
-  /** Tipo de la próxima cita: la confirmada o, si no hay, la tentativa. */
-  appointmentTypeUuid?: string;
+  /** Estados para la clínica (activo, inactivo, fallecido); vacío = todos. */
+  statuses?: PatientStatus[];
+  branchUuids?: string[];
+  /** Tipos de la próxima cita: la confirmada o, si no hay, la tentativa. */
+  appointmentTypeUuids?: string[];
+  hearingAidsInLab?: boolean;
+  hasActiveWarranty?: boolean;
+  isVideoCandidate?: boolean;
+  /** Próxima cita confirmada o tentativa; ambas o ninguna = todas. */
+  nextAppointmentKinds?: NextAppointmentKind[];
 }
+
+export enum NextAppointmentKind {
+  CONFIRMED = 'confirmed',
+  TENTATIVE = 'tentative',
+}
+
+/** Los filtros de varios valores viajan separados por coma. */
+const setList = (params: URLSearchParams, key: string, values?: string[]) => {
+  if (values?.length) params.set(key, values.join(','));
+};
 
 const PatientsService = {
   fetchAll: (
@@ -27,7 +42,7 @@ const PatientsService = {
     limit: number,
     search: string,
     status: PatientStatusFilter,
-    nextAppointmentMonth?: string,
+    nextAppointmentMonths?: string[],
     filters: PatientListFilters = {},
   ) => {
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
@@ -39,10 +54,14 @@ const PatientsService = {
 
     // Filtro por próxima cita (YYYY-MM). Cuando se manda, el API ignora la
     // paginación y devuelve todos los pacientes que coincidan en una sola página.
-    if (nextAppointmentMonth) params.set('nextAppointmentMonth', nextAppointmentMonth);
-    if (filters.status) params.set('status', filters.status);
-    if (filters.branchUuid) params.set('branchUuid', filters.branchUuid);
-    if (filters.appointmentTypeUuid) params.set('appointmentTypeUuid', filters.appointmentTypeUuid);
+    setList(params, 'nextAppointmentMonth', nextAppointmentMonths);
+    setList(params, 'status', filters.statuses);
+    setList(params, 'branchUuid', filters.branchUuids);
+    setList(params, 'appointmentTypeUuid', filters.appointmentTypeUuids);
+    if (filters.hearingAidsInLab) params.set('hearingAidsInLab', 'true');
+    if (filters.hasActiveWarranty) params.set('hasActiveWarranty', 'true');
+    if (filters.isVideoCandidate) params.set('isVideoCandidate', 'true');
+    setList(params, 'nextAppointmentKind', filters.nextAppointmentKinds);
 
     return ApiServiceClient(env.API.MEDICAL_RECORDS_URL).get<PaginatedResponse<Patient>>(
       `/patients?${params.toString()}`,
@@ -55,18 +74,20 @@ export function usePatientsQuery(
   limit: number,
   search: string,
   status: PatientStatusFilter,
-  nextAppointmentMonth?: string,
+  nextAppointmentMonths?: string[],
   filters: PatientListFilters = {},
+  isEnabled = true,
 ) {
   return useQuery({
-    queryKey: [FETCH_PATIENTS_KEY, page, limit, search, status, nextAppointmentMonth, filters],
+    enabled: isEnabled,
+    queryKey: [FETCH_PATIENTS_KEY, page, limit, search, status, nextAppointmentMonths, filters],
     queryFn: async () => {
       const response = await PatientsService.fetchAll(
         page,
         limit,
         search,
         status,
-        nextAppointmentMonth,
+        nextAppointmentMonths,
         filters,
       );
 

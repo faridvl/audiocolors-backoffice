@@ -3,6 +3,7 @@ import { Inbox, AlertTriangle, Loader2, SearchX } from 'lucide-react';
 import { tailwind } from '@/utils/tailwind-utils';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { topStripeStyle } from '@/shared/design/tokens';
 
 /**
  * Tabla responsive.
@@ -239,11 +240,7 @@ export function ResponsiveTable<T>({
               </Typography>
             )}
             <div
-              style={
-                rowAccentColor?.(row)
-                  ? { boxShadow: `inset 0 3px 0 0 ${rowAccentColor(row)}` }
-                  : undefined
-              }
+              style={topStripeStyle(rowAccentColor?.(row))}
               className="relative rounded-card border border-ink-200 bg-white p-4"
             >
               {rowActions && (

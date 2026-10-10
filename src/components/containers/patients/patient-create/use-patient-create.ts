@@ -6,7 +6,8 @@ import { useCreatePatientMutation } from '@/shared/api/mutations/patients/create
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { CreatePatientPayload, DocumentType } from '@/types/patients/patient';
-import { PatientFormValues } from '../patient-validation';
+import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
+import { PatientFormValues, resolveContactsForSave } from '../patient-validation';
 
 export const patientCreateInitialValues: PatientFormValues = {
   firstName: '',
@@ -15,21 +16,19 @@ export const patientCreateInitialValues: PatientFormValues = {
   documentId: '',
   birthDate: '',
   gender: '',
-  phone: '',
   email: '',
   address: '',
   branchUuid: '',
-  contacts: [],
+  contacts: [{ name: '', phone: '' }],
 };
 
 /** Traduce errores del API a mensajes de campo cuando se puede identificar. */
-function resolveFieldError(message: string): { field: keyof PatientFormValues; text: string } | null {
+function resolveFieldError(
+  message: string,
+): { field: keyof PatientFormValues; text: string } | null {
   // El API responde con tildes ("cédula ya está registrada"): se normaliza
   // quitando diacríticos para que el .includes() no falle por eso.
-  const normalized = message
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
+  const normalized = message.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
   if (normalized.includes('cedula') || normalized.includes('documentid')) {
     return { field: 'documentId', text: 'Esta cédula ya está registrada' };
@@ -47,27 +46,24 @@ export function usePatientCreate() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { executeCreatePatient, isPending } = useCreatePatientMutation();
 
-  const handleSubmit = (
-    values: PatientFormValues,
-    helpers: FormikHelpers<PatientFormValues>,
-  ) => {
+  const handleSubmit = (values: PatientFormValues, helpers: FormikHelpers<PatientFormValues>) => {
     setErrorMessage(null);
 
+    const { phone, contacts } = resolveContactsForSave(
+      values.contacts,
+      buildPatientFullName(values.firstName, values.lastName),
+    );
     const payload: CreatePatientPayload = {
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
-      phone: `+506 ${values.phone}`,
+      phone,
       birthDate: values.birthDate,
       documentId: values.documentId.trim(),
       ...(values.email.trim() && { email: values.email.trim().toLowerCase() }),
       ...(values.gender && { gender: values.gender }),
       ...(values.address.trim() && { address: values.address.trim() }),
       ...(values.branchUuid && { branchUuid: values.branchUuid }),
-      ...(values.contacts.length > 0 && {
-        contacts: values.contacts
-          .filter((contact) => contact.name.trim() && contact.phone.trim())
-          .map((contact) => ({ name: contact.name.trim(), phone: contact.phone.trim() })),
-      }),
+      contacts: contacts.map(({ name, phone: contactPhone }) => ({ name, phone: contactPhone })),
     };
 
     executeCreatePatient(payload, {

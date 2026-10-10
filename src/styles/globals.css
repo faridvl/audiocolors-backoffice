@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  /* Sin zoom por doble toque en el celular (tocar dos veces una píldora lo
+     disparaba); el zoom con dos dedos sigue disponible. */
+  html {
+    touch-action: manipulation;
+  }
+
   body {
     @apply bg-ink-50 text-ink-700 font-sans antialiased;
   }

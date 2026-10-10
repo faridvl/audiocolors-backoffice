@@ -14,6 +14,9 @@ export function useNavigation() {
       detail: (uuid: string) => router.push(routesPrivate.patients.detail(uuid)),
       edit: (uuid: string) => router.push(routesPrivate.patients.edit(uuid)),
     },
+    agenda: {
+      index: () => router.push(routesPrivate.agenda.index),
+    },
     activity: {
       index: () => router.push(routesPrivate.activity.index),
     },

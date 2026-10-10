@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'react-i18next';
 import { Menu, Transition } from '@headlessui/react';
-import { Users, History, LogOut, ChevronDown, ArrowLeft } from 'lucide-react';
+import {
+  Users,
+  CalendarDays,
+  CalendarSync,
+  History,
+  LogOut,
+  ChevronDown,
+  ArrowLeft,
+} from 'lucide-react';
+import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
+import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
+import { useIsIphone } from '@/hooks/use-is-iphone';
 import { useSession } from '@/hooks/use-session';
 import { useLogout } from '@/hooks/use-logout';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -12,6 +24,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 
 const NAVIGATION = [
   { label: 'Pacientes', href: routesPrivate.patients.index, icon: Users },
+  { label: 'Agenda', href: routesPrivate.agenda.index, icon: CalendarDays },
   { label: 'Bitácora', href: routesPrivate.activity.index, icon: History },
 ];
 
@@ -28,59 +41,85 @@ function getInitials(fullName?: string): string {
 const UserMenu: React.FC = () => {
   const { user, tenant } = useSession();
   const logout = useLogout();
+  const { t } = useTranslation();
+  const isIphone = useIsIphone();
+  const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
 
   return (
-    <Menu as="div" className="relative">
-      <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
-          {getInitials(user?.fullName)}
-        </span>
-        <span className="hidden text-left sm:flex sm:flex-col">
-          <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-            {user?.fullName ?? 'Cargando...'}
-          </Typography>
-          <Typography variant={TypographyVariant.HELPER}>{tenant?.businessName ?? ''}</Typography>
-        </span>
-        <ChevronDown className="h-4 w-4 text-ink-400" aria-hidden />
-      </Menu.Button>
-
-      <Transition
-        as={React.Fragment}
-        enter="transition ease-out duration-100"
-        enterFrom="transform opacity-0 scale-95"
-        enterTo="transform opacity-100 scale-100"
-        leave="transition ease-in duration-75"
-        leaveFrom="transform opacity-100 scale-100"
-        leaveTo="transform opacity-0 scale-95"
-      >
-        <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
-          <div className="border-b border-ink-100 px-3 py-2 sm:hidden">
-            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
+    <>
+      <Menu as="div" className="relative">
+        <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
+            {getInitials(user?.fullName)}
+          </span>
+          <span className="hidden text-left sm:flex sm:flex-col">
+            <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
               {user?.fullName ?? 'Cargando...'}
             </Typography>
-            <Typography variant={TypographyVariant.HELPER} className="truncate">
-              {tenant?.businessName ?? ''}
-            </Typography>
-          </div>
+            <Typography variant={TypographyVariant.HELPER}>{tenant?.businessName ?? ''}</Typography>
+          </span>
+          <ChevronDown className="h-4 w-4 text-ink-400" aria-hidden />
+        </Menu.Button>
 
-          <Menu.Item>
-            {({ active }) => (
-              <button
-                type="button"
-                onClick={logout}
-                className={tailwind(
-                  'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
-                  active && 'bg-ink-50',
+        <Transition
+          as={React.Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
+            <div className="border-b border-ink-100 px-3 py-2 sm:hidden">
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
+                {user?.fullName ?? 'Cargando...'}
+              </Typography>
+              <Typography variant={TypographyVariant.HELPER} className="truncate">
+                {tenant?.businessName ?? ''}
+              </Typography>
+            </div>
+
+            {/* La suscripción webcal solo la abre bien el Calendario del iPhone. */}
+            {isIphone && (
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    type="button"
+                    onClick={() => setIsCalendarSyncOpen(true)}
+                    className={tailwind(
+                      'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                      active && 'bg-ink-50',
+                    )}
+                  >
+                    <CalendarSync className="h-4 w-4" aria-hidden />
+                    {t(TEXT.AGENDA.CALENDAR_SYNC.MENU)}
+                  </button>
                 )}
-              >
-                <LogOut className="h-4 w-4" aria-hidden />
-                Cerrar sesión
-              </button>
+              </Menu.Item>
             )}
-          </Menu.Item>
-        </Menu.Items>
-      </Transition>
-    </Menu>
+
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  type="button"
+                  onClick={logout}
+                  className={tailwind(
+                    'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                    active && 'bg-ink-50',
+                  )}
+                >
+                  <LogOut className="h-4 w-4" aria-hidden />
+                  Cerrar sesión
+                </button>
+              )}
+            </Menu.Item>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+
+      {isCalendarSyncOpen && <CalendarSyncSheet onClose={() => setIsCalendarSyncOpen(false)} />}
+    </>
   );
 };
 

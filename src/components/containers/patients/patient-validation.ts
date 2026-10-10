@@ -46,19 +46,29 @@ const baseFields = {
   gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opción'),
 };
 
+const CONTACT_NAME_MAX_LENGTH = 80;
+const LOCAL_PHONE_PATTERN = /^\d{4}-\d{4}$/;
+const COUNTRY_PREFIX = '+506 ';
+
+const buildContactsField = (phoneField: Yup.StringSchema) =>
+  Yup.array()
+    .of(
+      Yup.object({
+        name: Yup.string().max(CONTACT_NAME_MAX_LENGTH, 'Máximo 80 caracteres'),
+        phone: phoneField.required('El teléfono es obligatorio'),
+      }),
+    )
+    .min(1, 'Agrega al menos un contacto');
+
 export const patientCreateValidationSchema = Yup.object({
   ...baseFields,
-  phone: Yup.string()
-    .matches(/^\d{4}-\d{4}$/, 'Formato: XXXX-XXXX')
-    .required('El teléfono es obligatorio'),
+  contacts: buildContactsField(Yup.string().matches(LOCAL_PHONE_PATTERN, 'Formato: XXXX-XXXX')),
 });
 
 export const patientEditValidationSchema = Yup.object({
   ...baseFields,
-  // Al editar, el telefono ya puede venir guardado como "+506 XXXX-XXXX".
-  phone: Yup.string()
-    .matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido')
-    .required('El teléfono es obligatorio'),
+  // Pacientes viejos pueden tener un teléfono extranjero o sin el formato local.
+  contacts: buildContactsField(Yup.string().matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido')),
 });
 
 export interface PatientContactFormValues {
@@ -75,9 +85,47 @@ export interface PatientFormValues {
   documentId: string;
   birthDate: string;
   gender: string;
-  phone: string;
   email: string;
   address: string;
   branchUuid: string;
   contacts: PatientContactFormValues[];
+}
+
+/**
+ * El paciente no tiene un campo de teléfono aparte: el primer contacto es el
+ * principal y su número se guarda también en el paciente, que es el que usan
+ * WhatsApp, "Llamar" y la búsqueda. Un contacto sin nombre es el paciente.
+ */
+export function resolveContactsForSave(
+  contacts: PatientContactFormValues[],
+  patientFullName: string,
+): { phone: string | undefined; contacts: PatientContactFormValues[] } {
+  const filled = contacts
+    .filter((contact) => contact.phone.trim())
+    .map((contact) => ({
+      ...(contact.uuid && { uuid: contact.uuid }),
+      name: (contact.name.trim() || patientFullName).slice(0, CONTACT_NAME_MAX_LENGTH),
+      phone: contact.phone.trim(),
+    }));
+  const primaryPhone = filled[0]?.phone;
+
+  return {
+    phone:
+      primaryPhone && LOCAL_PHONE_PATTERN.test(primaryPhone)
+        ? `${COUNTRY_PREFIX}${primaryPhone}`
+        : primaryPhone,
+    contacts: filled,
+  };
+}
+
+/** Teléfono del paciente como se escribe en un contacto: sin el prefijo del país. */
+export function toContactPhone(patientPhone: string): string {
+  return patientPhone.startsWith(COUNTRY_PREFIX)
+    ? patientPhone.slice(COUNTRY_PREFIX.length)
+    : patientPhone;
+}
+
+export function isSamePhone(first: string, second: string): boolean {
+  const lastDigits = (phone: string) => phone.replace(/\D/g, '').slice(-8);
+  return lastDigits(first) !== '' && lastDigits(first) === lastDigits(second);
 }

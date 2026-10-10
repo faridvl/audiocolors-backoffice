@@ -18,6 +18,9 @@
       "clearAll": "Limpiar todo",
       "showResults_one": "Mostrar {{count}} resultado",
       "showResults_other": "Mostrar {{count}} resultados"
+    },
+    "errors": {
+      "unexpected": "Algo salió mal. Intenta de nuevo."
     }
   },
   "auth": {
@@ -40,6 +43,164 @@
         "emailInvalid": "Correo inválido",
         "emailRequired": "El correo es obligatorio",
         "passwordRequired": "La contraseña es obligatoria"
+      }
+    }
+  },
+  "agenda": {
+    "pageTitle": "Agenda · AudioColors Gestión Clínica",
+    "title": "Agenda",
+    "schedule": "Agendar",
+    "week": {
+      "aria": "Días de la semana",
+      "today": "Hoy",
+      "dayAria": "{{date}}, {{count}} citas"
+    },
+    "monthPicker": {
+      "open": "Ir a otra fecha",
+      "previous": "Mes anterior",
+      "next": "Mes siguiente",
+      "weekdays": "L M X J V S D"
+    },
+    "filters": {
+      "branchAria": "Filtrar por sede",
+      "allBranches": "Todas las sedes",
+      "monthAria": "Filtrar por mes"
+    },
+    "day": {
+      "today": "Hoy · {{date}}",
+      "previous": "Día anterior",
+      "next": "Día siguiente"
+    },
+    "tabs": {
+      "aria": "Qué ver en la agenda",
+      "day": "Citas del día",
+      "pending": "Por confirmar"
+    },
+    "sections": {
+      "IN_ROOM": "En sala",
+      "UPCOMING": "Por llegar",
+      "SCHEDULED": "Agendadas",
+      "UNMARKED": "Sin marcar",
+      "DONE": "Atendidas"
+    },
+    "statuses": {
+      "IN_ROOM": "En sala",
+      "UPCOMING": "Por llegar",
+      "SCHEDULED": "Agendada",
+      "UNMARKED": "Sin marcar",
+      "DONE": "Atendida"
+    },
+    "unmarkedHint": "Nadie marcó si llegaron. Si se atendieron, márcalas como atendidas.",
+    "row": {
+      "markArrived": "Marcar que llegó",
+      "markDone": "Marcar como atendida",
+      "noType": "Sin tipo",
+      "scheduledBy": "Agendó {{name}}",
+      "scheduledByUnknown": "Agendó el equipo"
+    },
+    "menu": {
+      "viewPatient": "Ver expediente",
+      "reschedule": "Reagendar",
+      "whatsapp": "Recordar por WhatsApp",
+      "calendar": "Agregar a mi calendario",
+      "undoArrived": "Volver a por llegar",
+      "setTime": "Poner hora",
+      "changeTime": "Cambiar hora",
+      "returnToPending": "Volver a por confirmar"
+    },
+    "sheet": {
+      "close": "Cerrar",
+      "day": "Día",
+      "month": "Mes",
+      "type": "Tipo",
+      "time": "Hora",
+      "branch": "Sede",
+      "phone": "Teléfono",
+      "scheduledBy": "Agendada por",
+      "scheduledByUnknown": "Sin registrar"
+    },
+    "toasts": {
+      "arrived": "{{name}} está en sala",
+      "done": "Cita de {{name}} atendida",
+      "undone": "{{name}} volvió a por llegar",
+      "noPhone": "El paciente no tiene un teléfono válido para WhatsApp",
+      "phoneError": "No se pudo cargar el teléfono del paciente"
+    },
+    "whatsappMessage": "Hola {{name}}, le recordamos su cita en AudioColors el {{date}}. ¡Le esperamos!",
+    "calendarEvent": {
+      "title": "Cita AudioColors · {{name}}",
+      "description": "{{type}}. Evento de día completo: la hora la confirma la clínica."
+    },
+    "states": {
+      "emptyTitle": "No hay citas este día",
+      "emptyDescription": "Agenda una cita nueva o elige otro día.",
+      "errorTitle": "No se pudo cargar la agenda",
+      "retry": "Reintentar"
+    },
+    "pending": {
+      "subtitle_one": "Vuelven en {{month}} y todavía no tienen día",
+      "subtitle_other": "Vuelven en {{month}} y todavía no tienen día",
+      "empty": "Nadie pendiente de confirmar día en {{month}}.",
+      "setDay": "Confirmar día de la cita",
+      "callShort": "Llamar"
+    },
+    "picker": {
+      "title": "Agendar cita",
+      "description": "Busca al paciente para fijar su próxima cita.",
+      "searchPlaceholder": "Nombre o cédula",
+      "searchAria": "Buscar paciente",
+      "hint": "Escribe al menos 2 letras del nombre o la cédula.",
+      "empty": "Ningún paciente coincide con esa búsqueda.",
+      "close": "Cerrar"
+    },
+    "board": {
+      "count_one": "{{count}} cita",
+      "count_other": "{{count}} citas",
+      "noTime": "Sin hora asignada",
+      "noTimeHint": "Confirmadas sin hora. Arrástralas a un horario.",
+      "dropHere": "Suelta aquí",
+      "pastDay": "Este día ya pasó: no se pueden agendar citas.",
+      "pendingHint": "Arrastra un paciente a un horario, o tócalo y después toca el horario.",
+      "slotAria_one": "{{hour}}, {{count}} cita",
+      "slotAria_other": "{{hour}}, {{count}} citas",
+      "saving": "Guardando…",
+      "toasts": {
+        "confirmed": "Cita de {{name}} confirmada a las {{hour}}",
+        "moved": "Cita de {{name}} movida a las {{hour}}",
+        "timeError": "La cita de {{name}} quedó confirmada sin hora. Arrástrala de nuevo a un horario.",
+        "returned": "{{name}} volvió a por confirmar"
+      },
+      "returnHere": "Suelta aquí para dejarla por confirmar",
+      "selection": {
+        "title": "Elige un horario para {{name}}",
+        "openDayHint": "Toca un día del calendario y después un horario.",
+        "viewDetails": "Ver ficha",
+        "scheduleHere": "Agendar aquí"
+      }
+    },
+    "confirmSheet": {
+      "status": "Elige el día y la hora de la cita",
+      "hours": "Hora",
+      "moreOptions": "Cambiar tipo de cita o mes"
+    },
+    "timeSheet": {
+      "status": "Elige la hora de la cita"
+    },
+    "calendarSync": {
+      "menu": "Calendario del teléfono",
+      "title": "Calendario del iPhone",
+      "description": "Las citas aparecen solas en el Calendario. Agrega los calendarios que quieras, cuando quieras: cada uno tiene su color.",
+      "byBranch": "Por sede",
+      "byBranchAndType": "Por sede y tipo",
+      "groupingAria": "Cómo repartir las citas en calendarios",
+      "add": "Agregar",
+      "onPhone": "En tu iPhone",
+      "remove": "Quitar",
+      "removed": "Quitado: ya no recibe citas. Si todavía lo ves en el iPhone, elimínalo desde Calendario.",
+      "refreshHint": "El iPhone revisa los cambios cada 15 minutos aproximadamente. Para verlos ya, en Calendario toca Calendarios y desliza hacia abajo.",
+      "privacy": "Los eventos muestran el nombre del paciente: este calendario es solo tuyo.",
+      "toasts": {
+        "removed": "{{name}}: quitado del iPhone"
       }
     }
   },
@@ -72,7 +233,9 @@
       "branchAria": "Filtrar por sede del paciente",
       "typeLabel": "Tipo de cita",
       "typeAria": "Filtrar por tipo de cita",
-      "allMonths": "Todos los meses"
+      "allMonths": "Todos los meses",
+      "fromLabel": "Desde",
+      "toLabel": "Hasta"
     },
     "count_one": "{{count}} registro",
     "count_other": "{{count}} registros",
@@ -107,7 +270,12 @@
       "DOCUMENT_DELETED": "Archivo eliminado",
       "APPOINTMENT_TENTATIVE": "Cita tentativa",
       "APPOINTMENT_CONFIRMED": "Cita confirmada",
-      "STATUS_CHANGED": "Estado cambiado"
+      "APPOINTMENT_ARRIVED": "Llegó a la cita",
+      "APPOINTMENT_COMPLETED": "Cita atendida",
+      "STATUS_CHANGED": "Estado cambiado",
+      "HEARING_AIDS_LAB_CHANGED": "Audífonos en laboratorio",
+      "WARRANTY_CHANGED": "Garantía",
+      "VIDEO_CANDIDATE_CHANGED": "Candidato a video"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -130,6 +298,59 @@
         "ACTIVE": "Activo",
         "INACTIVE": "Inactivo",
         "DECEASED": "Fallecido"
+      },
+      "flagOn": {
+        "HEARING_AIDS_LAB_CHANGED": "Enviados al laboratorio",
+        "WARRANTY_CHANGED": "Garantía activada",
+        "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato"
+      },
+      "flagOff": {
+        "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
+        "WARRANTY_CHANGED": "Garantía desactivada",
+        "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato"
+      }
+    }
+  },
+  "patients": {
+    "summary": {
+      "tentative": "Citas tentativas este mes",
+      "confirmed": "Citas confirmadas este mes",
+      "controls": "Controles este mes",
+      "hearingAids": "Audífonos en laboratorio"
+    },
+    "flags": {
+      "menu": "Indicadores",
+      "title": "Indicadores del paciente",
+      "description": "Se guarda al tocar cada opción.",
+      "done": "Listo",
+      "since": "desde el {{date}}",
+      "labels": {
+        "hearingAidsInLab": "Audífonos en laboratorio",
+        "hasActiveWarranty": "Garantía activa",
+        "isVideoCandidate": "Candidato a video"
+      },
+      "toastsOn": {
+        "hearingAidsInLab": "Audífonos marcados en laboratorio",
+        "hasActiveWarranty": "Garantía activada",
+        "isVideoCandidate": "Marcado como candidato a video"
+      },
+      "toastsOff": {
+        "hearingAidsInLab": "Audífonos devueltos al paciente",
+        "hasActiveWarranty": "Garantía desactivada",
+        "isVideoCandidate": "Ya no es candidato a video"
+      },
+      "columns": {
+        "hearingAidsInLab": "Audífonos",
+        "hasActiveWarranty": "Garantía",
+        "isVideoCandidate": "Video"
+      },
+      "values": {
+        "hearingAidsInLab": "En laboratorio",
+        "hasActiveWarranty": "Activa",
+        "isVideoCandidate": "Candidato"
+      },
+      "offValues": {
+        "hasActiveWarranty": "Sin garantía"
       }
     }
   }

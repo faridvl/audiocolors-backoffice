@@ -126,3 +126,101 @@ Ambas requieren cambio en el API, que se comparte con Zynka. Ver regla 7 de
    build, así que hay que redeployar si se añaden después).
 3. **Logo definitivo**: el actual sale de los vectores del `.ai` rasterizados a
    1400px. Exportar un SVG desde Illustrator daría calidad infinita.
+
+---
+
+## D10 · Agenda de escritorio: arrastrar es confirmar, sin tocar el API
+
+**Decisión:** en escritorio (`lg`) la agenda muestra el mes, los horarios del
+día (8:00 a 17:00, uno por hora) y "Por confirmar". Soltar un paciente en un
+horario confirma la cita sin modal; soltar una cita en "Por confirmar" la
+devuelve a mes tentativo. Un horario acepta varias citas. El celular se queda
+con la franja semanal y pestañas.
+
+**Cómo, con el API tal cual:** `POST next-appointment` solo recibe el día y
+guarda las 08:00 UTC; la hora se fija después con `PATCH /appointments/:uuid`
+(`date`, `startTime`, `endTime`). Volver a "por confirmar" es
+`PUT tentative-month` (que cancela la cita futura) y un `PATCH` a `CANCELLED`
+para la de hoy cuya hora ya pasó, que el API no cancela.
+
+**Por qué la hora es real (UTC-6) y no "flotante":** las 8:00 de la clínica
+se guardan como 14:00 UTC. Así el `.ics`, la cancelación de citas futuras y el
+job de medianoche ven la hora verdadera. Las citas confirmadas solo con día
+(08:00 UTC = 2:00 en Costa Rica) caen fuera de los horarios y se muestran en
+"Sin hora asignada", listas para arrastrar.
+
+**Cuándo deja de valer:** el API filtra `GET /appointments?date=` por día
+UTC. Un horario desde las 18:00 de Costa Rica cae en el día UTC siguiente y
+desaparecería de su día. Si la clínica atiende después de las 17:00, primero
+hay que filtrar por día local en el API.
+
+## 2026-10-04 · `yarn dev` siempre en el puerto 3000
+
+El API solo acepta los orígenes de `ALLOWED_ORIGINS` (CORS). Si el 3000 estaba
+ocupado, Next levantaba solo en el 3001 y el login fallaba con "revisa tu
+conexión a internet", sin pista de la causa. Con `-p 3000` Next falla al
+arrancar si el puerto está tomado, y en desarrollo el error de red explica que
+el API rechaza otros puertos.
+
+## 2026-10-09 · Calendario del iPhone: por sede o por sede y tipo, cada calendario por separado
+
+Se rehízo después de probarlo con la clínica, que ya organiza su calendario
+como "(RC) Controles", "(RC) Citas", "(PZ) Recetas"…
+
+- **Solo en iPhone**, desde el menú del usuario ("Calendario del teléfono"). En
+  computadora y Android no aparece: la suscripción `webcal://` es para el
+  Calendario de iOS.
+- **Un calendario = una sede, o una sede y un tipo de cita**, cada uno con su
+  color (el iPhone colorea calendarios enteros, no eventos). Sin "Todas las
+  sedes": un único calendario pierde los colores. En "por sede y tipo" el
+  evento muestra solo el paciente, como lo usa la clínica.
+- **Sin pasos de enlace a la vista**: el enlace se crea solo al abrir la ficha y
+  `POST /calendar-feed` ya no lo cambia. Se sacaron "Crear mi enlace",
+  "Copiar enlace", "Generar enlaces nuevos" y "Desconectar": cambiar el token
+  dejaba sin citas todo lo ya agregado.
+- **"En tu iPhone"**: el servidor no puede saber qué agregó el teléfono, pero
+  anota cuándo pidió cada calendario (`fetchedCalendars`). Si lo pidió en los
+  últimos 3 días, la fila ofrece "Quitar"; si no, "Agregar". Así se puede
+  agregar otra sede cualquier día sin tocar las anteriores.
+- **"Quitar"** no puede borrar la suscripción del teléfono: el API publica ese
+  calendario vacío. Para que desaparezca del iPhone hay que eliminarlo desde
+  Calendario. Un calendario quitado vuelve a ofrecer "Agregar", igual que uno
+  nuevo (no "Volver a mostrar"): si ya se borró del iPhone, solo el enlace
+  `webcal://` lo vuelve a suscribir. Agregar le devuelve las citas.
+- **No hay actualización instantánea**: iOS consulta los calendarios suscritos
+  cuando quiere (el API sugiere 15 minutos) y el servidor no puede avisarle. La
+  ficha explica cómo refrescar a mano.
+
+## 2026-10-04 · El estado del paciente es solo `status`, nunca `isActive`
+
+El paciente tiene dos campos que parecen lo mismo:
+
+- `status` (`ACTIVE` / `INACTIVE` / `DECEASED`): el estado para la clínica. Lo
+  cambia el modal "Estado del paciente" y lo filtra el listado.
+- `isActive` + `deletedAt`: el borrado lógico (`DELETE /patients/:uuid`), de
+  antes de que existiera `status`. El front ya no borra pacientes, pero quedan
+  registros viejos con `isActive = false` y `status = ACTIVE`.
+
+**El error:** la agenda pedía `PatientStatusFilter.ACTIVE` (solo
+`isActive = true`) y el expediente mostraba "Inactivo" por `!isActive`, mientras
+el listado y el modal decían "Activo". Un paciente así anotaba su mes "por
+confirmar" y no aparecía en la agenda: parecía intermitente porque dependía del
+paciente. Caso real: "Prueba SedeAuto" en el ambiente de pruebas.
+
+**La regla:** toda pantalla lee y filtra el estado por `status`. Las consultas
+de pacientes usan `PatientStatusFilter.ALL` (igual que el listado) y filtran con
+`filters.status` o en el cliente. No mostrar ni filtrar por `isActive`.
+
+**Pendiente:** decidir en el API si esos registros viejos se reactivan
+(`isActive = true`) o se pasan a `status = INACTIVE`, y que `PatientStatusFilter`
+deje de mezclar los dos conceptos.
+
+
+## 2026-10-10 · Resumen de pacientes: "Controles" se busca por nombre
+
+Las tarjetas de la pantalla de pacientes (solo escritorio) cuentan y filtran
+con los mismos filtros de la lista. La de "Controles este mes" necesita el
+tipo de cita "Control", que es un dato de la clínica y no tiene una marca en
+el API. Se busca por nombre (`CONTROL_TYPE_NAME` en `use-patient-summary.ts`);
+si la clínica no tiene ese tipo, la tarjeta no se muestra. Si algún día los
+tipos tienen una categoría en el API, usarla en lugar del nombre.

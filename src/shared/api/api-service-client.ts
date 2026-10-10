@@ -1,8 +1,12 @@
 import { CookiesManager } from '@/shared/utils/cookies-manager';
 import { routesPublic } from '@/shared/navigation/routes';
 
+// En local, un origen que el API no tiene en ALLOWED_ORIGINS (CORS) falla igual
+// que una red caída: el navegador no deja distinguirlos.
 const NETWORK_ERROR_MESSAGE =
-  'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
+  process.env.NODE_ENV === 'development'
+    ? 'No se pudo conectar con el API. En local, la app tiene que correr en http://localhost:3000: el API rechaza otros puertos.'
+    : 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
 const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
 interface ApiErrorBody {
