@@ -6,7 +6,7 @@ import { EMPTY_VALUE } from '@/shared/utils/formatters';
 import { Patient, PATIENT_FLAG_SINCE_FIELDS, PatientFlag } from '@/types/patients/patient';
 
 const FLAG_TONES: Record<PatientFlag, string> = {
-  [PatientFlag.HEARING_AIDS_IN_LAB]: 'bg-info/10 text-info',
+  [PatientFlag.HEARING_AIDS_IN_LAB]: 'bg-warning/15 text-ink-700',
   [PatientFlag.ACTIVE_WARRANTY]: 'bg-success/10 text-success',
   [PatientFlag.VIDEO_CANDIDATE]: 'bg-brand-50 text-brand-700',
 };

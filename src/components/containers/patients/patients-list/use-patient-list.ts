@@ -14,6 +14,14 @@ import { getBranchStripeColor } from '@/shared/design/tokens';
 import { buildMonthOption } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlag, PatientStatus } from '@/types/patients/patient';
+import {
+  PatientListPreset,
+  PatientListSelection,
+  applyPresetTo,
+  isPresetApplied,
+  removePresetFrom,
+  toPatientListFilters,
+} from './patient-list-selection';
 
 const PAGE_SIZE_DEFAULT = 7;
 const PAGE_SIZE_FILTERED = 10;
@@ -27,14 +35,6 @@ export const DEFAULT_STATUS_FILTER = [PatientStatus.ACTIVE];
 
 /** Prefijo de las claves con que la lista recuerda sus filtros al volver. */
 const MEMORY_KEY = 'patient-list';
-
-/** Filtros que aplica cada tarjeta del resumen; lo que no trae vuelve a su valor inicial. */
-export interface PatientListPreset {
-  months?: string[];
-  kinds?: NextAppointmentKind[];
-  types?: string[];
-  flags?: string[];
-}
 
 const KIND_LABELS: Record<NextAppointmentKind, string> = {
   [NextAppointmentKind.CONFIRMED]: 'Confirmada',
@@ -149,18 +149,28 @@ export function usePatientList() {
     return () => clearTimeout(timer);
   }, [searchTerm, debouncedSearch, setPage]);
 
-  const filters = useMemo(
+  const selection = useMemo<PatientListSelection>(
     () => ({
-      statuses: statusFilter as PatientStatus[],
-      branchUuids: branchFilter,
-      appointmentTypeUuids: appointmentTypeFilter,
-      hearingAidsInLab: flagFilter.includes(PatientFlag.HEARING_AIDS_IN_LAB),
-      hasActiveWarranty: flagFilter.includes(PatientFlag.ACTIVE_WARRANTY),
-      isVideoCandidate: flagFilter.includes(PatientFlag.VIDEO_CANDIDATE),
-      nextAppointmentKinds: kindFilter as NextAppointmentKind[],
+      search: debouncedSearch,
+      statuses: statusFilter,
+      branches: branchFilter,
+      months: monthFilter,
+      kinds: kindFilter,
+      types: appointmentTypeFilter,
+      flags: flagFilter,
     }),
-    [statusFilter, branchFilter, appointmentTypeFilter, flagFilter, kindFilter],
+    [
+      debouncedSearch,
+      statusFilter,
+      branchFilter,
+      monthFilter,
+      kindFilter,
+      appointmentTypeFilter,
+      flagFilter,
+    ],
   );
+
+  const filters = useMemo(() => toPatientListFilters(selection), [selection]);
 
   const isDefaultStatus =
     statusFilter.length === DEFAULT_STATUS_FILTER.length &&
@@ -192,31 +202,19 @@ export function usePatientList() {
     setPage(1);
   };
 
-  /** Una tarjeta del resumen reemplaza los filtros por los suyos, sobre los pacientes activos. */
-  const applyPreset = (preset: PatientListPreset) => {
-    setSearchTerm('');
-    setDebouncedSearch('');
-    setStatusFilter(DEFAULT_STATUS_FILTER);
-    setBranchFilter([]);
-    setMonthFilter(preset.months ?? []);
-    setKindFilter(preset.kinds ?? []);
-    setAppointmentTypeFilter(preset.types ?? []);
-    setFlagFilter(preset.flags ?? []);
+  const isPresetActive = (preset: PatientListPreset) => isPresetApplied(selection, preset);
+
+  /** La tarjeta se suma a los filtros que ya hay; tocarla de nuevo quita solo lo suyo. */
+  const togglePreset = (preset: PatientListPreset) => {
+    const next = isPresetActive(preset)
+      ? removePresetFrom(selection, preset)
+      : applyPresetTo(selection, preset);
+    setMonthFilter(next.months);
+    setKindFilter(next.kinds);
+    setAppointmentTypeFilter(next.types);
+    setFlagFilter(next.flags);
     setPage(1);
   };
-
-  const isSameList = (first: string[], second: string[] = []) =>
-    first.length === second.length && first.every((value) => second.includes(value));
-
-  /** Si los filtros actuales son exactamente los de la tarjeta, para marcarla. */
-  const isPresetActive = (preset: PatientListPreset) =>
-    debouncedSearch.trim() === '' &&
-    isDefaultStatus &&
-    branchFilter.length === 0 &&
-    isSameList(monthFilter, preset.months) &&
-    isSameList(kindFilter, preset.kinds) &&
-    isSameList(appointmentTypeFilter, preset.types) &&
-    isSameList(flagFilter, preset.flags);
 
   return {
     patients: data?.data ?? [],
@@ -247,7 +245,8 @@ export function usePatientList() {
     handleAppointmentTypeFilter: withPageReset(setAppointmentTypeFilter),
     handleFlagFilter: withPageReset(setFlagFilter),
     handleKindFilter: withPageReset(setKindFilter),
-    applyPreset,
+    selection,
+    togglePreset,
     isPresetActive,
     handlePageChange: setPage,
     handleRetry: refetch,

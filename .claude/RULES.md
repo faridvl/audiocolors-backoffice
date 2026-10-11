@@ -119,10 +119,10 @@ la columna que se necesita.
 
 ### 3.4 Lo importante arriba
 
-En el expediente, los documentos son lo que se consulta a diario. Los datos del
-paciente se resumen en una franja de una línea; lo secundario (correo, dirección,
-fecha de nacimiento) se despliega con un enlace de texto, no con un botón que
-compita visualmente.
+En el expediente, la tarjeta del paciente va en tres franjas: quién es (nombre,
+cédula, edad), lo de uso diario (próxima cita y contactos) y al pie nacimiento y
+sede. Todo visible siempre, sin "ver más". Correo, dirección y fecha de registro
+no se muestran (ver D11). El azul queda solo para las acciones.
 
 ---
 

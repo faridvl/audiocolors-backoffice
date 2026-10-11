@@ -12,13 +12,10 @@ import { useSyncPatientContactsMutation } from '@/shared/api/mutations/patients/
 import { useNavigation } from '@/hooks/use-navigation';
 import { DocumentType, UpdatePatientPayload } from '@/types/patients/patient';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
-import { PatientContact } from '@/types/patients/patient-contact';
 import {
-  isSamePhone,
-  PatientContactFormValues,
+  buildInitialContacts,
   PatientFormValues,
   resolveContactsForSave,
-  toContactPhone,
 } from '../patient-validation';
 
 /** La API no guarda el tipo de documento; se infiere del formato guardado. */
@@ -27,28 +24,6 @@ function inferDocumentType(documentId?: string): DocumentType {
   if (/^\d-\d{4}-\d{4}$/.test(documentId)) return DocumentType.NATIONAL;
   if (/^\d{11,12}$/.test(documentId)) return DocumentType.DIMEX;
   return DocumentType.PASSPORT;
-}
-
-/**
- * El contacto con el teléfono del paciente va primero, porque el primero es el
- * principal. Si ninguno lo tiene (pacientes de antes de los contactos), ese
- * teléfono entra como primer contacto con el nombre del paciente.
- */
-function buildInitialContacts(
-  contacts: PatientContact[],
-  patientPhone: string | undefined,
-  patientFullName: string,
-): PatientContactFormValues[] {
-  const formContacts = contacts.map(({ uuid, name, phone }) => ({ uuid, name, phone }));
-  if (!patientPhone) {
-    return formContacts.length > 0 ? formContacts : [{ name: '', phone: '' }];
-  }
-
-  const primary = formContacts.find((contact) => isSamePhone(contact.phone, patientPhone));
-  if (!primary) {
-    return [{ name: patientFullName, phone: toContactPhone(patientPhone) }, ...formContacts];
-  }
-  return [primary, ...formContacts.filter((contact) => contact !== primary)];
 }
 
 export function usePatientEdit(uuid: string) {

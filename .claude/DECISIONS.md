@@ -224,3 +224,50 @@ tipo de cita "Control", que es un dato de la clínica y no tiene una marca en
 el API. Se busca por nombre (`CONTROL_TYPE_NAME` en `use-patient-summary.ts`);
 si la clínica no tiene ese tipo, la tarjeta no se muestra. Si algún día los
 tipos tienen una categoría en el API, usarla en lugar del nombre.
+
+---
+
+## D11 · Expediente: datos siempre visibles y sin correo, dirección ni registro
+
+**Decisión (2026-10-10):** se quita el enlace "Ver todos los datos"; la tarjeta
+muestra todo lo que tiene. Correo, dirección y fecha de registro no se muestran
+por ahora (se siguen guardando y editando en el formulario).
+
+**Por qué:** la clínica los consulta siempre y casi nunca llena correo ni
+dirección: el enlace era un clic de más y los vacíos ocupaban lugar.
+
+---
+
+## D12 · Contactos: vuelve el modal en el expediente
+
+**Decisión (2026-10-10):** "Editar contactos" abre un modal en el expediente, en
+vez de llevar al formulario del paciente. El modal y el formulario comparten
+`PatientContactsFields` y guardan igual: el primer contacto es el teléfono
+principal y, si cambia, se actualiza también en el paciente.
+
+**Por qué:** ir al formulario entero para cambiar un teléfono sacaba del
+expediente.
+
+---
+
+## D13 · Indicadores sin fechas, en pestañas, y candidato a video aparte
+
+**Decisión (2026-10-10):** el modal de indicadores tiene dos pestañas,
+Laboratorio (audífonos en laboratorio) y Datos del audífono (garantía).
+Candidato a video es una casilla en el expediente. No se muestra desde cuándo
+está prendido ninguno, aunque el API lo guarde.
+
+**Por qué:** a la clínica solo le importa si el indicador está o no, no su fecha.
+
+---
+
+## D14 · Las tarjetas del resumen cuentan sobre los filtros de la lista
+
+**Decisión (2026-10-10):** cada tarjeta de Pacientes cuenta su condición dentro
+de los filtros aplicados (búsqueda, estado, sede, indicadores...). Lo que la
+tarjeta define (mes, confirmada/tentativa, tipo) reemplaza al filtro manual; los
+indicadores se suman. Tocarla aplica lo suyo sin borrar el resto, y volver a
+tocarla quita solo lo suyo.
+
+**Por qué:** el número tiene que coincidir con lo que muestra la lista al tocar
+la tarjeta.

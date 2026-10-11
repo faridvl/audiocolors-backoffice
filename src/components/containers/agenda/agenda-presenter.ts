@@ -179,7 +179,12 @@ export function buildSlotHours(): number[] {
  * fuera de los horarios, así que se leen como "sin hora".
  */
 export function resolveSlotHour(appointment: Appointment): number | null {
-  const hour = new Date(appointment.schedule.startTime).getHours();
+  return toSlotHour(appointment.schedule.startTime);
+}
+
+/** Horario de una fecha ISO, o null si cae fuera de los horarios. */
+export function toSlotHour(isoDate: string): number | null {
+  const hour = new Date(isoDate).getHours();
   return hour >= SlotHour.FIRST && hour <= SlotHour.LAST ? hour : null;
 }
 

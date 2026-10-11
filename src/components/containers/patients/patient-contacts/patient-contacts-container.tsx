@@ -1,5 +1,7 @@
 import React from 'react';
 import { Pencil, Phone, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 import { PatientContact } from '@/types/patients/patient-contact';
 import { usePatientContacts } from './use-patient-contacts';
 
@@ -28,19 +30,25 @@ interface PatientContactsContainerProps {
 
 /**
  * Los contactos se ven siempre en el resumen: muchas veces el que contesta es
- * un familiar. Se editan en el formulario del paciente, porque el primero es
- * el teléfono principal y se guarda junto con el paciente.
+ * un familiar. Se editan en un modal o en el formulario del paciente.
  */
 export const PatientContactsContainer: React.FC<PatientContactsContainerProps> = ({
   patientUuid,
   patientPhone,
   onEdit,
 }) => {
+  const { t } = useTranslation();
   const { contacts, legacyPhone } = usePatientContacts(patientUuid, patientPhone);
 
   return (
-    <div className="flex flex-col gap-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
-      {legacyPhone && <ContactLink icon={Phone} name="Paciente" phone={legacyPhone} />}
+    <div className="flex flex-col gap-y-1.5">
+      {legacyPhone && (
+        <ContactLink
+          icon={Phone}
+          name={t(TEXT.PATIENTS.DETAIL.PATIENT_CONTACT)}
+          phone={legacyPhone}
+        />
+      )}
       {contacts.map((contact: PatientContact, index) => (
         <ContactLink
           key={contact.uuid}
@@ -53,10 +61,10 @@ export const PatientContactsContainer: React.FC<PatientContactsContainerProps> =
       <button
         type="button"
         onClick={onEdit}
-        className="flex w-fit items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
+        className="flex w-fit items-center gap-1.5 text-sm text-ink-500 hover:text-brand-700 hover:underline"
       >
         <Pencil className="h-3.5 w-3.5" aria-hidden />
-        Editar contactos
+        {t(TEXT.PATIENTS.DETAIL.EDIT_CONTACTS)}
       </button>
     </div>
   );
