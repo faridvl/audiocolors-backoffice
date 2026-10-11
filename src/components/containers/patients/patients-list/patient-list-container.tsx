@@ -154,7 +154,8 @@ export const PatientListContainer: React.FC = () => {
     handleAppointmentTypeFilter,
     handleFlagFilter,
     handleKindFilter,
-    applyPreset,
+    selection,
+    togglePreset,
     isPresetActive,
     handlePageChange,
     handleRetry,
@@ -177,7 +178,11 @@ export const PatientListContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <PatientSummaryCards isPresetActive={isPresetActive} onSelectPreset={applyPreset} />
+      <PatientSummaryCards
+        selection={selection}
+        isPresetActive={isPresetActive}
+        onTogglePreset={togglePreset}
+      />
 
       <FilterBar
         leading={

@@ -1,20 +1,22 @@
 import React from 'react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { tailwind } from '@/utils/tailwind-utils';
-import { PatientListPreset } from './use-patient-list';
+import { PatientListPreset, PatientListSelection } from './patient-list-selection';
 import { usePatientSummary } from './use-patient-summary';
 
 interface PatientSummaryCardsProps {
+  selection: PatientListSelection;
   isPresetActive: (preset: PatientListPreset) => boolean;
-  onSelectPreset: (preset: PatientListPreset) => void;
+  onTogglePreset: (preset: PatientListPreset) => void;
 }
 
 /** Tarjetas que filtran la lista con un clic (y lo quitan con otro). Solo escritorio (`lg`). */
 export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
+  selection,
   isPresetActive,
-  onSelectPreset,
+  onTogglePreset,
 }) => {
-  const { cards } = usePatientSummary();
+  const { cards } = usePatientSummary(selection);
 
   return (
     <div className="hidden gap-3 lg:grid lg:grid-cols-4">
@@ -24,8 +26,7 @@ export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
           <button
             key={card.key}
             type="button"
-            // Volver a tocar la tarjeta activa la quita: la lista vuelve a sin filtros.
-            onClick={() => onSelectPreset(isActive ? {} : card.preset)}
+            onClick={() => onTogglePreset(card.preset)}
             aria-pressed={isActive}
             className={tailwind(
               'rounded-card border bg-white px-4 py-3 text-left transition-colors',

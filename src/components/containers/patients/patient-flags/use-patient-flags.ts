@@ -6,7 +6,6 @@ import { useUpdatePatientFlagMutation } from '@/shared/api/mutations/patients/up
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
-import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PATIENT_FLAG_SINCE_FIELDS, PatientFlag } from '@/types/patients/patient';
 
@@ -14,26 +13,41 @@ export interface PatientFlagItem {
   flag: PatientFlag;
   label: string;
   isOn: boolean;
-  sinceLabel?: string;
   isUpdating: boolean;
 }
+
+/** Secciones del modal de indicadores. Candidato a video va aparte, como casilla en el expediente. */
+export enum PatientFlagSection {
+  LAB = 'lab',
+  HEARING_AID = 'hearingAid',
+}
+
+const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
+  [PatientFlagSection.LAB]: [PatientFlag.HEARING_AIDS_IN_LAB],
+  [PatientFlagSection.HEARING_AID]: [PatientFlag.ACTIVE_WARRANTY],
+};
 
 export function usePatientFlags(patient: Patient) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { executeUpdatePatientFlag } = useUpdatePatientFlagMutation();
   const [updatingFlag, setUpdatingFlag] = useState<PatientFlag | null>(null);
+  const [activeSection, setActiveSection] = useState(PatientFlagSection.LAB);
 
-  const flags: PatientFlagItem[] = Object.values(PatientFlag).map((flag) => {
-    const since = patient[PATIENT_FLAG_SINCE_FIELDS[flag]] ?? null;
-    return {
-      flag,
-      label: t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`),
-      isOn: since !== null,
-      sinceLabel: since ? t(TEXT.PATIENTS.FLAGS.SINCE, { date: formatDate(since) }) : undefined,
-      isUpdating: updatingFlag === flag,
-    };
+  // El API guarda desde cuándo está prendido, pero solo importa si lo está.
+  const buildItem = (flag: PatientFlag): PatientFlagItem => ({
+    flag,
+    label: t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`),
+    isOn: Boolean(patient[PATIENT_FLAG_SINCE_FIELDS[flag]]),
+    isUpdating: updatingFlag === flag,
   });
+
+  const sections = Object.values(PatientFlagSection).map((section) => ({
+    key: section,
+    title: t(`${TEXT.PATIENTS.FLAGS.SECTION_PREFIX}.${section}`),
+    flags: SECTION_FLAGS[section].map(buildItem),
+  }));
+  const videoCandidate = buildItem(PatientFlag.VIDEO_CANDIDATE);
 
   const handleToggle = (flag: PatientFlag, isOn: boolean) => {
     setUpdatingFlag(flag);
@@ -58,5 +72,12 @@ export function usePatientFlags(patient: Patient) {
     );
   };
 
-  return { flags, handleToggle };
+  return {
+    sections,
+    activeSection,
+    activeFlags: sections.find((section) => section.key === activeSection)?.flags ?? [],
+    videoCandidate,
+    handleToggle,
+    handleSectionChange: setActiveSection,
+  };
 }

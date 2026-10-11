@@ -3,7 +3,8 @@
     "buttons": {
       "save": "Guardar",
       "cancel": "Cancelar",
-      "loading": "Cargando..."
+      "loading": "Cargando...",
+      "retry": "Reintentar"
     },
     "pagination": {
       "showing": "Mostrando {{start}} a {{end}} de {{total}} registros"
@@ -21,7 +22,8 @@
     },
     "errors": {
       "unexpected": "Algo salió mal. Intenta de nuevo."
-    }
+    },
+    "notRegistered": "Sin registrar"
   },
   "auth": {
     "login": {
@@ -323,7 +325,10 @@
       "title": "Indicadores del paciente",
       "description": "Se guarda al tocar cada opción.",
       "done": "Listo",
-      "since": "desde el {{date}}",
+      "sections": {
+        "lab": "Laboratorio",
+        "hearingAid": "Datos del audífono"
+      },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",
         "hasActiveWarranty": "Garantía activa",
@@ -352,6 +357,83 @@
       "offValues": {
         "hasActiveWarranty": "Sin garantía"
       }
+    },
+    "schedule": {
+      "title": "Próxima cita",
+      "descriptions": {
+        "month": "Anota el mes en que le toca volver y de qué es. El día se define cuando el paciente confirme.",
+        "day": "Elige el día y, si ya la sabes, la hora.",
+        "none": "¿Dejar al paciente sin próxima cita? Se quita el mes tentativo y se cancela la cita agendada."
+      },
+      "submit": {
+        "month": "Guardar mes",
+        "day": "Agendar",
+        "none": "Dejar sin cita"
+      },
+      "modesAria": "Tipo de agendamiento",
+      "modeMonth": "Solo el mes",
+      "modeDay": "Día confirmado",
+      "tentativeSummary": "Tentativo: {{month}}",
+      "scheduledSummary": "Agendada: {{date}}",
+      "monthLabel": "Mes tentativo",
+      "previousYear": "Año anterior",
+      "nextYear": "Año siguiente",
+      "dateLabel": "Fecha",
+      "hourLabel": "Hora",
+      "hourNone": "Sin hora",
+      "typeLabel": "Tipo de cita",
+      "typePlaceholder": "Seleccione un tipo",
+      "noTypes": "No hay tipos de cita configurados. Pide a soporte que los agregue.",
+      "back": "Volver",
+      "validation": {
+        "monthRequired": "Elige el mes tentativo",
+        "typeRequired": "El tipo de cita es obligatorio",
+        "dateRequired": "La fecha es obligatoria",
+        "datePast": "La fecha no puede ser en el pasado"
+      },
+      "toasts": {
+        "cleared": "El paciente quedó sin cita",
+        "tentative": "Próxima cita tentativa: {{month}}",
+        "scheduled": "Cita agendada",
+        "scheduledAt": "Cita agendada a las {{hour}}",
+        "timeError": "La cita quedó agendada sin hora. Asígnala desde la agenda."
+      }
+    },
+    "detail": {
+      "loading": "Cargando expediente...",
+      "loadError": "No se pudo cargar el paciente",
+      "age_one": "{{count}} año",
+      "age_other": "{{count}} años",
+      "nextAppointment": "Próxima cita",
+      "noAppointment": "Sin cita",
+      "pendingConfirmation": "Por confirmar",
+      "schedule": "Agendar",
+      "reschedule": "Reagendar",
+      "contacts": "Contactos",
+      "patientContact": "Paciente",
+      "editContacts": "Editar contactos",
+      "fields": {
+        "documentId": "Cédula",
+        "birthDate": "Nacimiento",
+        "branch": "Sede"
+      },
+      "actions": {
+        "more": "Más acciones",
+        "edit": "Modificar paciente",
+        "changeStatus": "Cambiar estado"
+      }
+    },
+    "contacts": {
+      "title": "Contactos",
+      "caption": "El primer teléfono es el principal: a ese se llama y se envían los recordatorios.",
+      "primary": "Contacto principal",
+      "contact": "Contacto",
+      "nameHint": "Vacío si es del paciente. Si es de un familiar: María (hija)",
+      "phone": "Teléfono",
+      "phoneHint": "Formato: 8888-8888",
+      "remove": "Quitar contacto",
+      "add": "Agregar contacto",
+      "saved": "Contactos guardados"
     }
   }
 }
