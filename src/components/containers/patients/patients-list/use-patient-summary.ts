@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   NextAppointmentKind,
-  PatientListFilters,
   PatientStatusFilter,
   usePatientsQuery,
 } from '@/shared/api/querys/patients-query';
@@ -10,8 +9,13 @@ import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-
 import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { toDayKey, toMonthKey } from '@/shared/utils/dates';
 import { TEXT } from '@/static/texts/i18n';
-import { PatientFlag, PatientStatus } from '@/types/patients/patient';
-import { PatientListPreset } from './use-patient-list';
+import { PatientFlag } from '@/types/patients/patient';
+import {
+  PatientListPreset,
+  PatientListSelection,
+  applyPresetTo,
+  toPatientListFilters,
+} from './patient-list-selection';
 
 /** Con limit 1 la consulta solo trae el total: es lo único que muestra la tarjeta. */
 const COUNT_LIMIT = 1;
@@ -29,28 +33,23 @@ export interface PatientSummaryCard {
   preset: PatientListPreset;
 }
 
-/** Cuenta los pacientes activos que mostraría la lista con los filtros de la tarjeta. */
-function useCount(preset: PatientListPreset, isEnabled: boolean) {
-  const filters: PatientListFilters = {
-    statuses: [PatientStatus.ACTIVE],
-    nextAppointmentKinds: preset.kinds,
-    appointmentTypeUuids: preset.types,
-    hearingAidsInLab: preset.flags?.includes(PatientFlag.HEARING_AIDS_IN_LAB),
-  };
+/** Cuenta los pacientes que mostraría la lista al tocar la tarjeta, con los filtros actuales. */
+function useCount(selection: PatientListSelection, preset: PatientListPreset, isEnabled: boolean) {
+  const cardSelection = applyPresetTo(selection, preset);
   const { data } = usePatientsQuery(
     1,
     COUNT_LIMIT,
-    '',
+    cardSelection.search,
     PatientStatusFilter.ALL,
-    preset.months,
-    filters,
+    cardSelection.months,
+    toPatientListFilters(cardSelection),
     isEnabled,
   );
   return data?.meta.total;
 }
 
 /** Resumen sobre la lista de pacientes. Solo en escritorio: en el celular ni se consulta. */
-export function usePatientSummary() {
+export function usePatientSummary(selection: PatientListSelection) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
@@ -70,10 +69,14 @@ export function usePatientSummary() {
     [currentMonth, controlTypeUuid],
   );
 
-  const confirmedCount = useCount(presets.confirmed, isDesktop);
-  const tentativeCount = useCount(presets.tentative, isDesktop);
-  const controlsCount = useCount(presets.controls, isDesktop && Boolean(controlTypeUuid));
-  const hearingAidsCount = useCount(presets.hearingAids, isDesktop);
+  const confirmedCount = useCount(selection, presets.confirmed, isDesktop);
+  const tentativeCount = useCount(selection, presets.tentative, isDesktop);
+  const controlsCount = useCount(
+    selection,
+    presets.controls,
+    isDesktop && Boolean(controlTypeUuid),
+  );
+  const hearingAidsCount = useCount(selection, presets.hearingAids, isDesktop);
 
   const cards: PatientSummaryCard[] = [
     {

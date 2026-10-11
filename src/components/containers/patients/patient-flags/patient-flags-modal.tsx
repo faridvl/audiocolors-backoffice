@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Ear } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Switch } from '@/components/common/switch/switch';
+import { Tabs } from '@/components/common/tabs/tabs';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
@@ -17,7 +18,8 @@ interface PatientFlagsModalProps {
 /** Prender o apagar los indicadores: cada switch guarda al tocarlo, sin botón de guardar. */
 export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, onClose }) => {
   const { t } = useTranslation();
-  const { flags, handleToggle } = usePatientFlags(patient);
+  const { sections, activeSection, activeFlags, handleToggle, handleSectionChange } =
+    usePatientFlags(patient);
   useEscapeKey(onClose);
 
   return (
@@ -46,14 +48,20 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
           </div>
         </div>
 
-        <div className="mt-5 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
-          {flags.map((item) => (
+        <Tabs
+          items={sections.map((section) => ({ value: section.key, label: section.title }))}
+          value={activeSection}
+          onChange={handleSectionChange}
+          ariaLabel={t(TEXT.PATIENTS.FLAGS.TITLE)}
+          className="mt-5"
+        />
+        <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
+          {activeFlags.map((item) => (
             <Switch
               key={item.flag}
               isChecked={item.isOn}
               onChange={(isOn) => handleToggle(item.flag, isOn)}
               label={item.label}
-              description={item.sinceLabel}
               isLoading={item.isUpdating}
               className="w-full py-2"
             />

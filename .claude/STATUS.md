@@ -2,7 +2,7 @@
 
 > Documento vivo. Actualizar al cierre de cada etapa, antes de `git push`.
 
-**Última actualización:** 2026-09-15 · **Branch:** `main`
+**Última actualización:** 2026-10-10 · **Branch:** `feature/resumen-segun-filtros`
 
 ---
 
@@ -68,6 +68,13 @@ agenda (se reconocen porque se "completaron" antes de su propia fecha).
 Límites conocidos: el API no guarda la hora real (todas a las 08:00 UTC) ni el
 profesional que atiende; la fila muestra quién **agendó**.
 
+### Etapa 6 — Ajustes de pacientes y expediente
+Tarjetas del resumen según los filtros (D14). Expediente rediseñado en tres
+franjas, con los datos siempre visibles (D11). Contactos editables en un modal
+(D12). Indicadores en pestañas y sin fechas, y candidato a video como casilla
+(D13). Al confirmar una cita se puede elegir la hora (8:00 a 17:00), con el
+mismo guardado que la agenda.
+
 ---
 
 ## 📋 Pendientes
@@ -84,6 +91,7 @@ profesional que atiende; la fila muestra quién **agendó**.
 | P1-1 | Logo en SVG | El actual sale de vectores rasterizados a 1400px. Exportar SVG desde Illustrator da calidad infinita |
 | P1-2 | Limpiar el paciente inactivo huérfano | Requiere acceso a DB: el API no permite reactivar ni borrar del todo (ver D9) |
 | P1-3 | Paginación real del filtro "Inactivos" | Hoy filtra en cliente y su conteo no es exacto. Requiere cambio en el API |
+| P1-5 | Migrar a i18n el resto del módulo de pacientes | Lista (`patient-list-container`, `use-patient-list`), formulario y mensajes de `patient-validation` siguen con texto suelto |
 | P1-4 | **Migrar a i18n** (`i18next` + `es.json`, patrón de Zynka) | Revierte la regla anterior de "sin i18n" — ver RULES.md §5.2. Instalar `i18next`/`react-i18next`, crear `src/shared/i18n/i18n.ts` + `src/static/texts/i18n.ts` (`TEXT` const) + `es.json`, y migrar los ~17 archivos `.tsx` con strings hardcodeados. Magastore NO sirve de referencia de uso real (tiene el setup pero 0% adoptado); usar Zynka como modelo de convención de keys. |
 
 ### ⚪ Si el uso lo pide

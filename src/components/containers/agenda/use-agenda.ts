@@ -28,7 +28,7 @@ import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
 import { Patient, PatientStatus } from '@/types/patients/patient';
-import { ScheduleMode } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
+import { ScheduleMode } from '@/components/containers/patients/schedule-appointment/use-schedule-appointment';
 import {
   addDays,
   buildWeekDayKeys,

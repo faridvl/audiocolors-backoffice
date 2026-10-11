@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { DocumentType, PatientGender } from '@/types/patients/patient';
+import { PatientContact } from '@/types/patients/patient-contact';
 
 const NAME_REGEX = /^[a-zA-ZaeiouAEIOUuUnN\u00C0-\u017F\s]+$/;
 
@@ -65,11 +66,18 @@ export const patientCreateValidationSchema = Yup.object({
   contacts: buildContactsField(Yup.string().matches(LOCAL_PHONE_PATTERN, 'Formato: XXXX-XXXX')),
 });
 
+// Pacientes viejos pueden tener un teléfono extranjero o sin el formato local.
+const editContactsField = buildContactsField(
+  Yup.string().matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido'),
+);
+
 export const patientEditValidationSchema = Yup.object({
   ...baseFields,
-  // Pacientes viejos pueden tener un teléfono extranjero o sin el formato local.
-  contacts: buildContactsField(Yup.string().matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido')),
+  contacts: editContactsField,
 });
+
+/** Solo los contactos, para editarlos desde el expediente sin abrir el formulario entero. */
+export const patientContactsValidationSchema = Yup.object({ contacts: editContactsField });
 
 export interface PatientContactFormValues {
   /** Presente solo si el contacto ya existía al abrir el formulario. */
@@ -128,4 +136,26 @@ export function toContactPhone(patientPhone: string): string {
 export function isSamePhone(first: string, second: string): boolean {
   const lastDigits = (phone: string) => phone.replace(/\D/g, '').slice(-8);
   return lastDigits(first) !== '' && lastDigits(first) === lastDigits(second);
+}
+
+/**
+ * El contacto con el teléfono del paciente va primero, porque el primero es el
+ * principal. Si ninguno lo tiene (pacientes de antes de los contactos), ese
+ * teléfono entra como primer contacto con el nombre del paciente.
+ */
+export function buildInitialContacts(
+  contacts: PatientContact[],
+  patientPhone: string | undefined,
+  patientFullName: string,
+): PatientContactFormValues[] {
+  const formContacts = contacts.map(({ uuid, name, phone }) => ({ uuid, name, phone }));
+  if (!patientPhone) {
+    return formContacts.length > 0 ? formContacts : [{ name: '', phone: '' }];
+  }
+
+  const primary = formContacts.find((contact) => isSamePhone(contact.phone, patientPhone));
+  if (!primary) {
+    return [{ name: patientFullName, phone: toContactPhone(patientPhone) }, ...formContacts];
+  }
+  return [primary, ...formContacts.filter((contact) => contact !== primary)];
 }

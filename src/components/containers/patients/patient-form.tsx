@@ -1,15 +1,12 @@
 import React from 'react';
-import { Form, useFormikContext, FieldArray } from 'formik';
-import { Save, X, Plus, Trash2 } from 'lucide-react';
+import { Form, useFormikContext } from 'formik';
+import { Save, X } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { FormSelectField } from '@/components/common/form/form-select-field';
 import { FormViewSection } from '@/components/common/form/form-view-section';
-import {
-  PatientNameFillButton,
-  buildPatientFullName,
-} from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
+import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
+import { PatientContactsFields } from '@/components/containers/patients/patient-contacts/patient-contacts-fields';
 import {
   DocumentType,
   DOCUMENT_TYPE_LABELS,
@@ -18,12 +15,7 @@ import {
 } from '@/types/patients/patient';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { getBranchStripeColor } from '@/shared/design/tokens';
-import {
-  DOCUMENT_MASKS,
-  formatNationalId,
-  formatPhone,
-  PatientFormValues,
-} from './patient-validation';
+import { DOCUMENT_MASKS, formatNationalId, PatientFormValues } from './patient-validation';
 
 interface PatientFormProps {
   submitLabel: string;
@@ -104,89 +96,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <FieldArray name="contacts">
-              {({ push, remove }) => {
-                const lastContact = values.contacts[values.contacts.length - 1];
-                const canAddAnother = !lastContact || !!lastContact.phone.trim();
-
-                return (
-                  <div className="flex flex-col gap-3">
-                    {values.contacts.map((contact, index) => (
-                      <div key={contact.uuid ?? index} className="flex items-start gap-2">
-                        <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-start">
-                          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                            <FormField
-                              name={`contacts.${index}.name`}
-                              label={index === 0 ? 'Contacto principal' : 'Contacto'}
-                              hint="Vacío si es del paciente. Si es de un familiar: María (hija)"
-                              maxLength={80}
-                              endAdornment={
-                                <PatientNameFillButton
-                                  disabled={!patientFullName}
-                                  onClick={() =>
-                                    setFieldValue(
-                                      `contacts.${index}.name`,
-                                      patientFullName.slice(0, 80),
-                                    )
-                                  }
-                                />
-                              }
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1.5">
-                            <FormField
-                              name={`contacts.${index}.phone`}
-                              label="Teléfono"
-                              hint="Formato: 8888-8888"
-                              inputMode="tel"
-                              required
-                              onChange={(event) =>
-                                setFieldValue(
-                                  `contacts.${index}.phone`,
-                                  formatPhone(event.target.value),
-                                )
-                              }
-                              className="sm:w-40"
-                            />
-                          </div>
-                        </div>
-                        {values.contacts.length > 1 && (
-                          // Mismo alto de etiqueta que los campos, para quedar a la par del input.
-                          <div className="flex shrink-0 flex-col gap-1.5">
-                            <Typography
-                              variant={TypographyVariant.BODY}
-                              className="invisible"
-                              aria-hidden
-                            >
-                              &nbsp;
-                            </Typography>
-                            <button
-                              type="button"
-                              onClick={() => remove(index)}
-                              aria-label="Quitar contacto"
-                              className="flex h-[46px] w-10 items-center justify-center rounded-lg text-ink-400 transition-colors hover:bg-danger/10 hover:text-danger"
-                            >
-                              <Trash2 className="h-4 w-4" aria-hidden />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-
-                    {canAddAnother && (
-                      <button
-                        type="button"
-                        onClick={() => push({ name: '', phone: '' })}
-                        className="flex w-fit items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline"
-                      >
-                        <Plus className="h-3.5 w-3.5" aria-hidden />
-                        Agregar contacto
-                      </button>
-                    )}
-                  </div>
-                );
-              }}
-            </FieldArray>
+            <PatientContactsFields patientFullName={patientFullName} />
           </div>
 
           <FormField
