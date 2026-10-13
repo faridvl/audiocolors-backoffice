@@ -109,7 +109,6 @@ export enum AppointmentAction {
   SET_TIME = 'SET_TIME',
   RESCHEDULE = 'RESCHEDULE',
   WHATSAPP = 'WHATSAPP',
-  CALENDAR = 'CALENDAR',
   /** Deshace la confirmación: vuelve a quedar solo el mes (lo mismo que arrastrarla a "Por confirmar"). */
   RETURN_TO_PENDING = 'RETURN_TO_PENDING',
 }
@@ -128,7 +127,6 @@ export function resolveAppointmentActions(
     ...(canMove ? [AppointmentAction.SET_TIME] : []),
     AppointmentAction.RESCHEDULE,
     AppointmentAction.WHATSAPP,
-    AppointmentAction.CALENDAR,
     ...(canMove ? [AppointmentAction.RETURN_TO_PENDING] : []),
   ];
 

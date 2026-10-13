@@ -93,7 +93,6 @@ export const TEXT = {
       VIEW_PATIENT: 'agenda.menu.viewPatient',
       RESCHEDULE: 'agenda.menu.reschedule',
       WHATSAPP: 'agenda.menu.whatsapp',
-      CALENDAR: 'agenda.menu.calendar',
       UNDO_ARRIVED: 'agenda.menu.undoArrived',
       SET_TIME: 'agenda.menu.setTime',
       CHANGE_TIME: 'agenda.menu.changeTime',
@@ -118,10 +117,6 @@ export const TEXT = {
       PHONE_ERROR: 'agenda.toasts.phoneError',
     },
     WHATSAPP_MESSAGE: 'agenda.whatsappMessage',
-    CALENDAR_EVENT: {
-      TITLE: 'agenda.calendarEvent.title',
-      DESCRIPTION: 'agenda.calendarEvent.description',
-    },
     STATES: {
       EMPTY_TITLE: 'agenda.states.emptyTitle',
       EMPTY_DESCRIPTION: 'agenda.states.emptyDescription',

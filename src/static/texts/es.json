@@ -104,7 +104,6 @@
       "viewPatient": "Ver expediente",
       "reschedule": "Reagendar",
       "whatsapp": "Recordar por WhatsApp",
-      "calendar": "Agregar a mi calendario",
       "undoArrived": "Volver a por llegar",
       "setTime": "Poner hora",
       "changeTime": "Cambiar hora",
@@ -129,10 +128,6 @@
       "phoneError": "No se pudo cargar el teléfono del paciente"
     },
     "whatsappMessage": "Hola {{name}}, le recordamos su cita en AudioColors el {{date}}. ¡Le esperamos!",
-    "calendarEvent": {
-      "title": "Cita AudioColors · {{name}}",
-      "description": "{{type}}. Evento de día completo: la hora la confirma la clínica."
-    },
     "states": {
       "emptyTitle": "No hay citas este día",
       "emptyDescription": "Agenda una cita nueva o elige otro día.",
