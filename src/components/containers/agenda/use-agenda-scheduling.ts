@@ -7,6 +7,7 @@ import { useSetTentativeMonthMutation } from '@/shared/api/mutations/patients/se
 import { useUpdateAppointmentStatusMutation } from '@/shared/api/mutations/appointments/update-appointment-status-mutation';
 import { useUpdateAppointmentTimeMutation } from '@/shared/api/mutations/appointments/update-appointment-time-mutation';
 import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
+import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-months-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
@@ -15,7 +16,7 @@ import { EMPTY_VALUE, getFullName } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
 import { Patient } from '@/types/patients/patient';
-import { buildSlotTimes, resolveSlotHour } from './agenda-presenter';
+import { buildSlotTimes, resolveSlotHour, resolveTypeDuration } from './agenda-presenter';
 
 /** Algo que se está guardando: se muestra en su destino mientras tanto. */
 export interface SavingItem {
@@ -53,6 +54,7 @@ export function useAgendaScheduling() {
   const { executeUpdateAppointmentTimeAsync } = useUpdateAppointmentTimeMutation();
   const { executeSetTentativeMonthAsync } = useSetTentativeMonthMutation();
   const { executeUpdateAppointmentStatusAsync } = useUpdateAppointmentStatusMutation();
+  const { data: appointmentTypes } = useAppointmentTypesQuery();
 
   const [savingItems, setSavingItems] = useState<SavingItem[]>([]);
   const savingIds = useMemo(() => new Set(savingItems.map((item) => item.id)), [savingItems]);
@@ -96,7 +98,11 @@ export function useAgendaScheduling() {
       try {
         await executeUpdateAppointmentTimeAsync({
           appointmentUuid: appointment.id,
-          ...buildSlotTimes(dayKey, hour),
+          ...buildSlotTimes(
+            dayKey,
+            hour,
+            resolveTypeDuration(appointmentTypes, patient.tentativeAppointmentTypeUuid),
+          ),
         });
       } catch {
         toast.error(t(TEXT.AGENDA.BOARD.TOASTS.TIME_ERROR, { name }));
@@ -114,7 +120,11 @@ export function useAgendaScheduling() {
     return track({ id: appointment.id, title: name, dayKey, hour }, async () => {
       await executeUpdateAppointmentTimeAsync({
         appointmentUuid: appointment.id,
-        ...buildSlotTimes(dayKey, hour),
+        ...buildSlotTimes(
+          dayKey,
+          hour,
+          resolveTypeDuration(appointmentTypes, appointment.typeUUID),
+        ),
       });
       toast.success(t(TEXT.AGENDA.BOARD.TOASTS.MOVED, { name, hour: formatHour(hour) }));
     });

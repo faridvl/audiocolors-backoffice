@@ -1,4 +1,5 @@
 import React from 'react';
+import { useDragAutoScroll } from '@/hooks/use-drag-auto-scroll';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
@@ -38,7 +39,7 @@ const UnscheduledBlock: React.FC<Pick<DayPanelProps, 'agenda' | 'board'>> = ({ a
         {t(TEXT.AGENDA.BOARD.NO_TIME)} · {board.unscheduledAppointments.length}
       </Typography>
       <Typography variant={TypographyVariant.HELPER} className="mb-2">
-        {t(TEXT.AGENDA.BOARD.NO_TIME_HINT)}
+        {t(board.isDayOpen ? TEXT.AGENDA.BOARD.NO_TIME_HINT : TEXT.AGENDA.BOARD.NO_TIME_PAST_HINT)}
       </Typography>
       <ul className="flex flex-col gap-1.5">
         {board.unscheduledAppointments.map((appointment) => (
@@ -50,6 +51,7 @@ const UnscheduledBlock: React.FC<Pick<DayPanelProps, 'agenda' | 'board'>> = ({ a
             typeColor={agenda.resolveTypeColor(appointment.typeUUID)}
             branchName={agenda.resolveBranchName(appointment.branchUUID)}
             drag={board.dragAppointment(appointment)}
+            isDragSource={board.isDragSource(appointment.id)}
             density={RowDensity.COMPACT}
             onClick={() => agenda.handleOpenAppointment(appointment.id)}
           />
@@ -65,14 +67,18 @@ const UnscheduledBlock: React.FC<Pick<DayPanelProps, 'agenda' | 'board'>> = ({ a
  */
 export const DayPanel: React.FC<DayPanelProps> = ({ agenda, board, side, onClose }) => {
   const { t } = useTranslation();
+  const { containerRef, handleDragOver } = useDragAutoScroll<HTMLDivElement>();
 
   useEscapeKey(onClose);
 
   return (
     <section
       aria-label={agenda.dayTitle}
+      onDragOver={handleDragOver}
       className={tailwind(
-        'absolute bottom-3 top-3 z-20 flex w-80 flex-col rounded-card border border-ink-200 bg-white shadow-xl',
+        // Nunca más ancha que la tarjeta del calendario (si no, se mete bajo el menú
+        // lateral), pero sí más alta: así el día entero entra sin scroll.
+        'absolute top-3 z-20 flex max-h-[calc(100dvh-9rem)] min-h-[calc(100%-1.5rem)] w-80 max-w-[calc(100%-1.5rem)] flex-col rounded-card border border-ink-200 bg-white shadow-xl motion-safe:animate-fade-in',
         SIDE_STYLES[side],
       )}
     >
@@ -84,6 +90,12 @@ export const DayPanel: React.FC<DayPanelProps> = ({ agenda, board, side, onClose
           <Typography variant={TypographyVariant.HELPER}>
             {t(TEXT.AGENDA.BOARD.COUNT, { count: agenda.dayCount })}
           </Typography>
+          {/* En el encabezado y no en la lista: con scroll, el aviso quedaba fuera de la vista. */}
+          {!board.isDayOpen && (
+            <Typography variant={TypographyVariant.HELPER} className="mt-1 text-warning">
+              {t(TEXT.AGENDA.BOARD.PAST_DAY)}
+            </Typography>
+          )}
         </div>
         <Button
           variant={ButtonVariant.GHOST}
@@ -94,13 +106,10 @@ export const DayPanel: React.FC<DayPanelProps> = ({ agenda, board, side, onClose
         />
       </header>
 
-      <div className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto overflow-x-hidden p-3">
-        {!board.isDayOpen && (
-          <Typography variant={TypographyVariant.HELPER} className="rounded-lg bg-ink-50 px-3 py-2">
-            {t(TEXT.AGENDA.BOARD.PAST_DAY)}
-          </Typography>
-        )}
-
+      <div
+        ref={containerRef}
+        className="flex min-w-0 flex-1 flex-col gap-3 overflow-y-auto overflow-x-hidden p-3"
+      >
         {agenda.isLoading && <AgendaLoading />}
         {agenda.isError && <AgendaError onRetry={() => void agenda.handleRetry()} />}
 

@@ -26,8 +26,22 @@ export const PendingColumn: React.FC<PendingColumnProps> = ({ agenda, board, isD
   const patients = agenda.pendingPatients;
   const { selectedPending } = board;
 
+  // Arrastrando una cita, el aviso cambia de texto en su lugar: la lista no se corre.
+  const hint = board.isDraggingAppointment
+    ? t(TEXT.AGENDA.BOARD.RETURN_HERE)
+    : patients.length > 0
+      ? t(TEXT.AGENDA.BOARD.PENDING_HINT)
+      : null;
+
   return (
-    <section className="flex flex-col gap-3 rounded-card border border-ink-200 bg-white p-4">
+    <DropZone
+      accepts={board.acceptsOnPending}
+      onDrop={board.handleDropOnPending}
+      className={tailwind(
+        'flex flex-col gap-3 rounded-card border border-ink-200 bg-white p-4',
+        board.isDraggingAppointment && 'border-dashed border-brand/60',
+      )}
+    >
       <header>
         <Typography variant={TypographyVariant.SUBTITLE} as="h2">
           {t(TEXT.AGENDA.TABS.PENDING)}{' '}
@@ -52,55 +66,41 @@ export const PendingColumn: React.FC<PendingColumnProps> = ({ agenda, board, isD
         />
       )}
 
-      {!selectedPending && patients.length > 0 && (
+      {!selectedPending && hint && (
         <Typography
           variant={TypographyVariant.HELPER}
           className="rounded-lg bg-brand-50 px-3 py-2 text-brand-700"
         >
-          {t(TEXT.AGENDA.BOARD.PENDING_HINT)}
+          {hint}
         </Typography>
       )}
 
-      <DropZone
-        accepts={board.acceptsOnPending}
-        onDrop={board.handleDropOnPending}
-        className={tailwind(
-          'rounded-lg p-1',
-          board.isDraggingAppointment && 'border border-dashed border-ink-300',
-        )}
-      >
-        {board.isDraggingAppointment && (
-          <Typography variant={TypographyVariant.HELPER} className="px-2 py-1 text-center">
-            {t(TEXT.AGENDA.BOARD.RETURN_HERE)}
-          </Typography>
-        )}
-
-        {patients.length === 0 && board.returningItems.length === 0 ? (
-          <Typography variant={TypographyVariant.HELPER} className="py-8 text-center">
-            {t(TEXT.AGENDA.PENDING.EMPTY, { month: agenda.pendingMonthLabel })}
-          </Typography>
-        ) : (
-          <ul className="flex flex-col gap-1.5">
-            {board.returningItems.map((item) => (
-              <SavingRow key={item.id} title={item.title} />
-            ))}
-            {patients.map((patient) => (
-              <ListRow
-                key={patient.uuid}
-                title={getFullName(patient.firstName, patient.lastName)}
-                subtitle={patient.tentativeAppointmentTypeName ?? t(TEXT.AGENDA.ROW.NO_TYPE)}
-                branchName={agenda.resolveBranchName(patient.branchUuid)}
-                drag={board.dragPending(patient)}
-                className={tailwind(
-                  patient.uuid === selectedPending?.uuid &&
-                    'border-brand bg-brand-50 ring-2 ring-brand',
-                )}
-                onClick={() => board.handleTogglePending(patient)}
-              />
-            ))}
-          </ul>
-        )}
-      </DropZone>
-    </section>
+      {patients.length === 0 && board.returningItems.length === 0 ? (
+        <Typography variant={TypographyVariant.HELPER} className="py-8 text-center">
+          {t(TEXT.AGENDA.PENDING.EMPTY, { month: agenda.pendingMonthLabel })}
+        </Typography>
+      ) : (
+        <ul className="flex flex-col gap-1.5">
+          {board.returningItems.map((item) => (
+            <SavingRow key={item.id} title={item.title} />
+          ))}
+          {patients.map((patient) => (
+            <ListRow
+              key={patient.uuid}
+              title={getFullName(patient.firstName, patient.lastName)}
+              subtitle={patient.tentativeAppointmentTypeName ?? t(TEXT.AGENDA.ROW.NO_TYPE)}
+              branchName={agenda.resolveBranchName(patient.branchUuid)}
+              drag={board.dragPending(patient)}
+              isDragSource={board.isDragSource(patient.uuid)}
+              className={tailwind(
+                patient.uuid === selectedPending?.uuid &&
+                  'border-brand bg-brand-50 ring-2 ring-brand',
+              )}
+              onClick={() => board.handleTogglePending(patient)}
+            />
+          ))}
+        </ul>
+      )}
+    </DropZone>
   );
 };
