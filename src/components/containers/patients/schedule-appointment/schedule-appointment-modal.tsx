@@ -123,6 +123,36 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
         )}
 
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-5">
+          {/* El tipo va primero y en los dos modos: define cuánto dura la cita,
+              se sabe desde que se anota el mes y al confirmar el día llega precargado. */}
+          {!isConfirmingClear && (
+            <div className="flex flex-col gap-1.5">
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
+                {t(TEXT.PATIENTS.SCHEDULE.TYPE_LABEL)}
+                <span className="ml-0.5 text-danger">*</span>
+              </Typography>
+              <PillSelect
+                variant={PillSelectVariant.FIELD}
+                ariaLabel={t(TEXT.PATIENTS.SCHEDULE.TYPE_LABEL)}
+                value={selectedTypeUuid}
+                onChange={handleTypeChange}
+                placeholder={t(TEXT.PATIENTS.SCHEDULE.TYPE_PLACEHOLDER)}
+                options={appointmentTypes.map((appointmentType) => ({
+                  value: appointmentType.uuid,
+                  label: appointmentType.name,
+                }))}
+              />
+              {/* El catalogo de tipos no se administra desde el backoffice: si
+                el tenant no tiene ninguno, sin este aviso el selector queda
+                vacio y no se entiende por que no se puede guardar. */}
+              {hasNoAppointmentTypes && (
+                <Typography variant={TypographyVariant.HELPER} className="text-danger">
+                  {t(TEXT.PATIENTS.SCHEDULE.NO_TYPES)}
+                </Typography>
+              )}
+            </div>
+          )}
+
           {mode === ScheduleMode.MONTH && (
             <div className="flex flex-col gap-1.5">
               <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
@@ -185,36 +215,6 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
                   className="sm:w-44"
                 />
               </div>
-            </div>
-          )}
-
-          {/* El tipo va en los dos modos: de que es la cita se sabe desde que
-              se anota el mes, y al confirmar el dia llega ya precargado. */}
-          {!isConfirmingClear && (
-            <div className="flex flex-col gap-1.5">
-              <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
-                {t(TEXT.PATIENTS.SCHEDULE.TYPE_LABEL)}
-                <span className="ml-0.5 text-danger">*</span>
-              </Typography>
-              <PillSelect
-                variant={PillSelectVariant.FIELD}
-                ariaLabel={t(TEXT.PATIENTS.SCHEDULE.TYPE_LABEL)}
-                value={selectedTypeUuid}
-                onChange={handleTypeChange}
-                placeholder={t(TEXT.PATIENTS.SCHEDULE.TYPE_PLACEHOLDER)}
-                options={appointmentTypes.map((appointmentType) => ({
-                  value: appointmentType.uuid,
-                  label: appointmentType.name,
-                }))}
-              />
-              {/* El catalogo de tipos no se administra desde el backoffice: si
-                el tenant no tiene ninguno, sin este aviso el selector queda
-                vacio y no se entiende por que no se puede guardar. */}
-              {hasNoAppointmentTypes && (
-                <Typography variant={TypographyVariant.HELPER} className="text-danger">
-                  {t(TEXT.PATIENTS.SCHEDULE.NO_TYPES)}
-                </Typography>
-              )}
             </div>
           )}
 
