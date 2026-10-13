@@ -160,8 +160,9 @@
       "count_other": "{{count}} citas",
       "noTime": "Sin hora asignada",
       "noTimeHint": "Confirmadas sin hora. Arrástralas a un horario.",
-      "dropHere": "Suelta aquí",
-      "pastDay": "Este día ya pasó: no se pueden agendar citas.",
+      "noTimePastHint": "Quedaron confirmadas sin hora.",
+      "dropHere": "Soltar aquí",
+      "pastDay": "Este día ya pasó: no se pueden agendar ni mover citas.",
       "pendingHint": "Arrastra un paciente a un horario, o tócalo y después toca el horario.",
       "slotAria_one": "{{hour}}, {{count}} cita",
       "slotAria_other": "{{hour}}, {{count}} citas",
@@ -172,7 +173,7 @@
         "timeError": "La cita de {{name}} quedó confirmada sin hora. Arrástrala de nuevo a un horario.",
         "returned": "{{name}} volvió a por confirmar"
       },
-      "returnHere": "Suelta aquí para dejarla por confirmar",
+      "returnHere": "Suéltala aquí para dejarla por confirmar",
       "selection": {
         "title": "Elige un horario para {{name}}",
         "openDayHint": "Toca un día del calendario y después un horario.",

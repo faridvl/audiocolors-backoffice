@@ -175,6 +175,7 @@ export const TEXT = {
       COUNT: 'agenda.board.count',
       NO_TIME: 'agenda.board.noTime',
       NO_TIME_HINT: 'agenda.board.noTimeHint',
+      NO_TIME_PAST_HINT: 'agenda.board.noTimePastHint',
       DROP_HERE: 'agenda.board.dropHere',
       PAST_DAY: 'agenda.board.pastDay',
       PENDING_HINT: 'agenda.board.pendingHint',
