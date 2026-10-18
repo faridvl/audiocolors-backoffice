@@ -104,7 +104,6 @@
       "viewPatient": "Ver expediente",
       "reschedule": "Reagendar",
       "whatsapp": "Recordar por WhatsApp",
-      "calendar": "Agregar a mi calendario",
       "undoArrived": "Volver a por llegar",
       "setTime": "Poner hora",
       "changeTime": "Cambiar hora",
@@ -129,10 +128,6 @@
       "phoneError": "No se pudo cargar el teléfono del paciente"
     },
     "whatsappMessage": "Hola {{name}}, le recordamos su cita en AudioColors el {{date}}. ¡Le esperamos!",
-    "calendarEvent": {
-      "title": "Cita AudioColors · {{name}}",
-      "description": "{{type}}. Evento de día completo: la hora la confirma la clínica."
-    },
     "states": {
       "emptyTitle": "No hay citas este día",
       "emptyDescription": "Agenda una cita nueva o elige otro día.",
@@ -160,8 +155,9 @@
       "count_other": "{{count}} citas",
       "noTime": "Sin hora asignada",
       "noTimeHint": "Confirmadas sin hora. Arrástralas a un horario.",
-      "dropHere": "Suelta aquí",
-      "pastDay": "Este día ya pasó: no se pueden agendar citas.",
+      "noTimePastHint": "Quedaron confirmadas sin hora.",
+      "dropHere": "Soltar aquí",
+      "pastDay": "Este día ya pasó: no se pueden agendar ni mover citas.",
       "pendingHint": "Arrastra un paciente a un horario, o tócalo y después toca el horario.",
       "slotAria_one": "{{hour}}, {{count}} cita",
       "slotAria_other": "{{hour}}, {{count}} citas",
@@ -172,7 +168,7 @@
         "timeError": "La cita de {{name}} quedó confirmada sin hora. Arrástrala de nuevo a un horario.",
         "returned": "{{name}} volvió a por confirmar"
       },
-      "returnHere": "Suelta aquí para dejarla por confirmar",
+      "returnHere": "Suéltala aquí para dejarla por confirmar",
       "selection": {
         "title": "Elige un horario para {{name}}",
         "openDayHint": "Toca un día del calendario y después un horario.",

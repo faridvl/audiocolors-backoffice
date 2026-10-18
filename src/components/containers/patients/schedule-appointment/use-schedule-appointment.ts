@@ -14,6 +14,7 @@ import { useUpdateAppointmentTimeMutation } from '@/shared/api/mutations/appoint
 import {
   buildSlotHours,
   buildSlotTimes,
+  resolveTypeDuration,
   toSlotHour,
 } from '@/components/containers/agenda/agenda-presenter';
 import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
@@ -231,7 +232,7 @@ export function useScheduleAppointment({
         try {
           await executeUpdateAppointmentTimeAsync({
             appointmentUuid: appointment.id,
-            ...buildSlotTimes(date, hour),
+            ...buildSlotTimes(date, hour, resolveTypeDuration(appointmentTypes, selectedTypeUuid)),
           });
           toast.success(
             t(TEXT.PATIENTS.SCHEDULE.TOASTS.SCHEDULED_AT, {

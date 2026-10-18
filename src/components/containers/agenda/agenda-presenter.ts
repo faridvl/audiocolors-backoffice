@@ -6,6 +6,7 @@ import {
   weekdayIndex,
 } from '@/shared/utils/dates';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
+import { AppointmentType } from '@/types/appointments/appointment-type';
 
 /**
  * Grupos del día. Hoy y los días pasados se leen como una fila de llegada
@@ -109,7 +110,6 @@ export enum AppointmentAction {
   SET_TIME = 'SET_TIME',
   RESCHEDULE = 'RESCHEDULE',
   WHATSAPP = 'WHATSAPP',
-  CALENDAR = 'CALENDAR',
   /** Deshace la confirmación: vuelve a quedar solo el mes (lo mismo que arrastrarla a "Por confirmar"). */
   RETURN_TO_PENDING = 'RETURN_TO_PENDING',
 }
@@ -128,7 +128,6 @@ export function resolveAppointmentActions(
     ...(canMove ? [AppointmentAction.SET_TIME] : []),
     AppointmentAction.RESCHEDULE,
     AppointmentAction.WHATSAPP,
-    AppointmentAction.CALENDAR,
     ...(canMove ? [AppointmentAction.RETURN_TO_PENDING] : []),
   ];
 
@@ -163,8 +162,17 @@ export enum SlotHour {
   LAST = 17,
 }
 
-/** Mismo largo que usa el API al crear la cita. */
-export const SLOT_DURATION_MINUTES = 30;
+/** Largo de una cita cuyo tipo no tiene duración: el mismo que usa el API al crearla. */
+export const DEFAULT_APPOINTMENT_DURATION_MINUTES = 30;
+
+/** Duración de un tipo de cita (dato de la clínica en el API), o la de por defecto. */
+export function resolveTypeDuration(
+  appointmentTypes: AppointmentType[] | undefined,
+  typeUuid: string | null | undefined,
+): number {
+  const type = appointmentTypes?.find((appointmentType) => appointmentType.uuid === typeUuid);
+  return type?.duration ?? DEFAULT_APPOINTMENT_DURATION_MINUTES;
+}
 
 export function buildSlotHours(): number[] {
   return Array.from(
@@ -188,15 +196,16 @@ export function toSlotHour(isoDate: string): number | null {
   return hour >= SlotHour.FIRST && hour <= SlotHour.LAST ? hour : null;
 }
 
-/** Inicio y fin (ISO) de un horario de un día, en la hora local de la clínica. */
+/** Inicio y fin (ISO) de una cita en un horario del día, en la hora local de la clínica. */
 export function buildSlotTimes(
   dayKey: string,
   hour: number,
+  durationMinutes: number,
 ): { startTime: string; endTime: string } {
   const start = atHour(dayKey, hour);
   return {
     startTime: start.toISOString(),
-    endTime: addMinutes(start, SLOT_DURATION_MINUTES).toISOString(),
+    endTime: addMinutes(start, durationMinutes).toISOString(),
   };
 }
 

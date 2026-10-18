@@ -30,6 +30,8 @@ interface ListRowProps {
   isMuted?: boolean;
   trailing?: React.ReactNode;
   drag?: RowDragProps;
+  /** Es la fila que se está arrastrando: queda atenuada en su lugar. */
+  isDragSource?: boolean;
   density?: RowDensity;
   onClick: () => void;
 }
@@ -44,6 +46,7 @@ export const ListRow: React.FC<ListRowProps> = ({
   isMuted = false,
   trailing,
   drag,
+  isDragSource = false,
   density = RowDensity.REGULAR,
   onClick,
 }) => {
@@ -62,6 +65,7 @@ export const ListRow: React.FC<ListRowProps> = ({
           ROW_DENSITY_STYLES[density],
           className,
           drag && 'cursor-grab active:cursor-grabbing',
+          isDragSource && 'opacity-40',
         )}
       >
         {/* El asa dice "esto se arrastra" sin texto; el punto del tipo sigue al lado. */}
@@ -105,6 +109,7 @@ interface AppointmentListRowProps {
   typeColor?: string;
   branchName?: string;
   drag?: RowDragProps;
+  isDragSource?: boolean;
   density?: RowDensity;
   onClick: () => void;
 }
@@ -117,6 +122,7 @@ export const AppointmentListRow: React.FC<AppointmentListRowProps> = ({
   typeColor,
   branchName,
   drag,
+  isDragSource,
   density,
   onClick,
 }) => {
@@ -135,6 +141,7 @@ export const AppointmentListRow: React.FC<AppointmentListRowProps> = ({
         isDone ? <Check className="h-4 w-4 shrink-0 text-success" aria-hidden /> : undefined
       }
       drag={drag}
+      isDragSource={isDragSource}
       density={density}
       onClick={onClick}
     />

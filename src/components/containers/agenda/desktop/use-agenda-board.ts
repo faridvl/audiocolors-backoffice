@@ -8,7 +8,13 @@ import {
   DayTiming,
   resolveSlotHour,
 } from '../agenda-presenter';
-import { AgendaDragKind, AgendaDragPayload, isAgendaDrag, markAgendaDrag } from '../agenda-drag';
+import {
+  deferFromDragEvent,
+  AgendaDragKind,
+  AgendaDragPayload,
+  isAgendaDrag,
+  markAgendaDrag,
+} from '../agenda-drag';
 import { RowDragProps } from '../agenda-list-row';
 import { SavingItem } from '../use-agenda-scheduling';
 import { AgendaState } from '../use-agenda';
@@ -83,10 +89,12 @@ export function useAgendaBoard(agenda: AgendaState) {
     if (!payload) return;
 
     const { patient, appointment } = findPayloadTarget(payload);
-    if (patient) void scheduling.confirmPending(patient, selectedDayKey, hour);
-    if (appointment && canMoveAppointment(appointment, selectedTiming)) {
-      void scheduling.moveAppointment(appointment, selectedDayKey, hour);
-    }
+    deferFromDragEvent(() => {
+      if (patient) void scheduling.confirmPending(patient, selectedDayKey, hour);
+      if (appointment && canMoveAppointment(appointment, selectedTiming)) {
+        void scheduling.moveAppointment(appointment, selectedDayKey, hour);
+      }
+    });
   };
 
   const handleDropOnPending = () => {
@@ -97,7 +105,9 @@ export function useAgendaBoard(agenda: AgendaState) {
     const { appointment } = findPayloadTarget(payload);
     if (appointment && canMoveAppointment(appointment, selectedTiming)) {
       // Vuelve a la lista donde se soltó: el mes que muestra "Por confirmar".
-      void scheduling.returnToPending(appointment, selectedDayKey, pendingMonthKey);
+      deferFromDragEvent(
+        () => void scheduling.returnToPending(appointment, selectedDayKey, pendingMonthKey),
+      );
     }
   };
 
@@ -111,11 +121,14 @@ export function useAgendaBoard(agenda: AgendaState) {
   const buildDrag = (payload: AgendaDragPayload): RowDragProps => ({
     onDragStart: (event) => {
       markAgendaDrag(event, payload);
-      setDragging(payload);
-      // Arrastrar reemplaza a la selección: no quedan dos intenciones a la vez.
-      setSelectedPendingUuid(null);
+      deferFromDragEvent(() => {
+        setDragging(payload);
+        // Arrastrar reemplaza a la selección: no quedan dos intenciones a la vez.
+        setSelectedPendingUuid(null);
+      });
     },
-    onDragEnd: () => setDragging(null),
+    // También diferido: así nunca corre antes que el `setDragging` de arriba.
+    onDragEnd: () => deferFromDragEvent(() => setDragging(null)),
   });
 
   const dragPending = (patient: Patient): RowDragProps =>
@@ -131,6 +144,9 @@ export function useAgendaBoard(agenda: AgendaState) {
     setSelectedPendingUuid((current) => (current === patient.uuid ? null : patient.uuid));
 
   const handleClearSelection = () => setSelectedPendingUuid(null);
+
+  /** La fila que se está arrastrando se atenúa en su lugar: se ve qué se mueve. */
+  const isDragSource = (id: string) => dragging?.id === id;
 
   /** Tocar un horario con un paciente marcado lo confirma ahí. */
   const handleTapSlot = (hour: number) => {
@@ -156,6 +172,7 @@ export function useAgendaBoard(agenda: AgendaState) {
     handleTogglePending,
     handleClearSelection,
     handleTapSlot,
+    isDragSource,
   };
 }
 

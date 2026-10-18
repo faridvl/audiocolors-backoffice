@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  CalendarPlus,
   CalendarX2,
   CircleCheck,
   Clock,
@@ -32,7 +31,6 @@ const ACTION_ICONS: Record<AppointmentAction, LucideIcon> = {
   [AppointmentAction.SET_TIME]: Clock,
   [AppointmentAction.RESCHEDULE]: CalendarX2,
   [AppointmentAction.WHATSAPP]: MessageCircle,
-  [AppointmentAction.CALENDAR]: CalendarPlus,
   [AppointmentAction.RETURN_TO_PENDING]: Undo2,
 };
 
@@ -43,7 +41,6 @@ const ACTION_LABELS: Record<AppointmentAction, string> = {
   [AppointmentAction.SET_TIME]: TEXT.AGENDA.MENU.SET_TIME,
   [AppointmentAction.RESCHEDULE]: TEXT.AGENDA.MENU.RESCHEDULE,
   [AppointmentAction.WHATSAPP]: TEXT.AGENDA.MENU.WHATSAPP,
-  [AppointmentAction.CALENDAR]: TEXT.AGENDA.MENU.CALENDAR,
   [AppointmentAction.RETURN_TO_PENDING]: TEXT.AGENDA.MENU.RETURN_TO_PENDING,
 };
 
@@ -70,8 +67,6 @@ export const AppointmentSheet: React.FC<{ agenda: AgendaState; appointment: Appo
         return agenda.handleReschedule(appointment);
       case AppointmentAction.WHATSAPP:
         return void agenda.handleSendWhatsApp(appointment, agenda.selectedDayKey);
-      case AppointmentAction.CALENDAR:
-        return agenda.handleAddToCalendar(appointment, agenda.selectedDayKey);
       case AppointmentAction.RETURN_TO_PENDING:
         return agenda.handleReturnToPending(appointment);
     }
