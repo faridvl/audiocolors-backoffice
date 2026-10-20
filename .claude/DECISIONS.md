@@ -291,22 +291,21 @@ meses. La bitácora conserva su orden.
 
 ---
 
-## D16 · Resumen de pacientes en el celular, en su propia pestaña
+## D16 · Resumen de pacientes también en el celular, arriba de la lista
 
-**Decisión (2026-10-20):** debajo de `lg` la pantalla de Pacientes tiene dos
-pestañas, Pacientes y Resumen. Resumen muestra las mismas tarjetas (D14) en dos
-columnas; tocar una aplica su filtro y vuelve a Pacientes. Las tarjetas solo se
-consultan cuando se ven. En escritorio no cambia nada.
+**Decisión (2026-10-20):** las tarjetas del resumen (D14) se ven en todos los
+tamaños, arriba de la lista: en dos columnas debajo de `lg` y en cuatro en
+escritorio. Se probó ponerlas en una pestaña aparte en el celular y la clínica
+las quiso en la misma vista.
 
-**Por qué:** en el celular y el iPad vertical no había forma de ver el resumen,
-y arriba de la lista le quitaba lugar.
+**Por qué:** en el celular y el iPad vertical no había forma de ver el resumen.
 
 ---
 
 ## D17 · Acciones del paciente a la vista, sin menú "⋯"
 
 **Decisión (2026-10-20):** Modificar, Cambiar estado e Indicadores son botones
-visibles en la tarjeta del expediente. Debajo de `lg` van bajo el nombre; en el
-celular (menos de `sm`) solo con ícono y `aria-label`.
+visibles en la tarjeta del expediente, en una columna a la derecha de los datos;
+en el celular (menos de `sm`) solo con ícono y `aria-label`.
 
 **Por qué:** la clínica las usa seguido y en el menú no se encontraban.

@@ -20,13 +20,7 @@ import { EMPTY_VALUE, formatDate, formatMonthLabel, getFullName } from '@/shared
 import { tailwind } from '@/utils/tailwind-utils';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { Tabs } from '@/components/common/tabs/tabs';
-import {
-  usePatientList,
-  ALL_VALUE,
-  DEFAULT_STATUS_FILTER,
-  PatientListView,
-} from './use-patient-list';
+import { usePatientList, ALL_VALUE, DEFAULT_STATUS_FILTER } from './use-patient-list';
 import { PatientSummaryCards } from './patient-summary-cards';
 import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { BadgeSize } from '@/components/common/badge/badge';
@@ -162,11 +156,7 @@ export const PatientListContainer: React.FC = () => {
     handleKindFilter,
     selection,
     isPresetActive,
-    view,
-    viewTabs,
-    isSummaryVisible,
-    handleViewChange,
-    handleSummaryCardSelect,
+    togglePreset,
     handlePageChange,
     handleRetry,
     navigateToCreate,
@@ -188,27 +178,13 @@ export const PatientListContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Tabs
-        items={viewTabs}
-        value={view}
-        onChange={handleViewChange}
-        ariaLabel={t(TEXT.PATIENTS.LIST.VIEWS.ARIA_LABEL)}
-        className="lg:hidden"
-      />
-
       <PatientSummaryCards
         selection={selection}
         isPresetActive={isPresetActive}
-        onTogglePreset={handleSummaryCardSelect}
-        isVisible={isSummaryVisible}
+        onTogglePreset={togglePreset}
       />
 
-      <div
-        className={tailwind(
-          'flex-col gap-4 lg:flex',
-          view === PatientListView.SUMMARY ? 'hidden' : 'flex',
-        )}
-      >
+      <div className="flex flex-col gap-4">
         <FilterBar
           leading={
             <div className="relative w-full lg:w-72">

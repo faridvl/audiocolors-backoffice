@@ -370,13 +370,6 @@
     }
   },
   "patients": {
-    "list": {
-      "views": {
-        "ariaLabel": "Vista de pacientes",
-        "patients": "Pacientes",
-        "summary": "Resumen"
-      }
-    },
     "summary": {
       "tentative": "Citas tentativas este mes",
       "confirmed": "Citas confirmadas este mes",

@@ -315,11 +315,6 @@ export const TEXT = {
   },
   PATIENTS: {
     LIST: {
-      VIEWS: {
-        ARIA_LABEL: 'patients.list.views.ariaLabel',
-        PATIENTS: 'patients.list.views.patients',
-        SUMMARY: 'patients.list.views.summary',
-      },
     },
     SUMMARY: {
       TENTATIVE: 'patients.summary.tentative',

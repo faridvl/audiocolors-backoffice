@@ -10,7 +10,7 @@ interface PatientActionsProps {
   onEditFlags: () => void;
 }
 
-/** Acciones del paciente a la vista. En el celular solo íconos: con texto no entran en una fila. */
+/** Acciones del paciente en una columna a la derecha. En el celular solo íconos: con texto le quitan ancho a los datos. */
 export const PatientActions: React.FC<PatientActionsProps> = ({
   onEdit,
   onChangeStatus,
@@ -28,7 +28,7 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
   ];
 
   return (
-    <div className="flex shrink-0 flex-wrap gap-2">
+    <div className="flex shrink-0 flex-col gap-2">
       {actions.map((action) => (
         <Button
           key={action.label}
@@ -37,7 +37,7 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
           aria-label={action.label}
           title={action.label}
           icon={<action.icon className="h-4 w-4 text-ink-500" aria-hidden />}
-          className="min-w-[44px] whitespace-nowrap px-3"
+          className="min-w-[44px] justify-start whitespace-nowrap px-3"
         >
           <span className="hidden sm:inline">{action.label}</span>
         </Button>

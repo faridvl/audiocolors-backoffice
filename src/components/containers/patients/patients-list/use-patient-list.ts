@@ -10,7 +10,6 @@ import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useRememberedState } from '@/hooks/use-remembered-state';
-import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { buildMonthOption } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
@@ -36,12 +35,6 @@ export const DEFAULT_STATUS_FILTER = [PatientStatus.ACTIVE];
 
 /** Prefijo de las claves con que la lista recuerda sus filtros al volver. */
 const MEMORY_KEY = 'patient-list';
-
-/** Pestañas de la pantalla debajo de `lg`; en escritorio se ve todo junto. */
-export enum PatientListView {
-  PATIENTS = 'patients',
-  SUMMARY = 'summary',
-}
 
 const KIND_LABELS: Record<NextAppointmentKind, string> = {
   [NextAppointmentKind.CONFIRMED]: 'Confirmada',
@@ -77,19 +70,6 @@ export function usePatientList() {
   );
   const [flagFilter, setFlagFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.flags`, []);
   const [kindFilter, setKindFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.kinds`, []);
-  const [view, setView] = useRememberedState(`${MEMORY_KEY}.view`, PatientListView.PATIENTS);
-  const isDesktop = useIsDesktop();
-  // El resumen solo se consulta cuando se ve: siempre en escritorio, en el celular en su pestaña.
-  const isSummaryVisible = isDesktop || view === PatientListView.SUMMARY;
-
-  const viewTabs = useMemo(
-    () => [
-      { value: PatientListView.PATIENTS, label: t(TEXT.PATIENTS.LIST.VIEWS.PATIENTS) },
-      { value: PatientListView.SUMMARY, label: t(TEXT.PATIENTS.LIST.VIEWS.SUMMARY) },
-    ],
-    [t],
-  );
-
   const { data: scheduledMonths } = useAppointmentMonthsQuery();
   const { data: branches } = useBranchesQuery();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
@@ -235,12 +215,6 @@ export function usePatientList() {
     setPage(1);
   };
 
-  /** En el celular, la tarjeta lleva a la lista ya filtrada. */
-  const handleSummaryCardSelect = (preset: PatientListPreset) => {
-    togglePreset(preset);
-    setView(PatientListView.PATIENTS);
-  };
-
   return {
     patients: data?.data ?? [],
     // Con el filtro de próxima cita, el API devuelve todo en una sola página
@@ -272,11 +246,7 @@ export function usePatientList() {
     handleKindFilter: withPageReset(setKindFilter),
     selection,
     isPresetActive,
-    view,
-    viewTabs,
-    isSummaryVisible,
-    handleViewChange: setView,
-    handleSummaryCardSelect,
+    togglePreset,
     handlePageChange: setPage,
     handleRetry: refetch,
     navigateToCreate: navigation.patients.create,

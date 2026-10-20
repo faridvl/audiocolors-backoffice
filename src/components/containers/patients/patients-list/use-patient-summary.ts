@@ -47,8 +47,8 @@ function useCount(selection: PatientListSelection, preset: PatientListPreset, is
   return data?.meta.total;
 }
 
-/** Resumen sobre la lista de pacientes. Mientras no se ve (`isEnabled`), ni se consulta. */
-export function usePatientSummary(selection: PatientListSelection, isEnabled: boolean) {
+/** Resumen sobre la lista de pacientes, en todos los tamaños de pantalla. */
+export function usePatientSummary(selection: PatientListSelection) {
   const { t } = useTranslation();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
   const currentMonth = toMonthKey(toDayKey(new Date()));
@@ -67,14 +67,10 @@ export function usePatientSummary(selection: PatientListSelection, isEnabled: bo
     [currentMonth, controlTypeUuid],
   );
 
-  const confirmedCount = useCount(selection, presets.confirmed, isEnabled);
-  const tentativeCount = useCount(selection, presets.tentative, isEnabled);
-  const controlsCount = useCount(
-    selection,
-    presets.controls,
-    isEnabled && Boolean(controlTypeUuid),
-  );
-  const hearingAidsCount = useCount(selection, presets.hearingAids, isEnabled);
+  const confirmedCount = useCount(selection, presets.confirmed, true);
+  const tentativeCount = useCount(selection, presets.tentative, true);
+  const controlsCount = useCount(selection, presets.controls, Boolean(controlTypeUuid));
+  const hearingAidsCount = useCount(selection, presets.hearingAids, true);
 
   const cards: PatientSummaryCard[] = [
     {
