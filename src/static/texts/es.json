@@ -331,35 +331,53 @@
       "done": "Listo",
       "sections": {
         "lab": "Laboratorio",
-        "hearingAid": "Datos del audífono"
+        "warranty": "Estado de garantía"
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",
         "hasActiveWarranty": "Garantía activa",
-        "isVideoCandidate": "Candidato a video"
+        "isVideoCandidate": "Candidato a video",
+        "warrantyExpired": "Garantía expirada",
+        "renewPrescription": "Renovar receta"
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
         "hasActiveWarranty": "Garantía activada",
-        "isVideoCandidate": "Marcado como candidato a video"
+        "isVideoCandidate": "Marcado como candidato a video",
+        "warrantyExpired": "Garantía marcada como expirada",
+        "renewPrescription": "Marcado para renovar la receta"
       },
       "toastsOff": {
         "hearingAidsInLab": "Audífonos devueltos al paciente",
         "hasActiveWarranty": "Garantía desactivada",
-        "isVideoCandidate": "Ya no es candidato a video"
+        "isVideoCandidate": "Ya no es candidato a video",
+        "warrantyExpired": "Garantía ya no marcada como expirada",
+        "renewPrescription": "Ya no hay que renovar la receta"
       },
       "columns": {
         "hearingAidsInLab": "Audífonos",
         "hasActiveWarranty": "Garantía",
-        "isVideoCandidate": "Video"
+        "isVideoCandidate": "Video",
+        "warrantyExpired": "Garantía expirada",
+        "renewPrescription": "Receta"
       },
       "values": {
         "hearingAidsInLab": "En laboratorio",
         "hasActiveWarranty": "Activa",
-        "isVideoCandidate": "Candidato"
+        "isVideoCandidate": "Candidato",
+        "warrantyExpired": "Expirada",
+        "renewPrescription": "Renovar"
       },
       "offValues": {
         "hasActiveWarranty": "Sin garantía"
+      },
+      "warrantyDocument": {
+        "label": "Archivo de la garantía",
+        "none": "Ninguno",
+        "empty": "Todavía no hay archivos subidos como Garantías. Súbelo en los documentos del expediente para poder elegirlo aquí.",
+        "loading": "Cargando archivos…",
+        "saved": "Archivo de la garantía guardado",
+        "cleared": "Se quitó el archivo de la garantía"
       }
     },
     "schedule": {

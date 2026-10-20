@@ -9,6 +9,8 @@ const FLAG_TONES: Record<PatientFlag, string> = {
   [PatientFlag.HEARING_AIDS_IN_LAB]: 'bg-warning/15 text-ink-700',
   [PatientFlag.ACTIVE_WARRANTY]: 'bg-success/10 text-success',
   [PatientFlag.VIDEO_CANDIDATE]: 'bg-brand-50 text-brand-700',
+  [PatientFlag.WARRANTY_EXPIRED]: 'bg-danger/10 text-danger',
+  [PatientFlag.RENEW_PRESCRIPTION]: 'bg-info/10 text-info',
 };
 
 const OFF_TONE = 'bg-ink-100 text-ink-500';

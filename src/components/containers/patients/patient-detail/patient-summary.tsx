@@ -20,7 +20,12 @@ import { PatientActions } from './patient-actions';
 import { PatientDatum } from './patient-datum';
 
 /** Los que se cambian desde el modal; candidato a video tiene su casilla. */
-const MODAL_FLAGS = [PatientFlag.HEARING_AIDS_IN_LAB, PatientFlag.ACTIVE_WARRANTY];
+const MODAL_FLAGS = [
+  PatientFlag.HEARING_AIDS_IN_LAB,
+  PatientFlag.ACTIVE_WARRANTY,
+  PatientFlag.WARRANTY_EXPIRED,
+  PatientFlag.RENEW_PRESCRIPTION,
+];
 
 interface PatientSummaryProps {
   patient: Patient;

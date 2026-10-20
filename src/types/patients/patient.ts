@@ -46,6 +46,10 @@ export interface Patient {
   hearingAidsInLabSince?: string | null;
   warrantyActiveSince?: string | null;
   videoCandidateSince?: string | null;
+  warrantyExpiredSince?: string | null;
+  renewPrescriptionSince?: string | null;
+  /** Documento (categoría WARRANTY) elegido como el de la garantía. */
+  warrantyDocumentUuid?: string | null;
   birthDate: string;
   email?: string;
   gender?: string;
@@ -95,21 +99,32 @@ export interface CreatePatientPayload {
   contacts?: CreatePatientContactPayload[];
 }
 
-export type UpdatePatientPayload = Partial<CreatePatientPayload>;
+export type UpdatePatientPayload = Partial<CreatePatientPayload> & {
+  /** null lo limpia. */
+  warrantyDocumentUuid?: string | null;
+};
 
 /** Indicadores que se prenden y apagan desde el expediente. El valor es la clave del API. */
 export enum PatientFlag {
   HEARING_AIDS_IN_LAB = 'hearingAidsInLab',
   ACTIVE_WARRANTY = 'hasActiveWarranty',
   VIDEO_CANDIDATE = 'isVideoCandidate',
+  WARRANTY_EXPIRED = 'warrantyExpired',
+  RENEW_PRESCRIPTION = 'renewPrescription',
 }
 
 /** Campo del paciente que guarda desde cuándo está prendido cada indicador. */
 export const PATIENT_FLAG_SINCE_FIELDS: Record<
   PatientFlag,
-  'hearingAidsInLabSince' | 'warrantyActiveSince' | 'videoCandidateSince'
+  | 'hearingAidsInLabSince'
+  | 'warrantyActiveSince'
+  | 'videoCandidateSince'
+  | 'warrantyExpiredSince'
+  | 'renewPrescriptionSince'
 > = {
   [PatientFlag.HEARING_AIDS_IN_LAB]: 'hearingAidsInLabSince',
   [PatientFlag.ACTIVE_WARRANTY]: 'warrantyActiveSince',
   [PatientFlag.VIDEO_CANDIDATE]: 'videoCandidateSince',
+  [PatientFlag.WARRANTY_EXPIRED]: 'warrantyExpiredSince',
+  [PatientFlag.RENEW_PRESCRIPTION]: 'renewPrescriptionSince',
 };
