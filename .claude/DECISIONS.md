@@ -253,9 +253,16 @@ expediente.
 ## D13 · Indicadores sin fechas, en pestañas, y candidato a video aparte
 
 **Decisión (2026-10-10):** el modal de indicadores tiene dos pestañas,
-Laboratorio (audífonos en laboratorio) y Datos del audífono (garantía).
-Candidato a video es una casilla en el expediente. No se muestra desde cuándo
-está prendido ninguno, aunque el API lo guarde.
+Laboratorio (audífonos en laboratorio) y Estado de garantía (garantía activa,
+garantía expirada y renovar receta). Candidato a video es una casilla en el
+expediente. No se muestra desde cuándo está prendido ninguno, aunque el API lo
+guarde.
+
+**Actualización (2026-10-20):** la pestaña "Datos del audífono" pasa a "Estado
+de garantía" y suma los switches de garantía expirada y renovar receta, más un
+desplegable para elegir cuál de los archivos subidos como Garantías es el de la
+garantía (`warrantyDocumentUuid` en el paciente, "Ninguno" lo limpia). Sin
+archivos de garantía se muestra una ayuda en vez del desplegable vacío.
 
 **Por qué:** a la clínica solo le importa si el indicador está o no, no su fecha.
 

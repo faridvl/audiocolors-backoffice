@@ -72,6 +72,8 @@ export function toPatientListFilters(selection: PatientListSelection): PatientLi
     hearingAidsInLab: selection.flags.includes(PatientFlag.HEARING_AIDS_IN_LAB),
     hasActiveWarranty: selection.flags.includes(PatientFlag.ACTIVE_WARRANTY),
     isVideoCandidate: selection.flags.includes(PatientFlag.VIDEO_CANDIDATE),
+    warrantyExpired: selection.flags.includes(PatientFlag.WARRANTY_EXPIRED),
+    renewPrescription: selection.flags.includes(PatientFlag.RENEW_PRESCRIPTION),
     nextAppointmentKinds: selection.kinds as NextAppointmentKind[],
   };
 }

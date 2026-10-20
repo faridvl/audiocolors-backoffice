@@ -288,6 +288,14 @@ export const TEXT = {
       OFF_PREFIX: 'patients.flags.offValues',
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',
       TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
+      WARRANTY_DOCUMENT: {
+        LABEL: 'patients.flags.warrantyDocument.label',
+        NONE: 'patients.flags.warrantyDocument.none',
+        EMPTY: 'patients.flags.warrantyDocument.empty',
+        LOADING: 'patients.flags.warrantyDocument.loading',
+        SAVED: 'patients.flags.warrantyDocument.saved',
+        CLEARED: 'patients.flags.warrantyDocument.cleared',
+      },
     },
     DETAIL: {
       LOADING: 'patients.detail.loading',

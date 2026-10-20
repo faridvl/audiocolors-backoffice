@@ -19,12 +19,16 @@ export interface PatientFlagItem {
 /** Secciones del modal de indicadores. Candidato a video va aparte, como casilla en el expediente. */
 export enum PatientFlagSection {
   LAB = 'lab',
-  HEARING_AID = 'hearingAid',
+  WARRANTY = 'warranty',
 }
 
 const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
   [PatientFlagSection.LAB]: [PatientFlag.HEARING_AIDS_IN_LAB],
-  [PatientFlagSection.HEARING_AID]: [PatientFlag.ACTIVE_WARRANTY],
+  [PatientFlagSection.WARRANTY]: [
+    PatientFlag.ACTIVE_WARRANTY,
+    PatientFlag.WARRANTY_EXPIRED,
+    PatientFlag.RENEW_PRESCRIPTION,
+  ],
 };
 
 export function usePatientFlags(patient: Patient) {
@@ -78,6 +82,7 @@ export function usePatientFlags(patient: Patient) {
     activeFlags: sections.find((section) => section.key === activeSection)?.flags ?? [],
     videoCandidate,
     handleToggle,
+    isWarrantySection: activeSection === PatientFlagSection.WARRANTY,
     handleSectionChange: setActiveSection,
   };
 }
