@@ -266,6 +266,7 @@
       "NOTE_ADDED": "Nota agregada",
       "DOCUMENT_UPLOADED": "Archivo subido",
       "DOCUMENT_RENAMED": "Archivo renombrado",
+      "DOCUMENT_CATEGORY_CHANGED": "Archivo cambiado de sección",
       "DOCUMENT_DELETED": "Archivo eliminado",
       "APPOINTMENT_TENTATIVE": "Cita tentativa",
       "APPOINTMENT_CONFIRMED": "Cita confirmada",
@@ -274,7 +275,9 @@
       "STATUS_CHANGED": "Estado cambiado",
       "HEARING_AIDS_LAB_CHANGED": "Audífonos en laboratorio",
       "WARRANTY_CHANGED": "Garantía",
-      "VIDEO_CANDIDATE_CHANGED": "Candidato a video"
+      "VIDEO_CANDIDATE_CHANGED": "Candidato a video",
+      "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
+      "RENEW_PRESCRIPTION_CHANGED": "Renovar receta"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -291,7 +294,8 @@
         "gender": "Género",
         "bloodType": "Tipo de sangre",
         "occupation": "Ocupación",
-        "branchUuid": "Sede"
+        "branchUuid": "Sede",
+        "warrantyDocumentUuid": "Archivo de la garantía"
       },
       "statuses": {
         "ACTIVE": "Activo",
@@ -301,12 +305,16 @@
       "flagOn": {
         "HEARING_AIDS_LAB_CHANGED": "Enviados al laboratorio",
         "WARRANTY_CHANGED": "Garantía activada",
-        "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato"
+        "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato",
+        "WARRANTY_EXPIRED_CHANGED": "Garantía marcada como expirada",
+        "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta"
       },
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
-        "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato"
+        "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato",
+        "WARRANTY_EXPIRED_CHANGED": "Garantía ya no marcada como expirada",
+        "RENEW_PRESCRIPTION_CHANGED": "Ya no hay que renovar la receta"
       }
     }
   },
