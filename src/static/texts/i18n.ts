@@ -261,6 +261,57 @@ export const TEXT = {
       FLAG_OFF_PREFIX: 'activity.detail.flagOff',
     },
   },
+  DOCUMENTS: {
+    TITLE: 'documents.title',
+    FIELDS: {
+      NAME: 'documents.fields.name',
+      CATEGORY: 'documents.fields.category',
+    },
+    UPLOAD: {
+      BUTTON: 'documents.upload.button',
+      BUTTON_SHORT: 'documents.upload.buttonShort',
+      NAME_LABEL: 'documents.upload.nameLabel',
+      CONFIRM: 'documents.upload.confirm',
+    },
+    LIST: {
+      SEARCH_PLACEHOLDER: 'documents.list.searchPlaceholder',
+      SEARCH_LABEL: 'documents.list.searchLabel',
+      FILTER_ALL: 'documents.list.filterAll',
+      LOADING: 'documents.list.loading',
+      ERROR: 'documents.list.error',
+      EMPTY_TITLE: 'documents.list.emptyTitle',
+      EMPTY_DESCRIPTION: 'documents.list.emptyDescription',
+      NO_RESULTS_TITLE: 'documents.list.noResultsTitle',
+      NO_RESULTS_DESCRIPTION: 'documents.list.noResultsDescription',
+      REGISTERED_BY: 'documents.list.registeredBy',
+      EDIT_LABEL: 'documents.list.editLabel',
+      DELETE_LABEL: 'documents.list.deleteLabel',
+    },
+    PREVIEW: {
+      LABEL: 'documents.preview.label',
+      OPEN_NEW_TAB: 'documents.preview.openNewTab',
+      CLOSE: 'documents.preview.close',
+      ROTATE: 'documents.preview.rotate',
+      OPEN_FILE: 'documents.preview.openFile',
+      PDF_MOBILE_HINT: 'documents.preview.pdfMobileHint',
+      UNSUPPORTED: 'documents.preview.unsupported',
+    },
+    EDIT: {
+      TITLE: 'documents.edit.title',
+    },
+    DELETE: {
+      TITLE: 'documents.delete.title',
+      MESSAGE: 'documents.delete.message',
+      CONFIRM: 'documents.delete.confirm',
+    },
+    TOASTS: {
+      TOO_LARGE: 'documents.toasts.tooLarge',
+      NAME_REQUIRED: 'documents.toasts.nameRequired',
+      UPLOADED: 'documents.toasts.uploaded',
+      UPDATED: 'documents.toasts.updated',
+      DELETED: 'documents.toasts.deleted',
+    },
+  },
   PATIENTS: {
     SUMMARY: {
       TENTATIVE: 'patients.summary.tentative',
