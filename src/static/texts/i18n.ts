@@ -22,6 +22,7 @@ export const TEXT = {
       SHOW_RESULTS: 'common.filters.showResults',
       APPLY: 'common.filters.apply',
       REMOVE: 'common.filters.remove',
+      ALL_MONTHS: 'common.filters.allMonths',
     },
   },
   AUTH: {
@@ -261,7 +262,60 @@ export const TEXT = {
       FLAG_OFF_PREFIX: 'activity.detail.flagOff',
     },
   },
+  DOCUMENTS: {
+    TITLE: 'documents.title',
+    FIELDS: {
+      NAME: 'documents.fields.name',
+      CATEGORY: 'documents.fields.category',
+    },
+    UPLOAD: {
+      BUTTON: 'documents.upload.button',
+      BUTTON_SHORT: 'documents.upload.buttonShort',
+      NAME_LABEL: 'documents.upload.nameLabel',
+      CONFIRM: 'documents.upload.confirm',
+    },
+    LIST: {
+      SEARCH_PLACEHOLDER: 'documents.list.searchPlaceholder',
+      SEARCH_LABEL: 'documents.list.searchLabel',
+      FILTER_ALL: 'documents.list.filterAll',
+      LOADING: 'documents.list.loading',
+      ERROR: 'documents.list.error',
+      EMPTY_TITLE: 'documents.list.emptyTitle',
+      EMPTY_DESCRIPTION: 'documents.list.emptyDescription',
+      NO_RESULTS_TITLE: 'documents.list.noResultsTitle',
+      NO_RESULTS_DESCRIPTION: 'documents.list.noResultsDescription',
+      REGISTERED_BY: 'documents.list.registeredBy',
+      EDIT_LABEL: 'documents.list.editLabel',
+      DELETE_LABEL: 'documents.list.deleteLabel',
+    },
+    PREVIEW: {
+      LABEL: 'documents.preview.label',
+      OPEN_NEW_TAB: 'documents.preview.openNewTab',
+      CLOSE: 'documents.preview.close',
+      ROTATE: 'documents.preview.rotate',
+      OPEN_FILE: 'documents.preview.openFile',
+      PDF_MOBILE_HINT: 'documents.preview.pdfMobileHint',
+      UNSUPPORTED: 'documents.preview.unsupported',
+    },
+    EDIT: {
+      TITLE: 'documents.edit.title',
+    },
+    DELETE: {
+      TITLE: 'documents.delete.title',
+      MESSAGE: 'documents.delete.message',
+      CONFIRM: 'documents.delete.confirm',
+    },
+    TOASTS: {
+      TOO_LARGE: 'documents.toasts.tooLarge',
+      NAME_REQUIRED: 'documents.toasts.nameRequired',
+      UPLOADED: 'documents.toasts.uploaded',
+      UPDATED: 'documents.toasts.updated',
+      DELETED: 'documents.toasts.deleted',
+    },
+  },
   PATIENTS: {
+    LIST: {
+    },
     SUMMARY: {
       TENTATIVE: 'patients.summary.tentative',
       CONFIRMED: 'patients.summary.confirmed',
@@ -284,6 +338,14 @@ export const TEXT = {
       OFF_PREFIX: 'patients.flags.offValues',
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',
       TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
+      WARRANTY_DOCUMENT: {
+        LABEL: 'patients.flags.warrantyDocument.label',
+        NONE: 'patients.flags.warrantyDocument.none',
+        EMPTY: 'patients.flags.warrantyDocument.empty',
+        LOADING: 'patients.flags.warrantyDocument.loading',
+        SAVED: 'patients.flags.warrantyDocument.saved',
+        CLEARED: 'patients.flags.warrantyDocument.cleared',
+      },
     },
     DETAIL: {
       LOADING: 'patients.detail.loading',
@@ -303,7 +365,6 @@ export const TEXT = {
         BRANCH: 'patients.detail.fields.branch',
       },
       ACTIONS: {
-        MORE: 'patients.detail.actions.more',
         EDIT: 'patients.detail.actions.edit',
         CHANGE_STATUS: 'patients.detail.actions.changeStatus',
       },

@@ -111,9 +111,12 @@ export const PillSelect: React.FC<PillSelectProps> = ({
         {options.map((option, index) => {
           const previousGroup = index > 0 ? options[index - 1].group : undefined;
           const startsGroup = option.group && option.group !== previousGroup;
+          // Una opción suelta después de un grupo (p. ej. "Sin cita" tras los meses) no es del grupo.
+          const endsGroup = !option.group && Boolean(previousGroup);
 
           return (
             <React.Fragment key={option.value}>
+              {endsGroup && <div role="presentation" className="my-1 border-t border-ink-100" />}
               {startsGroup && (
                 <div
                   role="presentation"

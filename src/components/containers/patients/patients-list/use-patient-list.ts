@@ -70,20 +70,19 @@ export function usePatientList() {
   );
   const [flagFilter, setFlagFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.flags`, []);
   const [kindFilter, setKindFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.kinds`, []);
-
   const { data: scheduledMonths } = useAppointmentMonthsQuery();
   const { data: branches } = useBranchesQuery();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
 
   const appointmentMonthOptions = useMemo(
     () => [
-      { label: 'Todos los meses', value: ALL_VALUE },
-      { label: 'Sin cita', value: NO_APPOINTMENT_VALUE },
-      // Del más lejano al más cercano, igual que el filtro de mes de la
-      // bitácora: el API los devuelve en orden ascendente.
-      ...[...(scheduledMonths?.months ?? [])].sort().reverse().map(buildMonthOption),
+      { label: t(TEXT.GENERAL.FILTERS.ALL_MONTHS), value: ALL_VALUE },
+      // Del más cercano al más lejano: lo que la clínica busca casi siempre es
+      // lo de este mes y el siguiente.
+      ...[...(scheduledMonths?.months ?? [])].sort().map(buildMonthOption),
+      { label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT), value: NO_APPOINTMENT_VALUE },
     ],
-    [scheduledMonths],
+    [scheduledMonths, t],
   );
 
   const statusOptions = useMemo(
@@ -246,8 +245,8 @@ export function usePatientList() {
     handleFlagFilter: withPageReset(setFlagFilter),
     handleKindFilter: withPageReset(setKindFilter),
     selection,
-    togglePreset,
     isPresetActive,
+    togglePreset,
     handlePageChange: setPage,
     handleRetry: refetch,
     navigateToCreate: navigation.patients.create,

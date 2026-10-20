@@ -253,9 +253,16 @@ expediente.
 ## D13 · Indicadores sin fechas, en pestañas, y candidato a video aparte
 
 **Decisión (2026-10-10):** el modal de indicadores tiene dos pestañas,
-Laboratorio (audífonos en laboratorio) y Datos del audífono (garantía).
-Candidato a video es una casilla en el expediente. No se muestra desde cuándo
-está prendido ninguno, aunque el API lo guarde.
+Laboratorio (audífonos en laboratorio) y Estado de garantía (garantía activa,
+garantía expirada y renovar receta). Candidato a video es una casilla en el
+expediente. No se muestra desde cuándo está prendido ninguno, aunque el API lo
+guarde.
+
+**Actualización (2026-10-20):** la pestaña "Datos del audífono" pasa a "Estado
+de garantía" y suma los switches de garantía expirada y renovar receta, más un
+desplegable para elegir cuál de los archivos subidos como Garantías es el de la
+garantía (`warrantyDocumentUuid` en el paciente, "Ninguno" lo limpia). Sin
+archivos de garantía se muestra una ayuda en vez del desplegable vacío.
 
 **Por qué:** a la clínica solo le importa si el indicador está o no, no su fecha.
 
@@ -271,3 +278,34 @@ tocarla quita solo lo suyo.
 
 **Por qué:** el número tiene que coincidir con lo que muestra la lista al tocar
 la tarjeta.
+
+---
+
+## D15 · Filtro de meses: del más cercano al más lejano, "Sin cita" al final
+
+**Decisión (2026-10-20):** en Pacientes el filtro de próxima cita lista "Todos
+los meses", los meses en orden ascendente y "Sin cita" al final, separado de los
+meses. La bitácora conserva su orden.
+
+**Por qué:** lo que la clínica busca casi siempre es este mes y el siguiente.
+
+---
+
+## D16 · Resumen de pacientes también en el celular, arriba de la lista
+
+**Decisión (2026-10-20):** las tarjetas del resumen (D14) se ven en todos los
+tamaños, arriba de la lista: en dos columnas debajo de `lg` y en cuatro en
+escritorio. Se probó ponerlas en una pestaña aparte en el celular y la clínica
+las quiso en la misma vista.
+
+**Por qué:** en el celular y el iPad vertical no había forma de ver el resumen.
+
+---
+
+## D17 · Acciones del paciente a la vista, sin menú "⋯"
+
+**Decisión (2026-10-20):** Modificar, Cambiar estado e Indicadores son botones
+visibles en la tarjeta del expediente, en una columna a la derecha de los datos;
+en el celular (menos de `sm`) solo con ícono y `aria-label`.
+
+**Por qué:** la clínica las usa seguido y en el menú no se encontraban.

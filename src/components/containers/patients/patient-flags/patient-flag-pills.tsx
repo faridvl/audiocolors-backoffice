@@ -9,6 +9,8 @@ const FLAG_TONES: Record<PatientFlag, string> = {
   [PatientFlag.HEARING_AIDS_IN_LAB]: 'bg-warning/15 text-ink-700',
   [PatientFlag.ACTIVE_WARRANTY]: 'bg-success/10 text-success',
   [PatientFlag.VIDEO_CANDIDATE]: 'bg-brand-50 text-brand-700',
+  [PatientFlag.WARRANTY_EXPIRED]: 'bg-danger/10 text-danger',
+  [PatientFlag.RENEW_PRESCRIPTION]: 'bg-info/10 text-info',
 };
 
 const OFF_TONE = 'bg-ink-100 text-ink-500';
@@ -25,6 +27,11 @@ const PILL_CLASSES =
 const isFlagOn = (patient: Patient, flag: PatientFlag) =>
   Boolean(patient[PATIENT_FLAG_SINCE_FIELDS[flag]]);
 
+/** Una garantía expirada ya dice que no hay garantía: "Sin garantía" sobra al lado. */
+const isOffLabelShown = (patient: Patient, flag: PatientFlag) =>
+  FLAGS_SHOWN_WHEN_OFF.includes(flag) &&
+  !(flag === PatientFlag.ACTIVE_WARRANTY && isFlagOn(patient, PatientFlag.WARRANTY_EXPIRED));
+
 /**
  * Etiquetas de los indicadores junto al estado del paciente. Con `onClick`
  * (en el expediente) son botones que abren el modal para cambiarlos.
@@ -40,7 +47,7 @@ export const PatientFlagPills: React.FC<{
   return (
     <>
       {flags
-        .filter((flag) => isFlagOn(patient, flag) || FLAGS_SHOWN_WHEN_OFF.includes(flag))
+        .filter((flag) => isFlagOn(patient, flag) || isOffLabelShown(patient, flag))
         .map((flag) => {
           const isOn = isFlagOn(patient, flag);
           const label = isOn
@@ -74,7 +81,10 @@ export const PatientFlagValue: React.FC<{ patient: Patient; flag: PatientFlag }>
   const { t } = useTranslation();
 
   if (!isFlagOn(patient, flag)) {
-    if (!FLAGS_SHOWN_WHEN_OFF.includes(flag)) return <>{EMPTY_VALUE}</>;
+    if (flag === PatientFlag.ACTIVE_WARRANTY && isFlagOn(patient, PatientFlag.WARRANTY_EXPIRED)) {
+      return <PatientFlagValue patient={patient} flag={PatientFlag.WARRANTY_EXPIRED} />;
+    }
+    if (!isOffLabelShown(patient, flag)) return <>{EMPTY_VALUE}</>;
     return (
       <span className={tailwind(PILL_CLASSES, OFF_TONE)}>
         {t(`${TEXT.PATIENTS.FLAGS.OFF_PREFIX}.${flag}`)}

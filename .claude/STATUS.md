@@ -2,7 +2,7 @@
 
 > Documento vivo. Actualizar al cierre de cada etapa, antes de `git push`.
 
-**Última actualización:** 2026-10-10 · **Branch:** `feature/resumen-segun-filtros`
+**Última actualización:** 2026-10-20 · **Branch:** `feature/ajustes-expediente`
 
 ---
 
@@ -74,6 +74,24 @@ franjas, con los datos siempre visibles (D11). Contactos editables en un modal
 (D12). Indicadores en pestañas y sin fechas, y candidato a video como casilla
 (D13). Al confirmar una cita se puede elegir la hora (8:00 a 17:00), con el
 mismo guardado que la agenda.
+
+### Etapa 7 — Agenda, citas, archivos y garantía
+Agenda de escritorio: el arrastre ya no se traba (Chrome lo cancelaba cuando
+la lista se corría al levantar la tarjeta) y la ventana del día entra entera en
+13" e iPad horizontal, con desplazamiento automático en el borde. Sin "Agregar a
+mi calendario". Al agendar, el tipo va primero y la cita dura lo que su tipo
+(Cita 60, Control y Mantenimiento 30; `PATCH /appointment-types/:uuid` nuevo).
+Archivos: subir sin ver la extensión, rotar al verla y cambiar de sección.
+Pacientes: meses del más cercano al más lejano con "Sin cita" al final (D15),
+pestaña "Resumen" en móvil (D16) y acciones a la vista (D17). Indicadores:
+pestaña "Estado de garantía" con "Garantía expirada", "Renovar receta" y el
+archivo de la garantía (D13).
+
+Cambios en el API: `feature/editar-tipo-cita` (ya en `develop`) y
+`feature/garantia-y-documentos` (PR #11, con la migración
+`20261020120000_add_warranty_expired_renew_prescription`, que se aplica a mano
+antes de mergear). Probado de punta a punta con el API y una base Postgres
+locales.
 
 ---
 

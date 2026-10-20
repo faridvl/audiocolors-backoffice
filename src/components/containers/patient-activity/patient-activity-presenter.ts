@@ -5,6 +5,7 @@ import {
   CircleCheck,
   DoorOpen,
   FilePen,
+  FolderInput,
   FileX,
   NotebookText,
   Paperclip,
@@ -15,11 +16,13 @@ import {
   UserPlus,
   type LucideIcon,
   Ear,
+  ShieldAlert,
   ShieldCheck,
+  FileClock,
   Video,
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
-import { DOCUMENT_CATEGORY_LABELS } from '@/types/documents/document.types';
+import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
 import { GENDER_LABELS, PatientGender } from '@/types/patients/patient';
 import {
   PatientActivity,
@@ -58,11 +61,23 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     [PatientActivityAction.NOTE_ADDED]: { icon: NotebookText, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.DOCUMENT_UPLOADED]: { icon: Paperclip, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.DOCUMENT_RENAMED]: { icon: FilePen, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.DOCUMENT_CATEGORY_CHANGED]: {
+      icon: FolderInput,
+      tone: ActionTone.NEUTRAL,
+    },
     [PatientActivityAction.DOCUMENT_DELETED]: { icon: FileX, tone: ActionTone.DANGER },
     [PatientActivityAction.STATUS_CHANGED]: { icon: UserCog, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.HEARING_AIDS_LAB_CHANGED]: { icon: Ear, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.WARRANTY_CHANGED]: { icon: ShieldCheck, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.VIDEO_CANDIDATE_CHANGED]: { icon: Video, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.WARRANTY_EXPIRED_CHANGED]: {
+      icon: ShieldAlert,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.RENEW_PRESCRIPTION_CHANGED]: {
+      icon: FileClock,
+      tone: ActionTone.NEUTRAL,
+    },
   };
 
 export function getActionLabel(t: TFunction, action: PatientActivityAction): string {
@@ -202,6 +217,14 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       return before === after ? after : `${before} → ${after}`;
     }
 
+    case PatientActivityAction.DOCUMENT_CATEGORY_CHANGED: {
+      const sectionLabel = (category?: unknown) =>
+        typeof category === 'string' && category in DOCUMENT_CATEGORY_LABELS
+          ? DOCUMENT_CATEGORY_LABELS[category as DocumentCategory]
+          : '—';
+      return `${sectionLabel(detail.before)} → ${sectionLabel(detail.after)}`;
+    }
+
     case PatientActivityAction.APPOINTMENT_TENTATIVE:
       return joinParts(
         formatMonthLabel(detail.month),
@@ -229,6 +252,8 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
     case PatientActivityAction.HEARING_AIDS_LAB_CHANGED:
     case PatientActivityAction.WARRANTY_CHANGED:
     case PatientActivityAction.VIDEO_CANDIDATE_CHANGED:
+    case PatientActivityAction.WARRANTY_EXPIRED_CHANGED:
+    case PatientActivityAction.RENEW_PRESCRIPTION_CHANGED:
       return context.t(
         `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
       );
