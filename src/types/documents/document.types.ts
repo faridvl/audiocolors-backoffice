@@ -36,6 +36,12 @@ export interface PatientDocument {
   url: string;
 }
 
+/** Cuerpo de `PATCH /patients/:uuid/documents/:documentUuid`: solo lo que cambió, al menos un campo. */
+export interface UpdateDocumentPayload {
+  originalName?: string;
+  category?: DocumentCategory;
+}
+
 /** Documento ya normalizado para la UI. */
 export interface DocumentItem {
   uuid: string;

@@ -318,6 +318,57 @@
       }
     }
   },
+  "documents": {
+    "title": "Archivos",
+    "fields": {
+      "name": "Nombre",
+      "category": "Categoría"
+    },
+    "upload": {
+      "button": "Subir archivo",
+      "buttonShort": "Subir",
+      "nameLabel": "Nombre del archivo",
+      "confirm": "Confirmar"
+    },
+    "list": {
+      "searchPlaceholder": "Buscar archivo",
+      "searchLabel": "Buscar archivos",
+      "filterAll": "Todos",
+      "loading": "Cargando archivos...",
+      "error": "No se pudieron cargar los archivos",
+      "emptyTitle": "Aún no hay archivos",
+      "emptyDescription": "Sube recetas, audiometrías, facturas o garantías del paciente.",
+      "noResultsTitle": "Sin resultados",
+      "noResultsDescription": "Prueba con otro nombre o cambia el filtro.",
+      "registeredBy": "Registrado por:",
+      "editLabel": "Editar {{name}}",
+      "deleteLabel": "Eliminar {{name}}"
+    },
+    "preview": {
+      "label": "Vista previa de {{name}}",
+      "openNewTab": "Abrir en pestaña nueva",
+      "close": "Cerrar vista previa",
+      "rotate": "Rotar imagen",
+      "openFile": "Abrir archivo",
+      "pdfMobileHint": "Abre el archivo para verlo a pantalla completa.",
+      "unsupported": "Este tipo de archivo no se puede previsualizar aquí."
+    },
+    "edit": {
+      "title": "Editar archivo"
+    },
+    "delete": {
+      "title": "Eliminar archivo",
+      "message": "Se eliminará <strong>{{name}}</strong> de forma permanente. Esta acción no se puede deshacer.",
+      "confirm": "Eliminar"
+    },
+    "toasts": {
+      "tooLarge": "El archivo supera el límite de {{size}} MB",
+      "nameRequired": "El nombre no puede estar vacío",
+      "uploaded": "Archivo subido",
+      "updated": "Archivo actualizado",
+      "deleted": "Archivo eliminado"
+    }
+  },
   "patients": {
     "list": {
       "views": {

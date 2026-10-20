@@ -1,19 +1,33 @@
 import React, { useEffect } from 'react';
-import { X, ExternalLink, FileQuestion } from 'lucide-react';
+import { X, ExternalLink, FileQuestion, RotateCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { DocumentItem, DocumentKind } from '@/types/documents/document.types';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { buttonClasses, ButtonVariant } from '@/components/common/button/button';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { tailwind } from '@/utils/tailwind-utils';
+import { TEXT } from '@/static/texts/i18n';
+
+const QUARTER_TURN_DEGREES = 90;
+const HALF_TURN_DEGREES = 180;
+
+const HEADER_ACTION_CLASSES =
+  'flex h-11 w-11 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700';
 
 interface DocumentPreviewModalProps {
   document: DocumentItem | null;
+  rotationDegrees: number;
+  onRotate: () => void;
   onClose: () => void;
 }
 
 export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
   document: item,
+  rotationDegrees,
+  onRotate,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const resolveAuthorLabel = useResolveAuthorLabel();
 
   useEffect(() => {
@@ -36,11 +50,15 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 
   if (!item) return null;
 
+  // De costado la imagen ocupa el alto del visor como ancho y viceversa: la
+  // caja que la contiene se dimensiona ya intercambiada y después se gira.
+  const isSideways = rotationDegrees % HALF_TURN_DEGREES === QUARTER_TURN_DEGREES;
+
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Vista previa de ${item.name}`}
+      aria-label={t(TEXT.DOCUMENTS.PREVIEW.LABEL, { name: item.name })}
       className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-ink-900/80 p-3 sm:p-6"
       onClick={onClose}
     >
@@ -48,32 +66,46 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
         className="mx-auto flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-card bg-white"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-center justify-between gap-3 border-b border-ink-200 px-4 py-3">
+        <header className="flex items-center justify-between gap-3 border-b border-ink-200 px-4 py-2">
           <div className="flex min-w-0 flex-col">
             <Typography variant={TypographyVariant.ACCENT} className="truncate">
               {item.name}
             </Typography>
             <Typography variant={TypographyVariant.HELPER} className="truncate">
-              {item.categoryLabel} · {item.sizeLabel} · Registrado por:{' '}
-              <span className="italic">{resolveAuthorLabel(item.uploadedByUuid, item.uploadedByName)}</span>
+              {item.categoryLabel} · {item.sizeLabel} · {t(TEXT.DOCUMENTS.LIST.REGISTERED_BY)}{' '}
+              <span className="italic">
+                {resolveAuthorLabel(item.uploadedByUuid, item.uploadedByName)}
+              </span>
             </Typography>
           </div>
 
           <div className="flex shrink-0 items-center gap-1">
+            {item.kind === DocumentKind.IMAGE && (
+              <button
+                type="button"
+                onClick={onRotate}
+                aria-label={t(TEXT.DOCUMENTS.PREVIEW.ROTATE)}
+                title={t(TEXT.DOCUMENTS.PREVIEW.ROTATE)}
+                className={HEADER_ACTION_CLASSES}
+              >
+                <RotateCw className="h-5 w-5" aria-hidden />
+              </button>
+            )}
             <a
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Abrir en pestaña nueva"
-              className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700"
+              aria-label={t(TEXT.DOCUMENTS.PREVIEW.OPEN_NEW_TAB)}
+              title={t(TEXT.DOCUMENTS.PREVIEW.OPEN_NEW_TAB)}
+              className={HEADER_ACTION_CLASSES}
             >
               <ExternalLink className="h-4 w-4" aria-hidden />
             </a>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Cerrar vista previa"
-              className="rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-700"
+              aria-label={t(TEXT.DOCUMENTS.PREVIEW.CLOSE)}
+              className={HEADER_ACTION_CLASSES}
             >
               <X className="h-5 w-5" aria-hidden />
             </button>
@@ -87,14 +119,26 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           )}
         >
           {item.kind === DocumentKind.IMAGE && (
-            // Archivo servido desde R2: se usa <img> para no configurar
-            // remotePatterns de next/image por cada dominio de storage.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={item.url}
-              alt={item.name}
-              className="max-h-full max-w-full object-contain"
-            />
+            // `container-type: size` habilita las unidades cqw/cqh, que dan el
+            // tamaño del visor para dimensionar la caja girada sin medir con JS.
+            <div className="relative h-full w-full overflow-hidden [container-type:size]">
+              <div
+                className={tailwind(
+                  'absolute left-1/2 top-1/2 flex items-center justify-center',
+                  isSideways ? 'h-[100cqw] w-[100cqh]' : 'h-full w-full',
+                )}
+                style={{ transform: `translate(-50%, -50%) rotate(${rotationDegrees}deg)` }}
+              >
+                {/* Archivo servido desde R2: se usa <img> para no configurar
+                    remotePatterns de next/image por cada dominio de storage. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.url}
+                  alt={item.name}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            </div>
           )}
 
           {item.kind === DocumentKind.PDF && (
@@ -114,16 +158,16 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               <div className="flex flex-col items-center gap-3 p-8 text-center md:hidden">
                 <FileQuestion className="h-10 w-10 text-ink-400" aria-hidden />
                 <Typography variant={TypographyVariant.BODY}>
-                  Abre el archivo para verlo a pantalla completa.
+                  {t(TEXT.DOCUMENTS.PREVIEW.PDF_MOBILE_HINT)}
                 </Typography>
                 <a
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+                  className={buttonClasses(ButtonVariant.PRIMARY)}
                 >
                   <ExternalLink className="h-4 w-4" aria-hidden />
-                  Abrir archivo
+                  {t(TEXT.DOCUMENTS.PREVIEW.OPEN_FILE)}
                 </a>
               </div>
             </>
@@ -133,16 +177,16 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
             <div className="flex flex-col items-center gap-3 p-8 text-center">
               <FileQuestion className="h-10 w-10 text-ink-400" aria-hidden />
               <Typography variant={TypographyVariant.BODY}>
-                Este tipo de archivo no se puede previsualizar aqui.
+                {t(TEXT.DOCUMENTS.PREVIEW.UNSUPPORTED)}
               </Typography>
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+                className={buttonClasses(ButtonVariant.PRIMARY)}
               >
                 <ExternalLink className="h-4 w-4" aria-hidden />
-                Abrir archivo
+                {t(TEXT.DOCUMENTS.PREVIEW.OPEN_FILE)}
               </a>
             </div>
           )}
