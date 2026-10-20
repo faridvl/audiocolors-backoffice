@@ -6,7 +6,6 @@ import {
   usePatientsQuery,
 } from '@/shared/api/querys/patients-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
-import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { toDayKey, toMonthKey } from '@/shared/utils/dates';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlag } from '@/types/patients/patient';
@@ -48,10 +47,9 @@ function useCount(selection: PatientListSelection, preset: PatientListPreset, is
   return data?.meta.total;
 }
 
-/** Resumen sobre la lista de pacientes. Solo en escritorio: en el celular ni se consulta. */
-export function usePatientSummary(selection: PatientListSelection) {
+/** Resumen sobre la lista de pacientes. Mientras no se ve (`isEnabled`), ni se consulta. */
+export function usePatientSummary(selection: PatientListSelection, isEnabled: boolean) {
   const { t } = useTranslation();
-  const isDesktop = useIsDesktop();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
   const currentMonth = toMonthKey(toDayKey(new Date()));
 
@@ -69,14 +67,14 @@ export function usePatientSummary(selection: PatientListSelection) {
     [currentMonth, controlTypeUuid],
   );
 
-  const confirmedCount = useCount(selection, presets.confirmed, isDesktop);
-  const tentativeCount = useCount(selection, presets.tentative, isDesktop);
+  const confirmedCount = useCount(selection, presets.confirmed, isEnabled);
+  const tentativeCount = useCount(selection, presets.tentative, isEnabled);
   const controlsCount = useCount(
     selection,
     presets.controls,
-    isDesktop && Boolean(controlTypeUuid),
+    isEnabled && Boolean(controlTypeUuid),
   );
-  const hearingAidsCount = useCount(selection, presets.hearingAids, isDesktop);
+  const hearingAidsCount = useCount(selection, presets.hearingAids, isEnabled);
 
   const cards: PatientSummaryCard[] = [
     {

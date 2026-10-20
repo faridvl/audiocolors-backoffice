@@ -271,3 +271,35 @@ tocarla quita solo lo suyo.
 
 **Por qué:** el número tiene que coincidir con lo que muestra la lista al tocar
 la tarjeta.
+
+---
+
+## D15 · Filtro de meses: del más cercano al más lejano, "Sin cita" al final
+
+**Decisión (2026-10-20):** en Pacientes el filtro de próxima cita lista "Todos
+los meses", los meses en orden ascendente y "Sin cita" al final, separado de los
+meses. La bitácora conserva su orden.
+
+**Por qué:** lo que la clínica busca casi siempre es este mes y el siguiente.
+
+---
+
+## D16 · Resumen de pacientes en el celular, en su propia pestaña
+
+**Decisión (2026-10-20):** debajo de `lg` la pantalla de Pacientes tiene dos
+pestañas, Pacientes y Resumen. Resumen muestra las mismas tarjetas (D14) en dos
+columnas; tocar una aplica su filtro y vuelve a Pacientes. Las tarjetas solo se
+consultan cuando se ven. En escritorio no cambia nada.
+
+**Por qué:** en el celular y el iPad vertical no había forma de ver el resumen,
+y arriba de la lista le quitaba lugar.
+
+---
+
+## D17 · Acciones del paciente a la vista, sin menú "⋯"
+
+**Decisión (2026-10-20):** Modificar, Cambiar estado e Indicadores son botones
+visibles en la tarjeta del expediente. Debajo de `lg` van bajo el nombre; en el
+celular (menos de `sm`) solo con ícono y `aria-label`.
+
+**Por qué:** la clínica las usa seguido y en el menú no se encontraban.

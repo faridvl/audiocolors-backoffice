@@ -20,7 +20,13 @@ import { EMPTY_VALUE, formatDate, formatMonthLabel, getFullName } from '@/shared
 import { tailwind } from '@/utils/tailwind-utils';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { usePatientList, ALL_VALUE, DEFAULT_STATUS_FILTER } from './use-patient-list';
+import { Tabs } from '@/components/common/tabs/tabs';
+import {
+  usePatientList,
+  ALL_VALUE,
+  DEFAULT_STATUS_FILTER,
+  PatientListView,
+} from './use-patient-list';
 import { PatientSummaryCards } from './patient-summary-cards';
 import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { BadgeSize } from '@/components/common/badge/badge';
@@ -155,8 +161,12 @@ export const PatientListContainer: React.FC = () => {
     handleFlagFilter,
     handleKindFilter,
     selection,
-    togglePreset,
     isPresetActive,
+    view,
+    viewTabs,
+    isSummaryVisible,
+    handleViewChange,
+    handleSummaryCardSelect,
     handlePageChange,
     handleRetry,
     navigateToCreate,
@@ -178,128 +188,144 @@ export const PatientListContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      <Tabs
+        items={viewTabs}
+        value={view}
+        onChange={handleViewChange}
+        ariaLabel={t(TEXT.PATIENTS.LIST.VIEWS.ARIA_LABEL)}
+        className="lg:hidden"
+      />
+
       <PatientSummaryCards
         selection={selection}
         isPresetActive={isPresetActive}
-        onTogglePreset={togglePreset}
+        onTogglePreset={handleSummaryCardSelect}
+        isVisible={isSummaryVisible}
       />
 
-      <FilterBar
-        leading={
-          <div className="relative w-full lg:w-72">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Buscar por nombre o cédula"
-              aria-label="Buscar pacientes"
-              className={tailwind(inputBaseClasses, 'pl-9')}
-            />
-          </div>
-        }
-        fields={[
-          {
-            key: 'status',
-            label: 'Estado',
-            values: statusFilter,
-            defaultValues: DEFAULT_STATUS_FILTER,
-            options: statusOptions,
-            allValue: ALL_VALUE,
-            onValuesChange: handleStatusFilter,
-          },
-          {
-            key: 'branch',
-            label: 'Sede',
-            values: branchFilter,
-            options: branchOptions,
-            allValue: ALL_VALUE,
-            onValuesChange: handleBranchFilter,
-          },
-          {
-            key: 'appointmentType',
-            label: 'Tipo de cita',
-            values: appointmentTypeFilter,
-            options: appointmentTypeOptions,
-            allValue: ALL_VALUE,
-            onValuesChange: handleAppointmentTypeFilter,
-          },
-          {
-            key: 'kind',
-            label: 'Próxima cita',
-            values: kindFilter,
-            options: kindOptions,
-            allValue: ALL_VALUE,
-            onValuesChange: handleKindFilter,
-          },
-          {
-            key: 'flags',
-            label: 'Indicadores',
-            values: flagFilter,
-            options: flagOptions,
-            allValue: ALL_VALUE,
-            onValuesChange: handleFlagFilter,
-          },
-          {
-            key: 'month',
-            label: 'Próxima cita',
-            ariaLabel: 'Filtrar por mes de próxima cita',
-            inline: true,
-            values: monthFilter,
-            options: appointmentMonthOptions,
-            allValue: ALL_VALUE,
-            onValuesChange: handleMonthFilter,
-          },
-        ]}
-        trailing={createButton}
-        resultCount={meta?.total}
-      />
-
-      {!isLoading && !isError && !!meta?.total && (
-        <Typography variant={TypographyVariant.HELPER}>
-          {meta.total} {meta.total === 1 ? 'paciente' : 'pacientes'}
-        </Typography>
-      )}
-
-      <ResponsiveTable
-        columns={columns}
-        rows={patients}
-        getRowKey={(patient) => patient.uuid}
-        isLoading={isLoading}
-        isError={isError}
-        hasActiveFilters={hasActiveFilters}
-        onRetry={handleRetry}
-        onRowClick={(patient) => navigateToDetail(patient.uuid)}
-        rowAccentColor={getRowAccentColor}
-        errorTitle="No se pudieron cargar los pacientes"
-        emptyTitle="Aún no hay pacientes registrados"
-        emptyDescription="Registra el primer paciente para comenzar."
-        emptyAction={createButton}
-        noResultsTitle="Sin resultados para tu búsqueda"
-        noResultsDescription="Prueba con otro nombre o cédula, o cambia los filtros."
-        rowActions={(patient) => (
-          <Button
-            variant={ButtonVariant.GHOST}
-            onClick={() => navigateToEdit(patient.uuid)}
-            aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
-            className="px-2 py-1.5"
-          >
-            <Pencil className="h-4 w-4" aria-hidden />
-          </Button>
+      <div
+        className={tailwind(
+          'flex-col gap-4 lg:flex',
+          view === PatientListView.SUMMARY ? 'hidden' : 'flex',
         )}
-      />
-
-      {meta && (
-        <Pagination
-          page={page}
-          totalPages={meta.totalPages}
-          total={meta.total}
-          onPageChange={handlePageChange}
+      >
+        <FilterBar
+          leading={
+            <div className="relative w-full lg:w-72">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
+                aria-hidden
+              />
+              <input
+                type="search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                placeholder="Buscar por nombre o cédula"
+                aria-label="Buscar pacientes"
+                className={tailwind(inputBaseClasses, 'pl-9')}
+              />
+            </div>
+          }
+          fields={[
+            {
+              key: 'status',
+              label: 'Estado',
+              values: statusFilter,
+              defaultValues: DEFAULT_STATUS_FILTER,
+              options: statusOptions,
+              allValue: ALL_VALUE,
+              onValuesChange: handleStatusFilter,
+            },
+            {
+              key: 'branch',
+              label: 'Sede',
+              values: branchFilter,
+              options: branchOptions,
+              allValue: ALL_VALUE,
+              onValuesChange: handleBranchFilter,
+            },
+            {
+              key: 'appointmentType',
+              label: 'Tipo de cita',
+              values: appointmentTypeFilter,
+              options: appointmentTypeOptions,
+              allValue: ALL_VALUE,
+              onValuesChange: handleAppointmentTypeFilter,
+            },
+            {
+              key: 'kind',
+              label: 'Próxima cita',
+              values: kindFilter,
+              options: kindOptions,
+              allValue: ALL_VALUE,
+              onValuesChange: handleKindFilter,
+            },
+            {
+              key: 'flags',
+              label: 'Indicadores',
+              values: flagFilter,
+              options: flagOptions,
+              allValue: ALL_VALUE,
+              onValuesChange: handleFlagFilter,
+            },
+            {
+              key: 'month',
+              label: 'Próxima cita',
+              ariaLabel: 'Filtrar por mes de próxima cita',
+              inline: true,
+              values: monthFilter,
+              options: appointmentMonthOptions,
+              allValue: ALL_VALUE,
+              onValuesChange: handleMonthFilter,
+            },
+          ]}
+          trailing={createButton}
+          resultCount={meta?.total}
         />
-      )}
+
+        {!isLoading && !isError && !!meta?.total && (
+          <Typography variant={TypographyVariant.HELPER}>
+            {meta.total} {meta.total === 1 ? 'paciente' : 'pacientes'}
+          </Typography>
+        )}
+
+        <ResponsiveTable
+          columns={columns}
+          rows={patients}
+          getRowKey={(patient) => patient.uuid}
+          isLoading={isLoading}
+          isError={isError}
+          hasActiveFilters={hasActiveFilters}
+          onRetry={handleRetry}
+          onRowClick={(patient) => navigateToDetail(patient.uuid)}
+          rowAccentColor={getRowAccentColor}
+          errorTitle="No se pudieron cargar los pacientes"
+          emptyTitle="Aún no hay pacientes registrados"
+          emptyDescription="Registra el primer paciente para comenzar."
+          emptyAction={createButton}
+          noResultsTitle="Sin resultados para tu búsqueda"
+          noResultsDescription="Prueba con otro nombre o cédula, o cambia los filtros."
+          rowActions={(patient) => (
+            <Button
+              variant={ButtonVariant.GHOST}
+              onClick={() => navigateToEdit(patient.uuid)}
+              aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
+              className="px-2 py-1.5"
+            >
+              <Pencil className="h-4 w-4" aria-hidden />
+            </Button>
+          )}
+        />
+
+        {meta && (
+          <Pagination
+            page={page}
+            totalPages={meta.totalPages}
+            total={meta.total}
+            onPageChange={handlePageChange}
+          />
+        )}
+      </div>
     </div>
   );
 };

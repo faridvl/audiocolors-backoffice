@@ -18,7 +18,8 @@
       "remove": "Quitar filtro {{label}}",
       "clearAll": "Limpiar todo",
       "showResults_one": "Mostrar {{count}} resultado",
-      "showResults_other": "Mostrar {{count}} resultados"
+      "showResults_other": "Mostrar {{count}} resultados",
+      "allMonths": "Todos los meses"
     },
     "errors": {
       "unexpected": "Algo salió mal. Intenta de nuevo."
@@ -310,6 +311,13 @@
     }
   },
   "patients": {
+    "list": {
+      "views": {
+        "ariaLabel": "Vista de pacientes",
+        "patients": "Pacientes",
+        "summary": "Resumen"
+      }
+    },
     "summary": {
       "tentative": "Citas tentativas este mes",
       "confirmed": "Citas confirmadas este mes",
@@ -414,7 +422,6 @@
         "branch": "Sede"
       },
       "actions": {
-        "more": "Más acciones",
         "edit": "Modificar paciente",
         "changeStatus": "Cambiar estado"
       }

@@ -16,7 +16,7 @@ import {
   PatientStatus,
 } from '@/types/patients/patient';
 import { NextAppointmentBlock } from './next-appointment-block';
-import { PatientActionsMenu } from './patient-actions-menu';
+import { PatientActions } from './patient-actions';
 import { PatientDatum } from './patient-datum';
 
 /** Los que se cambian desde el modal; candidato a video tiene su casilla. */
@@ -74,7 +74,8 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
 
   return (
     <section className="rounded-card border border-ink-200 bg-white p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3">
+      {/* Debajo de `lg` las acciones van bajo el nombre: al lado lo apretarían. */}
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <Typography variant={TypographyVariant.SUBTITLE} as="p" className="break-words">
@@ -92,11 +93,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
           )}
         </div>
 
-        <PatientActionsMenu
-          onEdit={onEdit}
-          onChangeStatus={onChangeStatus}
-          onEditFlags={onEditFlags}
-        />
+        <PatientActions onEdit={onEdit} onChangeStatus={onChangeStatus} onEditFlags={onEditFlags} />
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">

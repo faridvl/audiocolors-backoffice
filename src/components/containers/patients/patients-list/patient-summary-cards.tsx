@@ -8,18 +8,26 @@ interface PatientSummaryCardsProps {
   selection: PatientListSelection;
   isPresetActive: (preset: PatientListPreset) => boolean;
   onTogglePreset: (preset: PatientListPreset) => void;
+  /** Si se muestran: en escritorio siempre, debajo de `lg` solo en la pestaña "Resumen". */
+  isVisible: boolean;
 }
 
-/** Tarjetas que filtran la lista con un clic (y lo quitan con otro). Solo escritorio (`lg`). */
+/** Tarjetas que filtran la lista con un clic (y lo quitan con otro). */
 export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
   selection,
   isPresetActive,
   onTogglePreset,
+  isVisible,
 }) => {
-  const { cards } = usePatientSummary(selection);
+  const { cards } = usePatientSummary(selection, isVisible);
 
   return (
-    <div className="hidden gap-3 lg:grid lg:grid-cols-4">
+    <div
+      className={tailwind(
+        'grid-cols-2 gap-3 lg:grid lg:grid-cols-4',
+        isVisible ? 'grid' : 'hidden',
+      )}
+    >
       {cards.map((card) => {
         const isActive = isPresetActive(card.preset);
         return (

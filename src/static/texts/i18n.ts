@@ -22,6 +22,7 @@ export const TEXT = {
       SHOW_RESULTS: 'common.filters.showResults',
       APPLY: 'common.filters.apply',
       REMOVE: 'common.filters.remove',
+      ALL_MONTHS: 'common.filters.allMonths',
     },
   },
   AUTH: {
@@ -262,6 +263,13 @@ export const TEXT = {
     },
   },
   PATIENTS: {
+    LIST: {
+      VIEWS: {
+        ARIA_LABEL: 'patients.list.views.ariaLabel',
+        PATIENTS: 'patients.list.views.patients',
+        SUMMARY: 'patients.list.views.summary',
+      },
+    },
     SUMMARY: {
       TENTATIVE: 'patients.summary.tentative',
       CONFIRMED: 'patients.summary.confirmed',
@@ -303,7 +311,6 @@ export const TEXT = {
         BRANCH: 'patients.detail.fields.branch',
       },
       ACTIONS: {
-        MORE: 'patients.detail.actions.more',
         EDIT: 'patients.detail.actions.edit',
         CHANGE_STATUS: 'patients.detail.actions.changeStatus',
       },
