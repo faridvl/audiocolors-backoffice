@@ -4,6 +4,8 @@ import { tailwind } from '@/utils/tailwind-utils';
 export interface SegmentedOption<TValue extends string> {
   value: TValue;
   label: string;
+  /** Clases de la opción cuando está elegida; por defecto, blanca con sombra. */
+  selectedClassName?: string;
 }
 
 interface SegmentedControlProps<TValue extends string> {
@@ -43,7 +45,9 @@ export function SegmentedControl<TValue extends string>({
             className={tailwind(
               'min-h-[44px] min-w-[52px] rounded-md px-3 text-sm font-semibold transition-colors',
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand',
-              isSelected ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-800',
+              isSelected
+                ? (option.selectedClassName ?? 'bg-white text-ink-900 shadow-sm')
+                : 'text-ink-500 hover:text-ink-800',
             )}
           >
             {option.label}

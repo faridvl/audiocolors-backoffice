@@ -30,7 +30,12 @@ export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
         value={isChecked ? YesNo.YES : YesNo.NO}
         onChange={(value) => onChange(value === YesNo.YES)}
         options={[
-          { value: YesNo.YES, label: t(TEXT.GENERAL.YES) },
+          // Un "Sí" tiene que verse de un vistazo entre quince filas en "No".
+          {
+            value: YesNo.YES,
+            label: t(TEXT.GENERAL.YES),
+            selectedClassName: 'bg-brand text-white shadow-sm',
+          },
           { value: YesNo.NO, label: t(TEXT.GENERAL.NO) },
         ]}
       />
