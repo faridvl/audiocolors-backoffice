@@ -38,7 +38,8 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-card bg-white p-6"
+        // Con varias garantías la lista crece: el modal hace scroll en vez de salirse de la pantalla.
+        className="max-h-[92dvh] w-full max-w-sm overflow-y-auto rounded-card bg-white p-6"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start gap-3">

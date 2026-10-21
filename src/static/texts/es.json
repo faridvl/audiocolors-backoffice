@@ -429,7 +429,10 @@
         "empty": "Todavía no hay archivos subidos como Garantías. Súbelo en los documentos del expediente para poder elegirlo aquí.",
         "loading": "Cargando archivos…",
         "saved": "Archivo de la garantía guardado",
-        "cleared": "Se quitó el archivo de la garantía"
+        "cleared": "Se quitó el archivo de la garantía",
+        "allTitle": "Todas las garantías ({{count}})",
+        "view": "Ver {{name}}",
+        "selected": "Elegida"
       }
     },
     "schedule": {

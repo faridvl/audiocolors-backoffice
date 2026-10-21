@@ -7,10 +7,7 @@ import {
   DocumentCategory,
   DocumentFilter,
   DocumentItem,
-  DocumentKind,
-  DOCUMENT_CATEGORY_LABELS,
   DOCUMENT_NAME_MAX_LENGTH,
-  PatientDocument,
   UpdateDocumentPayload,
 } from '@/types/documents/document.types';
 import {
@@ -21,9 +18,9 @@ import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/uplo
 import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/delete-document-mutation';
 import { useUpdateDocumentMutation } from '@/shared/api/mutations/documents/update-document-mutation';
 import { useIsMobile } from '@/hooks/use-is-mobile';
-import { formatDate, formatFileSize } from '@/shared/utils/formatters';
-import { repairFileName } from '@/shared/utils/file-name';
 import { TEXT } from '@/static/texts/i18n';
+import { mapToDocumentItem } from './document-items';
+import { useDocumentPreview } from './use-document-preview';
 
 /** Solo se pagina en movil: el grid de escritorio ya muestra varias columnas a la vez. */
 const MOBILE_PAGE_SIZE = 5;
@@ -39,26 +36,6 @@ const MAX_FILE_SIZE_MB = 20;
 const BYTES_PER_MB = 1024 * 1024;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * BYTES_PER_MB;
 
-const ROTATION_STEP_DEGREES = 90;
-const FULL_TURN_DEGREES = 360;
-
-const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
-
-/**
- * El tipo de archivo se decide por la URL (el archivo real en R2), nunca por
- * `name`: el nombre se puede editar libremente y el archivo subyacente no
- * cambia, así que basarse en el nombre rompería el preview en cuanto alguien
- * renombrara un PDF sin dejarle la extensión .pdf.
- */
-function resolveDocumentKind(url: string): DocumentKind {
-  const target = url.toLowerCase();
-
-  if (target.endsWith('.pdf')) return DocumentKind.PDF;
-  if (IMAGE_EXTENSIONS.some((extension) => target.endsWith(extension))) return DocumentKind.IMAGE;
-
-  return DocumentKind.OTHER;
-}
-
 /**
  * Separa el nombre de su extensión. Al subir solo se deja editar la base:
  * el API arma la clave en R2 con la extensión del nombre recibido y el
@@ -69,25 +46,6 @@ function splitFileName(fileName: string): { baseName: string; extension: string 
   if (dotIndex <= 0) return { baseName: fileName, extension: '' };
 
   return { baseName: fileName.slice(0, dotIndex), extension: fileName.slice(dotIndex) };
-}
-
-function mapToDocumentItem(document: PatientDocument): DocumentItem {
-  const category = DOCUMENT_CATEGORY_LABELS[document.category]
-    ? document.category
-    : DocumentCategory.OTHER;
-
-  return {
-    uuid: document.uuid,
-    name: repairFileName(document.originalName),
-    url: document.url,
-    category,
-    categoryLabel: DOCUMENT_CATEGORY_LABELS[category],
-    kind: resolveDocumentKind(document.url),
-    uploadedAtLabel: formatDate(document.uploadedAt),
-    uploadedByUuid: document.uploadedByUuid,
-    uploadedByName: document.uploadedByName,
-    sizeLabel: formatFileSize(document.size),
-  };
 }
 
 export function useDocuments(patientUuid: string) {
@@ -102,8 +60,7 @@ export function useDocuments(patientUuid: string) {
   );
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingFileBaseName, setPendingFileBaseName] = useState('');
-  const [previewDocument, setPreviewDocument] = useState<DocumentItem | null>(null);
-  const [previewRotationDegrees, setPreviewRotationDegrees] = useState(0);
+  const preview = useDocumentPreview();
   const [documentToDelete, setDocumentToDelete] = useState<DocumentItem | null>(null);
   const [documentToEdit, setDocumentToEdit] = useState<DocumentItem | null>(null);
   const [editName, setEditName] = useState('');
@@ -222,16 +179,6 @@ export function useDocuments(patientUuid: string) {
     );
   };
 
-  const handleOpenPreview = (document: DocumentItem) => {
-    setPreviewRotationDegrees(0);
-    setPreviewDocument(document);
-  };
-
-  const handleClosePreview = () => setPreviewDocument(null);
-
-  const handleRotatePreview = () =>
-    setPreviewRotationDegrees((current) => (current + ROTATION_STEP_DEGREES) % FULL_TURN_DEGREES);
-
   const handleStartEdit = (document: DocumentItem) => {
     setDocumentToEdit(document);
     setEditName(document.name);
@@ -308,11 +255,11 @@ export function useDocuments(patientUuid: string) {
     openFilePicker,
     handleUpload,
     isUploading,
-    previewDocument,
-    previewRotationDegrees,
-    handleOpenPreview,
-    handleClosePreview,
-    handleRotatePreview,
+    previewDocument: preview.previewDocument,
+    previewRotationDegrees: preview.previewRotationDegrees,
+    handleOpenPreview: preview.handleOpenPreview,
+    handleClosePreview: preview.handleClosePreview,
+    handleRotatePreview: preview.handleRotatePreview,
     documentToDelete,
     setDocumentToDelete,
     handleConfirmDelete,

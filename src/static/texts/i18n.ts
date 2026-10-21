@@ -345,6 +345,9 @@ export const TEXT = {
         LOADING: 'patients.flags.warrantyDocument.loading',
         SAVED: 'patients.flags.warrantyDocument.saved',
         CLEARED: 'patients.flags.warrantyDocument.cleared',
+        ALL_TITLE: 'patients.flags.warrantyDocument.allTitle',
+        VIEW: 'patients.flags.warrantyDocument.view',
+        SELECTED: 'patients.flags.warrantyDocument.selected',
       },
     },
     DETAIL: {

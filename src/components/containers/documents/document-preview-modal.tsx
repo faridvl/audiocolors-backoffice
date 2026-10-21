@@ -34,16 +34,19 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     if (!item) return undefined;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      // En captura y sin propagar: si el visor se abrió sobre otro modal, Escape cierra solo el visor.
+      event.stopPropagation();
+      onClose();
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown, true);
     // Evita que la página de atras haga scroll mientras el visor esta abierto.
     const previousOverflow = window.document.body.style.overflow;
     window.document.body.style.overflow = 'hidden';
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown, true);
       window.document.body.style.overflow = previousOverflow;
     };
   }, [item, onClose]);
