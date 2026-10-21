@@ -379,7 +379,6 @@ export const TEXT = {
       LOADING: 'patients.background.loading',
       LOAD_ERROR: 'patients.background.loadError',
       EMPTY: 'patients.background.empty',
-      FILL: 'patients.background.fill',
       EDIT: 'patients.background.edit',
       FORM_CAPTION: 'patients.background.formCaption',
       HISTORY_TITLE: 'patients.background.historyTitle',

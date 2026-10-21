@@ -1,10 +1,10 @@
 import React from 'react';
-import { AlertTriangle, ClipboardList, Loader2, Pencil } from 'lucide-react';
+import { AlertTriangle, Loader2, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
-import { PatientBackgroundModal } from './patient-background-modal';
+import { PatientBackgroundForm } from './patient-background-form';
 import { PatientBackgroundSummary } from './patient-background-summary';
 import { usePatientBackground } from './use-patient-background';
 
@@ -31,13 +31,25 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
 
   if (isHidden) return null;
 
+  // Sin historia, la hoja se muestra directamente en la tarjeta para llenarla la primera vez.
+  const isFormVisible = !isLoading && !isError && (!background || isEditing);
+
   return (
-    <section className="flex flex-col gap-3 rounded-card border border-ink-200 bg-white p-4">
-      <div className="flex items-center justify-between gap-3">
-        <Typography variant={TypographyVariant.SUBTITLE}>
-          {t(TEXT.PATIENTS.BACKGROUND.TITLE)}
-        </Typography>
-        {background && (
+    <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <Typography variant={TypographyVariant.SUBTITLE}>
+            {t(TEXT.PATIENTS.BACKGROUND.TITLE)}
+          </Typography>
+          {isFormVisible && (
+            <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
+              {t(
+                background ? TEXT.PATIENTS.BACKGROUND.FORM_CAPTION : TEXT.PATIENTS.BACKGROUND.EMPTY,
+              )}
+            </Typography>
+          )}
+        </div>
+        {background && !isEditing && (
           <Button
             variant={ButtonVariant.GHOST}
             onClick={handleStartEditing}
@@ -69,31 +81,20 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
         </div>
       )}
 
-      {!isLoading && !isError && !background && (
-        <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-ink-300 px-4 py-6 text-center">
-          <ClipboardList className="h-8 w-8 text-ink-300" aria-hidden />
-          <Typography variant={TypographyVariant.BODY}>
-            {t(TEXT.PATIENTS.BACKGROUND.EMPTY)}
-          </Typography>
-          <Button variant={ButtonVariant.PRIMARY} onClick={handleStartEditing}>
-            {t(TEXT.PATIENTS.BACKGROUND.FILL)}
-          </Button>
-        </div>
+      {isFormVisible && (
+        <PatientBackgroundForm
+          patientUuid={patientUuid}
+          background={background}
+          onSaved={handleCloseEditing}
+          onCancel={background ? handleCloseEditing : undefined}
+        />
       )}
 
-      {!isLoading && !isError && background && (
+      {!isLoading && !isError && background && !isEditing && (
         <PatientBackgroundSummary
           background={background}
           groups={summaryGroups}
           authorship={authorship}
-        />
-      )}
-
-      {isEditing && (
-        <PatientBackgroundModal
-          patientUuid={patientUuid}
-          background={background}
-          onClose={handleCloseEditing}
         />
       )}
     </section>

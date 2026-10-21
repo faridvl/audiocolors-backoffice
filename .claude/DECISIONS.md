@@ -315,9 +315,13 @@ en el celular (menos de `sm`) solo con ícono y `aria-label`.
 ## D18 · Historia clínica
 
 **Decisión (2026-10-21):** tarjeta propia en el expediente, entre los datos del
-paciente y Control de evolución, con un modal que copia la hoja en papel. Cada
-antecedente es Sí / No en un control segmentado (`SegmentedControl`, 44px por
-opción, pensado para iPad); un formulario nuevo arranca todo en No.
+paciente y Control de evolución, que copia la hoja en papel **dentro de la
+tarjeta, sin modal**: sin historia se muestra la hoja para llenarla; ya llena, un
+resumen con lo que dio Sí, y "Editar" vuelve a mostrar la hoja en la misma
+tarjeta. Cada antecedente es Sí / No en un control segmentado
+(`SegmentedControl`, 44px por opción, pensado para iPad); el Sí elegido va en el
+color de marca para verse entre las filas en No. Un formulario nuevo arranca
+todo en No.
 
 - **403 oculta la tarjeta**: STAFF no tiene acceso a antecedentes clínicos. Para
   distinguirlo de una falla, `ApiServiceClient` ahora lanza `ApiError` (sigue
