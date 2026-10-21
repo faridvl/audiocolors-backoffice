@@ -7,6 +7,8 @@ export const TEXT = {
       RETRY: 'common.buttons.retry',
     },
     NOT_REGISTERED: 'common.notRegistered',
+    YES: 'common.yes',
+    NO: 'common.no',
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
     },
@@ -371,6 +373,29 @@ export const TEXT = {
         EDIT: 'patients.detail.actions.edit',
         CHANGE_STATUS: 'patients.detail.actions.changeStatus',
       },
+    },
+    BACKGROUND: {
+      TITLE: 'patients.background.title',
+      LOADING: 'patients.background.loading',
+      LOAD_ERROR: 'patients.background.loadError',
+      EMPTY: 'patients.background.empty',
+      FILL: 'patients.background.fill',
+      EDIT: 'patients.background.edit',
+      FORM_CAPTION: 'patients.background.formCaption',
+      HISTORY_TITLE: 'patients.background.historyTitle',
+      NO_HISTORY: 'patients.background.noHistory',
+      OTOSCOPY_TITLE: 'patients.background.otoscopyTitle',
+      RIGHT_EAR: 'patients.background.rightEar',
+      LEFT_EAR: 'patients.background.leftEar',
+      TINNITUS_TONE: 'patients.background.tinnitusTone',
+      TINNITUS_WITH_TONE: 'patients.background.tinnitusWithTone',
+      CREATED_BY: 'patients.background.createdBy',
+      UPDATED_BY: 'patients.background.updatedBy',
+      SAVED: 'patients.background.saved',
+      /** `${SECTION_PREFIX}.${BackgroundSection}` */
+      SECTION_PREFIX: 'patients.background.sections',
+      /** `${CONDITION_PREFIX}.${BackgroundCondition}` */
+      CONDITION_PREFIX: 'patients.background.conditions',
     },
     CONTACTS: {
       TITLE: 'patients.contacts.title',

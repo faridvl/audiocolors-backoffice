@@ -24,7 +24,9 @@
     "errors": {
       "unexpected": "Algo salió mal. Intenta de nuevo."
     },
-    "notRegistered": "Sin registrar"
+    "notRegistered": "Sin registrar",
+    "yes": "Sí",
+    "no": "No"
   },
   "auth": {
     "login": {
@@ -277,7 +279,9 @@
       "WARRANTY_CHANGED": "Garantía",
       "VIDEO_CANDIDATE_CHANGED": "Candidato a video",
       "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
-      "RENEW_PRESCRIPTION_CHANGED": "Renovar receta"
+      "RENEW_PRESCRIPTION_CHANGED": "Renovar receta",
+      "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
+      "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -497,6 +501,46 @@
       "actions": {
         "edit": "Modificar paciente",
         "changeStatus": "Cambiar estado"
+      }
+    },
+    "background": {
+      "title": "Historia clínica",
+      "loading": "Cargando historia clínica...",
+      "loadError": "No se pudo cargar la historia clínica",
+      "empty": "Se llena una sola vez, la primera vez que viene el paciente.",
+      "fill": "Llenar historia clínica",
+      "edit": "Editar",
+      "formCaption": "Marca Sí en lo que el paciente tenga o haya tenido.",
+      "historyTitle": "Antecedentes",
+      "noHistory": "Sin antecedentes registrados",
+      "otoscopyTitle": "Exploración física (Otoscopia)",
+      "rightEar": "OD (oído derecho)",
+      "leftEar": "OI (oído izquierdo)",
+      "tinnitusTone": "¿Qué tonalidad?",
+      "tinnitusWithTone": "{{label}} ({{tone}})",
+      "createdBy": "Llenada por {{author}} el {{date}}",
+      "updatedBy": "Modificada por {{author}} el {{date}}",
+      "saved": "Historia clínica guardada",
+      "sections": {
+        "surgeries": "Cirugías",
+        "conditions": "Padecimientos",
+        "symptoms": "Padece de"
+      },
+      "conditions": {
+        "earInfections": "Infecciones de oído",
+        "nasalSurgery": "Nariz",
+        "throatSurgery": "Garganta",
+        "earSurgery": "Oídos",
+        "diabetes": "Diabetes",
+        "cholesterol": "Colesterol",
+        "highPressure": "Presión alta",
+        "allergies": "Alergias",
+        "rhinitis": "Rinitis",
+        "vertigo": "Vértigo",
+        "dizziness": "Mareo",
+        "headacheNoise": "Cefalea (por ruido)",
+        "cloggedEar": "Sensación de oído tapado",
+        "tinnitus": "Acúfeno"
       }
     },
     "contacts": {
