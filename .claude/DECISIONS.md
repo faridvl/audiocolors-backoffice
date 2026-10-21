@@ -309,3 +309,22 @@ visibles en la tarjeta del expediente, en una columna a la derecha de los datos;
 en el celular (menos de `sm`) solo con ícono y `aria-label`.
 
 **Por qué:** la clínica las usa seguido y en el menú no se encontraban.
+
+---
+
+## D18 · Historia clínica
+
+**Decisión (2026-10-21):** tarjeta propia en el expediente, entre los datos del
+paciente y Control de evolución, con un modal que copia la hoja en papel. Cada
+antecedente es Sí / No en un control segmentado (`SegmentedControl`, 44px por
+opción, pensado para iPad); un formulario nuevo arranca todo en No.
+
+- **403 oculta la tarjeta**: STAFF no tiene acceso a antecedentes clínicos. Para
+  distinguirlo de una falla, `ApiServiceClient` ahora lanza `ApiError` (sigue
+  siendo un `Error` con el mismo mensaje, más el `status`); el resto de la app no
+  cambia. Un 403 o 404 no se reintenta.
+- **`notes` se reenvía tal cual**: el API lo tiene pero la hoja no; como el PUT
+  reemplaza todo, el formulario manda el valor que ya había para no borrarlo.
+- **La tonalidad se descarta si Acúfeno es No**, aunque se haya escrito antes.
+- **Autor**: el API solo da `createdByUuid` / `updatedByUuid`, sin nombre; se
+  resuelve con `useResolveAuthorLabel` (nombre solo si fue el usuario logueado).
