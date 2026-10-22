@@ -317,7 +317,7 @@ en el celular (menos de `sm`) solo con ícono y `aria-label`.
 **Decisión (2026-10-21):** tarjeta propia en el expediente, entre los datos del
 paciente y Control de evolución, que copia la hoja en papel **dentro de la
 tarjeta, sin modal**: sin historia se muestra la hoja para llenarla; ya llena,
-queda un resumen fijo, **sin editar** (se llena una sola vez, la primera vez
+queda la hoja completa en solo lectura (todos los antecedentes; el Sí resalta con ✓ y el No queda apagado, con la misma grilla que el formulario), **sin editar** (se llena una sola vez, la primera vez
 que viene el paciente; junto a Guardar se avisa que después no se modifica). En
 pantalla ancha las secciones van en columnas angostas para que cada Sí/No quede
 junto a su antecedente. Cada antecedente es Sí / No en un control segmentado

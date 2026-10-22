@@ -16,7 +16,7 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { background, isHidden, isLoading, isError, refetch, summaryGroups, authorship } =
+  const { background, isHidden, isLoading, isError, refetch, authorship } =
     usePatientBackground(patientUuid);
 
   if (isHidden) return null;
@@ -63,11 +63,7 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
       {isFormVisible && <PatientBackgroundForm patientUuid={patientUuid} background={background} />}
 
       {!isLoading && !isError && background && (
-        <PatientBackgroundSummary
-          background={background}
-          groups={summaryGroups}
-          authorship={authorship}
-        />
+        <PatientBackgroundSummary background={background} authorship={authorship} />
       )}
     </section>
   );
