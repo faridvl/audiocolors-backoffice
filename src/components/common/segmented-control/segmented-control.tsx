@@ -1,6 +1,17 @@
 import React from 'react';
 import { tailwind } from '@/utils/tailwind-utils';
 
+export enum SegmentedControlSize {
+  REGULAR = 'REGULAR',
+  /** Para formularios con muchas filas: sigue siendo cómodo al dedo en iPad. */
+  COMPACT = 'COMPACT',
+}
+
+const SIZE_STYLES: Record<SegmentedControlSize, string> = {
+  [SegmentedControlSize.REGULAR]: 'min-h-[44px] min-w-[52px] px-3',
+  [SegmentedControlSize.COMPACT]: 'min-h-[36px] min-w-[44px] px-2.5',
+};
+
 export interface SegmentedOption<TValue extends string> {
   value: TValue;
   label: string;
@@ -13,6 +24,7 @@ interface SegmentedControlProps<TValue extends string> {
   value: TValue;
   onChange: (value: TValue) => void;
   ariaLabel: string;
+  size?: SegmentedControlSize;
   className?: string;
 }
 
@@ -22,6 +34,7 @@ export function SegmentedControl<TValue extends string>({
   value,
   onChange,
   ariaLabel,
+  size = SegmentedControlSize.REGULAR,
   className,
 }: SegmentedControlProps<TValue>) {
   return (
@@ -43,7 +56,8 @@ export function SegmentedControl<TValue extends string>({
             aria-checked={isSelected}
             onClick={() => onChange(option.value)}
             className={tailwind(
-              'min-h-[44px] min-w-[52px] rounded-md px-3 text-sm font-semibold transition-colors',
+              'rounded-md text-sm font-semibold transition-colors',
+              SIZE_STYLES[size],
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand',
               isSelected
                 ? (option.selectedClassName ?? 'bg-white text-ink-900 shadow-sm')

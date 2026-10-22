@@ -1,6 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SegmentedControl } from '@/components/common/segmented-control/segmented-control';
+import {
+  SegmentedControl,
+  SegmentedControlSize,
+} from '@/components/common/segmented-control/segmented-control';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 
@@ -23,10 +26,11 @@ export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-ink-100 py-1.5">
+    <div className="flex items-center justify-between gap-3 border-b border-ink-100 py-1 last:border-b-0">
       <Typography variant={TypographyVariant.BODY}>{label}</Typography>
       <SegmentedControl
         ariaLabel={label}
+        size={SegmentedControlSize.COMPACT}
         value={isChecked ? YesNo.YES : YesNo.NO}
         onChange={(value) => onChange(value === YesNo.YES)}
         options={[

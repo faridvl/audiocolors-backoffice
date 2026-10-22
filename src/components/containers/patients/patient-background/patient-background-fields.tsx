@@ -25,14 +25,15 @@ export const PatientBackgroundFields: React.FC = () => {
           {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
         </Typography>
 
-        {BACKGROUND_SECTIONS.map(({ section, hasTitle, conditions }) => (
-          <div key={section} className="flex flex-col">
-            {hasTitle && (
-              <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="mt-1">
-                {t(`${TEXT.PATIENTS.BACKGROUND.SECTION_PREFIX}.${section}`)}
-              </Typography>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-6">
+        {/* Columnas angostas: en pantalla ancha cada Sí/No queda junto a su antecedente. */}
+        <div className="grid items-start gap-x-8 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
+          {BACKGROUND_SECTIONS.map(({ section, hasTitle, conditions }) => (
+            <div key={section} className="flex min-w-0 flex-col">
+              {hasTitle && (
+                <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="mb-0.5">
+                  {t(`${TEXT.PATIENTS.BACKGROUND.SECTION_PREFIX}.${section}`)}
+                </Typography>
+              )}
               {conditions.map((condition) => (
                 <BackgroundConditionRow
                   key={condition}
@@ -42,11 +43,12 @@ export const PatientBackgroundFields: React.FC = () => {
                 />
               ))}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
         {values[BackgroundCondition.TINNITUS] && (
           <FormField
+            className="sm:max-w-sm"
             name="tinnitusTone"
             label={t(TEXT.PATIENTS.BACKGROUND.TINNITUS_TONE)}
             maxLength={BACKGROUND_TONE_MAX_LENGTH}
@@ -58,18 +60,20 @@ export const PatientBackgroundFields: React.FC = () => {
         <Typography variant={TypographyVariant.SUBTITLE}>
           {t(TEXT.PATIENTS.BACKGROUND.OTOSCOPY_TITLE)}
         </Typography>
-        <FormField
-          as="textarea"
-          name="otoscopyRight"
-          label={t(TEXT.PATIENTS.BACKGROUND.RIGHT_EAR)}
-          maxLength={BACKGROUND_OTOSCOPY_MAX_LENGTH}
-        />
-        <FormField
-          as="textarea"
-          name="otoscopyLeft"
-          label={t(TEXT.PATIENTS.BACKGROUND.LEFT_EAR)}
-          maxLength={BACKGROUND_OTOSCOPY_MAX_LENGTH}
-        />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FormField
+            as="textarea"
+            name="otoscopyRight"
+            label={t(TEXT.PATIENTS.BACKGROUND.RIGHT_EAR)}
+            maxLength={BACKGROUND_OTOSCOPY_MAX_LENGTH}
+          />
+          <FormField
+            as="textarea"
+            name="otoscopyLeft"
+            label={t(TEXT.PATIENTS.BACKGROUND.LEFT_EAR)}
+            maxLength={BACKGROUND_OTOSCOPY_MAX_LENGTH}
+          />
+        </div>
       </section>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Loader2, Pencil } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
@@ -16,23 +16,13 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const {
-    background,
-    isHidden,
-    isLoading,
-    isError,
-    refetch,
-    summaryGroups,
-    authorship,
-    isEditing,
-    handleStartEditing,
-    handleCloseEditing,
-  } = usePatientBackground(patientUuid);
+  const { background, isHidden, isLoading, isError, refetch, summaryGroups, authorship } =
+    usePatientBackground(patientUuid);
 
   if (isHidden) return null;
 
-  // Sin historia, la hoja se muestra directamente en la tarjeta para llenarla la primera vez.
-  const isFormVisible = !isLoading && !isError && (!background || isEditing);
+  // Se llena una sola vez: sin historia se muestra la hoja; guardada, queda el resumen fijo.
+  const isFormVisible = !isLoading && !isError && !background;
 
   return (
     <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
@@ -43,21 +33,10 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
           </Typography>
           {isFormVisible && (
             <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
-              {t(
-                background ? TEXT.PATIENTS.BACKGROUND.FORM_CAPTION : TEXT.PATIENTS.BACKGROUND.EMPTY,
-              )}
+              {t(TEXT.PATIENTS.BACKGROUND.EMPTY)}
             </Typography>
           )}
         </div>
-        {background && !isEditing && (
-          <Button
-            variant={ButtonVariant.GHOST}
-            onClick={handleStartEditing}
-            icon={<Pencil className="h-4 w-4" aria-hidden />}
-          >
-            {t(TEXT.PATIENTS.BACKGROUND.EDIT)}
-          </Button>
-        )}
       </div>
 
       {isLoading && (
@@ -81,16 +60,9 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
         </div>
       )}
 
-      {isFormVisible && (
-        <PatientBackgroundForm
-          patientUuid={patientUuid}
-          background={background}
-          onSaved={handleCloseEditing}
-          onCancel={background ? handleCloseEditing : undefined}
-        />
-      )}
+      {isFormVisible && <PatientBackgroundForm patientUuid={patientUuid} background={background} />}
 
-      {!isLoading && !isError && background && !isEditing && (
+      {!isLoading && !isError && background && (
         <PatientBackgroundSummary
           background={background}
           groups={summaryGroups}

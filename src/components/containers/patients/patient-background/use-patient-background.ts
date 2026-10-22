@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   isForbiddenError,
@@ -49,7 +49,6 @@ export function usePatientBackground(patientUuid: string) {
     error,
     refetch,
   } = usePatientBackgroundQuery(patientUuid);
-  const [isEditing, setIsEditing] = useState(false);
 
   const summaryGroups = useMemo(
     () => (background ? buildSummaryGroups(background, (key, options) => t(key, options)) : []),
@@ -83,8 +82,5 @@ export function usePatientBackground(patientUuid: string) {
     refetch,
     summaryGroups,
     authorship,
-    isEditing,
-    handleStartEditing: () => setIsEditing(true),
-    handleCloseEditing: () => setIsEditing(false),
   };
 }

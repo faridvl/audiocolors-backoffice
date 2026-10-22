@@ -42,7 +42,6 @@ function toNullableText(value: string): string | null {
 export function usePatientBackgroundForm(
   patientUuid: string,
   background: PatientBackground | null,
-  onClose: () => void,
 ) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -69,8 +68,8 @@ export function usePatientBackgroundForm(
           void queryClient.invalidateQueries({
             queryKey: [FETCH_PATIENT_BACKGROUND_KEY, patientUuid],
           });
+          // Al refrescar llega la historia guardada y la tarjeta pasa sola al resumen.
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
-          onClose();
         },
         onError: (error: Error) => toast.error(error.message),
       },
