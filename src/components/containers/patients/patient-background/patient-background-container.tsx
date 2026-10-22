@@ -1,11 +1,12 @@
 import React from 'react';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientBackgroundForm } from './patient-background-form';
 import { PatientBackgroundSummary } from './patient-background-summary';
+import { BackgroundFormMode } from './use-patient-background-form';
 import { usePatientBackground } from './use-patient-background';
 
 interface PatientBackgroundContainerProps {
@@ -16,13 +17,23 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
   patientUuid,
 }) => {
   const { t } = useTranslation();
-  const { background, isHidden, isLoading, isError, refetch, authorship } =
-    usePatientBackground(patientUuid);
+  const {
+    background,
+    isHidden,
+    isLoading,
+    isError,
+    refetch,
+    authorship,
+    isUpdating,
+    handleStartUpdate,
+    handleCloseUpdate,
+  } = usePatientBackground(patientUuid);
 
   if (isHidden) return null;
 
-  // Se llena una sola vez: sin historia se muestra la hoja; guardada, queda el resumen fijo.
-  const isFormVisible = !isLoading && !isError && !background;
+  // Se llena una sola vez y queda fija; editarla después deja el cambio en Control de evolución.
+  const isReady = !isLoading && !isError;
+  const isFormVisible = isReady && (!background || isUpdating);
 
   return (
     <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
@@ -31,12 +42,22 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
           <Typography variant={TypographyVariant.SUBTITLE}>
             {t(TEXT.PATIENTS.BACKGROUND.TITLE)}
           </Typography>
-          {isFormVisible && (
+          {isReady && !background && (
             <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
               {t(TEXT.PATIENTS.BACKGROUND.EMPTY)}
             </Typography>
           )}
         </div>
+        {isReady && background && !isUpdating && (
+          <Button
+            variant={ButtonVariant.GHOST}
+            onClick={handleStartUpdate}
+            icon={<Pencil className="h-4 w-4" aria-hidden />}
+            className="shrink-0"
+          >
+            {t(TEXT.PATIENTS.BACKGROUND.UPDATE.BUTTON)}
+          </Button>
+        )}
       </div>
 
       {isLoading && (
@@ -60,9 +81,16 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
         </div>
       )}
 
-      {isFormVisible && <PatientBackgroundForm patientUuid={patientUuid} background={background} />}
+      {isFormVisible && (
+        <PatientBackgroundForm
+          patientUuid={patientUuid}
+          background={background}
+          mode={background ? BackgroundFormMode.UPDATE : BackgroundFormMode.FILL}
+          onClose={handleCloseUpdate}
+        />
+      )}
 
-      {!isLoading && !isError && background && (
+      {isReady && background && !isUpdating && (
         <PatientBackgroundSummary background={background} authorship={authorship} />
       )}
     </section>

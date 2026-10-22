@@ -393,6 +393,17 @@ export const TEXT = {
       SECTION_PREFIX: 'patients.background.sections',
       /** `${CONDITION_PREFIX}.${BackgroundCondition}` */
       CONDITION_PREFIX: 'patients.background.conditions',
+      /** Editar una ya llena: la original queda fija y el cambio va a Control de evolución. */
+      UPDATE: {
+        BUTTON: 'patients.background.update.button',
+        HINT: 'patients.background.update.hint',
+        SUBMIT: 'patients.background.update.submit',
+        SAVED: 'patients.background.update.saved',
+        NO_CHANGES: 'patients.background.update.noChanges',
+        NOTE_TITLE: 'patients.background.update.noteTitle',
+        CHANGE_LINE: 'patients.background.update.changeLine',
+        TONE_LABEL: 'patients.background.update.toneLabel',
+      },
     },
     CONTACTS: {
       TITLE: 'patients.contacts.title',

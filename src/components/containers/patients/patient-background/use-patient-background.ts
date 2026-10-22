@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   isForbiddenError,
@@ -36,6 +37,8 @@ export function usePatientBackground(patientUuid: string) {
     }
   }
 
+  const [isUpdating, setIsUpdating] = useState(false);
+
   return {
     background: background ?? null,
     // STAFF no tiene acceso a antecedentes clínicos: la tarjeta no se muestra.
@@ -44,5 +47,8 @@ export function usePatientBackground(patientUuid: string) {
     isError,
     refetch,
     authorship,
+    isUpdating,
+    handleStartUpdate: () => setIsUpdating(true),
+    handleCloseUpdate: () => setIsUpdating(false),
   };
 }
