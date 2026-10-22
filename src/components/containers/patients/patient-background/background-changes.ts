@@ -5,7 +5,7 @@ import { PATIENT_NOTE_TEXT_MAX_LENGTH } from '@/types/patients/patient-note';
 import type { PatientBackgroundFormValues } from './use-patient-background-form';
 
 /** Largo máximo de un texto citado en la nota, para que varios cambios entren en una sola. */
-const QUOTED_TEXT_MAX_LENGTH = 100;
+const QUOTED_TEXT_MAX_LENGTH = 300;
 const ELLIPSIS = '…';
 
 function quote(t: TFunction, value: string | null | undefined): string {

@@ -18,4 +18,4 @@ export interface CreatePatientNotePayload {
   category?: DocumentCategory;
 }
 
-export const PATIENT_NOTE_TEXT_MAX_LENGTH = 500;
+export const PATIENT_NOTE_TEXT_MAX_LENGTH = 2500;
