@@ -30,6 +30,46 @@
     "yes": "Sí",
     "no": "No"
   },
+  "releaseNotes": {
+    "menu": "Notificaciones",
+    "title": "Notificaciones",
+    "close": "Cerrar",
+    "version": "Nueva versión {{version}}",
+    "unseen_one": "{{count}} notificación sin ver",
+    "unseen_other": "{{count}} notificaciones sin ver",
+    "releases": {
+      "v1_0_0": {
+        "clinicalHistory": {
+          "title": "Historia clínica",
+          "description": "Se llena la primera vez que viene el paciente. Si se edita, la hoja actualizada queda como PDF en Archivos."
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "Al fondo del menú: tipos de cita (nombre, duración y cuál es el control) y las preguntas de la historia clínica."
+        },
+        "roles": {
+          "title": "Permisos por puesto",
+          "description": "Recepción ve pacientes, agenda y archivos, sin la información clínica."
+        },
+        "warranty": {
+          "title": "Estado de garantía",
+          "description": "Garantía expirada, renovar receta y el archivo de la garantía del paciente."
+        },
+        "files": {
+          "title": "Archivos",
+          "description": "Se pueden renombrar, cambiar de sección y rotar; los nombres se ven sin la extensión."
+        },
+        "patients": {
+          "title": "Pacientes",
+          "description": "Resumen también en el celular, meses del más cercano al más lejano y \"Sin cita\" en Próxima cita."
+        },
+        "agenda": {
+          "title": "Agenda",
+          "description": "Las citas se mueven de hora sin trabarse y cada una dura lo que su tipo de cita."
+        }
+      }
+    }
+  },
   "layout": {
     "appLabel": "Gestión Clínica",
     "loadingUser": "Cargando...",

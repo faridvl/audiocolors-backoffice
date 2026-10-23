@@ -29,6 +29,15 @@ export const TEXT = {
       ALL_MONTHS: 'common.filters.allMonths',
     },
   },
+  RELEASE_NOTES: {
+    MENU: 'releaseNotes.menu',
+    TITLE: 'releaseNotes.title',
+    CLOSE: 'releaseNotes.close',
+    VERSION: 'releaseNotes.version',
+    UNSEEN: 'releaseNotes.unseen',
+    /** `${RELEASES_PREFIX}.v1_0_0.clinicalHistory.title`: el contenido de cada versión. */
+    RELEASES_PREFIX: 'releaseNotes.releases',
+  },
   LAYOUT: {
     APP_LABEL: 'layout.appLabel',
     LOADING_USER: 'layout.loadingUser',

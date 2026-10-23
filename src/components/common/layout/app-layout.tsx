@@ -10,11 +10,15 @@ import {
   History,
   LogOut,
   ChevronDown,
+  Bell,
   ArrowLeft,
   Settings,
   type LucideIcon,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
+import { CountBadge } from '@/components/common/badge/count-badge';
+import { ReleaseNotesModal } from '@/components/containers/release-notes/release-notes-modal';
+import { useReleaseNotes } from '@/components/containers/release-notes/use-release-notes';
 import { SETTINGS_SECTIONS } from '@/components/containers/settings/settings-sections';
 import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
@@ -63,13 +67,21 @@ const UserMenu: React.FC = () => {
   const { t } = useTranslation();
   const isIphone = useIsIphone();
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
+  const releaseNotes = useReleaseNotes(user?.uuid);
 
   return (
     <>
       <Menu as="div" className="relative">
         <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
+          <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
             {getInitials(user?.fullName)}
+            {/* Invita a abrir el menú: ahí está la novedad sin ver. */}
+            {releaseNotes.unseenCount > 0 && (
+              <span
+                className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-white"
+                aria-hidden
+              />
+            )}
           </span>
           <span className="hidden text-left sm:flex sm:flex-col">
             <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
@@ -122,6 +134,26 @@ const UserMenu: React.FC = () => {
               {({ active }) => (
                 <button
                   type="button"
+                  onClick={releaseNotes.handleOpen}
+                  className={tailwind(
+                    'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                    active && 'bg-ink-50',
+                  )}
+                >
+                  <Bell className="h-4 w-4" aria-hidden />
+                  <span className="flex-1">{t(TEXT.RELEASE_NOTES.MENU)}</span>
+                  <CountBadge
+                    count={releaseNotes.unseenCount}
+                    ariaLabel={t(TEXT.RELEASE_NOTES.UNSEEN, { count: releaseNotes.unseenCount })}
+                  />
+                </button>
+              )}
+            </Menu.Item>
+
+            <Menu.Item>
+              {({ active }) => (
+                <button
+                  type="button"
                   onClick={logout}
                   className={tailwind(
                     'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
@@ -138,6 +170,10 @@ const UserMenu: React.FC = () => {
       </Menu>
 
       {isCalendarSyncOpen && <CalendarSyncSheet onClose={() => setIsCalendarSyncOpen(false)} />}
+
+      {releaseNotes.isOpen && (
+        <ReleaseNotesModal releases={releaseNotes.releases} onClose={releaseNotes.handleClose} />
+      )}
     </>
   );
 };
