@@ -24,7 +24,7 @@ import {
   resolveAnswers,
 } from './clinical-history';
 
-/** Llenarla por primera vez, o editarla: la original no se toca y lo editado va a Archivos. */
+/** Llenarla por primera vez, o editarla: se actualiza y lo que cambió queda como PDF en Archivos. */
 export enum BackgroundFormMode {
   FILL = 'FILL',
   UPDATE = 'UPDATE',
@@ -87,7 +87,7 @@ export function usePatientBackgroundForm({
     );
   };
 
-  const saveUpdateAsPdf = async (values: ClinicalHistoryFormValues) => {
+  const saveUpdate = async (values: ClinicalHistoryFormValues) => {
     const changes = buildBackgroundChanges(t, fields, originalAnswers, values);
     if (changes.length === 0) {
       toast.info(t(TEXT.PATIENTS.BACKGROUND.UPDATE.NO_CHANGES));
@@ -115,24 +115,36 @@ export function usePatientBackgroundForm({
     }
 
     const fileName = `${t(TEXT.PATIENTS.BACKGROUND.UPDATE.FILE_NAME, { date: toDayKey(today) })}.pdf`;
-    executeUploadDocument(
+    const refreshAfterUpdate = () => {
+      void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_BACKGROUND_KEY, patientUuid] });
+      void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_DOCUMENTS_KEY, patientUuid] });
+      void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
+      onDone();
+    };
+
+    // La historia queda con lo último; el PDF en Archivos es el registro de qué cambió y quién.
+    executeSavePatientBackground(
+      { patientUuid, background: buildPayload(fields, values, background?.notes ?? null) },
       {
-        patientUuid,
-        file: new File([pdf], fileName, { type: PDF_MIME_TYPE }),
-        category: DocumentCategory.CLINICAL_HISTORY,
-        fileName,
-      },
-      {
-        onSuccess: () => {
-          toast.success(t(TEXT.PATIENTS.BACKGROUND.UPDATE.SAVED));
-          void queryClient.invalidateQueries({
-            queryKey: [FETCH_PATIENT_DOCUMENTS_KEY, patientUuid],
-          });
-          void queryClient.invalidateQueries({
-            queryKey: [FETCH_PATIENT_ACTIVITY_KEY],
-          });
-          onDone();
-        },
+        onSuccess: () =>
+          executeUploadDocument(
+            {
+              patientUuid,
+              file: new File([pdf], fileName, { type: PDF_MIME_TYPE }),
+              category: DocumentCategory.CLINICAL_HISTORY,
+              fileName,
+            },
+            {
+              onSuccess: () => {
+                toast.success(t(TEXT.PATIENTS.BACKGROUND.UPDATE.SAVED));
+                refreshAfterUpdate();
+              },
+              onError: () => {
+                toast.error(t(TEXT.PATIENTS.BACKGROUND.UPDATE.PDF_UPLOAD_ERROR));
+                refreshAfterUpdate();
+              },
+            },
+          ),
         onError: (error: Error) => toast.error(error.message),
       },
     );
@@ -140,7 +152,7 @@ export function usePatientBackgroundForm({
 
   const handleSubmit = (values: ClinicalHistoryFormValues) => {
     if (mode === BackgroundFormMode.UPDATE && background) {
-      void saveUpdateAsPdf(values);
+      void saveUpdate(values);
       return;
     }
     saveFirstTime(values);
