@@ -15,7 +15,7 @@ para poder entregar a un cliente real sin esperar a que Zynka esté completo.
 
 | Repo | Ubicación | Rol |
 |---|---|---|
-| API | `C:\Users\Personal\Desktop\standard-saas-api` | Backend compartido. **No se toca** |
+| API | `E:\Proyectos\node\standard-saas-api` | Backend compartido |
 | Zynka | `D:\Documentos\Proyectos\React\next-audiology-files` | Origen del código |
 | Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
 | Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotos |
@@ -25,7 +25,8 @@ para poder entregar a un cliente real sin esperar a que Zynka esté completo.
 Next.js 14 (Pages Router) · TypeScript · Tailwind · TanStack Query 5 ·
 Formik + Yup · Sonner · Fira Sans
 
-Sin PDF, sin audiograma, sin inventario. Citas: próxima cita por paciente
+Sin audiograma ni inventario. El único PDF que se genera es la historia clínica
+editada (jsPDF en el navegador, ver D18). Citas: próxima cita por paciente
 (mes tentativo → día confirmado) y la agenda del día en `/agenda`.
 
 ## Estructura
@@ -92,7 +93,7 @@ expiración. La validación real la hace el API.
 
 AudioColors es un tenant del mismo backend que Zynka. **El aislamiento lo
 resuelve el JWT**: cada controller del API lee `tenantUuid` del token y el
-frontend nunca lo envía. Por eso este repo no necesitó ningún cambio en el API.
+frontend nunca lo envía.
 
 | Dato | Valor |
 |---|---|

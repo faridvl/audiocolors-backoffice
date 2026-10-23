@@ -15,11 +15,13 @@ import { buildMonthOption } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlag, PatientStatus } from '@/types/patients/patient';
 import {
+  NO_APPOINTMENT_VALUE,
   PatientListPreset,
   PatientListSelection,
   applyPresetTo,
   isPresetApplied,
   removePresetFrom,
+  toNextAppointmentMonths,
   toPatientListFilters,
 } from './patient-list-selection';
 
@@ -27,8 +29,6 @@ const PAGE_SIZE_DEFAULT = 7;
 const PAGE_SIZE_FILTERED = 10;
 const SEARCH_DEBOUNCE_MS = 300;
 export const ALL_VALUE = 'all';
-/** Opción del filtro de próxima cita para quien no tiene cita ni mes anotado; el API la reconoce así. */
-const NO_APPOINTMENT_VALUE = 'none';
 
 /** El listado arranca mostrando solo pacientes activos. */
 export const DEFAULT_STATUS_FILTER = [PatientStatus.ACTIVE];
@@ -70,20 +70,19 @@ export function usePatientList() {
   );
   const [flagFilter, setFlagFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.flags`, []);
   const [kindFilter, setKindFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.kinds`, []);
-
   const { data: scheduledMonths } = useAppointmentMonthsQuery();
   const { data: branches } = useBranchesQuery();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
 
   const appointmentMonthOptions = useMemo(
     () => [
-      { label: 'Todos los meses', value: ALL_VALUE },
-      { label: 'Sin cita', value: NO_APPOINTMENT_VALUE },
-      // Del más lejano al más cercano, igual que el filtro de mes de la
-      // bitácora: el API los devuelve en orden ascendente.
-      ...[...(scheduledMonths?.months ?? [])].sort().reverse().map(buildMonthOption),
+      { label: t(TEXT.GENERAL.FILTERS.ALL_MONTHS), value: ALL_VALUE },
+      // Del más cercano al más lejano: lo que la clínica busca casi siempre es
+      // lo de este mes y el siguiente.
+      ...[...(scheduledMonths?.months ?? [])].sort().map(buildMonthOption),
+      { label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT), value: NO_APPOINTMENT_VALUE },
     ],
-    [scheduledMonths],
+    [scheduledMonths, t],
   );
 
   const statusOptions = useMemo(
@@ -135,8 +134,9 @@ export function usePatientList() {
         label: KIND_LABELS[kind],
         value: kind,
       })),
+      { label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT), value: NO_APPOINTMENT_VALUE },
     ],
-    [],
+    [t],
   );
 
   useEffect(() => {
@@ -193,12 +193,24 @@ export function usePatientList() {
     pageSize,
     debouncedSearch,
     PatientStatusFilter.ALL,
-    monthFilter,
+    toNextAppointmentMonths(selection),
     filters,
   );
 
   const withPageReset = (setter: (values: string[]) => void) => (values: string[]) => {
     setter(values);
+    setPage(1);
+  };
+
+  // "Sin cita" contradice a confirmada y tentativa: elegir una quita la otra.
+  const handleKindFilter = (values: string[]) => {
+    const added = values.filter((value) => !kindFilter.includes(value));
+    const next = added.includes(NO_APPOINTMENT_VALUE)
+      ? [NO_APPOINTMENT_VALUE]
+      : added.length > 0
+        ? values.filter((value) => value !== NO_APPOINTMENT_VALUE)
+        : values;
+    setKindFilter(next);
     setPage(1);
   };
 
@@ -244,10 +256,10 @@ export function usePatientList() {
     handleBranchFilter: withPageReset(setBranchFilter),
     handleAppointmentTypeFilter: withPageReset(setAppointmentTypeFilter),
     handleFlagFilter: withPageReset(setFlagFilter),
-    handleKindFilter: withPageReset(setKindFilter),
+    handleKindFilter,
     selection,
-    togglePreset,
     isPresetActive,
+    togglePreset,
     handlePageChange: setPage,
     handleRetry: refetch,
     navigateToCreate: navigation.patients.create,

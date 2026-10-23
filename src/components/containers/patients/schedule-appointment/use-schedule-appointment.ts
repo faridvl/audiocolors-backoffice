@@ -14,10 +14,17 @@ import { useUpdateAppointmentTimeMutation } from '@/shared/api/mutations/appoint
 import {
   buildSlotHours,
   buildSlotTimes,
+  resolveTypeDuration,
   toSlotHour,
 } from '@/components/containers/agenda/agenda-presenter';
 import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
-import { formatHour, resolveInitialConfirmDay, toDayKey, toMonthKey } from '@/shared/utils/dates';
+import {
+  formatHour,
+  MINUTES_IN_HOUR,
+  resolveInitialConfirmDay,
+  toDayKey,
+  toMonthKey,
+} from '@/shared/utils/dates';
 import { TEXT } from '@/static/texts/i18n';
 
 /** Los dos momentos del flujo: primero se anota el mes, despues el dia. */
@@ -231,7 +238,11 @@ export function useScheduleAppointment({
         try {
           await executeUpdateAppointmentTimeAsync({
             appointmentUuid: appointment.id,
-            ...buildSlotTimes(date, hour),
+            ...buildSlotTimes(
+              date,
+              hour * MINUTES_IN_HOUR,
+              resolveTypeDuration(appointmentTypes, selectedTypeUuid),
+            ),
           });
           toast.success(
             t(TEXT.PATIENTS.SCHEDULE.TOASTS.SCHEDULED_AT, {

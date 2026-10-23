@@ -1,6 +1,9 @@
 import { NextAppointmentKind, PatientListFilters } from '@/shared/api/querys/patients-query';
 import { PatientFlag, PatientStatus } from '@/types/patients/patient';
 
+/** Opción "Sin cita" (de meses y de próxima cita): ni cita ni mes anotado. El API la reconoce así. */
+export const NO_APPOINTMENT_VALUE = 'none';
+
 /** Filtros que aplica cada tarjeta del resumen. */
 export interface PatientListPreset {
   months?: string[];
@@ -64,6 +67,15 @@ export function isPresetApplied(selection: PatientListSelection, preset: Patient
   );
 }
 
+/**
+ * El API no acepta "Sin cita" como tipo de próxima cita, solo como mes: elegida
+ * en "Próxima cita" se manda junto a los meses.
+ */
+export function toNextAppointmentMonths(selection: PatientListSelection): string[] {
+  if (!selection.kinds.includes(NO_APPOINTMENT_VALUE)) return selection.months;
+  return Array.from(new Set([...selection.months, NO_APPOINTMENT_VALUE]));
+}
+
 export function toPatientListFilters(selection: PatientListSelection): PatientListFilters {
   return {
     statuses: selection.statuses as PatientStatus[],
@@ -72,6 +84,10 @@ export function toPatientListFilters(selection: PatientListSelection): PatientLi
     hearingAidsInLab: selection.flags.includes(PatientFlag.HEARING_AIDS_IN_LAB),
     hasActiveWarranty: selection.flags.includes(PatientFlag.ACTIVE_WARRANTY),
     isVideoCandidate: selection.flags.includes(PatientFlag.VIDEO_CANDIDATE),
-    nextAppointmentKinds: selection.kinds as NextAppointmentKind[],
+    warrantyExpired: selection.flags.includes(PatientFlag.WARRANTY_EXPIRED),
+    renewPrescription: selection.flags.includes(PatientFlag.RENEW_PRESCRIPTION),
+    nextAppointmentKinds: selection.kinds.filter(
+      (kind) => kind !== NO_APPOINTMENT_VALUE,
+    ) as NextAppointmentKind[],
   };
 }

@@ -1,6 +1,6 @@
 {
   "name": "audiocolors-backoffice",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "author": {
     "name": "Farid Villacis"
@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release:bump": "node scripts/release.mjs bump",
+    "release:check": "node scripts/release.mjs check --base origin/main"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.2",
@@ -20,6 +22,7 @@
     "formik": "^2.4.6",
     "i18next": "^23.11.5",
     "js-cookie": "^3.0.5",
+    "jspdf": "3.0.1",
     "lucide-react": "^0.564.0",
     "next": "^14.2.4",
     "react": "^18.3.1",

@@ -31,3 +31,13 @@ export function markAgendaDrag(event: React.DragEvent, payload: AgendaDragPayloa
 export function isAgendaDrag(event: React.DragEvent): boolean {
   return Array.from(event.dataTransfer.types).includes(DRAG_FORMAT);
 }
+
+/**
+ * Corre un cambio de pantalla fuera del evento de arrastre. Chrome cancela el
+ * arrastre si dentro de `dragstart` la fila se corre de lugar (las pistas de
+ * "Suelta aquí" la empujan), y pierde el `dragend` si dentro de `drop` la
+ * fila se saca de su horario.
+ */
+export function deferFromDragEvent(task: () => void) {
+  window.setTimeout(task, 0);
+}

@@ -22,7 +22,6 @@ import { useUpdateAppointmentStatusMutation } from '@/shared/api/mutations/appoi
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { getBranchStripeColor } from '@/shared/design/tokens';
-import { downloadCalendarEvent } from '@/shared/utils/calendar-file';
 import { buildMonthOption, formatMonthLabel } from '@/shared/utils/formatters';
 import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
 import { TEXT } from '@/static/texts/i18n';
@@ -36,6 +35,7 @@ import {
   formatLongDay,
   formatCompactDay,
   fromDayKey,
+  MINUTES_IN_HOUR,
   startOfWeek,
   toDayKey,
   toMonthKey,
@@ -389,7 +389,7 @@ export function useAgenda() {
 
   const handleSetTimeAt = (appointment: Appointment, hour: number) => {
     setTimeAppointmentUuid(null);
-    void scheduling.moveAppointment(appointment, selectedDayKey, hour);
+    void scheduling.moveAppointment(appointment, selectedDayKey, hour * MINUTES_IN_HOUR);
   };
 
   /** "Confirmar día": la ficha con calendario y horas, sin modal de formulario. */
@@ -400,7 +400,7 @@ export function useAgenda() {
 
   const handleConfirmAt = (dayKey: string, hour: number) => {
     if (!confirmTarget) return;
-    void scheduling.confirmPending(confirmTarget, dayKey, hour);
+    void scheduling.confirmPending(confirmTarget, dayKey, hour * MINUTES_IN_HOUR);
     setConfirmTarget(null);
   };
 
@@ -479,21 +479,6 @@ export function useAgenda() {
     }
   };
 
-  const handleAddToCalendar = (appointment: Appointment, dayKey: string) => {
-    const name = appointment.patientName ?? '';
-    downloadCalendarEvent(
-      {
-        uid: appointment.id,
-        dayKey,
-        title: t(TEXT.AGENDA.CALENDAR_EVENT.TITLE, { name }),
-        description: t(TEXT.AGENDA.CALENDAR_EVENT.DESCRIPTION, {
-          type: appointment.typeName ?? t(TEXT.AGENDA.ROW.NO_TYPE),
-        }),
-      },
-      `cita-${dayKey}`,
-    );
-  };
-
   return {
     todayKey,
     view,
@@ -557,7 +542,6 @@ export function useAgenda() {
     scheduling,
     handleSendWhatsApp,
     handleCallPatient,
-    handleAddToCalendar,
     handleRetry: refetch,
     navigateToPatient: navigation.patients.detail,
   };

@@ -9,6 +9,22 @@ const NETWORK_ERROR_MESSAGE =
     : 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
 const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
+export enum HttpStatus {
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+}
+
+/** Error del API con su status, para distinguir p. ej. un 403 de rol de una falla real. */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 interface ApiErrorBody {
   message?: string | string[];
 }
@@ -79,7 +95,10 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
   const data = await parseJsonBody<T>(response);
 
   if (!response.ok) {
-    throw new Error(resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE));
+    throw new ApiError(
+      resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE),
+      response.status,
+    );
   }
 
   return data as T;

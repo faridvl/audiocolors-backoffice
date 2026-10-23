@@ -2,7 +2,7 @@
 
 > Documento vivo. Actualizar al cierre de cada etapa, antes de `git push`.
 
-**Última actualización:** 2026-10-10 · **Branch:** `feature/resumen-segun-filtros`
+**Última actualización:** 2026-10-20 · **Branch:** `feature/ajustes-expediente`
 
 ---
 
@@ -75,6 +75,24 @@ franjas, con los datos siempre visibles (D11). Contactos editables en un modal
 (D13). Al confirmar una cita se puede elegir la hora (8:00 a 17:00), con el
 mismo guardado que la agenda.
 
+### Etapa 7 — Agenda, citas, archivos y garantía
+Agenda de escritorio: el arrastre ya no se traba (Chrome lo cancelaba cuando
+la lista se corría al levantar la tarjeta) y la ventana del día entra entera en
+13" e iPad horizontal, con desplazamiento automático en el borde. Sin "Agregar a
+mi calendario". Al agendar, el tipo va primero y la cita dura lo que su tipo
+(Cita 60, Control y Mantenimiento 30; `PATCH /appointment-types/:uuid` nuevo).
+Archivos: subir sin ver la extensión, rotar al verla y cambiar de sección.
+Pacientes: meses del más cercano al más lejano con "Sin cita" al final (D15),
+pestaña "Resumen" en móvil (D16) y acciones a la vista (D17). Indicadores:
+pestaña "Estado de garantía" con "Garantía expirada", "Renovar receta" y el
+archivo de la garantía (D13).
+
+Cambios en el API: `feature/editar-tipo-cita` (ya en `develop`) y
+`feature/garantia-y-documentos` (PR #11, con la migración
+`20261020120000_add_warranty_expired_renew_prescription`, que se aplica a mano
+antes de mergear). Probado de punta a punta con el API y una base Postgres
+locales.
+
 ---
 
 ## 📋 Pendientes
@@ -84,6 +102,7 @@ mismo guardado que la agenda.
 |---|---|---|
 | P0-1 | **Cambiar las contraseñas temporales** | Ambos usuarios tienen `Password1`. `PATCH /users/:uuid` con `password` |
 | P0-2 | **Desplegar** | Ver "Próximo paso" |
+| P0-3 | **Duración de los tipos de cita en producción** | Al pasar a producción, revisar en Configuración → Tipos de cita: Cita 60 min, Control y Mantenimiento 30, y Control marcado como control |
 
 ### 🟠 Deseable
 | # | Tarea | Notas |
@@ -93,6 +112,12 @@ mismo guardado que la agenda.
 | P1-3 | Paginación real del filtro "Inactivos" | Hoy filtra en cliente y su conteo no es exacto. Requiere cambio en el API |
 | P1-5 | Migrar a i18n el resto del módulo de pacientes | Lista (`patient-list-container`, `use-patient-list`), formulario y mensajes de `patient-validation` siguen con texto suelto |
 | P1-4 | **Migrar a i18n** (`i18next` + `es.json`, patrón de Zynka) | Revierte la regla anterior de "sin i18n" — ver RULES.md §5.2. Instalar `i18next`/`react-i18next`, crear `src/shared/i18n/i18n.ts` + `src/static/texts/i18n.ts` (`TEXT` const) + `es.json`, y migrar los ~17 archivos `.tsx` con strings hardcodeados. Magastore NO sirve de referencia de uso real (tiene el setup pero 0% adoptado); usar Zynka como modelo de convención de keys. |
+
+### 🔵 Próximas etapas (decididas, sin empezar)
+| # | Tarea | Notas |
+|---|---|---|
+| P3-1 | **Configuración**: faltan sedes y usuarios | D21. Ya están Tipos de cita (D22) e Historia clínica |
+| P3-2 | **Permisos configurables** por el administrador | D20: por rol y por clínica, el API y el front revisan permisos |
 
 ### ⚪ Si el uso lo pide
 | # | Tarea | Notas |

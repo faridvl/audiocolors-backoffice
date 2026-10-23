@@ -9,9 +9,12 @@ import { ChangePatientStatusModal } from '@/components/containers/patients/patie
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
+import { PatientBackgroundContainer } from '@/components/containers/patients/patient-background/patient-background-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { useNavigation } from '@/hooks/use-navigation';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { EditContactsModal } from '@/components/containers/patients/patient-contacts/edit-contacts-modal';
 import { PatientSummary } from './patient-summary';
 
@@ -22,6 +25,7 @@ interface PatientDetailContainerProps {
 export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ uuid }) => {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const { can } = usePermissions();
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
@@ -62,7 +66,13 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         onEdit={() => navigation.patients.edit(patient.uuid)}
       />
 
-      <PatientNotesContainer patientUuid={patient.uuid} />
+      {/* El empleado ve los datos generales y los archivos, nada clínico. */}
+      {can(Permission.VIEW_CLINICAL_RECORD) && (
+        <>
+          <PatientBackgroundContainer patientUuid={patient.uuid} />
+          <PatientNotesContainer patientUuid={patient.uuid} />
+        </>
+      )}
 
       <DocumentsContainer patientUuid={patient.uuid} />
 

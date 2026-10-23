@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import {
   ALL_CATEGORIES_FILTER,
   DocumentCategory,
   DocumentFilter,
   DocumentItem,
-  DocumentKind,
-  DOCUMENT_CATEGORY_LABELS,
   DOCUMENT_NAME_MAX_LENGTH,
-  PatientDocument,
+  UpdateDocumentPayload,
 } from '@/types/documents/document.types';
 import {
   usePatientDocumentsQuery,
@@ -17,10 +16,12 @@ import {
 } from '@/shared/api/querys/patient-documents-query';
 import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/upload-document-mutation';
 import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/delete-document-mutation';
-import { useRenameDocumentMutation } from '@/shared/api/mutations/documents/rename-document-mutation';
+import { useUpdateDocumentMutation } from '@/shared/api/mutations/documents/update-document-mutation';
 import { useIsMobile } from '@/hooks/use-is-mobile';
-import { formatDate, formatFileSize } from '@/shared/utils/formatters';
-import { repairFileName } from '@/shared/utils/file-name';
+import { splitFileName } from '@/shared/utils/file-name';
+import { TEXT } from '@/static/texts/i18n';
+import { mapToDocumentItem } from './document-items';
+import { useDocumentPreview } from './use-document-preview';
 
 /** Solo se pagina en movil: el grid de escritorio ya muestra varias columnas a la vez. */
 const MOBILE_PAGE_SIZE = 5;
@@ -32,57 +33,12 @@ const MOBILE_PAGE_SIZE = 5;
  * previsualiza — el visor ya cae con gracia a "Abrir archivo" para lo que
  * no es imagen o PDF. Limite de tamano: 20 MB por archivo.
  */
-const MAX_FILE_SIZE_BYTES = 20 * 1024 * 1024;
-
-const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
-
-/**
- * El tipo de archivo se decide por la URL (el archivo real en R2), nunca por
- * `name`: el nombre se puede editar libremente y el archivo subyacente no
- * cambia, así que basarse en el nombre rompería el preview en cuanto alguien
- * renombrara un PDF sin dejarle la extensión .pdf.
- */
-function resolveDocumentKind(url: string): DocumentKind {
-  const target = url.toLowerCase();
-
-  if (target.endsWith('.pdf')) return DocumentKind.PDF;
-  if (IMAGE_EXTENSIONS.some((extension) => target.endsWith(extension))) return DocumentKind.IMAGE;
-
-  return DocumentKind.OTHER;
-}
-
-/**
- * Separa el nombre de su extensión. Al subir solo se deja editar la base:
- * el API arma la clave en R2 con la extensión del nombre recibido y el
- * preview depende de ella, así que perderla rompería la vista del archivo.
- */
-function splitFileName(fileName: string): { baseName: string; extension: string } {
-  const dotIndex = fileName.lastIndexOf('.');
-  if (dotIndex <= 0) return { baseName: fileName, extension: '' };
-
-  return { baseName: fileName.slice(0, dotIndex), extension: fileName.slice(dotIndex) };
-}
-
-function mapToDocumentItem(document: PatientDocument): DocumentItem {
-  const category = DOCUMENT_CATEGORY_LABELS[document.category]
-    ? document.category
-    : DocumentCategory.OTHER;
-
-  return {
-    uuid: document.uuid,
-    name: repairFileName(document.originalName),
-    url: document.url,
-    category,
-    categoryLabel: DOCUMENT_CATEGORY_LABELS[category],
-    kind: resolveDocumentKind(document.url),
-    uploadedAtLabel: formatDate(document.uploadedAt),
-    uploadedByUuid: document.uploadedByUuid,
-    uploadedByName: document.uploadedByName,
-    sizeLabel: formatFileSize(document.size),
-  };
-}
+const MAX_FILE_SIZE_MB = 20;
+const BYTES_PER_MB = 1024 * 1024;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * BYTES_PER_MB;
 
 export function useDocuments(patientUuid: string) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -93,17 +49,18 @@ export function useDocuments(patientUuid: string) {
   );
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [pendingFileBaseName, setPendingFileBaseName] = useState('');
-  const [previewDocument, setPreviewDocument] = useState<DocumentItem | null>(null);
+  const preview = useDocumentPreview();
   const [documentToDelete, setDocumentToDelete] = useState<DocumentItem | null>(null);
-  const [documentToRename, setDocumentToRename] = useState<DocumentItem | null>(null);
-  const [renameValue, setRenameValue] = useState('');
+  const [documentToEdit, setDocumentToEdit] = useState<DocumentItem | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editCategory, setEditCategory] = useState<DocumentCategory>(DocumentCategory.OTHER);
   const [page, setPage] = useState(1);
 
   const isMobile = useIsMobile();
   const { data, isLoading, isError, refetch } = usePatientDocumentsQuery(patientUuid);
   const { executeUploadDocument, isPending: isUploading } = useUploadDocumentMutation();
   const { executeDeleteDocument, isPending: isDeleting } = useDeleteDocumentMutation();
-  const { executeRenameDocument, isPending: isRenaming } = useRenameDocumentMutation();
+  const { executeUpdateDocument, isPending: isUpdating } = useUpdateDocumentMutation();
 
   const documents = useMemo(() => (data ?? []).map(mapToDocumentItem), [data]);
 
@@ -113,7 +70,7 @@ export function useDocuments(patientUuid: string) {
     return documents.filter((document) => {
       const matchesFilter = filter === ALL_CATEGORIES_FILTER || document.category === filter;
       const matchesSearch =
-        !normalizedSearch || document.name.toLowerCase().includes(normalizedSearch);
+        !normalizedSearch || document.displayName.toLowerCase().includes(normalizedSearch);
       return matchesFilter && matchesSearch;
     });
   }, [documents, filter, searchTerm]);
@@ -142,7 +99,7 @@ export function useDocuments(patientUuid: string) {
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      toast.error('El archivo supera el límite de 20 MB');
+      toast.error(t(TEXT.DOCUMENTS.TOASTS.TOO_LARGE, { size: MAX_FILE_SIZE_MB }));
       return;
     }
 
@@ -170,7 +127,7 @@ export function useDocuments(patientUuid: string) {
     const trimmedBaseName = pendingFileBaseName.trim();
 
     if (!trimmedBaseName) {
-      toast.error('El nombre no puede estar vacío');
+      toast.error(t(TEXT.DOCUMENTS.TOASTS.NAME_REQUIRED));
       return;
     }
 
@@ -183,7 +140,7 @@ export function useDocuments(patientUuid: string) {
       },
       {
         onSuccess: () => {
-          toast.success('Archivo subido');
+          toast.success(t(TEXT.DOCUMENTS.TOASTS.UPLOADED));
           clearPendingFile();
           void invalidateDocuments();
         },
@@ -199,7 +156,7 @@ export function useDocuments(patientUuid: string) {
       { patientUuid, documentUuid: documentToDelete.uuid },
       {
         onSuccess: () => {
-          toast.success('Archivo eliminado');
+          toast.success(t(TEXT.DOCUMENTS.TOASTS.DELETED));
           setDocumentToDelete(null);
           void invalidateDocuments();
         },
@@ -211,35 +168,52 @@ export function useDocuments(patientUuid: string) {
     );
   };
 
-  const handleStartRename = (document: DocumentItem) => {
-    setDocumentToRename(document);
-    setRenameValue(document.name);
+  const handleStartEdit = (document: DocumentItem) => {
+    setDocumentToEdit(document);
+    setEditName(document.displayName);
+    setEditCategory(document.category);
   };
 
-  const handleCancelRename = () => {
-    setDocumentToRename(null);
-    setRenameValue('');
+  const handleCancelEdit = () => {
+    setDocumentToEdit(null);
+    setEditName('');
   };
 
-  const handleRenameValueChange = (value: string) =>
-    setRenameValue(value.slice(0, DOCUMENT_NAME_MAX_LENGTH));
+  const handleEditCategoryChange = (value: string) => {
+    const category = Object.values(DocumentCategory).find((option) => option === value);
+    if (category) setEditCategory(category);
+  };
 
-  const handleConfirmRename = () => {
-    if (!documentToRename) return;
+  const handleEditNameChange = (value: string) =>
+    setEditName(value.slice(0, DOCUMENT_NAME_MAX_LENGTH));
 
-    const trimmedName = renameValue.trim();
+  const handleConfirmEdit = () => {
+    if (!documentToEdit) return;
+
+    const trimmedName = editName.trim();
 
     if (!trimmedName) {
-      toast.error('El nombre no puede estar vacío');
+      toast.error(t(TEXT.DOCUMENTS.TOASTS.NAME_REQUIRED));
       return;
     }
 
-    executeRenameDocument(
-      { patientUuid, documentUuid: documentToRename.uuid, originalName: trimmedName },
+    // Se edita sin extensión y se le devuelve la que tenía.
+    const fullName = `${trimmedName}${splitFileName(documentToEdit.name).extension}`;
+    const changes: UpdateDocumentPayload = {};
+    if (fullName !== documentToEdit.name) changes.originalName = fullName;
+    if (editCategory !== documentToEdit.category) changes.category = editCategory;
+
+    if (!Object.keys(changes).length) {
+      handleCancelEdit();
+      return;
+    }
+
+    executeUpdateDocument(
+      { patientUuid, documentUuid: documentToEdit.uuid, changes },
       {
         onSuccess: () => {
-          toast.success('Archivo renombrado');
-          handleCancelRename();
+          toast.success(t(TEXT.DOCUMENTS.TOASTS.UPDATED));
+          handleCancelEdit();
           void invalidateDocuments();
         },
         onError: (error: Error) => toast.error(error.message),
@@ -265,7 +239,6 @@ export function useDocuments(patientUuid: string) {
     handlePageChange: setPage,
     pendingFile,
     pendingFileBaseName,
-    pendingFileExtension,
     handlePendingFileBaseNameChange,
     handleFileSelected,
     clearPendingFile,
@@ -273,18 +246,23 @@ export function useDocuments(patientUuid: string) {
     openFilePicker,
     handleUpload,
     isUploading,
-    previewDocument,
-    setPreviewDocument,
+    previewDocument: preview.previewDocument,
+    previewRotationDegrees: preview.previewRotationDegrees,
+    handleOpenPreview: preview.handleOpenPreview,
+    handleClosePreview: preview.handleClosePreview,
+    handleRotatePreview: preview.handleRotatePreview,
     documentToDelete,
     setDocumentToDelete,
     handleConfirmDelete,
     isDeleting,
-    documentToRename,
-    renameValue,
-    handleStartRename,
-    handleCancelRename,
-    handleRenameValueChange,
-    handleConfirmRename,
-    isRenaming,
+    documentToEdit,
+    editName,
+    editCategory,
+    handleEditCategoryChange,
+    handleStartEdit,
+    handleCancelEdit,
+    handleEditNameChange,
+    handleConfirmEdit,
+    isUpdating,
   };
 }

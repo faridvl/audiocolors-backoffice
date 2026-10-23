@@ -22,6 +22,8 @@ export interface PatientListFilters {
   hearingAidsInLab?: boolean;
   hasActiveWarranty?: boolean;
   isVideoCandidate?: boolean;
+  warrantyExpired?: boolean;
+  renewPrescription?: boolean;
   /** Próxima cita confirmada o tentativa; ambas o ninguna = todas. */
   nextAppointmentKinds?: NextAppointmentKind[];
 }
@@ -61,6 +63,8 @@ const PatientsService = {
     if (filters.hearingAidsInLab) params.set('hearingAidsInLab', 'true');
     if (filters.hasActiveWarranty) params.set('hasActiveWarranty', 'true');
     if (filters.isVideoCandidate) params.set('isVideoCandidate', 'true');
+    if (filters.warrantyExpired) params.set('warrantyExpired', 'true');
+    if (filters.renewPrescription) params.set('renewPrescription', 'true');
     setList(params, 'nextAppointmentKind', filters.nextAppointmentKinds);
 
     return ApiServiceClient(env.API.MEDICAL_RECORDS_URL).get<PaginatedResponse<Patient>>(

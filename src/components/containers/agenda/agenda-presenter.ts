@@ -1,11 +1,15 @@
 import {
   addMinutes,
-  atHour,
+  atMinute,
   firstDayOfMonth,
+  MINUTE_IN_MS,
+  MINUTES_IN_HOUR,
+  toMinuteOfDay,
   toMonthKey,
   weekdayIndex,
 } from '@/shared/utils/dates';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
+import { AppointmentType } from '@/types/appointments/appointment-type';
 
 /**
  * Grupos del día. Hoy y los días pasados se leen como una fila de llegada
@@ -109,7 +113,6 @@ export enum AppointmentAction {
   SET_TIME = 'SET_TIME',
   RESCHEDULE = 'RESCHEDULE',
   WHATSAPP = 'WHATSAPP',
-  CALENDAR = 'CALENDAR',
   /** Deshace la confirmación: vuelve a quedar solo el mes (lo mismo que arrastrarla a "Por confirmar"). */
   RETURN_TO_PENDING = 'RETURN_TO_PENDING',
 }
@@ -128,7 +131,6 @@ export function resolveAppointmentActions(
     ...(canMove ? [AppointmentAction.SET_TIME] : []),
     AppointmentAction.RESCHEDULE,
     AppointmentAction.WHATSAPP,
-    AppointmentAction.CALENDAR,
     ...(canMove ? [AppointmentAction.RETURN_TO_PENDING] : []),
   ];
 
@@ -163,8 +165,34 @@ export enum SlotHour {
   LAST = 17,
 }
 
-/** Mismo largo que usa el API al crear la cita. */
-export const SLOT_DURATION_MINUTES = 30;
+/** Largo de una cita cuyo tipo no tiene duración: el mismo que usa el API al crearla. */
+export const DEFAULT_APPOINTMENT_DURATION_MINUTES = 30;
+
+/** Duración de un tipo de cita (dato de la clínica en el API), o la de por defecto. */
+export function resolveTypeDuration(
+  appointmentTypes: AppointmentType[] | undefined,
+  typeUuid: string | null | undefined,
+): number {
+  const type = appointmentTypes?.find((appointmentType) => appointmentType.uuid === typeUuid);
+  return type?.duration ?? DEFAULT_APPOINTMENT_DURATION_MINUTES;
+}
+
+/**
+ * Cuánto dura una cita ya guardada: la que tiene, o la de su tipo si no tiene
+ * hora real (las confirmadas solo con día). Mover una cita no la alarga ni la acorta.
+ */
+export function resolveAppointmentDuration(
+  appointment: Appointment,
+  appointmentTypes: AppointmentType[] | undefined,
+): number {
+  const savedMinutes =
+    (new Date(appointment.schedule.endTime).getTime() -
+      new Date(appointment.schedule.startTime).getTime()) /
+    MINUTE_IN_MS;
+  return resolveSlotHour(appointment) !== null && savedMinutes > 0
+    ? savedMinutes
+    : resolveTypeDuration(appointmentTypes, appointment.typeUUID);
+}
 
 export function buildSlotHours(): number[] {
   return Array.from(
@@ -188,16 +216,98 @@ export function toSlotHour(isoDate: string): number | null {
   return hour >= SlotHour.FIRST && hour <= SlotHour.LAST ? hour : null;
 }
 
-/** Inicio y fin (ISO) de un horario de un día, en la hora local de la clínica. */
+/** Inicio y fin (ISO) de una cita que empieza en un minuto del día, en la hora local de la clínica. */
 export function buildSlotTimes(
   dayKey: string,
-  hour: number,
+  startMinute: number,
+  durationMinutes: number,
 ): { startTime: string; endTime: string } {
-  const start = atHour(dayKey, hour);
+  const start = atMinute(dayKey, startMinute);
   return {
     startTime: start.toISOString(),
-    endTime: addMinutes(start, SLOT_DURATION_MINUTES).toISOString(),
+    endTime: addMinutes(start, durationMinutes).toISOString(),
   };
+}
+
+/** La línea de tiempo del día va de la primera hora al final de la última. */
+export const TIMELINE_START_MINUTE = SlotHour.FIRST * MINUTES_IN_HOUR;
+export const TIMELINE_END_MINUTE = (SlotHour.LAST + 1) * MINUTES_IN_HOUR;
+/** Soltar o tocar la línea de tiempo cae en la media hora más cercana. */
+export const TIMELINE_STEP_MINUTES = 30;
+
+/** Minuto del día en que empieza una cita, o null si no tiene hora (ver `resolveSlotHour`). */
+export function resolveStartMinute(appointment: Appointment): number | null {
+  return resolveSlotHour(appointment) === null
+    ? null
+    : toMinuteOfDay(appointment.schedule.startTime);
+}
+
+/**
+ * Minuto (relativo al inicio de la línea de tiempo) → media hora donde cae,
+ * sin salirse del día: la última empieza media hora antes del cierre.
+ */
+export function snapToTimelineStep(offsetMinutes: number): number {
+  const step = Math.floor(offsetMinutes / TIMELINE_STEP_MINUTES) * TIMELINE_STEP_MINUTES;
+  const lastStart = TIMELINE_END_MINUTE - TIMELINE_STEP_MINUTES;
+  return Math.min(lastStart, Math.max(TIMELINE_START_MINUTE, TIMELINE_START_MINUTE + step));
+}
+
+export interface TimelineBlock {
+  appointment: Appointment;
+  startMinute: number;
+  endMinute: number;
+  /** Columna dentro de su grupo de citas que se cruzan, y cuántas columnas tiene el grupo. */
+  lane: number;
+  laneCount: number;
+}
+
+/**
+ * Ubica las citas con hora en la línea de tiempo. Las que se cruzan van lado a
+ * lado, como en Teams o Google Calendar: cada grupo de citas encadenadas se
+ * reparte en columnas, y cada cita toma la primera columna libre.
+ */
+export function buildTimelineBlocks(
+  appointments: Appointment[],
+  fallbackDuration: (appointment: Appointment) => number,
+): TimelineBlock[] {
+  const placed = appointments
+    .map((appointment) => {
+      const startMinute = resolveStartMinute(appointment);
+      if (startMinute === null) return null;
+      const savedEnd = toMinuteOfDay(appointment.schedule.endTime);
+      const endMinute =
+        savedEnd > startMinute ? savedEnd : startMinute + fallbackDuration(appointment);
+      return { appointment, startMinute, endMinute: Math.min(endMinute, TIMELINE_END_MINUTE) };
+    })
+    .filter((block): block is Omit<TimelineBlock, 'lane' | 'laneCount'> => block !== null)
+    .sort(
+      (first, second) =>
+        first.startMinute - second.startMinute || second.endMinute - first.endMinute,
+    );
+
+  const blocks: TimelineBlock[] = [];
+  let group: TimelineBlock[] = [];
+  let laneEnds: number[] = [];
+  let groupEnd = -1;
+
+  const closeGroup = () => {
+    group.forEach((block) => (block.laneCount = laneEnds.length));
+    blocks.push(...group);
+    group = [];
+    laneEnds = [];
+  };
+
+  placed.forEach((item) => {
+    if (item.startMinute >= groupEnd) closeGroup();
+    const freeLane = laneEnds.findIndex((laneEnd) => laneEnd <= item.startMinute);
+    const lane = freeLane === -1 ? laneEnds.length : freeLane;
+    laneEnds[lane] = item.endMinute;
+    group.push({ ...item, lane, laneCount: 1 });
+    groupEnd = Math.max(groupEnd, item.endMinute);
+  });
+  closeGroup();
+
+  return blocks;
 }
 
 /**

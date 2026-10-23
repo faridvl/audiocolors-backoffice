@@ -10,7 +10,7 @@ interface PatientSummaryCardsProps {
   onTogglePreset: (preset: PatientListPreset) => void;
 }
 
-/** Tarjetas que filtran la lista con un clic (y lo quitan con otro). Solo escritorio (`lg`). */
+/** Tarjetas que filtran la lista con un clic (y lo quitan con otro). */
 export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
   selection,
   isPresetActive,
@@ -19,7 +19,7 @@ export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
   const { cards } = usePatientSummary(selection);
 
   return (
-    <div className="hidden gap-3 lg:grid lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
       {cards.map((card) => {
         const isActive = isPresetActive(card.preset);
         return (

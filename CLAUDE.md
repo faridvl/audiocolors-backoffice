@@ -31,8 +31,8 @@ completo.
 
 ## Las tres reglas que más se rompen
 
-1. **El API no se toca.** Se comparte con Zynka; un cambio incompatible rompe el
-   otro sitio. Si hace falta, se discute antes.
+1. **Todo texto visible sale de i18n.** `t(TEXT.MODULO.CLAVE)` con su espejo en
+   `es.json`; nunca un string en el JSX (RULES.md §5.2).
 2. **Colores por token, nunca hex suelto.** `bg-brand`, no `bg-[#66ae36]`.
 3. **Español con tildes.** `años`, no `anios`. Al escribir texto visible usa la
    herramienta Write o Python con UTF-8, no heredocs de bash.
@@ -43,6 +43,8 @@ completo.
 yarn dev         # servidor en :3000
 yarn lint        # ESLint
 yarn typecheck   # tsc --noEmit
+yarn release:bump X.Y.Z   # antes de un PR a main (RULES.md §10)
+yarn release:check        # versión mayor que main y con sus novedades
 ```
 
 Antes de cada commit: `yarn lint && yarn typecheck` limpios.
@@ -63,7 +65,7 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 
 | Repo | Ubicación | Rol |
 |---|---|---|
-| API | `C:\Users\Personal\Desktop\standard-saas-api` | Backend compartido |
+| API | `E:\Proyectos\node\standard-saas-api` | Backend compartido |
 | Zynka | `D:\Documentos\Proyectos\React\next-audiology-files` | Origen del código |
 | Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
 | Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotografía |
@@ -75,6 +77,8 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | `brand-assets` | Regenerar logo, favicon o variantes desde el manual vectorial |
 | `ui-audit` | Auditar la interfaz contra las reglas antes de un push |
 | `nueva-seccion` | Añadir un CRUD completo siguiendo los patrones del proyecto |
+| `novedades` | Imagen de "Novedades" para el cliente con los cambios de una entrega, y su registro en `docs/novedades/HISTORIAL.md` (qué commits cubre cada entrega, para no mezclarlas) |
+| `nueva-version` | Antes del PR a main: bump, borrador del changelog de Notificaciones para que el usuario lo apruebe, cargarlo y abrir el PR |
 | `commit` | Redactar el mensaje de commit (qué se hizo / qué se probó). Skill de usuario, no vive en este repo — aplica en cualquier proyecto de la cuenta |
 
 No dupliques como skill algo que ya resuelve un comando o un agente existente

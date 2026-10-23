@@ -1,24 +1,25 @@
 import React, { useMemo, useState } from 'react';
-import { formatHour } from '@/shared/utils/dates';
+import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { Appointment } from '@/types/appointments/appointment';
 import { Patient } from '@/types/patients/patient';
 import {
-  buildSlotHours,
+  buildTimelineBlocks,
   canMoveAppointment,
   DayTiming,
+  resolveAppointmentDuration,
   resolveSlotHour,
+  resolveTypeDuration,
 } from '../agenda-presenter';
-import { AgendaDragKind, AgendaDragPayload, isAgendaDrag, markAgendaDrag } from '../agenda-drag';
+import {
+  deferFromDragEvent,
+  AgendaDragKind,
+  AgendaDragPayload,
+  isAgendaDrag,
+  markAgendaDrag,
+} from '../agenda-drag';
 import { RowDragProps } from '../agenda-list-row';
 import { SavingItem } from '../use-agenda-scheduling';
 import { AgendaState } from '../use-agenda';
-
-export interface BoardSlot {
-  hour: number;
-  label: string;
-  appointments: Appointment[];
-  saving: SavingItem[];
-}
 
 /**
  * Agendar en escritorio, de dos formas que conviven:
@@ -29,8 +30,8 @@ export interface BoardSlot {
  * - Tocar y tocar (dedo, iPad, o quien no arrastra): tocar un paciente lo
  *   marca y tocar un horario del día abierto lo confirma ahí.
  *
- * Guardar es igual en las dos: lo hace `useAgendaScheduling`. Un horario
- * acepta varias citas; no se bloquea a nadie por hora ocupada.
+ * Guardar es igual en las dos: lo hace `useAgendaScheduling`. Las citas que
+ * se cruzan conviven lado a lado; no se bloquea a nadie por hora ocupada.
  */
 export function useAgendaBoard(agenda: AgendaState) {
   const [dragging, setDragging] = useState<AgendaDragPayload | null>(null);
@@ -45,19 +46,23 @@ export function useAgendaBoard(agenda: AgendaState) {
     scheduling,
   } = agenda;
   const { savingItems, savingIds } = scheduling;
+  const { data: appointmentTypes } = useAppointmentTypesQuery();
   const isDayOpen = selectedTiming !== DayTiming.PAST;
 
-  const slots: BoardSlot[] = useMemo(
+  const durationOf = (typeUuid?: string | null) => resolveTypeDuration(appointmentTypes, typeUuid);
+
+  const blocks = useMemo(
     () =>
-      buildSlotHours().map((hour) => ({
-        hour,
-        label: formatHour(hour),
-        appointments: selectedAppointments.filter(
-          (appointment) => !savingIds.has(appointment.id) && resolveSlotHour(appointment) === hour,
-        ),
-        saving: savingItems.filter((item) => item.dayKey === selectedDayKey && item.hour === hour),
-      })),
-    [selectedAppointments, savingIds, savingItems, selectedDayKey],
+      buildTimelineBlocks(
+        selectedAppointments.filter((appointment) => !savingIds.has(appointment.id)),
+        (appointment) => resolveTypeDuration(appointmentTypes, appointment.typeUUID),
+      ),
+    [selectedAppointments, savingIds, appointmentTypes],
+  );
+
+  const savingOnDay = savingItems.filter(
+    (item): item is SavingItem & { startMinute: number } =>
+      item.dayKey === selectedDayKey && item.startMinute !== null,
   );
 
   const unscheduledAppointments = useMemo(
@@ -68,7 +73,7 @@ export function useAgendaBoard(agenda: AgendaState) {
     [selectedAppointments, savingIds],
   );
 
-  const returningItems = savingItems.filter((item) => item.hour === null);
+  const returningItems = savingItems.filter((item) => item.startMinute === null);
 
   const selectedPending = pendingPatients.find((patient) => patient.uuid === selectedPendingUuid);
 
@@ -77,16 +82,26 @@ export function useAgendaBoard(agenda: AgendaState) {
       ? { patient: pendingPatients.find((patient) => patient.uuid === payload.id) }
       : { appointment: selectedAppointments.find((appointment) => appointment.id === payload.id) };
 
-  const handleDropOnSlot = (hour: number) => {
+  /** Cuánto dura lo que se arrastra: la sombra de soltar tiene ese largo. */
+  const draggingDuration = (() => {
+    if (!dragging) return null;
+    const { patient, appointment } = findPayloadTarget(dragging);
+    if (patient) return durationOf(patient.tentativeAppointmentTypeUuid);
+    return appointment ? resolveAppointmentDuration(appointment, appointmentTypes) : null;
+  })();
+
+  const handleDropAt = (startMinute: number) => {
     const payload = dragging;
     setDragging(null);
     if (!payload) return;
 
     const { patient, appointment } = findPayloadTarget(payload);
-    if (patient) void scheduling.confirmPending(patient, selectedDayKey, hour);
-    if (appointment && canMoveAppointment(appointment, selectedTiming)) {
-      void scheduling.moveAppointment(appointment, selectedDayKey, hour);
-    }
+    deferFromDragEvent(() => {
+      if (patient) void scheduling.confirmPending(patient, selectedDayKey, startMinute);
+      if (appointment && canMoveAppointment(appointment, selectedTiming)) {
+        void scheduling.moveAppointment(appointment, selectedDayKey, startMinute);
+      }
+    });
   };
 
   const handleDropOnPending = () => {
@@ -97,12 +112,14 @@ export function useAgendaBoard(agenda: AgendaState) {
     const { appointment } = findPayloadTarget(payload);
     if (appointment && canMoveAppointment(appointment, selectedTiming)) {
       // Vuelve a la lista donde se soltó: el mes que muestra "Por confirmar".
-      void scheduling.returnToPending(appointment, selectedDayKey, pendingMonthKey);
+      deferFromDragEvent(
+        () => void scheduling.returnToPending(appointment, selectedDayKey, pendingMonthKey),
+      );
     }
   };
 
-  /** Un horario recibe cualquier cosa de la agenda, pero solo de hoy en adelante. */
-  const acceptsOnSlot = (event: React.DragEvent) => isDayOpen && isAgendaDrag(event);
+  /** La línea de tiempo recibe cualquier cosa de la agenda, pero solo de hoy en adelante. */
+  const acceptsOnTimeline = (event: React.DragEvent) => isDayOpen && isAgendaDrag(event);
 
   /** "Por confirmar" solo recibe citas: un paciente pendiente ya está ahí. */
   const acceptsOnPending = (event: React.DragEvent) =>
@@ -111,11 +128,14 @@ export function useAgendaBoard(agenda: AgendaState) {
   const buildDrag = (payload: AgendaDragPayload): RowDragProps => ({
     onDragStart: (event) => {
       markAgendaDrag(event, payload);
-      setDragging(payload);
-      // Arrastrar reemplaza a la selección: no quedan dos intenciones a la vez.
-      setSelectedPendingUuid(null);
+      deferFromDragEvent(() => {
+        setDragging(payload);
+        // Arrastrar reemplaza a la selección: no quedan dos intenciones a la vez.
+        setSelectedPendingUuid(null);
+      });
     },
-    onDragEnd: () => setDragging(null),
+    // También diferido: así nunca corre antes que el `setDragging` de arriba.
+    onDragEnd: () => deferFromDragEvent(() => setDragging(null)),
   });
 
   const dragPending = (patient: Patient): RowDragProps =>
@@ -132,10 +152,13 @@ export function useAgendaBoard(agenda: AgendaState) {
 
   const handleClearSelection = () => setSelectedPendingUuid(null);
 
-  /** Tocar un horario con un paciente marcado lo confirma ahí. */
-  const handleTapSlot = (hour: number) => {
+  /** La fila que se está arrastrando se atenúa en su lugar: se ve qué se mueve. */
+  const isDragSource = (id: string) => dragging?.id === id;
+
+  /** Tocar la línea de tiempo con un paciente marcado lo confirma ahí. */
+  const handleTapAt = (startMinute: number) => {
     if (!selectedPending || !isDayOpen) return;
-    void scheduling.confirmPending(selectedPending, selectedDayKey, hour);
+    void scheduling.confirmPending(selectedPending, selectedDayKey, startMinute);
     setSelectedPendingUuid(null);
   };
 
@@ -143,19 +166,22 @@ export function useAgendaBoard(agenda: AgendaState) {
     isDayOpen,
     isDragging: dragging !== null,
     isDraggingAppointment: dragging?.kind === AgendaDragKind.APPOINTMENT,
-    slots,
+    blocks,
+    savingOnDay,
+    draggingDuration,
     unscheduledAppointments,
     returningItems,
     selectedPending,
-    acceptsOnSlot,
+    acceptsOnTimeline,
     acceptsOnPending,
-    handleDropOnSlot,
+    handleDropAt,
     handleDropOnPending,
     dragPending,
     dragAppointment,
     handleTogglePending,
     handleClearSelection,
-    handleTapSlot,
+    handleTapAt,
+    isDragSource,
   };
 }
 

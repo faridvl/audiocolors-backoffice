@@ -187,7 +187,7 @@ Registro público, recuperación de contraseña, citas/agenda como módulo propi
 
 ### 5.2 Multi-tenant sin tocar el API
 
-AudioColors es un tenant más del mismo backend que Zynka. El aislamiento lo resuelve el **JWT**: cada controller del API lee `tenantUuid` del token, y el frontend **nunca lo envía**. Por eso este repo no necesitó ningún cambio en el API — un frontend nuevo, logueado con un usuario de AudioColors, solo ve datos de AudioColors automáticamente (ver [D1 en DECISIONS.md](../.claude/DECISIONS.md)).
+AudioColors es un tenant más del mismo backend que Zynka. El aislamiento lo resuelve el **JWT**: cada controller del API lee `tenantUuid` del token, y el frontend **nunca lo envía**. Un frontend nuevo, logueado con un usuario de AudioColors, solo ve datos de AudioColors automáticamente (ver [D1 en DECISIONS.md](../.claude/DECISIONS.md)).
 
 | Dato | Valor |
 |---|---|
@@ -233,9 +233,9 @@ Errores de red → toast desde el hook, no pantalla de error, salvo listas y det
 
 ## 7. Backend Compartido (standard-saas-api)
 
-### 7.1 Regla dura: el API no se toca
+### 7.1 Cambios en el API
 
-Este frontend consume `standard-saas-api` **sin modificarlo**. Lo comparte con Zynka — un cambio incompatible rompe el otro sitio. Si una funcionalidad necesita un cambio en el API, se discute antes.
+Cuando una funcionalidad lo necesita, el API se cambia en su propia rama con PR a `develop`, igual que el front (ver D24 en DECISIONS.md).
 
 ### 7.2 Endpoints consumidos
 

@@ -9,6 +9,7 @@ import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
 import { usePatientFlags } from './use-patient-flags';
+import { WarrantyDocumentSelect } from './warranty-document-select';
 
 interface PatientFlagsModalProps {
   patient: Patient;
@@ -18,8 +19,14 @@ interface PatientFlagsModalProps {
 /** Prender o apagar los indicadores: cada switch guarda al tocarlo, sin botón de guardar. */
 export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, onClose }) => {
   const { t } = useTranslation();
-  const { sections, activeSection, activeFlags, handleToggle, handleSectionChange } =
-    usePatientFlags(patient);
+  const {
+    sections,
+    activeSection,
+    activeFlags,
+    isWarrantySection,
+    handleToggle,
+    handleSectionChange,
+  } = usePatientFlags(patient);
   useEscapeKey(onClose);
 
   return (
@@ -31,7 +38,8 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-card bg-white p-6"
+        // Con varias garantías la lista crece: el modal hace scroll en vez de salirse de la pantalla.
+        className="max-h-[92dvh] w-full max-w-sm overflow-y-auto rounded-card bg-white p-6"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start gap-3">
@@ -67,6 +75,11 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
             />
           ))}
         </div>
+        {isWarrantySection && (
+          <div className="mt-4">
+            <WarrantyDocumentSelect patient={patient} />
+          </div>
+        )}
 
         <div className="mt-5 flex justify-end">
           <Button variant={ButtonVariant.SECONDARY} onClick={onClose} className="w-full sm:w-auto">

@@ -10,7 +10,8 @@ interface DropZoneProps {
   /** Clases extra mientras algo aceptable está encima. */
   activeClassName?: string;
   ariaLabel?: string;
-  children: React.ReactNode;
+  /** Una función recibe si hay algo aceptable encima, para mostrar la pista solo ahí. */
+  children: React.ReactNode | ((isOver: boolean) => React.ReactNode);
 }
 
 /**
@@ -65,7 +66,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
       }}
       className={tailwind('transition-colors', className, isOver && activeClassName)}
     >
-      {children}
+      {typeof children === 'function' ? children(isOver) : children}
     </div>
   );
 };

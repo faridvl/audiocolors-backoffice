@@ -291,13 +291,12 @@ pantallas y el container de la agenda llegó a casi 600 líneas.
 
 ---
 
-## 7. El API no se toca
+## 7. El API
 
-Este frontend consume `standard-saas-api` **sin modificarlo**. Lo comparte con
-Zynka: un cambio incompatible rompe el otro sitio.
-
-Si una funcionalidad necesita un cambio en el API, **se discute antes**; no se
-implementa por cuenta propia.
+Este frontend consume `standard-saas-api`. Cuando una funcionalidad lo necesita,
+el API se cambia en su propia rama con PR a `develop`, igual que el front; las
+migraciones a producción las aplica la acción `[Release] Production` al
+mergear a `main`.
 
 ### Comportamientos verificados del API
 
@@ -314,6 +313,53 @@ implementa por cuenta propia.
   cuerpo y lanzaría `SyntaxError`.
 - El aislamiento por tenant sale del **JWT**; el frontend nunca envía
   `tenantUuid`.
+
+---
+
+## 9. Roles y permisos
+
+Pensado para varias clínicas (multi-tenant): cada usuario tiene un rol y lo que
+ve sale de ese rol, nunca del nombre de la clínica.
+
+| Rol | Quién es | Ve |
+|---|---|---|
+| `OWNER` | Dueño (puede ser médico) | Todo |
+| `ADMIN` | Administrador | Todo |
+| `DOCTOR` | Médico | Todo, incluido cambiar las preguntas de la historia clínica |
+| `STAFF` | Empleado: recepción, secretaría | Pacientes (datos generales, contactos, citas), Agenda y Archivos. **No** ve historia clínica, Control de evolución, Bitácora ni las preguntas |
+
+- Los permisos viven en `src/shared/auth/permissions.ts` (`Permission` y
+  `ROLE_PERMISSIONS`); se consultan con `usePermissions().can(...)`. Nunca
+  comparar el rol suelto en un componente.
+- Una pantalla entera va dentro de `RequirePermission`; un bloque del expediente
+  se renderiza solo con el permiso, para que ni siquiera pida sus datos.
+- Una entrada del menú lateral lleva `permission` y se oculta sin él.
+- **El API valida lo mismo** (`CLINICAL_ACCESS_ROLES` en medical-records): ocultar
+  en pantalla no protege datos clínicos (Ley 8968). Un permiso nuevo se agrega
+  en los dos lados.
+
+---
+
+## 10. Versiones y notificaciones de novedades
+
+Cada salida a producción (PR de `develop` a `main`) es una **versión** y llega a
+la clínica como una notificación en la bandeja del menú del usuario.
+
+Todo el proceso está en la skill `nueva-version`.
+
+1. **Antes de abrir el PR a main:** `yarn release:bump X.Y.Z` (sube `package.json`
+   y prepara la entrada en `src/static/releases.ts` y `es.json`). Cada cambio es
+   una novedad, una mejora o una corrección, con tema y descripción en `es.json`.
+2. **Mostrarle al usuario el borrador de las novedades y esperar su OK** antes de
+   abrir el PR. Nunca se publica un changelog que no vio.
+3. `yarn release:check` limpio. El workflow `[CHECK] Versión documentada` lo exige
+   en cada PR a main: la versión tiene que ser mayor que la de main y traer sus novedades.
+4. Al mergear a main, `[Release] Etiqueta de versión` marca el commit con `vX.Y.Z`.
+
+**Cómo se escriben:** pensadas para el personal de la clínica, no para
+desarrolladores. Tono sobrio de sistema médico: "Tema: descripción", sin emojis. Generales, sin detalle técnico ni de cómo funciona por dentro
+("Una hoja nueva para la primera visita del paciente", no "guarda la copia de las
+preguntas en templateSnapshot"). Pocas palabras por cambio.
 
 ---
 

@@ -18,12 +18,160 @@
       "remove": "Quitar filtro {{label}}",
       "clearAll": "Limpiar todo",
       "showResults_one": "Mostrar {{count}} resultado",
-      "showResults_other": "Mostrar {{count}} resultados"
+      "showResults_other": "Mostrar {{count}} resultados",
+      "allMonths": "Todos los meses"
     },
     "errors": {
       "unexpected": "Algo salió mal. Intenta de nuevo."
     },
-    "notRegistered": "Sin registrar"
+    "notRegistered": "Sin registrar",
+    "forbidden": "Tu usuario no tiene acceso a esta sección.",
+    "characterCount": "{{count}} / {{max}}",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "notifications": {
+    "menu": "Notificaciones",
+    "title": "Notificaciones",
+    "close": "Cerrar",
+    "back": "Volver",
+    "clear": "Limpiar",
+    "unread": "Sin leer",
+    "unreadCount_one": "{{count}} notificación sin leer",
+    "unreadCount_other": "{{count}} notificaciones sin leer",
+    "emptyTitle": "No hay notificaciones",
+    "emptyDescription": "Las novedades de cada versión aparecen acá.",
+    "releaseTitle": "Versión {{version}}",
+    "releases": {
+      "v1_0_0": {
+        "clinicalHistory": {
+          "title": "Historia clínica",
+          "description": "registro de antecedentes y otoscopia en el expediente; cada actualización queda documentada en Archivos."
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "administración de los tipos de cita y de las preguntas de la historia clínica."
+        },
+        "notifications": {
+          "title": "Notificaciones",
+          "description": "aviso de nuevas versiones desde el menú de usuario."
+        },
+        "roles": {
+          "title": "Permisos por rol",
+          "description": "el personal de recepción accede a pacientes, agenda y archivos, sin la información clínica."
+        },
+        "warranty": {
+          "title": "Garantía",
+          "description": "registro de garantía expirada, renovación de receta y documento de garantía."
+        },
+        "files": {
+          "title": "Archivos",
+          "description": "se pueden renombrar, cambiar de sección y rotar las imágenes."
+        },
+        "patients": {
+          "title": "Pacientes",
+          "description": "resumen disponible en el celular, filtro \"Sin cita\" y meses en orden cronológico."
+        },
+        "agenda": {
+          "title": "Agenda",
+          "description": "la duración de cada cita se toma de su tipo."
+        },
+        "agendaDrag": {
+          "title": "Agenda",
+          "description": "las citas se pueden mover de hora más de una vez."
+        }
+      }
+    },
+    "kinds": {
+      "NEW": "Novedades",
+      "IMPROVED": "Mejoras",
+      "FIXED": "Correcciones"
+    },
+    "counts": {
+      "NEW_one": "{{count}} novedad",
+      "NEW_other": "{{count}} novedades",
+      "IMPROVED_one": "{{count}} mejora",
+      "IMPROVED_other": "{{count}} mejoras",
+      "FIXED_one": "{{count}} corrección",
+      "FIXED_other": "{{count}} correcciones"
+    }
+  },
+  "layout": {
+    "appLabel": "Gestión Clínica",
+    "loadingUser": "Cargando...",
+    "logout": "Cerrar sesión",
+    "nav": {
+      "patients": "Pacientes",
+      "agenda": "Agenda",
+      "activity": "Bitácora"
+    },
+    "version": "Versión {{version}}"
+  },
+  "settings": {
+    "pageTitle": "Configuración · AudioColors Gestión Clínica",
+    "title": "Configuración",
+    "nav": "Configuración",
+    "sections": {
+      "APPOINTMENT_TYPES": {
+        "title": "Tipos de cita",
+        "description": "Nombre y duración de cada tipo de cita."
+      },
+      "CLINICAL_HISTORY": {
+        "title": "Historia clínica",
+        "description": "Preguntas de la hoja de la primera visita. Los cambios no afectan las historias ya llenas."
+      }
+    },
+    "appointmentTypes": {
+      "pageTitle": "Tipos de cita · AudioColors Gestión Clínica",
+      "loading": "Cargando tipos de cita...",
+      "loadError": "No se pudieron cargar los tipos de cita",
+      "empty": "La clínica todavía no tiene tipos de cita.",
+      "name": "Nombre",
+      "duration": "Duración",
+      "noDuration": "Sin definir (30 minutos)",
+      "minutes": "{{count}} minutos",
+      "saved": "Tipo de cita guardado",
+      "isControl": "Cuenta como control",
+      "isControlHint": "Es el que se cuenta en la tarjeta \"Controles este mes\" de Pacientes.",
+      "controlBadge": "Controles del mes",
+      "controlSet": "Al guardar, \"{{name}}\" será el que se cuente en \"Controles este mes\".",
+      "controlReplace": "Al guardar, \"{{name}}\" reemplaza a \"{{previous}}\" como control: desde ahora \"Controles este mes\" cuenta \"{{name}}\".",
+      "controlRemove": "Al guardar no quedará ningún control y la tarjeta \"Controles este mes\" dejará de verse.",
+      "editTitle": "Editar tipo de cita",
+      "editLabel": "Editar {{name}}",
+      "minutesShort": "{{count}} min"
+    }
+  },
+  "clinicalTemplate": {
+    "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
+    "templateName": "Historia clínica",
+    "loading": "Cargando preguntas...",
+    "loadError": "No se pudieron cargar las preguntas",
+    "label": "Pregunta",
+    "kind": "Tipo de respuesta",
+    "kinds": {
+      "YES_NO": "Sí / No",
+      "YES_NO_DETAIL": "Sí / No y un dato",
+      "TEXT": "Texto libre"
+    },
+    "detailLabel": "Qué se pregunta si es Sí",
+    "remove": "Quitar pregunta",
+    "add": "Agregar pregunta",
+    "maxReached": "Llegaste al máximo de {{max}} preguntas.",
+    "saved": "Preguntas guardadas",
+    "validation": {
+      "labelRequired": "Escribe la pregunta",
+      "detailRequired": "Escribe qué se pregunta si es Sí",
+      "atLeastOne": "La hoja necesita al menos una pregunta"
+    },
+    "labelPlaceholder": "Escribe la pregunta",
+    "detailPlaceholder": "Si es Sí, qué se pregunta (por ejemplo: ¿Qué tonalidad?)",
+    "noSection": "Sin título",
+    "newSection": "Nombre de una sección nueva",
+    "addSection": "Agregar sección",
+    "sectionName": "Nombre de la sección",
+    "dragHandle": "Arrastrar para mover la pregunta",
+    "dragHint": "Para moverla, arrastra una pregunta por su asa."
   },
   "auth": {
     "login": {
@@ -104,7 +252,6 @@
       "viewPatient": "Ver expediente",
       "reschedule": "Reagendar",
       "whatsapp": "Recordar por WhatsApp",
-      "calendar": "Agregar a mi calendario",
       "undoArrived": "Volver a por llegar",
       "setTime": "Poner hora",
       "changeTime": "Cambiar hora",
@@ -129,10 +276,6 @@
       "phoneError": "No se pudo cargar el teléfono del paciente"
     },
     "whatsappMessage": "Hola {{name}}, le recordamos su cita en AudioColors el {{date}}. ¡Le esperamos!",
-    "calendarEvent": {
-      "title": "Cita AudioColors · {{name}}",
-      "description": "{{type}}. Evento de día completo: la hora la confirma la clínica."
-    },
     "states": {
       "emptyTitle": "No hay citas este día",
       "emptyDescription": "Agenda una cita nueva o elige otro día.",
@@ -160,11 +303,11 @@
       "count_other": "{{count}} citas",
       "noTime": "Sin hora asignada",
       "noTimeHint": "Confirmadas sin hora. Arrástralas a un horario.",
-      "dropHere": "Suelta aquí",
-      "pastDay": "Este día ya pasó: no se pueden agendar citas.",
+      "noTimePastHint": "Quedaron confirmadas sin hora.",
+      "pastDay": "Este día ya pasó: no se pueden agendar ni mover citas.",
       "pendingHint": "Arrastra un paciente a un horario, o tócalo y después toca el horario.",
-      "slotAria_one": "{{hour}}, {{count}} cita",
-      "slotAria_other": "{{hour}}, {{count}} citas",
+      "timelineAria": "Horarios del día",
+      "timeRange": "{{start}} – {{end}}",
       "saving": "Guardando…",
       "toasts": {
         "confirmed": "Cita de {{name}} confirmada a las {{hour}}",
@@ -172,7 +315,7 @@
         "timeError": "La cita de {{name}} quedó confirmada sin hora. Arrástrala de nuevo a un horario.",
         "returned": "{{name}} volvió a por confirmar"
       },
-      "returnHere": "Suelta aquí para dejarla por confirmar",
+      "returnHere": "Suéltala aquí para dejarla por confirmar",
       "selection": {
         "title": "Elige un horario para {{name}}",
         "openDayHint": "Toca un día del calendario y después un horario.",
@@ -269,6 +412,7 @@
       "NOTE_ADDED": "Nota agregada",
       "DOCUMENT_UPLOADED": "Archivo subido",
       "DOCUMENT_RENAMED": "Archivo renombrado",
+      "DOCUMENT_CATEGORY_CHANGED": "Archivo cambiado de sección",
       "DOCUMENT_DELETED": "Archivo eliminado",
       "APPOINTMENT_TENTATIVE": "Cita tentativa",
       "APPOINTMENT_CONFIRMED": "Cita confirmada",
@@ -277,7 +421,11 @@
       "STATUS_CHANGED": "Estado cambiado",
       "HEARING_AIDS_LAB_CHANGED": "Audífonos en laboratorio",
       "WARRANTY_CHANGED": "Garantía",
-      "VIDEO_CANDIDATE_CHANGED": "Candidato a video"
+      "VIDEO_CANDIDATE_CHANGED": "Candidato a video",
+      "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
+      "RENEW_PRESCRIPTION_CHANGED": "Renovar receta",
+      "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
+      "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -294,7 +442,8 @@
         "gender": "Género",
         "bloodType": "Tipo de sangre",
         "occupation": "Ocupación",
-        "branchUuid": "Sede"
+        "branchUuid": "Sede",
+        "warrantyDocumentUuid": "Archivo de la garantía"
       },
       "statuses": {
         "ACTIVE": "Activo",
@@ -304,13 +453,68 @@
       "flagOn": {
         "HEARING_AIDS_LAB_CHANGED": "Enviados al laboratorio",
         "WARRANTY_CHANGED": "Garantía activada",
-        "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato"
+        "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato",
+        "WARRANTY_EXPIRED_CHANGED": "Garantía marcada como expirada",
+        "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta"
       },
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
-        "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato"
+        "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato",
+        "WARRANTY_EXPIRED_CHANGED": "Garantía ya no marcada como expirada",
+        "RENEW_PRESCRIPTION_CHANGED": "Ya no hay que renovar la receta"
       }
+    }
+  },
+  "documents": {
+    "title": "Archivos",
+    "fields": {
+      "name": "Nombre",
+      "category": "Categoría"
+    },
+    "upload": {
+      "button": "Subir archivo",
+      "buttonShort": "Subir",
+      "nameLabel": "Nombre del archivo",
+      "confirm": "Confirmar"
+    },
+    "list": {
+      "searchPlaceholder": "Buscar archivo",
+      "searchLabel": "Buscar archivos",
+      "filterAll": "Todos",
+      "loading": "Cargando archivos...",
+      "error": "No se pudieron cargar los archivos",
+      "emptyTitle": "Aún no hay archivos",
+      "emptyDescription": "Sube recetas, audiometrías, facturas o garantías del paciente.",
+      "noResultsTitle": "Sin resultados",
+      "noResultsDescription": "Prueba con otro nombre o cambia el filtro.",
+      "registeredBy": "Registrado por:",
+      "editLabel": "Editar {{name}}",
+      "deleteLabel": "Eliminar {{name}}"
+    },
+    "preview": {
+      "label": "Vista previa de {{name}}",
+      "openNewTab": "Abrir en pestaña nueva",
+      "close": "Cerrar vista previa",
+      "rotate": "Rotar imagen",
+      "openFile": "Abrir archivo",
+      "pdfMobileHint": "Abre el archivo para verlo a pantalla completa.",
+      "unsupported": "Este tipo de archivo no se puede previsualizar aquí."
+    },
+    "edit": {
+      "title": "Editar archivo"
+    },
+    "delete": {
+      "title": "Eliminar archivo",
+      "message": "Se eliminará <strong>{{name}}</strong> de forma permanente. Esta acción no se puede deshacer.",
+      "confirm": "Eliminar"
+    },
+    "toasts": {
+      "tooLarge": "El archivo supera el límite de {{size}} MB",
+      "nameRequired": "El nombre no puede estar vacío",
+      "uploaded": "Archivo subido",
+      "updated": "Archivo actualizado",
+      "deleted": "Archivo eliminado"
     }
   },
   "patients": {
@@ -327,35 +531,56 @@
       "done": "Listo",
       "sections": {
         "lab": "Laboratorio",
-        "hearingAid": "Datos del audífono"
+        "warranty": "Estado de garantía"
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",
         "hasActiveWarranty": "Garantía activa",
-        "isVideoCandidate": "Candidato a video"
+        "isVideoCandidate": "Candidato a video",
+        "warrantyExpired": "Garantía expirada",
+        "renewPrescription": "Renovar receta"
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
         "hasActiveWarranty": "Garantía activada",
-        "isVideoCandidate": "Marcado como candidato a video"
+        "isVideoCandidate": "Marcado como candidato a video",
+        "warrantyExpired": "Garantía marcada como expirada",
+        "renewPrescription": "Marcado para renovar la receta"
       },
       "toastsOff": {
         "hearingAidsInLab": "Audífonos devueltos al paciente",
         "hasActiveWarranty": "Garantía desactivada",
-        "isVideoCandidate": "Ya no es candidato a video"
+        "isVideoCandidate": "Ya no es candidato a video",
+        "warrantyExpired": "Garantía ya no marcada como expirada",
+        "renewPrescription": "Ya no hay que renovar la receta"
       },
       "columns": {
         "hearingAidsInLab": "Audífonos",
         "hasActiveWarranty": "Garantía",
-        "isVideoCandidate": "Video"
+        "isVideoCandidate": "Video",
+        "warrantyExpired": "Garantía expirada",
+        "renewPrescription": "Receta"
       },
       "values": {
         "hearingAidsInLab": "En laboratorio",
         "hasActiveWarranty": "Activa",
-        "isVideoCandidate": "Candidato"
+        "isVideoCandidate": "Candidato",
+        "warrantyExpired": "Expirada",
+        "renewPrescription": "Renovar"
       },
       "offValues": {
         "hasActiveWarranty": "Sin garantía"
+      },
+      "warrantyDocument": {
+        "label": "Archivo de la garantía",
+        "none": "Ninguno",
+        "empty": "Todavía no hay archivos subidos como Garantías. Súbelo en los documentos del expediente para poder elegirlo aquí.",
+        "loading": "Cargando archivos…",
+        "saved": "Archivo de la garantía guardado",
+        "cleared": "Se quitó el archivo de la garantía",
+        "allTitle": "Todas las garantías ({{count}})",
+        "view": "Ver {{name}}",
+        "selected": "Elegida"
       }
     },
     "schedule": {
@@ -418,10 +643,68 @@
         "branch": "Sede"
       },
       "actions": {
-        "more": "Más acciones",
         "edit": "Modificar paciente",
         "changeStatus": "Cambiar estado"
       }
+    },
+    "background": {
+      "title": "Historia clínica",
+      "loading": "Cargando historia clínica...",
+      "loadError": "No se pudo cargar la historia clínica",
+      "empty": "Se llena una sola vez, la primera vez que viene el paciente. Marca Sí en lo que tenga o haya tenido.",
+      "finalHint": "Revísala antes de guardar: después ya no se puede modificar.",
+      "historyTitle": "Antecedentes",
+      "otoscopyTitle": "Exploración física (Otoscopia)",
+      "rightEar": "OD (oído derecho)",
+      "leftEar": "OI (oído izquierdo)",
+      "tinnitusTone": "¿Qué tonalidad?",
+      "toneValue": "Tonalidad: {{tone}}",
+      "createdBy": "Llenada por {{author}} el {{date}}",
+      "updatedBy": "Modificada por {{author}} el {{date}}",
+      "saved": "Historia clínica guardada",
+      "update": {
+        "button": "Editar",
+        "hint": "Al guardar se actualiza la historia y lo que cambió queda como PDF en Archivos.",
+        "submit": "Guardar cambios",
+        "saved": "Historia clínica actualizada. Lo que cambió quedó en Archivos.",
+        "noChanges": "No cambiaste nada respecto de la historia original",
+        "noteTitle": "Actualización de la historia clínica",
+        "changeLine": "• {{label}}: {{before}} → {{after}}",
+        "toneLabel": "Tonalidad del acúfeno",
+        "pdfError": "No se pudo generar el PDF de la historia clínica",
+        "fileName": "Historia clínica actualizada {{date}}",
+        "pdfUploadError": "La historia se actualizó, pero no se pudo guardar el PDF de cambios en Archivos."
+      },
+      "sections": {
+        "surgeries": "Cirugías",
+        "conditions": "Padecimientos",
+        "symptoms": "Padece de"
+      },
+      "conditions": {
+        "earInfections": "Infecciones de oído",
+        "nasalSurgery": "Nariz",
+        "throatSurgery": "Garganta",
+        "earSurgery": "Oídos",
+        "diabetes": "Diabetes",
+        "cholesterol": "Colesterol",
+        "highPressure": "Presión alta",
+        "allergies": "Alergias",
+        "rhinitis": "Rinitis",
+        "vertigo": "Vértigo",
+        "dizziness": "Mareo",
+        "headacheNoise": "Cefalea (por ruido)",
+        "cloggedEar": "Sensación de oído tapado",
+        "tinnitus": "Acúfeno"
+      },
+      "pdf": {
+        "title": "Historia clínica",
+        "patient": "Paciente: {{name}}",
+        "updatedBy": "Actualizada por {{author}} el {{date}}",
+        "changesTitle": "Cambios respecto de la historia original",
+        "changeLine": "- {{label}}: antes {{before}}, ahora {{after}}",
+        "sheetTitle": "Historia clínica actualizada"
+      },
+      "actions": "Acciones de la historia clínica"
     },
     "contacts": {
       "title": "Contactos",

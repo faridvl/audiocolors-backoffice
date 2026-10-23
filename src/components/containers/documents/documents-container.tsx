@@ -12,6 +12,7 @@ import {
   FolderOpen,
   X,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   ALL_CATEGORIES_FILTER,
   DocumentCategory,
@@ -28,7 +29,8 @@ import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useDocuments } from './use-documents';
 import { DocumentPreviewModal } from './document-preview-modal';
 import { ConfirmDeleteModal } from './confirm-delete-modal';
-import { RenameDocumentModal } from './rename-document-modal';
+import { EditDocumentModal } from './edit-document-modal';
+import { TEXT } from '@/static/texts/i18n';
 
 const KIND_ICONS: Record<DocumentKind, React.ComponentType<{ className?: string }>> = {
   [DocumentKind.IMAGE]: ImageIcon,
@@ -36,19 +38,19 @@ const KIND_ICONS: Record<DocumentKind, React.ComponentType<{ className?: string 
   [DocumentKind.OTHER]: FileIcon,
 };
 
-const FILTER_OPTIONS = [
-  { label: 'Todos', value: ALL_CATEGORIES_FILTER },
-  ...Object.values(DocumentCategory).map((category) => ({
-    label: DOCUMENT_CATEGORY_LABELS[category],
-    value: category,
-  })),
-];
+const CATEGORY_FILTER_OPTIONS = Object.values(DocumentCategory).map((category) => ({
+  label: DOCUMENT_CATEGORY_LABELS[category],
+  value: category,
+}));
+
+const CARD_ACTION_CLASSES =
+  'flex h-11 w-11 items-center justify-center rounded-lg text-ink-400 transition-colors';
 
 interface DocumentCardProps {
   document: DocumentItem;
   authorLabel: string;
   onPreview: () => void;
-  onRename: () => void;
+  onEdit: () => void;
   onDelete: () => void;
 }
 
@@ -56,9 +58,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   document,
   authorLabel,
   onPreview,
-  onRename,
+  onEdit,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   const Icon = KIND_ICONS[document.kind];
 
   return (
@@ -73,37 +76,41 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
             <Icon className="h-4 w-4 text-brand-600" />
           </span>
           <Typography variant={TypographyVariant.HELPER} className="min-w-0 truncate text-ink-700">
-            {document.name}
+            {document.displayName}
           </Typography>
         </button>
 
-        <div className="flex shrink-0 items-center gap-0.5 -mr-1.5 -mt-1.5">
+        <div className="-mr-3 -mt-3 flex shrink-0 items-center">
           <button
             type="button"
-            onClick={onRename}
-            aria-label={`Renombrar ${document.name}`}
-            className="rounded-lg p-1.5 text-ink-400 hover:bg-brand-50 hover:text-brand-600"
+            onClick={onEdit}
+            aria-label={t(TEXT.DOCUMENTS.LIST.EDIT_LABEL, { name: document.displayName })}
+            className={tailwind(CARD_ACTION_CLASSES, 'hover:bg-brand-50 hover:text-brand-600')}
           >
             <Pencil className="h-4 w-4" aria-hidden />
           </button>
           <button
             type="button"
             onClick={onDelete}
-            aria-label={`Eliminar ${document.name}`}
-            className="rounded-lg p-1.5 text-ink-400 hover:bg-danger/10 hover:text-danger"
+            aria-label={t(TEXT.DOCUMENTS.LIST.DELETE_LABEL, { name: document.displayName })}
+            className={tailwind(CARD_ACTION_CLASSES, 'hover:bg-danger/10 hover:text-danger')}
           >
             <Trash2 className="h-4 w-4" aria-hidden />
           </button>
         </div>
       </div>
 
-      <button type="button" onClick={onPreview} className="flex flex-1 flex-col items-start gap-1.5 p-4 pt-3 text-left">
+      <button
+        type="button"
+        onClick={onPreview}
+        className="flex flex-1 flex-col items-start gap-1.5 p-4 pt-3 text-left"
+      >
         <Typography variant={TypographyVariant.HELPER}>
           {document.categoryLabel} &middot; {document.sizeLabel}
         </Typography>
         <Typography variant={TypographyVariant.HELPER}>{document.uploadedAtLabel}</Typography>
         <Typography variant={TypographyVariant.HELPER}>
-          Registrado por: <span className="italic">{authorLabel}</span>
+          {t(TEXT.DOCUMENTS.LIST.REGISTERED_BY)} <span className="italic">{authorLabel}</span>
         </Typography>
       </button>
     </div>
@@ -115,6 +122,7 @@ interface DocumentsContainerProps {
 }
 
 export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const {
     documents,
     filteredCount,
@@ -130,7 +138,6 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
     setSelectedCategory,
     pendingFile,
     pendingFileBaseName,
-    pendingFileExtension,
     handlePendingFileBaseNameChange,
     handleFileSelected,
     clearPendingFile,
@@ -139,30 +146,40 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
     handleUpload,
     isUploading,
     previewDocument,
-    setPreviewDocument,
+    previewRotationDegrees,
+    handleOpenPreview,
+    handleClosePreview,
+    handleRotatePreview,
     documentToDelete,
     setDocumentToDelete,
     handleConfirmDelete,
     isDeleting,
-    documentToRename,
-    renameValue,
-    handleStartRename,
-    handleCancelRename,
-    handleRenameValueChange,
-    handleConfirmRename,
-    isRenaming,
+    documentToEdit,
+    editName,
+    editCategory,
+    handleStartEdit,
+    handleCancelEdit,
+    handleEditNameChange,
+    handleEditCategoryChange,
+    handleConfirmEdit,
+    isUpdating,
     page,
     totalPages,
     handlePageChange,
   } = useDocuments(patientUuid);
 
   const resolveAuthorLabel = useResolveAuthorLabel();
+  const filterOptions = [
+    { label: t(TEXT.DOCUMENTS.LIST.FILTER_ALL), value: ALL_CATEGORIES_FILTER },
+    ...CATEGORY_FILTER_OPTIONS,
+  ];
 
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <Typography variant={TypographyVariant.SUBTITLE}>
-          Archivos {totalCount > 0 && <span className="text-ink-400">({totalCount})</span>}
+          {t(TEXT.DOCUMENTS.TITLE)}{' '}
+          {totalCount > 0 && <span className="text-ink-400">({totalCount})</span>}
         </Typography>
 
         <Button
@@ -171,8 +188,8 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
           icon={<Upload className="h-4 w-4" aria-hidden />}
           className="shrink-0"
         >
-          <span className="hidden sm:inline">Subir archivo</span>
-          <span className="sm:hidden">Subir</span>
+          <span className="hidden sm:inline">{t(TEXT.DOCUMENTS.UPLOAD.BUTTON)}</span>
+          <span className="sm:hidden">{t(TEXT.DOCUMENTS.UPLOAD.BUTTON_SHORT)}</span>
         </Button>
       </div>
 
@@ -187,31 +204,29 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         <div className="flex flex-col gap-3 rounded-card border border-brand-200 bg-brand-50 p-4 sm:flex-row sm:items-end">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <label htmlFor="document-upload-name">
-              <Typography variant={TypographyVariant.HELPER}>Nombre del archivo</Typography>
+              <Typography variant={TypographyVariant.HELPER}>
+                {t(TEXT.DOCUMENTS.UPLOAD.NAME_LABEL)}
+              </Typography>
             </label>
-            <div className="flex min-w-0 items-center gap-2">
-              <input
-                id="document-upload-name"
-                type="text"
-                value={pendingFileBaseName}
-                onChange={(event) => handlePendingFileBaseNameChange(event.target.value)}
-                autoFocus
-                className={tailwind(inputBaseClasses, 'min-w-0 flex-1')}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && !isUploading) handleUpload();
-                }}
-              />
-              {pendingFileExtension && (
-                <Typography variant={TypographyVariant.BODY} className="shrink-0 text-ink-500">
-                  {pendingFileExtension}
-                </Typography>
-              )}
-            </div>
+            {/* La extensión no se muestra, pero el hook la vuelve a agregar al subir. */}
+            <input
+              id="document-upload-name"
+              type="text"
+              value={pendingFileBaseName}
+              onChange={(event) => handlePendingFileBaseNameChange(event.target.value)}
+              autoFocus
+              className={tailwind(inputBaseClasses, 'min-w-0')}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !isUploading) handleUpload();
+              }}
+            />
           </div>
 
           <div className="flex flex-col gap-1">
             <label htmlFor="document-category">
-              <Typography variant={TypographyVariant.HELPER}>Categoría</Typography>
+              <Typography variant={TypographyVariant.HELPER}>
+                {t(TEXT.DOCUMENTS.FIELDS.CATEGORY)}
+              </Typography>
             </label>
             <select
               id="document-category"
@@ -234,10 +249,10 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
               disabled={isUploading}
               icon={<X className="h-4 w-4" aria-hidden />}
             >
-              Cancelar
+              {t(TEXT.GENERAL.BUTTONS.CANCEL)}
             </Button>
             <Button variant={ButtonVariant.PRIMARY} onClick={handleUpload} isLoading={isUploading}>
-              Confirmar
+              {t(TEXT.DOCUMENTS.UPLOAD.CONFIRM)}
             </Button>
           </div>
         </div>
@@ -254,14 +269,14 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Buscar archivo"
-              aria-label="Buscar archivos"
+              placeholder={t(TEXT.DOCUMENTS.LIST.SEARCH_PLACEHOLDER)}
+              aria-label={t(TEXT.DOCUMENTS.LIST.SEARCH_LABEL)}
               className={tailwind(inputBaseClasses, 'pl-9')}
             />
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            {FILTER_OPTIONS.map((option) => (
+            {filterOptions.map((option) => (
               <button
                 key={option.value}
                 type="button"
@@ -283,18 +298,16 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       {isLoading && (
         <div className="flex items-center justify-center gap-2 rounded-card border border-ink-200 bg-white py-14">
           <Loader2 className="h-5 w-5 animate-spin text-brand" aria-hidden />
-          <Typography variant={TypographyVariant.BODY}>Cargando archivos...</Typography>
+          <Typography variant={TypographyVariant.BODY}>{t(TEXT.DOCUMENTS.LIST.LOADING)}</Typography>
         </div>
       )}
 
       {isError && !isLoading && (
         <div className="flex flex-col items-center gap-2 rounded-card border border-ink-200 bg-white py-14 text-center">
           <AlertTriangle className="h-8 w-8 text-danger" aria-hidden />
-          <Typography variant={TypographyVariant.ACCENT}>
-            No se pudieron cargar los archivos
-          </Typography>
+          <Typography variant={TypographyVariant.ACCENT}>{t(TEXT.DOCUMENTS.LIST.ERROR)}</Typography>
           <Button variant={ButtonVariant.SECONDARY} onClick={() => refetch()} className="mt-2">
-            Reintentar
+            {t(TEXT.GENERAL.BUTTONS.RETRY)}
           </Button>
         </div>
       )}
@@ -303,12 +316,14 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         <div className="flex flex-col items-center gap-2 rounded-card border border-dashed border-ink-300 bg-white py-14 text-center">
           <FolderOpen className="h-8 w-8 text-ink-300" aria-hidden />
           <Typography variant={TypographyVariant.ACCENT}>
-            {totalCount ? 'Sin resultados' : 'Aún no hay archivos'}
+            {t(totalCount ? TEXT.DOCUMENTS.LIST.NO_RESULTS_TITLE : TEXT.DOCUMENTS.LIST.EMPTY_TITLE)}
           </Typography>
           <Typography variant={TypographyVariant.BODY}>
-            {totalCount
-              ? 'Prueba con otro nombre o cambia el filtro.'
-              : 'Sube recetas, audiometrías, facturas o garantias del paciente.'}
+            {t(
+              totalCount
+                ? TEXT.DOCUMENTS.LIST.NO_RESULTS_DESCRIPTION
+                : TEXT.DOCUMENTS.LIST.EMPTY_DESCRIPTION,
+            )}
           </Typography>
         </div>
       )}
@@ -320,32 +335,44 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
               key={document.uuid}
               document={document}
               authorLabel={resolveAuthorLabel(document.uploadedByUuid, document.uploadedByName)}
-              onPreview={() => setPreviewDocument(document)}
-              onRename={() => handleStartRename(document)}
+              onPreview={() => handleOpenPreview(document)}
+              onEdit={() => handleStartEdit(document)}
               onDelete={() => setDocumentToDelete(document)}
             />
           ))}
         </div>
       )}
 
-      <Pagination page={page} totalPages={totalPages} total={filteredCount} onPageChange={handlePageChange} />
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={filteredCount}
+        onPageChange={handlePageChange}
+      />
 
-      <DocumentPreviewModal document={previewDocument} onClose={() => setPreviewDocument(null)} />
+      <DocumentPreviewModal
+        document={previewDocument}
+        rotationDegrees={previewRotationDegrees}
+        onRotate={handleRotatePreview}
+        onClose={handleClosePreview}
+      />
 
       <ConfirmDeleteModal
-        fileName={documentToDelete?.name ?? null}
+        fileName={documentToDelete?.displayName ?? null}
         isDeleting={isDeleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDocumentToDelete(null)}
       />
 
-      <RenameDocumentModal
-        isOpen={!!documentToRename}
-        value={renameValue}
-        isRenaming={isRenaming}
-        onChange={handleRenameValueChange}
-        onConfirm={handleConfirmRename}
-        onCancel={handleCancelRename}
+      <EditDocumentModal
+        isOpen={!!documentToEdit}
+        name={editName}
+        category={editCategory}
+        isSaving={isUpdating}
+        onNameChange={handleEditNameChange}
+        onCategoryChange={handleEditCategoryChange}
+        onConfirm={handleConfirmEdit}
+        onCancel={handleCancelEdit}
       />
     </section>
   );
