@@ -291,13 +291,12 @@ pantallas y el container de la agenda llegó a casi 600 líneas.
 
 ---
 
-## 7. El API no se toca
+## 7. El API
 
-Este frontend consume `standard-saas-api` **sin modificarlo**. Lo comparte con
-Zynka: un cambio incompatible rompe el otro sitio.
-
-Si una funcionalidad necesita un cambio en el API, **se discute antes**; no se
-implementa por cuenta propia.
+Este frontend consume `standard-saas-api`. Cuando una funcionalidad lo necesita,
+el API se cambia en su propia rama con PR a `develop`, igual que el front; las
+migraciones a producción las aplica la acción `[Release] Production` al
+mergear a `main`.
 
 ### Comportamientos verificados del API
 
