@@ -113,6 +113,12 @@ locales.
 | P1-5 | Migrar a i18n el resto del módulo de pacientes | Lista (`patient-list-container`, `use-patient-list`), formulario y mensajes de `patient-validation` siguen con texto suelto |
 | P1-4 | **Migrar a i18n** (`i18next` + `es.json`, patrón de Zynka) | Revierte la regla anterior de "sin i18n" — ver RULES.md §5.2. Instalar `i18next`/`react-i18next`, crear `src/shared/i18n/i18n.ts` + `src/static/texts/i18n.ts` (`TEXT` const) + `es.json`, y migrar los ~17 archivos `.tsx` con strings hardcodeados. Magastore NO sirve de referencia de uso real (tiene el setup pero 0% adoptado); usar Zynka como modelo de convención de keys. |
 
+### 🔵 Próximas etapas (decididas, sin empezar)
+| # | Tarea | Notas |
+|---|---|---|
+| P3-1 | **Configuración** en una sola entrada del menú | D21: sedes, tipos de cita y duración, preguntas de historia clínica, usuarios |
+| P3-2 | **Permisos configurables** por el administrador | D20: por rol y por clínica, el API y el front revisan permisos |
+
 ### ⚪ Si el uso lo pide
 | # | Tarea | Notas |
 |---|---|---|

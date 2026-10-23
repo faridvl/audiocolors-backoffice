@@ -378,3 +378,56 @@ abierto porque el empleado sube garantías y recetas.
 **Excepción:** `GET /patient-activity/actors` sigue abierto para el empleado: la
 agenda lo usa para mostrar quién agendó y solo trae nombres de usuarios.
 
+---
+
+## D20 · (Futuro) Permisos configurables por el administrador
+
+**Estado:** decidido, sin implementar (2026-10-22). Tenerlo en cuenta en todo
+desarrollo que toque roles o pantallas nuevas.
+
+**Decisión:**
+- **Roles fijos, definidos por nosotros:** `OWNER`, `ADMIN`, `DOCTOR`, `STAFF`.
+  Cada rol trae permisos por defecto (los de RULES.md §9).
+- **El administrador de cada clínica ajusta los permisos de cada rol**, solo
+  para su clínica, desde Configuración → Usuarios y permisos.
+- **Por rol, no por persona**, al principio. Excepciones por usuario solo si un
+  caso real lo pide.
+- **El catálogo de permisos es nuestro** (código, `Permission`): el
+  administrador prende y apaga, no inventa permisos.
+- **El API y el front revisan permisos, nunca el rol.** Hoy ya es así
+  (`usePermissions().can`, `CLINICAL_ACCESS_ROLES` en el API): el cambio será
+  reemplazar la tabla fija por la configuración de la clínica.
+
+**Cuidados al implementarlo:**
+1. Los permisos se leen del servidor en cada pedido (con cache corto), no se
+   guardan en el JWT: si no, un cambio no aplica hasta volver a iniciar sesión.
+2. Permisos que el administrador no puede quitarse (entrar a Configuración):
+   la clínica nunca queda sin quien administre.
+3. Dar acceso clínico a `STAFF` muestra un aviso (Ley 8968, datos sensibles).
+4. Cada cambio de permisos queda en la bitácora (quién y cuándo).
+5. Un permiso nuevo arranca con su valor por defecto en todas las clínicas, sin
+   migrar datos a mano.
+
+**Por qué:** más clínicas (multi-tenant) con personal distinto; cada una
+organiza su equipo a su manera y no queremos lógica por clínica en el código.
+
+---
+
+## D21 · (Futuro) Configuración en una sola entrada del menú
+
+**Estado:** decidido, sin implementar (2026-10-22).
+
+**Decisión:** los mantenimientos (sedes, tipos de cita y su duración, preguntas
+de la historia clínica, usuarios y permisos) van en una sola entrada
+"Configuración" con ícono de engranaje, abajo del menú lateral y solo para
+quien tenga permiso. Adentro, navegación propia: lista vertical a la izquierda
+en computadora; en el celular, la lista primero y al tocar se abre la sección.
+Una URL por sección (`/configuracion/sedes`, `/configuracion/agenda`,
+`/configuracion/historia-clinica`, `/configuracion/usuarios`). Se agrupa por
+tarea, no por tabla: "Agenda" junta tipos de cita y duraciones.
+
+**Por qué:** una entrada del menú por cada mantenimiento llena el menú de cosas
+que se usan poco. Las pestañas arriba sirven hasta 4-6 opciones; la lista
+lateral escala. Al hacerlo, "Historia clínica" sale del menú lateral y pasa
+a Configuración.
+
