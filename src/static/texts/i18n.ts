@@ -40,8 +40,10 @@ export const TEXT = {
     EMPTY_TITLE: 'notifications.emptyTitle',
     EMPTY_DESCRIPTION: 'notifications.emptyDescription',
     RELEASE_TITLE: 'notifications.releaseTitle',
-    RELEASE_INTRO: 'notifications.releaseIntro',
-    RELEASE_SUMMARY: 'notifications.releaseSummary',
+    /** `${KIND_PREFIX}.${ReleaseChangeKind}`: título de cada grupo. */
+    KIND_PREFIX: 'notifications.kinds',
+    /** `${COUNT_PREFIX}.${ReleaseChangeKind}` con `count`: resumen de la lista. */
+    COUNT_PREFIX: 'notifications.counts',
     /** `${RELEASES_PREFIX}.v1_0_0.clinicalHistory.title`: el contenido de cada versión. */
     RELEASES_PREFIX: 'notifications.releases',
   },
