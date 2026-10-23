@@ -27,12 +27,15 @@ export function usePatientBackground(patientUuid: string) {
     refetch: refetchTemplate,
   } = useClinicalHistoryTemplateQuery();
 
-  // Una historia ya llena se lee con las preguntas que tenía al llenarse (sin copia, es de antes
-  // de las preguntas configurables: la hoja estándar). Una nueva usa las de la clínica.
-  const fields = useMemo(() => {
-    if (background) return background.templateSnapshot ?? buildStandardFields(t);
-    return template?.fields ?? buildStandardFields(t);
-  }, [background, template, t]);
+  // Una historia ya llena se *lee* con las preguntas que tenía al llenarse (sin copia, es de
+  // antes de las preguntas configurables: la hoja estándar).
+  const summaryFields = useMemo(
+    () => (background ? (background.templateSnapshot ?? buildStandardFields(t)) : []),
+    [background, t],
+  );
+  // Llenarla o editarla usa las preguntas actuales de la clínica: al editar aparecen las
+  // agregadas después, con las respuestas que ya tenía en las demás.
+  const formFields = useMemo(() => template?.fields ?? buildStandardFields(t), [template, t]);
   const answers = useMemo(() => (background ? resolveAnswers(background) : {}), [background]);
 
   const authorship: string[] = [];
@@ -59,7 +62,8 @@ export function usePatientBackground(patientUuid: string) {
     background: background ?? null,
     // STAFF no tiene acceso a antecedentes clínicos: la tarjeta no se muestra.
     isHidden: isForbiddenError(error),
-    fields,
+    summaryFields,
+    formFields,
     answers,
     isLoading: isLoading || isTemplateLoading,
     isError: isError || isTemplateError,

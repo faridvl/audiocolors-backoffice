@@ -42,7 +42,11 @@ export const PatientBackgroundForm: React.FC<PatientBackgroundFormProps> = ({
         <PatientBackgroundFields fields={fields} />
 
         <div className="flex flex-col gap-3 border-t border-ink-100 pt-4 sm:flex-row sm:items-center sm:justify-end">
-          <Typography variant={TypographyVariant.HELPER}>
+          {/* El texto se acomoda; los botones no se parten en dos líneas. */}
+          <Typography
+            variant={TypographyVariant.HELPER}
+            className="min-w-0 sm:flex-1 sm:text-right"
+          >
             {t(
               isUpdate ? TEXT.PATIENTS.BACKGROUND.UPDATE.HINT : TEXT.PATIENTS.BACKGROUND.FINAL_HINT,
             )}
@@ -53,11 +57,17 @@ export const PatientBackgroundForm: React.FC<PatientBackgroundFormProps> = ({
               variant={ButtonVariant.SECONDARY}
               onClick={onClose}
               disabled={isPending}
+              className="shrink-0 whitespace-nowrap"
             >
               {t(TEXT.GENERAL.BUTTONS.CANCEL)}
             </Button>
           )}
-          <Button type="submit" variant={ButtonVariant.PRIMARY} isLoading={isPending}>
+          <Button
+            type="submit"
+            variant={ButtonVariant.PRIMARY}
+            isLoading={isPending}
+            className="shrink-0 whitespace-nowrap"
+          >
             {t(isUpdate ? TEXT.PATIENTS.BACKGROUND.UPDATE.SUBMIT : TEXT.GENERAL.BUTTONS.SAVE)}
           </Button>
         </div>
