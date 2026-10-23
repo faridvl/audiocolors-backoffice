@@ -451,3 +451,9 @@ y el interruptor de control, que avisa qué cambia al guardar. Sin agregar ni
 borrar tipos, y sin color: el color del tipo solo se ve como un punto en la
 agenda; lo que domina es el color de la sede.
 
+**Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
+muestra lo último (respuestas nuevas y preguntas agregadas) y "Modificada por X
+el día". El PDF en Archivos sigue generándose como registro de qué cambió y quién.
+Reemplaza "la original no se modifica nunca": la clínica quiere ver el estado
+actual del paciente en el expediente.
+
