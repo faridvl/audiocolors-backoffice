@@ -154,6 +154,12 @@ UTC. Un horario desde las 18:00 de Costa Rica cae en el día UTC siguiente y
 desaparecería de su día. Si la clínica atiende después de las 17:00, primero
 hay que filtrar por día local en el API.
 
+**Actualización (2026-10-23):** los horarios pasan a una línea de tiempo del
+día, como en Teams: una línea por media hora (de 8:00 a 18:00) y cada cita con
+el alto de su duración; las que se cruzan van lado a lado. Soltar o tocar cae en
+la media hora bajo el puntero, con una sombra de dónde quedaría. Mover una cita
+conserva su duración; una nueva toma la de su tipo. La ficha muestra inicio y fin.
+
 ## 2026-10-04 · `yarn dev` siempre en el puerto 3000
 
 El API solo acepta los orígenes de `ALLOWED_ORIGINS` (CORS). Si el 3000 estaba

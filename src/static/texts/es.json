@@ -304,11 +304,10 @@
       "noTime": "Sin hora asignada",
       "noTimeHint": "Confirmadas sin hora. Arrástralas a un horario.",
       "noTimePastHint": "Quedaron confirmadas sin hora.",
-      "dropHere": "Soltar aquí",
       "pastDay": "Este día ya pasó: no se pueden agendar ni mover citas.",
       "pendingHint": "Arrastra un paciente a un horario, o tócalo y después toca el horario.",
-      "slotAria_one": "{{hour}}, {{count}} cita",
-      "slotAria_other": "{{hour}}, {{count}} citas",
+      "timelineAria": "Horarios del día",
+      "timeRange": "{{start}} – {{end}}",
       "saving": "Guardando…",
       "toasts": {
         "confirmed": "Cita de {{name}} confirmada a las {{hour}}",

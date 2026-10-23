@@ -8,7 +8,7 @@
 export const CLINIC_LOCALE = 'es-CR';
 
 export const DAYS_IN_WEEK = 7;
-const MINUTE_IN_MS = 60_000;
+export const MINUTE_IN_MS = 60_000;
 
 /** Largo de "YYYY-MM" y "YYYY", para recortar un día a su mes o su año. */
 enum KeyLength {
@@ -115,12 +115,39 @@ export function atHour(dayKey: string, hour: number): Date {
   return date;
 }
 
-/** "8:00 a. m.": una hora del día en el formato de la clínica. */
-export function formatHour(hour: number): string {
-  return atHour(toDayKey(new Date()), hour).toLocaleTimeString(CLINIC_LOCALE, {
+export const MINUTES_IN_HOUR = 60;
+
+/** Fecha local de un día a un minuto del día (510 = 8:30). */
+export function atMinute(dayKey: string, minuteOfDay: number): Date {
+  const date = fromDayKey(dayKey);
+  date.setHours(0, minuteOfDay, 0, 0);
+  return date;
+}
+
+/** Minuto del día (hora local) de una fecha ISO: "…T14:30:00Z" en Costa Rica da 510. */
+export function toMinuteOfDay(isoDate: string): number {
+  const date = new Date(isoDate);
+  return date.getHours() * MINUTES_IN_HOUR + date.getMinutes();
+}
+
+/** "8:30 a. m.": un minuto del día en el formato de la clínica. */
+export function formatMinuteOfDay(minuteOfDay: number): string {
+  return atMinute(toDayKey(new Date()), minuteOfDay).toLocaleTimeString(CLINIC_LOCALE, {
     hour: 'numeric',
     minute: '2-digit',
   });
+}
+
+/** "8 a. m.": una hora en punto, corta, para la columna de horas de una línea de tiempo. */
+export function formatShortHour(hour: number): string {
+  return atMinute(toDayKey(new Date()), hour * MINUTES_IN_HOUR).toLocaleTimeString(CLINIC_LOCALE, {
+    hour: 'numeric',
+  });
+}
+
+/** "8:00 a. m.": una hora del día en el formato de la clínica. */
+export function formatHour(hour: number): string {
+  return formatMinuteOfDay(hour * MINUTES_IN_HOUR);
 }
 
 export function capitalize(text: string): string {

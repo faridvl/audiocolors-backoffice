@@ -35,6 +35,7 @@ import {
   formatLongDay,
   formatCompactDay,
   fromDayKey,
+  MINUTES_IN_HOUR,
   startOfWeek,
   toDayKey,
   toMonthKey,
@@ -388,7 +389,7 @@ export function useAgenda() {
 
   const handleSetTimeAt = (appointment: Appointment, hour: number) => {
     setTimeAppointmentUuid(null);
-    void scheduling.moveAppointment(appointment, selectedDayKey, hour);
+    void scheduling.moveAppointment(appointment, selectedDayKey, hour * MINUTES_IN_HOUR);
   };
 
   /** "Confirmar día": la ficha con calendario y horas, sin modal de formulario. */
@@ -399,7 +400,7 @@ export function useAgenda() {
 
   const handleConfirmAt = (dayKey: string, hour: number) => {
     if (!confirmTarget) return;
-    void scheduling.confirmPending(confirmTarget, dayKey, hour);
+    void scheduling.confirmPending(confirmTarget, dayKey, hour * MINUTES_IN_HOUR);
     setConfirmTarget(null);
   };
 
