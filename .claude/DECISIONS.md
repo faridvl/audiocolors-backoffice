@@ -470,7 +470,7 @@ dispositivos, guardarlo en el API.
 `yarn release:check` (RULES.md §10). El historial vive en `src/static/releases.ts`
 (nunca se borra una versión) y en las etiquetas `vX.Y.Z` de git.
 
-**Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
+**D18 · Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
 muestra lo último (respuestas nuevas y preguntas agregadas) y "Modificada por X
 el día". El PDF en Archivos sigue generándose como registro de qué cambió y quién.
 Reemplaza "la original no se modifica nunca": la clínica quiere ver el estado
