@@ -8,7 +8,6 @@ export enum NotificationKind {
 export interface AppNotification {
   id: string;
   kind: NotificationKind;
-  icon: string;
   publishedAt: string;
   release: Release;
 }
@@ -21,7 +20,6 @@ interface NotificationState {
 
 const EMPTY_STATE: NotificationState = { readIds: [], clearedIds: [] };
 const storageKey = (userUuid: string) => `audiocolors.notificaciones.${userUuid}`;
-const RELEASE_ICON = '🎉';
 
 function readState(userUuid: string): NotificationState {
   try {
@@ -53,7 +51,6 @@ function writeState(userUuid: string, state: NotificationState) {
 const ALL_NOTIFICATIONS: AppNotification[] = RELEASES.map((release) => ({
   id: `release-${release.version}`,
   kind: NotificationKind.RELEASE,
-  icon: RELEASE_ICON,
   publishedAt: release.publishedAt,
   release,
 }));

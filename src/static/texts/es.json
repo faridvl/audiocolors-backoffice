@@ -39,43 +39,61 @@
     "unread": "Sin leer",
     "unreadCount_one": "{{count}} notificación sin leer",
     "unreadCount_other": "{{count}} notificaciones sin leer",
-    "emptyTitle": "Estás al día",
-    "emptyDescription": "Cuando haya algo nuevo, aparece acá.",
-    "releaseTitle": "Nueva versión {{version}}",
-    "releaseIntro": "Esto es lo nuevo · {{date}}",
-    "releaseSummary_one": "{{names}} y {{count}} cambio más",
-    "releaseSummary_other": "{{names}} y {{count}} cambios más",
+    "emptyTitle": "No hay notificaciones",
+    "emptyDescription": "Las novedades de cada versión aparecen acá.",
+    "releaseTitle": "Versión {{version}}",
     "releases": {
       "v1_0_0": {
         "clinicalHistory": {
           "title": "Historia clínica",
-          "description": "Una hoja nueva para la primera visita del paciente."
+          "description": "registro de antecedentes y otoscopia en el expediente; cada actualización queda documentada en Archivos."
         },
         "settings": {
           "title": "Configuración",
-          "description": "Una sección para ajustar la clínica a su manera."
+          "description": "administración de los tipos de cita y de las preguntas de la historia clínica."
+        },
+        "notifications": {
+          "title": "Notificaciones",
+          "description": "aviso de nuevas versiones desde el menú de usuario."
         },
         "roles": {
-          "title": "Permisos por puesto",
-          "description": "Cada persona ve lo que corresponde a su puesto."
+          "title": "Permisos por rol",
+          "description": "el personal de recepción accede a pacientes, agenda y archivos, sin la información clínica."
         },
         "warranty": {
-          "title": "Estado de garantía",
-          "description": "Más detalle sobre la garantía de cada paciente."
+          "title": "Garantía",
+          "description": "registro de garantía expirada, renovación de receta y documento de garantía."
         },
         "files": {
           "title": "Archivos",
-          "description": "Más fácil ordenar y encontrar los archivos."
+          "description": "se pueden renombrar, cambiar de sección y rotar las imágenes."
         },
         "patients": {
           "title": "Pacientes",
-          "description": "Resumen y filtros más cómodos, también en el celular."
+          "description": "resumen disponible en el celular, filtro \"Sin cita\" y meses en orden cronológico."
         },
         "agenda": {
           "title": "Agenda",
-          "description": "Mover y agendar citas es más simple."
+          "description": "la duración de cada cita se toma de su tipo."
+        },
+        "agendaDrag": {
+          "title": "Agenda",
+          "description": "las citas se pueden mover de hora más de una vez."
         }
       }
+    },
+    "kinds": {
+      "NEW": "Novedades",
+      "IMPROVED": "Mejoras",
+      "FIXED": "Correcciones"
+    },
+    "counts": {
+      "NEW_one": "{{count}} novedad",
+      "NEW_other": "{{count}} novedades",
+      "IMPROVED_one": "{{count}} mejora",
+      "IMPROVED_other": "{{count}} mejoras",
+      "FIXED_one": "{{count}} corrección",
+      "FIXED_other": "{{count}} correcciones"
     }
   },
   "layout": {

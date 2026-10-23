@@ -43,8 +43,8 @@ function bump(version) {
     `  {`,
     `    version: '${version}',`,
     `    publishedAt: '${today}T12:00:00Z',`,
-    `    items: [`,
-    `      // item('✨', '${key}.claveDelCambio'),`,
+    `    changes: [`,
+    `      // feature('${key}.clave'), improvement('${key}.clave'), fix('${key}.clave'),`,
     `    ],`,
     `  },`,
   ].join('\n');
@@ -62,7 +62,7 @@ function bump(version) {
   writeJson(PACKAGE_PATH, packageJson);
 
   console.log(`✔ Versión ${version} preparada. Falta:`);
-  console.log(`  1. Agregar los cambios en ${RELEASES_PATH} (item con emoji y clave).`);
+  console.log(`  1. Agregar los cambios en ${RELEASES_PATH} (feature, improvement o fix con su clave).`);
   console.log(`  2. Su título y descripción en ${TEXTS_PATH} → notifications.releases.${key}.`);
   console.log('  3. yarn release:check');
 }
@@ -78,7 +78,9 @@ function check(baseRef) {
   const key = versionKey(version);
   const blockStart = releases.indexOf(`version: '${version}'`);
   const block = releases.slice(blockStart, releases.indexOf('],', blockStart));
-  const itemKeys = [...block.matchAll(/^\s*item\('[^']*',\s*'([^']+)'\)/gm)].map((match) => match[1]);
+  const itemKeys = [...block.matchAll(/^\s*(?:feature|improvement|fix)\('([^']+)'\)/gm)].map(
+    (match) => match[1],
+  );
   if (itemKeys.length === 0) fail(`La versión ${version} no tiene cambios en ${RELEASES_PATH}.`);
 
   const texts = readJson(TEXTS_PATH).notifications?.releases ?? {};

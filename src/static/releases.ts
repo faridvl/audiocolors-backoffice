@@ -1,8 +1,15 @@
 import { TEXT } from '@/static/texts/i18n';
 
-export interface ReleaseItem {
-  /** Emoji del cambio: le da vida a la nota sin ser texto (el texto sale de es.json). */
-  icon: string;
+/** Grupos de una versión, en el orden en que se muestran. */
+export enum ReleaseChangeKind {
+  NEW = 'NEW',
+  IMPROVED = 'IMPROVED',
+  FIXED = 'FIXED',
+}
+
+export interface ReleaseChange {
+  kind: ReleaseChangeKind;
+  /** Claves de `TEXT`: el texto vive en es.json, como el resto. */
   titleKey: string;
   descriptionKey: string;
 }
@@ -11,14 +18,20 @@ export interface Release {
   version: string;
   /** Mediodía UTC: así el día no cambia al mostrarlo en Costa Rica. */
   publishedAt: string;
-  items: ReleaseItem[];
+  changes: ReleaseChange[];
 }
 
-const item = (icon: string, key: string): ReleaseItem => ({
-  icon,
-  titleKey: `${TEXT.NOTIFICATIONS.RELEASES_PREFIX}.${key}.title`,
-  descriptionKey: `${TEXT.NOTIFICATIONS.RELEASES_PREFIX}.${key}.description`,
-});
+const change =
+  (kind: ReleaseChangeKind) =>
+  (key: string): ReleaseChange => ({
+    kind,
+    titleKey: `${TEXT.NOTIFICATIONS.RELEASES_PREFIX}.${key}.title`,
+    descriptionKey: `${TEXT.NOTIFICATIONS.RELEASES_PREFIX}.${key}.description`,
+  });
+
+const feature = change(ReleaseChangeKind.NEW);
+const improvement = change(ReleaseChangeKind.IMPROVED);
+const fix = change(ReleaseChangeKind.FIXED);
 
 /**
  * Versiones publicadas, de la más nueva a la más antigua. Cada una llega a la
@@ -30,14 +43,16 @@ export const RELEASES: Release[] = [
   {
     version: '1.0.0',
     publishedAt: '2026-10-23T12:00:00Z',
-    items: [
-      item('📋', 'v1_0_0.clinicalHistory'),
-      item('⚙️', 'v1_0_0.settings'),
-      item('🔐', 'v1_0_0.roles'),
-      item('🛡️', 'v1_0_0.warranty'),
-      item('📁', 'v1_0_0.files'),
-      item('👥', 'v1_0_0.patients'),
-      item('📅', 'v1_0_0.agenda'),
+    changes: [
+      feature('v1_0_0.clinicalHistory'),
+      feature('v1_0_0.settings'),
+      feature('v1_0_0.notifications'),
+      improvement('v1_0_0.roles'),
+      improvement('v1_0_0.warranty'),
+      improvement('v1_0_0.files'),
+      improvement('v1_0_0.patients'),
+      improvement('v1_0_0.agenda'),
+      fix('v1_0_0.agendaDrag'),
     ],
   },
 ];

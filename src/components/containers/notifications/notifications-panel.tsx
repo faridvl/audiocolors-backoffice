@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowLeft, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
@@ -20,11 +19,12 @@ interface NotificationsPanelProps {
 }
 
 const ICON_BUTTON =
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-500 hover:bg-ink-100 hover:text-ink-800';
+  'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 hover:bg-ink-100 hover:text-ink-800';
 
 /**
- * La bandeja: en el celular ocupa toda la pantalla; en computadora es una
- * ventana centrada. La lista y el detalle de una notificación viven adentro.
+ * Desplegable que sale del avatar, como las notificaciones de cualquier sitio.
+ * Va dentro de un contenedor `relative` junto al avatar; en el celular ocupa el
+ * ancho de la pantalla con su margen.
  */
 export const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   notifications,
@@ -39,41 +39,36 @@ export const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   useEscapeKey(selected ? onBack : onClose);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={t(TEXT.NOTIFICATIONS.TITLE)}
-      className="fixed inset-0 z-50 flex justify-center bg-ink-900/60 sm:items-center sm:p-4"
-      onClick={onClose}
-    >
+    <>
+      {/* Tocar fuera lo cierra, como un menú. */}
+      <div className="fixed inset-0 z-40" aria-hidden onClick={onClose} />
       <div
-        className="flex h-[100dvh] w-full flex-col bg-white sm:h-auto sm:max-h-[min(44rem,85vh)] sm:max-w-lg sm:rounded-card sm:shadow-lg"
-        style={{
-          paddingTop: 'env(safe-area-inset-top)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-label={t(TEXT.NOTIFICATIONS.TITLE)}
+        className="absolute right-0 top-full z-50 mt-2 flex max-h-[min(36rem,calc(100dvh-6rem))] w-[min(24rem,calc(100vw-2rem))] origin-top-right flex-col overflow-hidden rounded-lg border border-ink-200 bg-white shadow-lg"
       >
-        <div className="flex min-h-[60px] items-center gap-2 border-b border-ink-100 px-3">
-          {selected ? (
+        <div className="flex min-h-[52px] items-center gap-1 border-b border-ink-100 px-2">
+          {selected && (
             <button
               type="button"
               onClick={onBack}
               aria-label={t(TEXT.NOTIFICATIONS.BACK)}
               className={ICON_BUTTON}
             >
-              <ArrowLeft className="h-5 w-5" aria-hidden />
+              <ArrowLeft className="h-4 w-4" aria-hidden />
             </button>
-          ) : (
-            <span className="w-2" aria-hidden />
           )}
-          <Typography variant={TypographyVariant.ACCENT} className="flex-1 truncate">
+          <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="flex-1 truncate px-2">
             {t(TEXT.NOTIFICATIONS.TITLE)}
           </Typography>
           {!selected && notifications.length > 0 && (
-            <Button type="button" variant={ButtonVariant.GHOST} onClick={onClear} className="px-3">
+            <button
+              type="button"
+              onClick={onClear}
+              className="rounded-lg px-2 py-1.5 text-sm font-medium text-brand-600 hover:bg-ink-100 hover:text-brand-700"
+            >
               {t(TEXT.NOTIFICATIONS.CLEAR)}
-            </Button>
+            </button>
           )}
           <button
             type="button"
@@ -81,13 +76,14 @@ export const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
             aria-label={t(TEXT.NOTIFICATIONS.CLOSE)}
             className={ICON_BUTTON}
           >
-            <X className="h-5 w-5" aria-hidden />
+            <X className="h-4 w-4" aria-hidden />
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain">
+        {/* La clave reinicia el desplazamiento: el detalle siempre arranca desde arriba. */}
+        <div key={selected?.id ?? 'list'} className="overflow-y-auto overscroll-contain">
           {selected ? (
-            <ReleaseDetail release={selected.release} icon={selected.icon} />
+            <ReleaseDetail release={selected.release} />
           ) : (
             <NotificationList
               notifications={notifications}
@@ -97,6 +93,6 @@ export const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -70,7 +70,8 @@ const UserMenu: React.FC = () => {
   const notifications = useNotifications(user?.uuid);
 
   return (
-    <>
+    // La bandeja de notificaciones se despliega desde acá, debajo del avatar.
+    <div className="relative">
       <Menu as="div" className="relative">
         <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
           <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
@@ -191,7 +192,7 @@ const UserMenu: React.FC = () => {
           onClose={notifications.handleClose}
         />
       )}
-    </>
+    </div>
   );
 };
 
