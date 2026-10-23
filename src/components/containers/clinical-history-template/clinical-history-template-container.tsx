@@ -49,7 +49,9 @@ export const ClinicalHistoryTemplateContainer: React.FC = () => {
       {({ errors }) => (
         <Form className="mx-auto flex w-full max-w-3xl flex-col gap-4">
           <Typography variant={TypographyVariant.BODY} className="text-ink-600">
-            {t(TEXT.CLINICAL_TEMPLATE.INTRO)}
+            {t(TEXT.CLINICAL_TEMPLATE.INTRO)}{' '}
+            {/* Con el dedo no se arrastra: la indicación solo desde `sm`. */}
+            <span className="hidden sm:inline">{t(TEXT.CLINICAL_TEMPLATE.DRAG_HINT)}</span>
           </Typography>
 
           <ClinicalTemplateEditor

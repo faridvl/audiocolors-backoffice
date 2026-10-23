@@ -11,10 +11,11 @@ import {
   LogOut,
   ChevronDown,
   ArrowLeft,
-  ClipboardList,
+  Settings,
   type LucideIcon,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
+import { SETTINGS_SECTIONS } from '@/components/containers/settings/settings-sections';
 import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { useIsIphone } from '@/hooks/use-is-iphone';
@@ -27,7 +28,8 @@ import { BrandLogo } from '@/components/common/brand/brand-logo';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 interface NavigationItem {
-  label: string;
+  /** Clave de `TEXT`: el menú se arma fuera de un componente, se traduce al dibujarlo. */
+  labelKey: string;
   href: string;
   icon: LucideIcon;
   /** Sin permiso, el rol no ve la entrada. */
@@ -35,10 +37,10 @@ interface NavigationItem {
 }
 
 const NAVIGATION: NavigationItem[] = [
-  { label: 'Pacientes', href: routesPrivate.patients.index, icon: Users },
-  { label: 'Agenda', href: routesPrivate.agenda.index, icon: CalendarDays },
+  { labelKey: TEXT.LAYOUT.NAV.PATIENTS, href: routesPrivate.patients.index, icon: Users },
+  { labelKey: TEXT.LAYOUT.NAV.AGENDA, href: routesPrivate.agenda.index, icon: CalendarDays },
   {
-    label: 'Bitácora',
+    labelKey: TEXT.LAYOUT.NAV.ACTIVITY,
     href: routesPrivate.activity.index,
     icon: History,
     permission: Permission.VIEW_ACTIVITY,
@@ -71,7 +73,7 @@ const UserMenu: React.FC = () => {
           </span>
           <span className="hidden text-left sm:flex sm:flex-col">
             <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-              {user?.fullName ?? 'Cargando...'}
+              {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>{tenant?.businessName ?? ''}</Typography>
           </span>
@@ -90,7 +92,7 @@ const UserMenu: React.FC = () => {
           <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
             <div className="border-b border-ink-100 px-3 py-2 sm:hidden">
               <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
-                {user?.fullName ?? 'Cargando...'}
+                {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
               </Typography>
               <Typography variant={TypographyVariant.HELPER} className="truncate">
                 {tenant?.businessName ?? ''}
@@ -127,7 +129,7 @@ const UserMenu: React.FC = () => {
                   )}
                 >
                   <LogOut className="h-4 w-4" aria-hidden />
-                  Cerrar sesión
+                  {t(TEXT.LAYOUT.LOGOUT)}
                 </button>
               )}
             </Menu.Item>
@@ -137,6 +139,25 @@ const UserMenu: React.FC = () => {
 
       {isCalendarSyncOpen && <CalendarSyncSheet onClose={() => setIsCalendarSyncOpen(false)} />}
     </>
+  );
+};
+
+const SidebarLink: React.FC<{ item: NavigationItem; isActive: boolean }> = ({ item, isActive }) => {
+  const { t } = useTranslation();
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      aria-current={isActive ? 'page' : undefined}
+      className={tailwind(
+        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+        isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
+      )}
+    >
+      <Icon className="h-4 w-4" aria-hidden />
+      {t(item.labelKey)}
+    </Link>
   );
 };
 
@@ -168,15 +189,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const router = useRouter();
   const { t } = useTranslation();
   const { can } = usePermissions();
-  const navigation = [
-    ...NAVIGATION,
-    {
-      label: t(TEXT.CLINICAL_TEMPLATE.NAV),
-      href: routesPrivate.settings.clinicalHistory,
-      icon: ClipboardList,
-      permission: Permission.EDIT_CLINICAL_TEMPLATE,
-    },
-  ].filter((item) => !item.permission || can(item.permission));
+  const canOpenSettings = SETTINGS_SECTIONS.some((item) => can(item.permission));
+  const mainNavigation = NAVIGATION.filter((item) => !item.permission || can(item.permission));
+  const settingsItem: NavigationItem | null = canOpenSettings
+    ? { labelKey: TEXT.SETTINGS.NAV, href: routesPrivate.settings.index, icon: Settings }
+    : null;
+  // En el celular va como una pestaña más; en el menú lateral, sola al fondo.
+  const mobileNavigation = settingsItem ? [...mainNavigation, settingsItem] : mainNavigation;
 
   const isActiveRoute = (href: string) =>
     router.pathname === href || router.pathname.startsWith(`${href}/`);
@@ -190,33 +209,21 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             variant={TypographyVariant.HELPER}
             className="mt-1.5 block uppercase tracking-[0.18em] text-ink-400"
           >
-            Gestión Clínica
+            {t(TEXT.LAYOUT.APP_LABEL)}
           </Typography>
         </div>
 
         <nav className="mt-5 flex flex-col gap-1">
-          {navigation.map((item) => {
-            const isActive = isActiveRoute(item.href);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={isActive ? 'page' : undefined}
-                className={tailwind(
-                  'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
-                )}
-              >
-                <Icon className="h-4 w-4" aria-hidden />
-                {item.label}
-              </Link>
-            );
-          })}
+          {mainNavigation.map((item) => (
+            <SidebarLink key={item.href} item={item} isActive={isActiveRoute(item.href)} />
+          ))}
         </nav>
+
+        {settingsItem && (
+          <nav className="mt-auto border-t border-ink-100 pt-3">
+            <SidebarLink item={settingsItem} isActive={isActiveRoute(settingsItem.href)} />
+          </nav>
+        )}
       </aside>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
@@ -272,7 +279,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         className="fixed inset-x-0 bottom-0 z-10 flex border-t border-ink-200 bg-white md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {navigation.map((item) => {
+        {mobileNavigation.map((item) => {
           const isActive = isActiveRoute(item.href);
           const Icon = item.icon;
 
@@ -287,7 +294,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
               )}
             >
               <Icon className="h-5 w-5" aria-hidden />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}

@@ -42,13 +42,16 @@ export const ClinicalQuestionRow: React.FC<ClinicalQuestionRowProps> = ({
       data-question-row
       className={tailwind('flex gap-1 border-b border-ink-100 py-3', isDragging && 'opacity-40')}
     >
-      {/* Solo el asa es arrastrable: así se puede seleccionar el texto de los campos. */}
+      {/*
+        Solo el asa es arrastrable: así se puede seleccionar el texto de los campos. En el
+        celular no se muestra: el arrastre nativo no funciona con el dedo.
+      */}
       <button
         type="button"
         draggable
         {...drag}
         aria-label={t(TEXT.CLINICAL_TEMPLATE.DRAG_HANDLE)}
-        className="flex h-[46px] w-6 shrink-0 cursor-grab items-center justify-center text-ink-400 hover:text-ink-700 active:cursor-grabbing"
+        className="hidden h-[46px] w-6 shrink-0 cursor-grab sm:flex items-center justify-center text-ink-400 hover:text-ink-700 active:cursor-grabbing"
       >
         <GripVertical className="h-4 w-4" aria-hidden />
       </button>

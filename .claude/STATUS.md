@@ -102,7 +102,7 @@ locales.
 |---|---|---|
 | P0-1 | **Cambiar las contraseñas temporales** | Ambos usuarios tienen `Password1`. `PATCH /users/:uuid` con `password` |
 | P0-2 | **Desplegar** | Ver "Próximo paso" |
-| P0-3 | **Duración de los tipos de cita en producción** | Al pasar a producción, poner Cita en 60 min y Control y Mantenimiento en 30 (`PATCH /appointment-types/:uuid` con `duration`; no hay pantalla para hacerlo). Revisar que desarrollo también los tenga. Sin duración, la cita dura 30 |
+| P0-3 | **Duración de los tipos de cita en producción** | Al pasar a producción, revisar en Configuración → Tipos de cita: Cita 60 min, Control y Mantenimiento 30, y Control marcado como control |
 
 ### 🟠 Deseable
 | # | Tarea | Notas |
@@ -116,7 +116,7 @@ locales.
 ### 🔵 Próximas etapas (decididas, sin empezar)
 | # | Tarea | Notas |
 |---|---|---|
-| P3-1 | **Configuración** en una sola entrada del menú | D21: sedes, tipos de cita y duración, preguntas de historia clínica, usuarios |
+| P3-1 | **Configuración**: faltan sedes y usuarios | D21. Ya están Tipos de cita (D22) e Historia clínica |
 | P3-2 | **Permisos configurables** por el administrador | D20: por rol y por clínica, el API y el front revisan permisos |
 
 ### ⚪ Si el uso lo pide

@@ -12,7 +12,9 @@ export const routesPrivate = {
     index: '/bitacora',
   },
   settings: {
+    index: '/configuracion',
     clinicalHistory: '/configuracion/historia-clinica',
+    appointmentTypes: '/configuracion/tipos-de-cita',
   },
 };
 

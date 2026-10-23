@@ -20,12 +20,6 @@ import {
 /** Con limit 1 la consulta solo trae el total: es lo único que muestra la tarjeta. */
 const COUNT_LIMIT = 1;
 
-/**
- * Nombre del tipo de cita de los controles. Los tipos son datos de la clínica,
- * así que se busca por nombre; si no existe, la tarjeta no se muestra.
- */
-const CONTROL_TYPE_NAME = 'control';
-
 export interface PatientSummaryCard {
   key: string;
   label: string;
@@ -54,9 +48,8 @@ export function usePatientSummary(selection: PatientListSelection) {
   const { data: appointmentTypes } = useAppointmentTypesQuery();
   const currentMonth = toMonthKey(toDayKey(new Date()));
 
-  const controlTypeUuid = appointmentTypes?.find(
-    (type) => type.name.trim().toLowerCase() === CONTROL_TYPE_NAME,
-  )?.uuid;
+  // El tipo que la clínica marcó como control en Configuración; sin ninguno, la tarjeta no se muestra.
+  const controlTypeUuid = appointmentTypes?.find((type) => type.isControl)?.uuid;
 
   const presets = useMemo(
     () => ({
