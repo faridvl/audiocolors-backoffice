@@ -413,9 +413,9 @@ organiza su equipo a su manera y no queremos lógica por clínica en el código.
 
 ---
 
-## D21 · (Futuro) Configuración en una sola entrada del menú
+## D21 · Configuración en una sola entrada del menú
 
-**Estado:** decidido, sin implementar (2026-10-22).
+**Estado:** implementado con Tipos de cita e Historia clínica (2026-10-22); faltan sedes y usuarios.
 
 **Decisión:** los mantenimientos (sedes, tipos de cita y su duración, preguntas
 de la historia clínica, usuarios y permisos) van en una sola entrada
@@ -430,4 +430,21 @@ tarea, no por tabla: "Agenda" junta tipos de cita y duraciones.
 que se usan poco. Las pestañas arriba sirven hasta 4-6 opciones; la lista
 lateral escala. Al hacerlo, "Historia clínica" sale del menú lateral y pasa
 a Configuración.
+
+---
+
+## D22 · El "control" es un tipo de cita marcado, no un nombre
+
+**Decisión (2026-10-22):** la tarjeta "Controles este mes" cuenta el tipo de
+cita marcado con "Cuenta como control" en Configuración → Tipos de cita
+(`isControl` en el API, uno por clínica: marcar otro desmarca el anterior). Sin
+ninguno marcado, la tarjeta no se muestra. Reemplaza la búsqueda por el nombre
+"Control" (entrada del 2026-10-10): con los tipos editables, renombrarlo la
+hacía desaparecer. La migración marcó el tipo llamado "Control" de cada clínica.
+
+**Tipos de cita en Configuración:** lista de solo lectura (nombre, duración y
+la etiqueta "Controles del mes"); se edita en una ventana con nombre, duración
+y el interruptor de control, que avisa qué cambia al guardar. Sin agregar ni
+borrar tipos, y sin color: el color del tipo solo se ve como un punto en la
+agenda; lo que domina es el color de la sede.
 

@@ -6,18 +6,19 @@ export enum Permission {
   VIEW_CLINICAL_RECORD = 'VIEW_CLINICAL_RECORD',
   VIEW_ACTIVITY = 'VIEW_ACTIVITY',
   EDIT_CLINICAL_TEMPLATE = 'EDIT_CLINICAL_TEMPLATE',
+  EDIT_APPOINTMENT_TYPES = 'EDIT_APPOINTMENT_TYPES',
 }
 
-const CLINICAL_PERMISSIONS = Object.values(Permission);
+const ALL_PERMISSIONS = Object.values(Permission);
 
 /**
  * STAFF es el empleado (recepción, secretaría): ve pacientes, contactos, citas y
  * archivos, pero nada clínico. El médico puede ser además el dueño.
  */
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  [UserRole.OWNER]: CLINICAL_PERMISSIONS,
-  [UserRole.ADMIN]: CLINICAL_PERMISSIONS,
-  [UserRole.DOCTOR]: CLINICAL_PERMISSIONS,
+  [UserRole.OWNER]: ALL_PERMISSIONS,
+  [UserRole.ADMIN]: ALL_PERMISSIONS,
+  [UserRole.DOCTOR]: ALL_PERMISSIONS,
   [UserRole.STAFF]: [],
 };
 

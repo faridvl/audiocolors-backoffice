@@ -30,11 +30,55 @@
     "yes": "Sí",
     "no": "No"
   },
+  "layout": {
+    "appLabel": "Gestión Clínica",
+    "loadingUser": "Cargando...",
+    "logout": "Cerrar sesión",
+    "nav": {
+      "patients": "Pacientes",
+      "agenda": "Agenda",
+      "activity": "Bitácora"
+    }
+  },
+  "settings": {
+    "pageTitle": "Configuración · AudioColors Gestión Clínica",
+    "title": "Configuración",
+    "nav": "Configuración",
+    "sections": {
+      "APPOINTMENT_TYPES": {
+        "title": "Tipos de cita",
+        "description": "Nombre y duración de cada tipo de cita"
+      },
+      "CLINICAL_HISTORY": {
+        "title": "Historia clínica",
+        "description": "Preguntas de la hoja que se llena en la primera visita"
+      }
+    },
+    "appointmentTypes": {
+      "pageTitle": "Tipos de cita · AudioColors Gestión Clínica",
+      "loading": "Cargando tipos de cita...",
+      "loadError": "No se pudieron cargar los tipos de cita",
+      "empty": "La clínica todavía no tiene tipos de cita.",
+      "name": "Nombre",
+      "duration": "Duración",
+      "noDuration": "Sin definir (30 minutos)",
+      "minutes": "{{count}} minutos",
+      "saved": "Tipo de cita guardado",
+      "isControl": "Cuenta como control",
+      "isControlHint": "Es el que se cuenta en la tarjeta \"Controles este mes\" de Pacientes.",
+      "controlBadge": "Controles del mes",
+      "controlSet": "Al guardar, \"{{name}}\" será el que se cuente en \"Controles este mes\".",
+      "controlReplace": "Al guardar, \"{{name}}\" reemplaza a \"{{previous}}\" como control: desde ahora \"Controles este mes\" cuenta \"{{name}}\".",
+      "controlRemove": "Al guardar no quedará ningún control y la tarjeta \"Controles este mes\" dejará de verse.",
+      "editTitle": "Editar tipo de cita",
+      "editLabel": "Editar {{name}}",
+      "minutesShort": "{{count}} min"
+    }
+  },
   "clinicalTemplate": {
     "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
-    "title": "Preguntas de la historia clínica",
     "templateName": "Historia clínica",
-    "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Arrastra una pregunta por su asa para cambiarla de lugar o de sección, y toca el nombre de una sección para cambiarlo. Lo que cambies se usa en las historias que se llenen desde ahora: las ya llenas no cambian.",
+    "intro": "Los cambios no afectan las historias ya llenas.",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",
     "label": "Pregunta",
@@ -54,14 +98,14 @@
       "detailRequired": "Escribe qué se pregunta si es Sí",
       "atLeastOne": "La hoja necesita al menos una pregunta"
     },
-    "nav": "Historia clínica",
     "labelPlaceholder": "Escribe la pregunta",
     "detailPlaceholder": "Si es Sí, qué se pregunta (por ejemplo: ¿Qué tonalidad?)",
-    "noSection": "Sin título (las preguntas se muestran sueltas)",
+    "noSection": "Sin título",
     "newSection": "Nombre de una sección nueva",
     "addSection": "Agregar sección",
     "sectionName": "Nombre de la sección",
-    "dragHandle": "Arrastrar para mover la pregunta"
+    "dragHandle": "Arrastrar para mover la pregunta",
+    "dragHint": "Para moverla, arrastra una pregunta por su asa."
   },
   "auth": {
     "login": {
