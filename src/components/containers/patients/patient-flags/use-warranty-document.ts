@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { PillSelectOption } from '@/components/common/pill-select/pill-select';
+import { mapToDocumentItem } from '@/components/containers/documents/document-items';
+import { useDocumentPreview } from '@/components/containers/documents/use-document-preview';
 import { useUpdatePatientMutation } from '@/shared/api/mutations/patients/update-patient-mutation';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { usePatientDocumentsQuery } from '@/shared/api/querys/patient-documents-query';
@@ -13,16 +15,25 @@ import { Patient } from '@/types/patients/patient';
 /** Valor de la opción "Ninguno": el selector no admite null. */
 const NO_DOCUMENT_VALUE = '';
 
-/** Elegir cuál de los archivos subidos como Garantías es el de la garantía del paciente. */
+/**
+ * Las garantías del paciente (archivos con categoría Garantías): elegir cuál es
+ * la vigente y abrir cualquiera en el visor sin salir del modal.
+ */
 export function useWarrantyDocument(patient: Patient) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: documents, isLoading } = usePatientDocumentsQuery(patient.uuid);
   const { executeUpdatePatient, isPending: isSaving } = useUpdatePatientMutation();
+  const preview = useDocumentPreview();
 
   const warrantyDocuments = useMemo(
     () => (documents ?? []).filter((document) => document.category === DocumentCategory.WARRANTY),
     [documents],
+  );
+
+  const warrantyItems = useMemo(
+    () => warrantyDocuments.map(mapToDocumentItem),
+    [warrantyDocuments],
   );
 
   const options: PillSelectOption[] = useMemo(
@@ -68,6 +79,8 @@ export function useWarrantyDocument(patient: Patient) {
     options,
     selectedValue,
     hasDocuments: warrantyDocuments.length > 0,
+    warrantyItems,
+    preview,
     isLoading,
     isSaving,
     handleChange,

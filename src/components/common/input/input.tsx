@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Field, ErrorMessage } from 'formik';
+import { Field, ErrorMessage, useField } from 'formik';
 import { Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { tailwind } from '@/utils/tailwind-utils';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { TEXT } from '@/static/texts/i18n';
 
 /**
  * Estilo unico de campo. En Zynka estas clases estaban duplicadas literal
@@ -28,6 +30,8 @@ interface FormFieldProps {
   disabled?: boolean;
   as?: 'input' | 'select' | 'textarea';
   maxLength?: number;
+  /** Muestra "escritos / máximo" debajo del campo. Requiere `maxLength`. */
+  showCount?: boolean;
   hint?: string;
   className?: string;
   children?: React.ReactNode;
@@ -48,6 +52,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   disabled = false,
   as = 'input',
   maxLength,
+  showCount = false,
   hint,
   className,
   children,
@@ -55,7 +60,11 @@ export const FormField: React.FC<FormFieldProps> = ({
   inputMode,
   endAdornment,
 }) => {
+  const { t } = useTranslation();
+  const [{ value }] = useField<unknown>(name);
   const [showPassword, setShowPassword] = useState(false);
+  const isCountVisible = showCount && maxLength !== undefined;
+  const length = typeof value === 'string' ? value.length : 0;
   const isPassword = as === 'input' && type === 'password';
   const resolvedType = isPassword && showPassword ? 'text' : type;
 
@@ -107,7 +116,23 @@ export const FormField: React.FC<FormFieldProps> = ({
         {!isPassword && endAdornment}
       </div>
 
-      {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
+      {(hint || isCountVisible) && (
+        <div className="flex items-start justify-between gap-3">
+          {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
+          {isCountVisible && (
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="ml-auto shrink-0 tabular-nums"
+              aria-live="polite"
+            >
+              {t(TEXT.GENERAL.CHARACTER_COUNT, {
+                count: length,
+                max: maxLength,
+              })}
+            </Typography>
+          )}
+        </div>
+      )}
 
       <ErrorMessage name={name}>
         {(message) => <Typography variant={TypographyVariant.ERROR}>{message}</Typography>}

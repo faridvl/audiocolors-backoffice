@@ -11,6 +11,9 @@ export const routesPrivate = {
   activity: {
     index: '/bitacora',
   },
+  settings: {
+    clinicalHistory: '/configuracion/historia-clinica',
+  },
 };
 
 export const routesPublic = {

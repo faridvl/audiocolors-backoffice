@@ -3,6 +3,7 @@ import {
   CalendarCheck,
   CalendarClock,
   CircleCheck,
+  ClipboardList,
   DoorOpen,
   FilePen,
   FolderInput,
@@ -76,6 +77,14 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     },
     [PatientActivityAction.RENEW_PRESCRIPTION_CHANGED]: {
       icon: FileClock,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.CLINICAL_HISTORY_CREATED]: {
+      icon: ClipboardList,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.CLINICAL_HISTORY_UPDATED]: {
+      icon: ClipboardList,
       tone: ActionTone.NEUTRAL,
     },
   };

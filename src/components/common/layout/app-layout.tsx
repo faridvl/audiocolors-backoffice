@@ -11,8 +11,10 @@ import {
   LogOut,
   ChevronDown,
   ArrowLeft,
+  ClipboardList,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
+import { CLINICAL_TEMPLATE_EDITOR_ROLES } from '@/components/containers/clinical-history-template/use-clinical-history-template';
 import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { useIsIphone } from '@/hooks/use-is-iphone';
@@ -44,6 +46,7 @@ const UserMenu: React.FC = () => {
   const { t } = useTranslation();
   const isIphone = useIsIphone();
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
+  const canEditClinicalTemplate = !!user && CLINICAL_TEMPLATE_EDITOR_ROLES.includes(user.role);
 
   return (
     <>
@@ -95,6 +98,23 @@ const UserMenu: React.FC = () => {
                     <CalendarSync className="h-4 w-4" aria-hidden />
                     {t(TEXT.AGENDA.CALENDAR_SYNC.MENU)}
                   </button>
+                )}
+              </Menu.Item>
+            )}
+
+            {canEditClinicalTemplate && (
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href={routesPrivate.settings.clinicalHistory}
+                    className={tailwind(
+                      'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                      active && 'bg-ink-50',
+                    )}
+                  >
+                    <ClipboardList className="h-4 w-4" aria-hidden />
+                    {t(TEXT.CLINICAL_TEMPLATE.MENU)}
+                  </Link>
                 )}
               </Menu.Item>
             )}

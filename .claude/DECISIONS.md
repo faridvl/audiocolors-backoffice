@@ -309,3 +309,47 @@ visibles en la tarjeta del expediente, en una columna a la derecha de los datos;
 en el celular (menos de `sm`) solo con ícono y `aria-label`.
 
 **Por qué:** la clínica las usa seguido y en el menú no se encontraban.
+
+---
+
+## D18 · Historia clínica
+
+**Decisión (2026-10-21):** tarjeta propia en el expediente, entre los datos del
+paciente y Control de evolución, que copia la hoja en papel **dentro de la
+tarjeta, sin modal**: sin historia se muestra la hoja para llenarla; ya llena,
+queda la hoja completa en solo lectura (todos los antecedentes; el Sí resalta con ✓ y el No queda apagado, con la misma grilla que el formulario), y **la original no se modifica nunca**: "Editar" abre la misma hoja precargada y, al guardar, crea una nota con categoría Historia clínica en Control de evolución con lo que cambió ("Mareo: No → Sí"). La nota resume los textos largos para no pasar los 500 caracteres del API. En
+pantalla ancha las secciones van en columnas angostas para que cada Sí/No quede
+junto a su antecedente. Cada antecedente es Sí / No en un control segmentado
+(`SegmentedControl`, 44px por opción, pensado para iPad); el Sí elegido va en el
+color de marca para verse entre las filas en No. Un formulario nuevo arranca
+todo en No.
+
+- **403 oculta la tarjeta**: STAFF no tiene acceso a antecedentes clínicos. Para
+  distinguirlo de una falla, `ApiServiceClient` ahora lanza `ApiError` (sigue
+  siendo un `Error` con el mismo mensaje, más el `status`); el resto de la app no
+  cambia. Un 403 o 404 no se reintenta.
+- **`notes` se reenvía tal cual**: el API lo tiene pero la hoja no; como el PUT
+  reemplaza todo, el formulario manda el valor que ya había para no borrarlo.
+- **La tonalidad se descarta si Acúfeno es No**, aunque se haya escrito antes.
+- **Autor**: el API solo da `createdByUuid` / `updatedByUuid`, sin nombre; se
+  resuelve con `useResolveAuthorLabel` (nombre solo si fue el usuario logueado).
+
+**Actualización (2026-10-22):**
+
+- **Editar genera un PDF en Archivos**, no una nota: la hoja completa
+  actualizada y, arriba, lo que cambió ("antes No, ahora Sí"), en la sección
+  Historia clínica. La original sigue sin modificarse. El PDF se arma en el
+  navegador con jsPDF, cargado solo al guardar.
+- **Preguntas configurables**: un OWNER o ADMIN las cambia en
+  "Preguntas de la historia clínica" (menú del usuario,
+  `/configuracion/historia-clinica`). Sin plantilla guardada se usa la hoja
+  estándar. Cada historia guarda la copia de sus preguntas
+  (`templateSnapshot`) y se lee siempre con ellas; las llenadas antes, sin
+  copia, se leen con la hoja estándar, nunca con las preguntas actuales (si no,
+  aparecerían preguntas que no se hicieron). Las preguntas estándar conservan
+  sus ids, que son las columnas del API, para que esas columnas se sigan llenando.
+- **Diseño**: cada sección en su tarjeta, repartidas en dos columnas por altura
+  (CSS `columns`) y con ancho máximo, para que no queden huecos ni el Sí/No
+  lejos de su antecedente. El No elegido queda discreto; solo el Sí se pinta.
+  El detalle de un Sí (tonalidad) va pegado a su pregunta. Los textos muestran
+  el contador de caracteres (`FormField` con `showCount`).
