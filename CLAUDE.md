@@ -31,8 +31,8 @@ completo.
 
 ## Las tres reglas que más se rompen
 
-1. **El API no se toca.** Se comparte con Zynka; un cambio incompatible rompe el
-   otro sitio. Si hace falta, se discute antes.
+1. **Todo texto visible sale de i18n.** `t(TEXT.MODULO.CLAVE)` con su espejo en
+   `es.json`; nunca un string en el JSX (RULES.md §5.2).
 2. **Colores por token, nunca hex suelto.** `bg-brand`, no `bg-[#66ae36]`.
 3. **Español con tildes.** `años`, no `anios`. Al escribir texto visible usa la
    herramienta Write o Python con UTF-8, no heredocs de bash.

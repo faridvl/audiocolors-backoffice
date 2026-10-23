@@ -113,8 +113,7 @@ Se adoptaron de un back-office de producción maduro:
 | `DELETE /patients/:uuid` es soft delete y `PATCH` ignora `isActive` | Un paciente eliminado no se puede reactivar ni borrar del todo |
 | `GET /patients` solo distingue "activos" de "activos + inactivos" | El filtro "Inactivos" trae todos y filtra en cliente; su conteo no es exacto |
 
-Ambas requieren cambio en el API, que se comparte con Zynka. Ver regla 7 de
-`RULES.md`.
+Ambas requieren cambio en el API (ver D24).
 
 ---
 
@@ -484,3 +483,13 @@ el día". El PDF en Archivos sigue generándose como registro de qué cambió y 
 Reemplaza "la original no se modifica nunca": la clínica quiere ver el estado
 actual del paciente en el expediente.
 
+---
+
+## D24 · El API se cambia cuando hace falta
+
+**Decisión (2026-10-23):** se elimina la regla "el API no se toca". Nació para
+no romper Zynka, que comparte el backend, pero en la práctica los cambios del
+API (agenda, garantía, historia clínica, permisos, tipos de cita) salieron por
+ramas con PR a `develop` y dejaron el sistema mejor. Desde ahora el API se
+cambia como el front: rama propia, PR a `develop` y, al pasar a `main`, la
+acción `[Release] Production` aplica las migraciones.
