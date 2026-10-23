@@ -30,42 +30,50 @@
     "yes": "Sí",
     "no": "No"
   },
-  "releaseNotes": {
+  "notifications": {
     "menu": "Notificaciones",
     "title": "Notificaciones",
     "close": "Cerrar",
-    "version": "Nueva versión {{version}}",
-    "unseen_one": "{{count}} notificación sin ver",
-    "unseen_other": "{{count}} notificaciones sin ver",
+    "back": "Volver",
+    "clear": "Limpiar",
+    "unread": "Sin leer",
+    "unreadCount_one": "{{count}} notificación sin leer",
+    "unreadCount_other": "{{count}} notificaciones sin leer",
+    "emptyTitle": "Estás al día",
+    "emptyDescription": "Cuando haya algo nuevo, aparece acá.",
+    "releaseTitle": "Nueva versión {{version}}",
+    "releaseIntro": "Esto es lo nuevo · {{date}}",
+    "releaseSummary_one": "{{names}} y {{count}} cambio más",
+    "releaseSummary_other": "{{names}} y {{count}} cambios más",
     "releases": {
       "v1_0_0": {
         "clinicalHistory": {
           "title": "Historia clínica",
-          "description": "Se llena la primera vez que viene el paciente. Si se edita, la hoja actualizada queda como PDF en Archivos."
+          "description": "Una hoja nueva para la primera visita del paciente."
         },
         "settings": {
           "title": "Configuración",
-          "description": "Al fondo del menú: tipos de cita (nombre, duración y cuál es el control) y las preguntas de la historia clínica."
+          "description": "Una sección para ajustar la clínica a su manera."
         },
         "roles": {
           "title": "Permisos por puesto",
-          "description": "Recepción ve pacientes, agenda y archivos, sin la información clínica."
+          "description": "Cada persona ve lo que corresponde a su puesto."
         },
         "warranty": {
           "title": "Estado de garantía",
-          "description": "Garantía expirada, renovar receta y el archivo de la garantía del paciente."
+          "description": "Más detalle sobre la garantía de cada paciente."
         },
         "files": {
           "title": "Archivos",
-          "description": "Se pueden renombrar, cambiar de sección y rotar; los nombres se ven sin la extensión."
+          "description": "Más fácil ordenar y encontrar los archivos."
         },
         "patients": {
           "title": "Pacientes",
-          "description": "Resumen también en el celular, meses del más cercano al más lejano y \"Sin cita\" en Próxima cita."
+          "description": "Resumen y filtros más cómodos, también en el celular."
         },
         "agenda": {
           "title": "Agenda",
-          "description": "Las citas se mueven de hora sin trabarse y cada una dura lo que su tipo de cita."
+          "description": "Mover y agendar citas es más simple."
         }
       }
     }
@@ -78,7 +86,8 @@
       "patients": "Pacientes",
       "agenda": "Agenda",
       "activity": "Bitácora"
-    }
+    },
+    "version": "Versión {{version}}"
   },
   "settings": {
     "pageTitle": "Configuración · AudioColors Gestión Clínica",
@@ -87,11 +96,11 @@
     "sections": {
       "APPOINTMENT_TYPES": {
         "title": "Tipos de cita",
-        "description": "Nombre y duración de cada tipo de cita"
+        "description": "Nombre y duración de cada tipo de cita."
       },
       "CLINICAL_HISTORY": {
         "title": "Historia clínica",
-        "description": "Preguntas de la hoja que se llena en la primera visita"
+        "description": "Preguntas de la hoja de la primera visita. Los cambios no afectan las historias ya llenas."
       }
     },
     "appointmentTypes": {
@@ -118,7 +127,6 @@
   "clinicalTemplate": {
     "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
     "templateName": "Historia clínica",
-    "intro": "Los cambios no afectan las historias ya llenas.",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",
     "label": "Pregunta",

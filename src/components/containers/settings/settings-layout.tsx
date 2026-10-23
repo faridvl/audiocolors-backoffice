@@ -2,11 +2,17 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/common/layout/app-layout';
 import { RequirePermission } from '@/components/common/permission/require-permission';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
 import { SettingsNav } from './settings-nav';
-import { sectionTitleKey, SETTINGS_SECTIONS, SettingsSection } from './settings-sections';
+import {
+  sectionDescriptionKey,
+  sectionTitleKey,
+  SETTINGS_SECTIONS,
+  SettingsSection,
+} from './settings-sections';
 import { useSettingsNavigation } from './use-settings-navigation';
 
 interface SettingsLayoutProps {
@@ -34,7 +40,11 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ section, childre
         <aside className="hidden lg:sticky lg:top-0 lg:block">
           <SettingsNav sections={sections} activeSection={section} />
         </aside>
-        <div className="min-w-0">
+        {/* Todas las secciones arrancan igual (misma línea, mismo ancho): cambiar de una a otra no salta. */}
+        <div className="flex w-full min-w-0 max-w-3xl flex-col gap-4">
+          <Typography variant={TypographyVariant.BODY} className="text-ink-600">
+            {t(sectionDescriptionKey(section))}
+          </Typography>
           {permission ? (
             <RequirePermission permission={permission}>{children}</RequirePermission>
           ) : (

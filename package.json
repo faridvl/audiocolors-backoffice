@@ -1,6 +1,6 @@
 {
   "name": "audiocolors-backoffice",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "author": {
     "name": "Farid Villacis"
@@ -10,7 +10,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release:bump": "node scripts/release.mjs bump",
+    "release:check": "node scripts/release.mjs check --base origin/main"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.2",

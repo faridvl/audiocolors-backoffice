@@ -29,19 +29,27 @@ export const TEXT = {
       ALL_MONTHS: 'common.filters.allMonths',
     },
   },
-  RELEASE_NOTES: {
-    MENU: 'releaseNotes.menu',
-    TITLE: 'releaseNotes.title',
-    CLOSE: 'releaseNotes.close',
-    VERSION: 'releaseNotes.version',
-    UNSEEN: 'releaseNotes.unseen',
+  NOTIFICATIONS: {
+    MENU: 'notifications.menu',
+    TITLE: 'notifications.title',
+    CLOSE: 'notifications.close',
+    BACK: 'notifications.back',
+    CLEAR: 'notifications.clear',
+    UNREAD: 'notifications.unread',
+    UNREAD_COUNT: 'notifications.unreadCount',
+    EMPTY_TITLE: 'notifications.emptyTitle',
+    EMPTY_DESCRIPTION: 'notifications.emptyDescription',
+    RELEASE_TITLE: 'notifications.releaseTitle',
+    RELEASE_INTRO: 'notifications.releaseIntro',
+    RELEASE_SUMMARY: 'notifications.releaseSummary',
     /** `${RELEASES_PREFIX}.v1_0_0.clinicalHistory.title`: el contenido de cada versión. */
-    RELEASES_PREFIX: 'releaseNotes.releases',
+    RELEASES_PREFIX: 'notifications.releases',
   },
   LAYOUT: {
     APP_LABEL: 'layout.appLabel',
     LOADING_USER: 'layout.loadingUser',
     LOGOUT: 'layout.logout',
+    VERSION: 'layout.version',
     NAV: {
       PATIENTS: 'layout.nav.patients',
       AGENDA: 'layout.nav.agenda',
@@ -78,7 +86,6 @@ export const TEXT = {
   CLINICAL_TEMPLATE: {
     PAGE_TITLE: 'clinicalTemplate.pageTitle',
     TEMPLATE_NAME: 'clinicalTemplate.templateName',
-    INTRO: 'clinicalTemplate.intro',
     DRAG_HINT: 'clinicalTemplate.dragHint',
     LOADING: 'clinicalTemplate.loading',
     LOAD_ERROR: 'clinicalTemplate.loadError',

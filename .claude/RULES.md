@@ -341,6 +341,27 @@ ve sale de ese rol, nunca del nombre de la clínica.
 
 ---
 
+## 10. Versiones y notificaciones de novedades
+
+Cada salida a producción (PR de `develop` a `main`) es una **versión** y llega a
+la clínica como una notificación en la bandeja del menú del usuario.
+
+1. **Antes de abrir el PR a main:** `yarn release:bump X.Y.Z` (sube `package.json`
+   y prepara la entrada en `src/static/releases.ts` y `es.json`). Se completan los
+   cambios: un emoji por cambio y título + descripción en `es.json`.
+2. **Mostrarle al usuario el borrador de las novedades y esperar su OK** antes de
+   abrir el PR. Nunca se publica un changelog que no vio.
+3. `yarn release:check` limpio. El workflow `[CHECK] Versión documentada` lo exige
+   en cada PR a main: la versión tiene que ser mayor que la de main y traer sus novedades.
+4. Al mergear a main, `[Release] Etiqueta de versión` marca el commit con `vX.Y.Z`.
+
+**Cómo se escriben:** pensadas para el personal de la clínica, no para
+desarrolladores. Generales, sin detalle técnico ni de cómo funciona por dentro
+("Una hoja nueva para la primera visita del paciente", no "guarda la copia de las
+preguntas en templateSnapshot"). Pocas palabras por cambio.
+
+---
+
 ## 8. Antes de cada commit
 
 ```bash
