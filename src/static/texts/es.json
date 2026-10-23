@@ -25,6 +25,7 @@
       "unexpected": "Algo salió mal. Intenta de nuevo."
     },
     "notRegistered": "Sin registrar",
+    "forbidden": "Tu usuario no tiene acceso a esta sección.",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
     "no": "No"
@@ -36,7 +37,6 @@
     "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Arrastra una pregunta por su asa para cambiarla de lugar o de sección, y toca el nombre de una sección para cambiarlo. Lo que cambies se usa en las historias que se llenen desde ahora: las ya llenas no cambian.",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",
-    "forbidden": "Solo un administrador puede cambiar las preguntas de la historia clínica.",
     "label": "Pregunta",
     "kind": "Tipo de respuesta",
     "kinds": {

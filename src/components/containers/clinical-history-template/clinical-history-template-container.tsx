@@ -11,34 +11,15 @@ import { useClinicalHistoryTemplate } from './use-clinical-history-template';
 
 export const ClinicalHistoryTemplateContainer: React.FC = () => {
   const { t } = useTranslation();
-  const {
-    canEdit,
-    isSessionLoading,
-    initialValues,
-    validationSchema,
-    isLoading,
-    isError,
-    refetch,
-    isPending,
-    handleSubmit,
-  } = useClinicalHistoryTemplate();
+  const { initialValues, validationSchema, isLoading, isError, refetch, isPending, handleSubmit } =
+    useClinicalHistoryTemplate();
 
-  if (isLoading || isSessionLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center gap-2 py-12">
         <Loader2 className="h-5 w-5 animate-spin text-brand" aria-hidden />
         <Typography variant={TypographyVariant.BODY}>
           {t(TEXT.CLINICAL_TEMPLATE.LOADING)}
-        </Typography>
-      </div>
-    );
-  }
-
-  if (!canEdit) {
-    return (
-      <div className="mx-auto max-w-md py-12 text-center">
-        <Typography variant={TypographyVariant.BODY}>
-          {t(TEXT.CLINICAL_TEMPLATE.FORBIDDEN)}
         </Typography>
       </div>
     );

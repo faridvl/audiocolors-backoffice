@@ -317,6 +317,30 @@ implementa por cuenta propia.
 
 ---
 
+## 9. Roles y permisos
+
+Pensado para varias clínicas (multi-tenant): cada usuario tiene un rol y lo que
+ve sale de ese rol, nunca del nombre de la clínica.
+
+| Rol | Quién es | Ve |
+|---|---|---|
+| `OWNER` | Dueño (puede ser médico) | Todo |
+| `ADMIN` | Administrador | Todo |
+| `DOCTOR` | Médico | Todo, incluido cambiar las preguntas de la historia clínica |
+| `STAFF` | Empleado: recepción, secretaría | Pacientes (datos generales, contactos, citas), Agenda y Archivos. **No** ve historia clínica, Control de evolución, Bitácora ni las preguntas |
+
+- Los permisos viven en `src/shared/auth/permissions.ts` (`Permission` y
+  `ROLE_PERMISSIONS`); se consultan con `usePermissions().can(...)`. Nunca
+  comparar el rol suelto en un componente.
+- Una pantalla entera va dentro de `RequirePermission`; un bloque del expediente
+  se renderiza solo con el permiso, para que ni siquiera pida sus datos.
+- Una entrada del menú lateral lleva `permission` y se oculta sin él.
+- **El API valida lo mismo** (`CLINICAL_ACCESS_ROLES` en medical-records): ocultar
+  en pantalla no protege datos clínicos (Ley 8968). Un permiso nuevo se agrega
+  en los dos lados.
+
+---
+
 ## 8. Antes de cada commit
 
 ```bash

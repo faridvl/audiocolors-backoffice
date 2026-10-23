@@ -359,3 +359,22 @@ todo en No.
   el contador de caracteres (`FormField` con `showCount`).
 - **Editar va en el menú "⋯"** de la tarjeta (`ActionMenu`): es una acción
   poco frecuente.
+
+---
+
+## D19 · Permisos por rol: el empleado no ve lo clínico
+
+**Decisión (2026-10-22):** cuatro roles (dueño, administrador, médico y
+empleado). El empleado (recepción, secretaría) ve pacientes, contactos, citas,
+agenda y archivos; no ve historia clínica, Control de evolución, Bitácora ni
+las preguntas de la historia clínica. El médico sí puede cambiar las preguntas.
+Ver RULES.md §9.
+
+**Por qué:** pedido de la clínica, pensando en más clínicas y más personal. Los
+datos de salud son sensibles (Ley 8968), así que el API también lo bloquea
+(PR del API `feature/permisos-por-rol`), no solo la pantalla. Archivos queda
+abierto porque el empleado sube garantías y recetas.
+
+**Excepción:** `GET /patient-activity/actors` sigue abierto para el empleado: la
+agenda lo usa para mostrar quién agendó y solo trae nombres de usuarios.
+
