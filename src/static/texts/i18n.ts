@@ -478,7 +478,7 @@ export const TEXT = {
       SECTION_PREFIX: 'patients.background.sections',
       /** `${CONDITION_PREFIX}.${BackgroundCondition}` */
       CONDITION_PREFIX: 'patients.background.conditions',
-      /** Editar una ya llena: la original queda fija y la hoja actualizada va a Archivos como PDF. */
+      /** Editar una ya llena: se actualiza y lo que cambió queda como PDF en Archivos. */
       UPDATE: {
         BUTTON: 'patients.background.update.button',
         HINT: 'patients.background.update.hint',
@@ -489,6 +489,7 @@ export const TEXT = {
         CHANGE_LINE: 'patients.background.update.changeLine',
         TONE_LABEL: 'patients.background.update.toneLabel',
         PDF_ERROR: 'patients.background.update.pdfError',
+        PDF_UPLOAD_ERROR: 'patients.background.update.pdfUploadError',
         FILE_NAME: 'patients.background.update.fileName',
       },
       PDF: {

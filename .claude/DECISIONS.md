@@ -350,7 +350,10 @@ todo en No.
   estándar. Cada historia guarda la copia de sus preguntas
   (`templateSnapshot`) y se lee siempre con ellas; las llenadas antes, sin
   copia, se leen con la hoja estándar, nunca con las preguntas actuales (si no,
-  aparecerían preguntas que no se hicieron). Las preguntas estándar conservan
+  aparecerían preguntas que no se hicieron).
+  **Editar** usa en cambio las preguntas actuales, con las respuestas que ya
+  tenía: así se pueden contestar las agregadas después, y el PDF de cambios
+  las incluye. Ver la historia sigue mostrando sus preguntas originales. Las preguntas estándar conservan
   sus ids, que son las columnas del API, para que esas columnas se sigan llenando.
 - **Diseño**: cada sección en su tarjeta, repartidas en dos columnas por altura
   (CSS `columns`) y con ancho máximo, para que no queden huecos ni el Sí/No
@@ -466,4 +469,10 @@ dispositivos, guardarlo en el API.
 **Versiones:** `package.json` es la fuente; `yarn release:bump` y
 `yarn release:check` (RULES.md §10). El historial vive en `src/static/releases.ts`
 (nunca se borra una versión) y en las etiquetas `vX.Y.Z` de git.
+
+**Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
+muestra lo último (respuestas nuevas y preguntas agregadas) y "Modificada por X
+el día". El PDF en Archivos sigue generándose como registro de qué cambió y quién.
+Reemplaza "la original no se modifica nunca": la clínica quiere ver el estado
+actual del paciente en el expediente.
 
