@@ -25,8 +25,42 @@
       "unexpected": "Algo salió mal. Intenta de nuevo."
     },
     "notRegistered": "Sin registrar",
+    "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
     "no": "No"
+  },
+  "clinicalTemplate": {
+    "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
+    "title": "Preguntas de la historia clínica",
+    "menu": "Preguntas de la historia clínica",
+    "templateName": "Historia clínica",
+    "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Los cambios se usan en las historias que se llenen desde ahora: las ya llenas se siguen viendo con sus preguntas de entonces.",
+    "loading": "Cargando preguntas...",
+    "loadError": "No se pudieron cargar las preguntas",
+    "forbidden": "Solo un administrador puede cambiar las preguntas de la historia clínica.",
+    "questionNumber": "Pregunta {{number}}",
+    "label": "Pregunta",
+    "section": "Sección",
+    "sectionHint": "Las preguntas con la misma sección se muestran juntas. Vacía, va suelta.",
+    "kind": "Tipo de respuesta",
+    "kinds": {
+      "YES_NO": "Sí / No",
+      "YES_NO_DETAIL": "Sí / No, y si es Sí pide un dato",
+      "TEXT": "Texto libre"
+    },
+    "detailLabel": "Qué se pregunta si es Sí",
+    "detailHint": "Por ejemplo: \"¿Qué tonalidad?\"",
+    "moveUp": "Subir pregunta",
+    "moveDown": "Bajar pregunta",
+    "remove": "Quitar pregunta",
+    "add": "Agregar pregunta",
+    "maxReached": "Llegaste al máximo de {{max}} preguntas.",
+    "saved": "Preguntas guardadas",
+    "validation": {
+      "labelRequired": "Escribe la pregunta",
+      "detailRequired": "Escribe qué se pregunta si es Sí",
+      "atLeastOne": "La hoja necesita al menos una pregunta"
+    }
   },
   "auth": {
     "login": {
@@ -520,13 +554,15 @@
       "saved": "Historia clínica guardada",
       "update": {
         "button": "Editar",
-        "hint": "La historia original no se modifica: lo que cambies queda como una nota en Control de evolución.",
+        "hint": "La historia original no se modifica: al guardar, la hoja actualizada queda como PDF en Archivos.",
         "submit": "Guardar cambios",
-        "saved": "Cambios guardados en Control de evolución",
+        "saved": "La historia clínica actualizada quedó en Archivos",
         "noChanges": "No cambiaste nada respecto de la historia original",
         "noteTitle": "Actualización de la historia clínica",
         "changeLine": "• {{label}}: {{before}} → {{after}}",
-        "toneLabel": "Tonalidad del acúfeno"
+        "toneLabel": "Tonalidad del acúfeno",
+        "pdfError": "No se pudo generar el PDF de la historia clínica",
+        "fileName": "Historia clínica actualizada {{date}}"
       },
       "sections": {
         "surgeries": "Cirugías",
@@ -548,6 +584,14 @@
         "headacheNoise": "Cefalea (por ruido)",
         "cloggedEar": "Sensación de oído tapado",
         "tinnitus": "Acúfeno"
+      },
+      "pdf": {
+        "title": "Historia clínica",
+        "patient": "Paciente: {{name}}",
+        "updatedBy": "Actualizada por {{author}} el {{date}}",
+        "changesTitle": "Cambios respecto de la historia original",
+        "changeLine": "- {{label}}: antes {{before}}, ahora {{after}}",
+        "sheetTitle": "Historia clínica actualizada"
       }
     },
     "contacts": {

@@ -26,7 +26,7 @@ export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-ink-100 py-1 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 border-b border-ink-100 py-1.5 last:border-b-0">
       <Typography variant={TypographyVariant.BODY}>{label}</Typography>
       <SegmentedControl
         ariaLabel={label}
@@ -39,8 +39,14 @@ export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
             value: YesNo.YES,
             label: t(TEXT.GENERAL.YES),
             selectedClassName: 'bg-brand text-white shadow-sm',
+            unselectedClassName: 'font-normal text-ink-500 hover:text-ink-800',
           },
-          { value: YesNo.NO, label: t(TEXT.GENERAL.NO) },
+          // El No es lo esperado: elegido queda discreto para no competir con los Sí.
+          {
+            value: YesNo.NO,
+            label: t(TEXT.GENERAL.NO),
+            selectedClassName: 'bg-white text-ink-700 shadow-sm',
+          },
         ]}
       />
     </div>

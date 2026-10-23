@@ -63,7 +63,7 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 
 | Repo | Ubicación | Rol |
 |---|---|---|
-| API | `C:\Users\Personal\Desktop\standard-saas-api` | Backend compartido |
+| API | `E:\Proyectos\node\standard-saas-api` | Backend compartido |
 | Zynka | `D:\Documentos\Proyectos\React\next-audiology-files` | Origen del código |
 | Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
 | Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotografía |
@@ -75,6 +75,7 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | `brand-assets` | Regenerar logo, favicon o variantes desde el manual vectorial |
 | `ui-audit` | Auditar la interfaz contra las reglas antes de un push |
 | `nueva-seccion` | Añadir un CRUD completo siguiendo los patrones del proyecto |
+| `novedades` | Imagen de "Novedades" para el cliente con los cambios de una entrega, y su registro en `docs/novedades/HISTORIAL.md` (qué commits cubre cada entrega, para no mezclarlas) |
 | `commit` | Redactar el mensaje de commit (qué se hizo / qué se probó). Skill de usuario, no vive en este repo — aplica en cualquier proyecto de la cuenta |
 
 No dupliques como skill algo que ya resuelve un comando o un agente existente

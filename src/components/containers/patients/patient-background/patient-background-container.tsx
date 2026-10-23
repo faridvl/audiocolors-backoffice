@@ -19,6 +19,8 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
   const { t } = useTranslation();
   const {
     background,
+    fields,
+    answers,
     isHidden,
     isLoading,
     isError,
@@ -85,13 +87,14 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
         <PatientBackgroundForm
           patientUuid={patientUuid}
           background={background}
+          fields={fields}
           mode={background ? BackgroundFormMode.UPDATE : BackgroundFormMode.FILL}
           onClose={handleCloseUpdate}
         />
       )}
 
       {isReady && background && !isUpdating && (
-        <PatientBackgroundSummary background={background} authorship={authorship} />
+        <PatientBackgroundSummary fields={fields} answers={answers} authorship={authorship} />
       )}
     </section>
   );

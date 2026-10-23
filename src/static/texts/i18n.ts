@@ -7,6 +7,7 @@ export const TEXT = {
       RETRY: 'common.buttons.retry',
     },
     NOT_REGISTERED: 'common.notRegistered',
+    CHARACTER_COUNT: 'common.characterCount',
     YES: 'common.yes',
     NO: 'common.no',
     PAGINATION: {
@@ -25,6 +26,36 @@ export const TEXT = {
       APPLY: 'common.filters.apply',
       REMOVE: 'common.filters.remove',
       ALL_MONTHS: 'common.filters.allMonths',
+    },
+  },
+  CLINICAL_TEMPLATE: {
+    PAGE_TITLE: 'clinicalTemplate.pageTitle',
+    TITLE: 'clinicalTemplate.title',
+    MENU: 'clinicalTemplate.menu',
+    TEMPLATE_NAME: 'clinicalTemplate.templateName',
+    INTRO: 'clinicalTemplate.intro',
+    LOADING: 'clinicalTemplate.loading',
+    LOAD_ERROR: 'clinicalTemplate.loadError',
+    FORBIDDEN: 'clinicalTemplate.forbidden',
+    QUESTION_NUMBER: 'clinicalTemplate.questionNumber',
+    LABEL: 'clinicalTemplate.label',
+    SECTION: 'clinicalTemplate.section',
+    SECTION_HINT: 'clinicalTemplate.sectionHint',
+    KIND: 'clinicalTemplate.kind',
+    /** `${KIND_PREFIX}.${ClinicalQuestionKind}` */
+    KIND_PREFIX: 'clinicalTemplate.kinds',
+    DETAIL_LABEL: 'clinicalTemplate.detailLabel',
+    DETAIL_HINT: 'clinicalTemplate.detailHint',
+    MOVE_UP: 'clinicalTemplate.moveUp',
+    MOVE_DOWN: 'clinicalTemplate.moveDown',
+    REMOVE: 'clinicalTemplate.remove',
+    ADD: 'clinicalTemplate.add',
+    MAX_REACHED: 'clinicalTemplate.maxReached',
+    SAVED: 'clinicalTemplate.saved',
+    VALIDATION: {
+      LABEL_REQUIRED: 'clinicalTemplate.validation.labelRequired',
+      DETAIL_REQUIRED: 'clinicalTemplate.validation.detailRequired',
+      AT_LEAST_ONE: 'clinicalTemplate.validation.atLeastOne',
     },
   },
   AUTH: {
@@ -393,7 +424,7 @@ export const TEXT = {
       SECTION_PREFIX: 'patients.background.sections',
       /** `${CONDITION_PREFIX}.${BackgroundCondition}` */
       CONDITION_PREFIX: 'patients.background.conditions',
-      /** Editar una ya llena: la original queda fija y el cambio va a Control de evolución. */
+      /** Editar una ya llena: la original queda fija y la hoja actualizada va a Archivos como PDF. */
       UPDATE: {
         BUTTON: 'patients.background.update.button',
         HINT: 'patients.background.update.hint',
@@ -403,6 +434,16 @@ export const TEXT = {
         NOTE_TITLE: 'patients.background.update.noteTitle',
         CHANGE_LINE: 'patients.background.update.changeLine',
         TONE_LABEL: 'patients.background.update.toneLabel',
+        PDF_ERROR: 'patients.background.update.pdfError',
+        FILE_NAME: 'patients.background.update.fileName',
+      },
+      PDF: {
+        TITLE: 'patients.background.pdf.title',
+        PATIENT: 'patients.background.pdf.patient',
+        UPDATED_BY: 'patients.background.pdf.updatedBy',
+        CHANGES_TITLE: 'patients.background.pdf.changesTitle',
+        CHANGE_LINE: 'patients.background.pdf.changeLine',
+        SHEET_TITLE: 'patients.background.pdf.sheetTitle',
       },
     },
     CONTACTS: {

@@ -333,3 +333,23 @@ todo en No.
 - **La tonalidad se descarta si Acúfeno es No**, aunque se haya escrito antes.
 - **Autor**: el API solo da `createdByUuid` / `updatedByUuid`, sin nombre; se
   resuelve con `useResolveAuthorLabel` (nombre solo si fue el usuario logueado).
+
+**Actualización (2026-10-22):**
+
+- **Editar genera un PDF en Archivos**, no una nota: la hoja completa
+  actualizada y, arriba, lo que cambió ("antes No, ahora Sí"), en la sección
+  Historia clínica. La original sigue sin modificarse. El PDF se arma en el
+  navegador con jsPDF, cargado solo al guardar.
+- **Preguntas configurables**: un OWNER o ADMIN las cambia en
+  "Preguntas de la historia clínica" (menú del usuario,
+  `/configuracion/historia-clinica`). Sin plantilla guardada se usa la hoja
+  estándar. Cada historia guarda la copia de sus preguntas
+  (`templateSnapshot`) y se lee siempre con ellas; las llenadas antes, sin
+  copia, se leen con la hoja estándar, nunca con las preguntas actuales (si no,
+  aparecerían preguntas que no se hicieron). Las preguntas estándar conservan
+  sus ids, que son las columnas del API, para que esas columnas se sigan llenando.
+- **Diseño**: cada sección en su tarjeta, repartidas en dos columnas por altura
+  (CSS `columns`) y con ancho máximo, para que no queden huecos ni el Sí/No
+  lejos de su antecedente. El No elegido queda discreto; solo el Sí se pinta.
+  El detalle de un Sí (tonalidad) va pegado a su pregunta. Los textos muestran
+  el contador de caracteres (`FormField` con `showCount`).

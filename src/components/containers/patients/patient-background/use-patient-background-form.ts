@@ -1,80 +1,85 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { FETCH_PATIENT_BACKGROUND_KEY } from '@/shared/api/querys/patient-background-query';
-import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
 import { useSavePatientBackgroundMutation } from '@/shared/api/mutations/patients/save-patient-background-mutation';
-import { useCreatePatientNoteMutation } from '@/shared/api/mutations/patients/create-patient-note-mutation';
-import { FETCH_PATIENT_NOTES_KEY } from '@/shared/api/querys/patient-notes-query';
-import { DocumentCategory } from '@/types/documents/document.types';
-import { buildBackgroundChangeNote } from './background-changes';
+import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/upload-document-mutation';
+import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import { FETCH_PATIENT_BACKGROUND_KEY } from '@/shared/api/querys/patient-background-query';
+import { FETCH_PATIENT_DOCUMENTS_KEY } from '@/shared/api/querys/patient-documents-query';
+import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
+import { useSession } from '@/hooks/use-session';
+import { formatDate, getFullName } from '@/shared/utils/formatters';
+import { toDayKey } from '@/shared/utils/dates';
 import { TEXT } from '@/static/texts/i18n';
+import { ClinicalField } from '@/types/clinical-templates/clinical-template';
+import { DocumentCategory } from '@/types/documents/document.types';
+import { PatientBackground } from '@/types/patients/patient-background';
+import { buildBackgroundChanges } from './background-changes';
+import { buildClinicalHistoryPdf } from './clinical-history-pdf';
 import {
-  BackgroundCondition,
-  BackgroundConditions,
-  PatientBackground,
-  SavePatientBackgroundPayload,
-} from '@/types/patients/patient-background';
+  buildFormValues,
+  buildPayload,
+  ClinicalHistoryFormValues,
+  resolveAnswers,
+} from './clinical-history';
 
-/** Llenarla por primera vez, o registrar un cambio sobre la original (que no se toca). */
+/** Llenarla por primera vez, o editarla: la original no se toca y lo editado va a Archivos. */
 export enum BackgroundFormMode {
   FILL = 'FILL',
   UPDATE = 'UPDATE',
 }
 
-export interface PatientBackgroundFormValues extends BackgroundConditions {
-  tinnitusTone: string;
-  otoscopyRight: string;
-  otoscopyLeft: string;
+const PDF_MIME_TYPE = 'application/pdf';
+
+interface UsePatientBackgroundFormOptions {
+  patientUuid: string;
+  background: PatientBackground | null;
+  fields: ClinicalField[];
+  mode: BackgroundFormMode;
+  onDone: () => void;
 }
 
-function buildInitialValues(background: PatientBackground | null): PatientBackgroundFormValues {
-  const conditions = Object.fromEntries(
-    Object.values(BackgroundCondition).map((condition) => [
-      condition,
-      background?.[condition] ?? false,
-    ]),
-  ) as BackgroundConditions;
-
-  return {
-    ...conditions,
-    tinnitusTone: background?.tinnitusTone ?? '',
-    otoscopyRight: background?.otoscopyRight ?? '',
-    otoscopyLeft: background?.otoscopyLeft ?? '',
-  };
-}
-
-function toNullableText(value: string): string | null {
-  return value.trim() || null;
-}
-
-export function usePatientBackgroundForm(
-  patientUuid: string,
-  background: PatientBackground | null,
-  mode: BackgroundFormMode,
-  onDone: () => void,
-) {
+export function usePatientBackgroundForm({
+  patientUuid,
+  background,
+  fields,
+  mode,
+  onDone,
+}: UsePatientBackgroundFormOptions) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { user } = useSession();
+  const { data: patient } = usePatientQuery(patientUuid);
   const { executeSavePatientBackground, isPending: isSaving } = useSavePatientBackgroundMutation();
-  const { executeCreatePatientNote, isPending: isNoting } = useCreatePatientNoteMutation();
+  const { executeUploadDocument, isPending: isUploading } = useUploadDocumentMutation();
+  const [isBuildingPdf, setIsBuildingPdf] = useState(false);
 
-  const initialValues = useMemo(() => buildInitialValues(background), [background]);
+  const originalAnswers = useMemo(
+    () => (background ? resolveAnswers(background) : {}),
+    [background],
+  );
+  const initialValues = useMemo(
+    () => buildFormValues(fields, originalAnswers),
+    [fields, originalAnswers],
+  );
 
-  const registerUpdate = (original: PatientBackground, values: PatientBackgroundFormValues) => {
-    const text = buildBackgroundChangeNote(t, original, values);
-    if (!text) {
-      toast.info(t(TEXT.PATIENTS.BACKGROUND.UPDATE.NO_CHANGES));
-      return;
-    }
-    executeCreatePatientNote(
-      { patientUuid, text, category: DocumentCategory.CLINICAL_HISTORY },
+  const saveFirstTime = (values: ClinicalHistoryFormValues) => {
+    executeSavePatientBackground(
+      {
+        patientUuid,
+        background: buildPayload(fields, values, background?.notes ?? null),
+      },
       {
         onSuccess: () => {
-          toast.success(t(TEXT.PATIENTS.BACKGROUND.UPDATE.SAVED));
-          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_NOTES_KEY, patientUuid] });
-          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
+          toast.success(t(TEXT.PATIENTS.BACKGROUND.SAVED));
+          // Al refrescar llega la historia guardada y la tarjeta pasa sola al resumen.
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_PATIENT_BACKGROUND_KEY, patientUuid],
+          });
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_PATIENT_ACTIVITY_KEY],
+          });
           onDone();
         },
         onError: (error: Error) => toast.error(error.message),
@@ -82,37 +87,68 @@ export function usePatientBackgroundForm(
     );
   };
 
-  const handleSubmit = (values: PatientBackgroundFormValues) => {
-    if (mode === BackgroundFormMode.UPDATE && background) {
-      registerUpdate(background, values);
+  const saveUpdateAsPdf = async (values: ClinicalHistoryFormValues) => {
+    const changes = buildBackgroundChanges(t, fields, originalAnswers, values);
+    if (changes.length === 0) {
+      toast.info(t(TEXT.PATIENTS.BACKGROUND.UPDATE.NO_CHANGES));
       return;
     }
 
-    const payload: SavePatientBackgroundPayload = {
-      ...values,
-      // Sin acúfeno, una tonalidad escrita antes no tiene sentido guardarla.
-      tinnitusTone: values.tinnitus ? toNullableText(values.tinnitusTone) : null,
-      otoscopyRight: toNullableText(values.otoscopyRight),
-      otoscopyLeft: toNullableText(values.otoscopyLeft),
-      // El formulario no edita las notas: se reenvían para que el PUT no las borre.
-      notes: background?.notes ?? null,
-    };
+    const today = new Date();
+    setIsBuildingPdf(true);
+    let pdf: Blob;
+    try {
+      pdf = await buildClinicalHistoryPdf({
+        t,
+        patientName: patient ? getFullName(patient.firstName, patient.lastName) : '',
+        authorName: user?.fullName ?? '',
+        dateLabel: formatDate(today.toISOString()),
+        fields,
+        values,
+        changes,
+      });
+    } catch {
+      toast.error(t(TEXT.PATIENTS.BACKGROUND.UPDATE.PDF_ERROR));
+      return;
+    } finally {
+      setIsBuildingPdf(false);
+    }
 
-    executeSavePatientBackground(
-      { patientUuid, background: payload },
+    const fileName = `${t(TEXT.PATIENTS.BACKGROUND.UPDATE.FILE_NAME, { date: toDayKey(today) })}.pdf`;
+    executeUploadDocument(
+      {
+        patientUuid,
+        file: new File([pdf], fileName, { type: PDF_MIME_TYPE }),
+        category: DocumentCategory.CLINICAL_HISTORY,
+        fileName,
+      },
       {
         onSuccess: () => {
-          toast.success(t(TEXT.PATIENTS.BACKGROUND.SAVED));
+          toast.success(t(TEXT.PATIENTS.BACKGROUND.UPDATE.SAVED));
           void queryClient.invalidateQueries({
-            queryKey: [FETCH_PATIENT_BACKGROUND_KEY, patientUuid],
+            queryKey: [FETCH_PATIENT_DOCUMENTS_KEY, patientUuid],
           });
-          // Al refrescar llega la historia guardada y la tarjeta pasa sola al resumen.
-          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_PATIENT_ACTIVITY_KEY],
+          });
+          onDone();
         },
         onError: (error: Error) => toast.error(error.message),
       },
     );
   };
 
-  return { initialValues, isPending: isSaving || isNoting, handleSubmit };
+  const handleSubmit = (values: ClinicalHistoryFormValues) => {
+    if (mode === BackgroundFormMode.UPDATE && background) {
+      void saveUpdateAsPdf(values);
+      return;
+    }
+    saveFirstTime(values);
+  };
+
+  return {
+    initialValues,
+    isPending: isSaving || isUploading || isBuildingPdf,
+    handleSubmit,
+  };
 }

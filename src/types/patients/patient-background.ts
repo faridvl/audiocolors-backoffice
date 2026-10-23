@@ -1,4 +1,10 @@
-/** Antecedentes de la historia clínica: cada uno es Sí / No. Mismos nombres que el API. */
+import { ClinicalAnswer, ClinicalField } from '@/types/clinical-templates/clinical-template';
+
+/**
+ * Antecedentes con columna propia en el API: los de la lista estándar. Una
+ * historia sin `answers` (llenada antes de las preguntas configurables) se lee
+ * de estas columnas. Los valores son a la vez el id de la pregunta estándar.
+ */
 export enum BackgroundCondition {
   EAR_INFECTIONS = 'earInfections',
   NASAL_SURGERY = 'nasalSurgery',
@@ -16,59 +22,11 @@ export enum BackgroundCondition {
   TINNITUS = 'tinnitus',
 }
 
-/** Grupos de la hoja en papel, en su orden. */
-export enum BackgroundSection {
-  INFECTIONS = 'infections',
-  SURGERIES = 'surgeries',
-  CONDITIONS = 'conditions',
-  SYMPTOMS = 'symptoms',
+/** Textos con columna propia: también son id de pregunta estándar. */
+export enum BackgroundText {
+  OTOSCOPY_RIGHT = 'otoscopyRight',
+  OTOSCOPY_LEFT = 'otoscopyLeft',
 }
-
-interface BackgroundSectionConfig {
-  section: BackgroundSection;
-  /** Infecciones de oído va suelta en la hoja, sin título de grupo. */
-  hasTitle: boolean;
-  conditions: BackgroundCondition[];
-}
-
-export const BACKGROUND_SECTIONS: BackgroundSectionConfig[] = [
-  {
-    section: BackgroundSection.INFECTIONS,
-    hasTitle: false,
-    conditions: [BackgroundCondition.EAR_INFECTIONS],
-  },
-  {
-    section: BackgroundSection.SURGERIES,
-    hasTitle: true,
-    conditions: [
-      BackgroundCondition.NASAL_SURGERY,
-      BackgroundCondition.THROAT_SURGERY,
-      BackgroundCondition.EAR_SURGERY,
-    ],
-  },
-  {
-    section: BackgroundSection.CONDITIONS,
-    hasTitle: true,
-    conditions: [
-      BackgroundCondition.DIABETES,
-      BackgroundCondition.CHOLESTEROL,
-      BackgroundCondition.HIGH_PRESSURE,
-    ],
-  },
-  {
-    section: BackgroundSection.SYMPTOMS,
-    hasTitle: true,
-    conditions: [
-      BackgroundCondition.ALLERGIES,
-      BackgroundCondition.RHINITIS,
-      BackgroundCondition.VERTIGO,
-      BackgroundCondition.DIZZINESS,
-      BackgroundCondition.HEADACHE_NOISE,
-      BackgroundCondition.CLOGGED_EAR,
-      BackgroundCondition.TINNITUS,
-    ],
-  },
-];
 
 export type BackgroundConditions = Record<BackgroundCondition, boolean>;
 
@@ -79,14 +37,19 @@ export interface PatientBackgroundTexts {
   notes: string | null;
 }
 
-export type SavePatientBackgroundPayload = BackgroundConditions & PatientBackgroundTexts;
+export interface SavePatientBackgroundPayload extends BackgroundConditions, PatientBackgroundTexts {
+  answers: Record<string, ClinicalAnswer>;
+  templateSnapshot: ClinicalField[];
+}
 
-export interface PatientBackground extends SavePatientBackgroundPayload {
+export interface PatientBackground extends BackgroundConditions, PatientBackgroundTexts {
+  answers: Record<string, ClinicalAnswer> | null;
+  templateSnapshot: ClinicalField[] | null;
   createdAt: string;
   updatedAt: string;
   createdByUuid: string | null;
   updatedByUuid: string | null;
 }
 
-export const BACKGROUND_TONE_MAX_LENGTH = 120;
-export const BACKGROUND_OTOSCOPY_MAX_LENGTH = 1000;
+export const BACKGROUND_DETAIL_MAX_LENGTH = 120;
+export const BACKGROUND_TEXT_MAX_LENGTH = 1000;

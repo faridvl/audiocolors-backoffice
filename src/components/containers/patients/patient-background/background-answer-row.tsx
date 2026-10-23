@@ -21,7 +21,7 @@ export const BackgroundAnswerRow: React.FC<BackgroundAnswerRowProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="border-b border-ink-100 py-1.5 last:border-b-0">
+    <div className="border-b border-ink-100 py-2 last:border-b-0">
       <div className="flex items-center justify-between gap-3">
         <Typography
           variant={isChecked ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}

@@ -17,6 +17,8 @@ export interface SegmentedOption<TValue extends string> {
   label: string;
   /** Clases de la opción cuando está elegida; por defecto, blanca con sombra. */
   selectedClassName?: string;
+  /** Clases de la opción cuando no está elegida; por defecto, gris. */
+  unselectedClassName?: string;
 }
 
 interface SegmentedControlProps<TValue extends string> {
@@ -61,7 +63,7 @@ export function SegmentedControl<TValue extends string>({
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand',
               isSelected
                 ? (option.selectedClassName ?? 'bg-white text-ink-900 shadow-sm')
-                : 'text-ink-500 hover:text-ink-800',
+                : (option.unselectedClassName ?? 'text-ink-500 hover:text-ink-800'),
             )}
           >
             {option.label}

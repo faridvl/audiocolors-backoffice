@@ -43,6 +43,27 @@ esta base local.
    NEXT_PUBLIC_IDENTITY_API_URL=http://localhost:7170 NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=http://localhost:7071 yarn dev
    ```
 
+## Si Docker Desktop no arranca
+
+Docker Desktop está en `D:\Docker\Programas\Docker Desktop.exe` (no en
+`Program Files`) y necesita la versión 4.94 o superior.
+
+**"initializing Secrets Engine … engine.sock … The file cannot be accessed by
+the system"**: tras un apagado o reinicio quedó trabado el socket de una corrida
+anterior y Docker no lo puede reemplazar. Se arregla así:
+
+1. Tocar **Quit** en el aviso de error (no "Reset to factory defaults": borra
+   los contenedores y con ellos la base de prueba).
+2. Borrar el socket **desde WSL**. Desde Windows no se puede: `del`, `fsutil`
+   y renombrar la carpeta responden "El sistema no tiene acceso al archivo" o
+   "Acceso denegado", porque es un socket de Unix.
+   ```powershell
+   wsl -d docker-desktop -- rm -f /mnt/host/c/Users/Personal/AppData/Local/docker-secrets-engine/engine.sock
+   ```
+   (dentro de esa distro la unidad C está en `/mnt/host/c`, no en `/mnt/c`).
+3. `wsl --shutdown` y abrir Docker Desktop de nuevo. Si el contenedor
+   `audiocolors-prueba-db` no arranca solo: `docker start audiocolors-prueba-db`.
+
 ## Límites
 
 - Subir archivos no funciona: el API los manda a R2 y en local no hay
