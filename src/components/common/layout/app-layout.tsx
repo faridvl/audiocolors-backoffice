@@ -46,7 +46,6 @@ const UserMenu: React.FC = () => {
   const { t } = useTranslation();
   const isIphone = useIsIphone();
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
-  const canEditClinicalTemplate = !!user && CLINICAL_TEMPLATE_EDITOR_ROLES.includes(user.role);
 
   return (
     <>
@@ -102,23 +101,6 @@ const UserMenu: React.FC = () => {
               </Menu.Item>
             )}
 
-            {canEditClinicalTemplate && (
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
-                    href={routesPrivate.settings.clinicalHistory}
-                    className={tailwind(
-                      'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
-                      active && 'bg-ink-50',
-                    )}
-                  >
-                    <ClipboardList className="h-4 w-4" aria-hidden />
-                    {t(TEXT.CLINICAL_TEMPLATE.MENU)}
-                  </Link>
-                )}
-              </Menu.Item>
-            )}
-
             <Menu.Item>
               {({ active }) => (
                 <button
@@ -169,6 +151,20 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
 }) => {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { user } = useSession();
+  // Las preguntas de la historia clínica solo las cambia un administrador.
+  const navigation =
+    user && CLINICAL_TEMPLATE_EDITOR_ROLES.includes(user.role)
+      ? [
+          ...NAVIGATION,
+          {
+            label: t(TEXT.CLINICAL_TEMPLATE.NAV),
+            href: routesPrivate.settings.clinicalHistory,
+            icon: ClipboardList,
+          },
+        ]
+      : NAVIGATION;
 
   const isActiveRoute = (href: string) =>
     router.pathname === href || router.pathname.startsWith(`${href}/`);
@@ -187,7 +183,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </div>
 
         <nav className="mt-5 flex flex-col gap-1">
-          {NAVIGATION.map((item) => {
+          {navigation.map((item) => {
             const isActive = isActiveRoute(item.href);
             const Icon = item.icon;
 
@@ -264,7 +260,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         className="fixed inset-x-0 bottom-0 z-10 flex border-t border-ink-200 bg-white md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {NAVIGATION.map((item) => {
+        {navigation.map((item) => {
           const isActive = isActiveRoute(item.href);
           const Icon = item.icon;
 

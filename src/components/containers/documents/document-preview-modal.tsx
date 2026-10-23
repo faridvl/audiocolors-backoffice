@@ -61,7 +61,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={t(TEXT.DOCUMENTS.PREVIEW.LABEL, { name: item.name })}
+      aria-label={t(TEXT.DOCUMENTS.PREVIEW.LABEL, { name: item.displayName })}
       className="fixed inset-0 z-50 flex h-[100dvh] flex-col bg-ink-900/80 p-3 sm:p-6"
       onClick={onClose}
     >
@@ -72,7 +72,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
         <header className="flex items-center justify-between gap-3 border-b border-ink-200 px-4 py-2">
           <div className="flex min-w-0 flex-col">
             <Typography variant={TypographyVariant.ACCENT} className="truncate">
-              {item.name}
+              {item.displayName}
             </Typography>
             <Typography variant={TypographyVariant.HELPER} className="truncate">
               {item.categoryLabel} · {item.sizeLabel} · {t(TEXT.DOCUMENTS.LIST.REGISTERED_BY)}{' '}
@@ -137,7 +137,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.url}
-                  alt={item.name}
+                  alt={item.displayName}
                   className="max-h-full max-w-full object-contain"
                 />
               </div>
@@ -155,7 +155,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               */}
               <iframe
                 src={item.url}
-                title={item.name}
+                title={item.displayName}
                 className="hidden h-full w-full border-0 bg-white md:block"
               />
               <div className="flex flex-col items-center gap-3 p-8 text-center md:hidden">

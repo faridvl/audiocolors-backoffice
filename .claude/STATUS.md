@@ -102,6 +102,7 @@ locales.
 |---|---|---|
 | P0-1 | **Cambiar las contraseñas temporales** | Ambos usuarios tienen `Password1`. `PATCH /users/:uuid` con `password` |
 | P0-2 | **Desplegar** | Ver "Próximo paso" |
+| P0-3 | **Duración de los tipos de cita en producción** | Al pasar a producción, poner Cita en 60 min y Control y Mantenimiento en 30 (`PATCH /appointment-types/:uuid` con `duration`; no hay pantalla para hacerlo). Revisar que desarrollo también los tenga. Sin duración, la cita dura 30 |
 
 ### 🟠 Deseable
 | # | Tarea | Notas |

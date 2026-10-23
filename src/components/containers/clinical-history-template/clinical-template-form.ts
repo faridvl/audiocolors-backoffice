@@ -64,6 +64,25 @@ export function toTemplateFields(values: ClinicalTemplateFormValues): ClinicalFi
   });
 }
 
+export interface ClinicalQuestionGroup {
+  /** Vacía: las preguntas sueltas, sin título. */
+  section: string;
+  /** Posiciones en la lista de preguntas del formulario. */
+  indexes: number[];
+}
+
+/** Agrupa por sección en el orden en que aparece cada una, como en la hoja. */
+export function groupQuestionsBySection(
+  questions: ClinicalQuestionFormValues[],
+): ClinicalQuestionGroup[] {
+  const groups = new Map<string, number[]>();
+  questions.forEach((question, index) => {
+    const section = question.section.trim();
+    groups.set(section, [...(groups.get(section) ?? []), index]);
+  });
+  return Array.from(groups, ([section, indexes]) => ({ section, indexes }));
+}
+
 export function buildEmptyQuestion(section: string): ClinicalQuestionFormValues {
   return {
     id: crypto.randomUUID(),

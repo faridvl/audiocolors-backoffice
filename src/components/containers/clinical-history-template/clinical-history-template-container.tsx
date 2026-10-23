@@ -3,11 +3,19 @@ import { FieldArray, Form, Formik } from 'formik';
 import { AlertTriangle, Loader2, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { inputBaseClasses } from '@/components/common/input/input';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
-import { CLINICAL_TEMPLATE_MAX_FIELDS } from '@/types/clinical-templates/clinical-template';
-import { ClinicalQuestionCard } from './clinical-question-card';
-import { buildEmptyQuestion, ClinicalTemplateFormValues } from './clinical-template-form';
+import {
+  CLINICAL_SECTION_MAX_LENGTH,
+  CLINICAL_TEMPLATE_MAX_FIELDS,
+} from '@/types/clinical-templates/clinical-template';
+import { ClinicalQuestionRow } from './clinical-question-row';
+import {
+  buildEmptyQuestion,
+  ClinicalTemplateFormValues,
+  groupQuestionsBySection,
+} from './clinical-template-form';
 import { useClinicalHistoryTemplate } from './use-clinical-history-template';
 
 export const ClinicalHistoryTemplateContainer: React.FC = () => {
@@ -22,6 +30,9 @@ export const ClinicalHistoryTemplateContainer: React.FC = () => {
     refetch,
     isPending,
     handleSubmit,
+    newSectionName,
+    handleNewSectionNameChange,
+    clearNewSectionName,
   } = useClinicalHistoryTemplate();
 
   if (isLoading || isSessionLoading) {
@@ -67,30 +78,52 @@ export const ClinicalHistoryTemplateContainer: React.FC = () => {
       enableReinitialize
     >
       {({ values, errors }) => (
-        <Form className="mx-auto flex w-full max-w-3xl flex-col gap-4 pb-24">
+        <Form className="mx-auto flex w-full max-w-3xl flex-col gap-4">
           <Typography variant={TypographyVariant.BODY} className="text-ink-600">
             {t(TEXT.CLINICAL_TEMPLATE.INTRO)}
           </Typography>
 
           <FieldArray name="questions">
-            {({ move, remove, push }) => {
+            {({ insert, remove, push }) => {
               const isFull = values.questions.length >= CLINICAL_TEMPLATE_MAX_FIELDS;
-              const lastSection = values.questions[values.questions.length - 1]?.section ?? '';
+              const canRemove = values.questions.length > 1;
 
               return (
-                <div className="flex flex-col gap-3">
-                  {values.questions.map((question, index) => (
-                    <ClinicalQuestionCard
-                      key={question.id}
-                      index={index}
-                      question={question}
-                      isFirst={index === 0}
-                      isLast={index === values.questions.length - 1}
-                      canRemove={values.questions.length > 1}
-                      onMoveUp={() => move(index, index - 1)}
-                      onMoveDown={() => move(index, index + 1)}
-                      onRemove={() => remove(index)}
-                    />
+                <div className="flex flex-col gap-4">
+                  {groupQuestionsBySection(values.questions).map((group) => (
+                    <section
+                      key={group.section}
+                      className="flex flex-col rounded-lg border border-ink-200 bg-white px-3 pb-2 pt-3 sm:px-4"
+                    >
+                      <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+                        {group.section || t(TEXT.CLINICAL_TEMPLATE.NO_SECTION)}
+                      </Typography>
+                      {group.indexes.map((index) => (
+                        <ClinicalQuestionRow
+                          key={values.questions[index].id}
+                          index={index}
+                          question={values.questions[index]}
+                          canRemove={canRemove}
+                          onRemove={() => remove(index)}
+                        />
+                      ))}
+                      {!isFull && (
+                        <Button
+                          type="button"
+                          variant={ButtonVariant.GHOST}
+                          className="w-fit px-2 text-brand-600 hover:text-brand-700"
+                          onClick={() =>
+                            insert(
+                              group.indexes[group.indexes.length - 1] + 1,
+                              buildEmptyQuestion(group.section),
+                            )
+                          }
+                          icon={<Plus className="h-4 w-4" aria-hidden />}
+                        >
+                          {t(TEXT.CLINICAL_TEMPLATE.ADD)}
+                        </Button>
+                      )}
+                    </section>
                   ))}
 
                   {typeof errors.questions === 'string' && (
@@ -99,28 +132,39 @@ export const ClinicalHistoryTemplateContainer: React.FC = () => {
 
                   {isFull ? (
                     <Typography variant={TypographyVariant.HELPER}>
-                      {t(TEXT.CLINICAL_TEMPLATE.MAX_REACHED, {
-                        max: CLINICAL_TEMPLATE_MAX_FIELDS,
-                      })}
+                      {t(TEXT.CLINICAL_TEMPLATE.MAX_REACHED, { max: CLINICAL_TEMPLATE_MAX_FIELDS })}
                     </Typography>
                   ) : (
-                    <Button
-                      type="button"
-                      variant={ButtonVariant.SECONDARY}
-                      className="w-fit"
-                      onClick={() => push(buildEmptyQuestion(lastSection))}
-                      icon={<Plus className="h-4 w-4" aria-hidden />}
-                    >
-                      {t(TEXT.CLINICAL_TEMPLATE.ADD)}
-                    </Button>
+                    <div className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        value={newSectionName}
+                        onChange={(event) => handleNewSectionNameChange(event.target.value)}
+                        aria-label={t(TEXT.CLINICAL_TEMPLATE.NEW_SECTION)}
+                        placeholder={t(TEXT.CLINICAL_TEMPLATE.NEW_SECTION)}
+                        maxLength={CLINICAL_SECTION_MAX_LENGTH}
+                        className={inputBaseClasses}
+                      />
+                      <Button
+                        type="button"
+                        variant={ButtonVariant.SECONDARY}
+                        className="shrink-0"
+                        disabled={!newSectionName.trim()}
+                        onClick={() => {
+                          push(buildEmptyQuestion(newSectionName.trim()));
+                          clearNewSectionName();
+                        }}
+                        icon={<Plus className="h-4 w-4" aria-hidden />}
+                      >
+                        {t(TEXT.CLINICAL_TEMPLATE.ADD_SECTION)}
+                      </Button>
+                    </div>
                   )}
                 </div>
               );
             }}
           </FieldArray>
 
-          {/* Fija abajo: con muchas preguntas, guardar no obliga a bajar hasta el final. */}
-          <div className="sticky bottom-16 z-10 flex justify-end border-t border-ink-100 bg-white/95 py-3 backdrop-blur lg:bottom-0">
+          <div className="flex justify-end">
             <Button type="submit" variant={ButtonVariant.PRIMARY} isLoading={isPending}>
               {t(TEXT.GENERAL.BUTTONS.SAVE)}
             </Button>

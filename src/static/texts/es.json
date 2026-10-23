@@ -32,26 +32,19 @@
   "clinicalTemplate": {
     "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
     "title": "Preguntas de la historia clínica",
-    "menu": "Preguntas de la historia clínica",
     "templateName": "Historia clínica",
-    "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Los cambios se usan en las historias que se llenen desde ahora: las ya llenas se siguen viendo con sus preguntas de entonces.",
+    "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Lo que cambies se usa en las historias que se llenen desde ahora: las ya llenas no cambian.",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",
     "forbidden": "Solo un administrador puede cambiar las preguntas de la historia clínica.",
-    "questionNumber": "Pregunta {{number}}",
     "label": "Pregunta",
-    "section": "Sección",
-    "sectionHint": "Las preguntas con la misma sección se muestran juntas. Vacía, va suelta.",
     "kind": "Tipo de respuesta",
     "kinds": {
       "YES_NO": "Sí / No",
-      "YES_NO_DETAIL": "Sí / No, y si es Sí pide un dato",
+      "YES_NO_DETAIL": "Sí / No y un dato",
       "TEXT": "Texto libre"
     },
     "detailLabel": "Qué se pregunta si es Sí",
-    "detailHint": "Por ejemplo: \"¿Qué tonalidad?\"",
-    "moveUp": "Subir pregunta",
-    "moveDown": "Bajar pregunta",
     "remove": "Quitar pregunta",
     "add": "Agregar pregunta",
     "maxReached": "Llegaste al máximo de {{max}} preguntas.",
@@ -60,7 +53,13 @@
       "labelRequired": "Escribe la pregunta",
       "detailRequired": "Escribe qué se pregunta si es Sí",
       "atLeastOne": "La hoja necesita al menos una pregunta"
-    }
+    },
+    "nav": "Historia clínica",
+    "labelPlaceholder": "Escribe la pregunta",
+    "detailPlaceholder": "Si es Sí, qué se pregunta (por ejemplo: ¿Qué tonalidad?)",
+    "noSection": "Sin sección",
+    "newSection": "Nombre de una sección nueva",
+    "addSection": "Agregar sección"
   },
   "auth": {
     "login": {
@@ -592,7 +591,8 @@
         "changesTitle": "Cambios respecto de la historia original",
         "changeLine": "- {{label}}: antes {{before}}, ahora {{after}}",
         "sheetTitle": "Historia clínica actualizada"
-      }
+      },
+      "actions": "Acciones de la historia clínica"
     },
     "contacts": {
       "title": "Contactos",

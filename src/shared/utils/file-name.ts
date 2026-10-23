@@ -21,3 +21,17 @@ export function repairFileName(name: string): string {
     return name;
   }
 }
+
+/**
+ * Separa el nombre de su extensión. La extensión se conserva al guardar: el API
+ * arma la clave en R2 con ella y el preview depende de ella.
+ */
+export function splitFileName(fileName: string): { baseName: string; extension: string } {
+  const dotIndex = fileName.lastIndexOf('.');
+  if (dotIndex <= 0) return { baseName: fileName, extension: '' };
+
+  return { baseName: fileName.slice(0, dotIndex), extension: fileName.slice(dotIndex) };
+}
+
+/** El nombre como se muestra: sin ".pdf", ".jpg"... */
+export const stripFileExtension = (fileName: string) => splitFileName(fileName).baseName;

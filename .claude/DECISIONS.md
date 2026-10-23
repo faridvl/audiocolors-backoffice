@@ -341,8 +341,9 @@ todo en No.
   Historia clínica. La original sigue sin modificarse. El PDF se arma en el
   navegador con jsPDF, cargado solo al guardar.
 - **Preguntas configurables**: un OWNER o ADMIN las cambia en
-  "Preguntas de la historia clínica" (menú del usuario,
-  `/configuracion/historia-clinica`). Sin plantilla guardada se usa la hoja
+  "Historia clínica" del menú lateral (solo lo ven ellos,
+  `/configuracion/historia-clinica`): preguntas agrupadas por sección, una
+  fila por pregunta, agregar dentro de cada sección o crear una sección. Sin plantilla guardada se usa la hoja
   estándar. Cada historia guarda la copia de sus preguntas
   (`templateSnapshot`) y se lee siempre con ellas; las llenadas antes, sin
   copia, se leen con la hoja estándar, nunca con las preguntas actuales (si no,
@@ -353,3 +354,5 @@ todo en No.
   lejos de su antecedente. El No elegido queda discreto; solo el Sí se pinta.
   El detalle de un Sí (tonalidad) va pegado a su pregunta. Los textos muestran
   el contador de caracteres (`FormField` con `showCount`).
+- **Editar va en el menú "⋯"** de la tarjeta (`ActionMenu`): es una acción
+  poco frecuente.

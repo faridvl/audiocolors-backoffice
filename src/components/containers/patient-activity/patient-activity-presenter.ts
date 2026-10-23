@@ -31,7 +31,7 @@ import {
   PatientFieldChange,
 } from '@/types/patient-activity/patient-activity';
 import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
-import { repairFileName } from '@/shared/utils/file-name';
+import { repairFileName, stripFileExtension } from '@/shared/utils/file-name';
 
 enum ActionTone {
   ACCENT = 'bg-brand-50 text-brand-700',
@@ -210,18 +210,26 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       if (groupedFiles.length > 1) {
         return joinParts(
           context.t(TEXT.ACTIVITY.DETAIL.FILES_UPLOADED, { count: groupedFiles.length }),
-          groupedFiles.map((file) => repairFileName(file.detail?.originalName ?? '')).join(', '),
+          groupedFiles
+            .map((file) => stripFileExtension(repairFileName(file.detail?.originalName ?? '')))
+            .join(', '),
         );
       }
-      return joinParts(categoryLabel, repairFileName(detail.originalName ?? ''));
+      return joinParts(
+        categoryLabel,
+        stripFileExtension(repairFileName(detail.originalName ?? '')),
+      );
 
     case PatientActivityAction.DOCUMENT_DELETED:
-      return joinParts(categoryLabel, repairFileName(detail.originalName ?? ''));
+      return joinParts(
+        categoryLabel,
+        stripFileExtension(repairFileName(detail.originalName ?? '')),
+      );
 
     case PatientActivityAction.DOCUMENT_RENAMED: {
       if (typeof detail.before !== 'string') return '—';
-      const before = repairFileName(detail.before);
-      const after = repairFileName(detail.after ?? '');
+      const before = stripFileExtension(repairFileName(detail.before));
+      const after = stripFileExtension(repairFileName(detail.after ?? ''));
       // El renombrado automático que corregía las tildes queda igual al reparar: solo el nombre.
       return before === after ? after : `${before} → ${after}`;
     }

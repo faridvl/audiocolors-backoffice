@@ -18,6 +18,7 @@ import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/uplo
 import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/delete-document-mutation';
 import { useUpdateDocumentMutation } from '@/shared/api/mutations/documents/update-document-mutation';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { splitFileName } from '@/shared/utils/file-name';
 import { TEXT } from '@/static/texts/i18n';
 import { mapToDocumentItem } from './document-items';
 import { useDocumentPreview } from './use-document-preview';
@@ -35,18 +36,6 @@ const MOBILE_PAGE_SIZE = 5;
 const MAX_FILE_SIZE_MB = 20;
 const BYTES_PER_MB = 1024 * 1024;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * BYTES_PER_MB;
-
-/**
- * Separa el nombre de su extensión. Al subir solo se deja editar la base:
- * el API arma la clave en R2 con la extensión del nombre recibido y el
- * preview depende de ella, así que perderla rompería la vista del archivo.
- */
-function splitFileName(fileName: string): { baseName: string; extension: string } {
-  const dotIndex = fileName.lastIndexOf('.');
-  if (dotIndex <= 0) return { baseName: fileName, extension: '' };
-
-  return { baseName: fileName.slice(0, dotIndex), extension: fileName.slice(dotIndex) };
-}
 
 export function useDocuments(patientUuid: string) {
   const { t } = useTranslation();
@@ -81,7 +70,7 @@ export function useDocuments(patientUuid: string) {
     return documents.filter((document) => {
       const matchesFilter = filter === ALL_CATEGORIES_FILTER || document.category === filter;
       const matchesSearch =
-        !normalizedSearch || document.name.toLowerCase().includes(normalizedSearch);
+        !normalizedSearch || document.displayName.toLowerCase().includes(normalizedSearch);
       return matchesFilter && matchesSearch;
     });
   }, [documents, filter, searchTerm]);
@@ -181,7 +170,7 @@ export function useDocuments(patientUuid: string) {
 
   const handleStartEdit = (document: DocumentItem) => {
     setDocumentToEdit(document);
-    setEditName(document.name);
+    setEditName(document.displayName);
     setEditCategory(document.category);
   };
 
@@ -208,8 +197,10 @@ export function useDocuments(patientUuid: string) {
       return;
     }
 
+    // Se edita sin extensión y se le devuelve la que tenía.
+    const fullName = `${trimmedName}${splitFileName(documentToEdit.name).extension}`;
     const changes: UpdateDocumentPayload = {};
-    if (trimmedName !== documentToEdit.name) changes.originalName = trimmedName;
+    if (fullName !== documentToEdit.name) changes.originalName = fullName;
     if (editCategory !== documentToEdit.category) changes.category = editCategory;
 
     if (!Object.keys(changes).length) {

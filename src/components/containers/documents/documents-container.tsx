@@ -76,7 +76,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
             <Icon className="h-4 w-4 text-brand-600" />
           </span>
           <Typography variant={TypographyVariant.HELPER} className="min-w-0 truncate text-ink-700">
-            {document.name}
+            {document.displayName}
           </Typography>
         </button>
 
@@ -84,7 +84,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           <button
             type="button"
             onClick={onEdit}
-            aria-label={t(TEXT.DOCUMENTS.LIST.EDIT_LABEL, { name: document.name })}
+            aria-label={t(TEXT.DOCUMENTS.LIST.EDIT_LABEL, { name: document.displayName })}
             className={tailwind(CARD_ACTION_CLASSES, 'hover:bg-brand-50 hover:text-brand-600')}
           >
             <Pencil className="h-4 w-4" aria-hidden />
@@ -92,7 +92,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
           <button
             type="button"
             onClick={onDelete}
-            aria-label={t(TEXT.DOCUMENTS.LIST.DELETE_LABEL, { name: document.name })}
+            aria-label={t(TEXT.DOCUMENTS.LIST.DELETE_LABEL, { name: document.displayName })}
             className={tailwind(CARD_ACTION_CLASSES, 'hover:bg-danger/10 hover:text-danger')}
           >
             <Trash2 className="h-4 w-4" aria-hidden />
@@ -358,7 +358,7 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
       />
 
       <ConfirmDeleteModal
-        fileName={documentToDelete?.name ?? null}
+        fileName={documentToDelete?.displayName ?? null}
         isDeleting={isDeleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDocumentToDelete(null)}
