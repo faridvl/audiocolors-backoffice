@@ -1,8 +1,10 @@
 import Head from 'next/head';
 import { useTranslation } from 'react-i18next';
 import { AppLayout } from '@/components/common/layout/app-layout';
+import { RequirePermission } from '@/components/common/permission/require-permission';
 import { PatientActivityContainer } from '@/components/containers/patient-activity/patient-activity-container';
 import { authorizeServerSidePage } from '@/hocs/auth';
+import { Permission } from '@/shared/auth/permissions';
 import { TEXT } from '@/static/texts/i18n';
 
 export default function ActivityPage() {
@@ -15,7 +17,9 @@ export default function ActivityPage() {
       </Head>
 
       <AppLayout title={t(TEXT.ACTIVITY.TITLE)}>
-        <PatientActivityContainer />
+        <RequirePermission permission={Permission.VIEW_ACTIVITY}>
+          <PatientActivityContainer />
+        </RequirePermission>
       </AppLayout>
     </>
   );

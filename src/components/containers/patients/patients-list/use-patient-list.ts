@@ -15,11 +15,13 @@ import { buildMonthOption } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlag, PatientStatus } from '@/types/patients/patient';
 import {
+  NO_APPOINTMENT_VALUE,
   PatientListPreset,
   PatientListSelection,
   applyPresetTo,
   isPresetApplied,
   removePresetFrom,
+  toNextAppointmentMonths,
   toPatientListFilters,
 } from './patient-list-selection';
 
@@ -27,8 +29,6 @@ const PAGE_SIZE_DEFAULT = 7;
 const PAGE_SIZE_FILTERED = 10;
 const SEARCH_DEBOUNCE_MS = 300;
 export const ALL_VALUE = 'all';
-/** Opción del filtro de próxima cita para quien no tiene cita ni mes anotado; el API la reconoce así. */
-const NO_APPOINTMENT_VALUE = 'none';
 
 /** El listado arranca mostrando solo pacientes activos. */
 export const DEFAULT_STATUS_FILTER = [PatientStatus.ACTIVE];
@@ -134,8 +134,9 @@ export function usePatientList() {
         label: KIND_LABELS[kind],
         value: kind,
       })),
+      { label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT), value: NO_APPOINTMENT_VALUE },
     ],
-    [],
+    [t],
   );
 
   useEffect(() => {
@@ -192,12 +193,24 @@ export function usePatientList() {
     pageSize,
     debouncedSearch,
     PatientStatusFilter.ALL,
-    monthFilter,
+    toNextAppointmentMonths(selection),
     filters,
   );
 
   const withPageReset = (setter: (values: string[]) => void) => (values: string[]) => {
     setter(values);
+    setPage(1);
+  };
+
+  // "Sin cita" contradice a confirmada y tentativa: elegir una quita la otra.
+  const handleKindFilter = (values: string[]) => {
+    const added = values.filter((value) => !kindFilter.includes(value));
+    const next = added.includes(NO_APPOINTMENT_VALUE)
+      ? [NO_APPOINTMENT_VALUE]
+      : added.length > 0
+        ? values.filter((value) => value !== NO_APPOINTMENT_VALUE)
+        : values;
+    setKindFilter(next);
     setPage(1);
   };
 
@@ -243,7 +256,7 @@ export function usePatientList() {
     handleBranchFilter: withPageReset(setBranchFilter),
     handleAppointmentTypeFilter: withPageReset(setAppointmentTypeFilter),
     handleFlagFilter: withPageReset(setFlagFilter),
-    handleKindFilter: withPageReset(setKindFilter),
+    handleKindFilter,
     selection,
     isPresetActive,
     togglePreset,

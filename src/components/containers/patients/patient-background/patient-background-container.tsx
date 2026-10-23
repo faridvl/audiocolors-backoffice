@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Loader2, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ActionMenu } from '@/components/common/action-menu/action-menu';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
@@ -33,7 +34,7 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
 
   if (isHidden) return null;
 
-  // Se llena una sola vez y queda fija; editarla después deja el cambio en Control de evolución.
+  // Se llena una sola vez y queda fija; editarla después genera un PDF en Archivos.
   const isReady = !isLoading && !isError;
   const isFormVisible = isReady && (!background || isUpdating);
 
@@ -51,14 +52,16 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
           )}
         </div>
         {isReady && background && !isUpdating && (
-          <Button
-            variant={ButtonVariant.GHOST}
-            onClick={handleStartUpdate}
-            icon={<Pencil className="h-4 w-4" aria-hidden />}
-            className="shrink-0"
-          >
-            {t(TEXT.PATIENTS.BACKGROUND.UPDATE.BUTTON)}
-          </Button>
+          <ActionMenu
+            ariaLabel={t(TEXT.PATIENTS.BACKGROUND.ACTIONS)}
+            items={[
+              {
+                label: t(TEXT.PATIENTS.BACKGROUND.UPDATE.BUTTON),
+                icon: <Pencil className="h-4 w-4" aria-hidden />,
+                onClick: handleStartUpdate,
+              },
+            ]}
+          />
         )}
       </div>
 

@@ -12,22 +12,37 @@ import {
   ChevronDown,
   ArrowLeft,
   ClipboardList,
+  type LucideIcon,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
-import { CLINICAL_TEMPLATE_EDITOR_ROLES } from '@/components/containers/clinical-history-template/use-clinical-history-template';
 import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { useIsIphone } from '@/hooks/use-is-iphone';
 import { useSession } from '@/hooks/use-session';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { useLogout } from '@/hooks/use-logout';
 import { tailwind } from '@/utils/tailwind-utils';
 import { BrandLogo } from '@/components/common/brand/brand-logo';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
-const NAVIGATION = [
+interface NavigationItem {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  /** Sin permiso, el rol no ve la entrada. */
+  permission?: Permission;
+}
+
+const NAVIGATION: NavigationItem[] = [
   { label: 'Pacientes', href: routesPrivate.patients.index, icon: Users },
   { label: 'Agenda', href: routesPrivate.agenda.index, icon: CalendarDays },
-  { label: 'Bitácora', href: routesPrivate.activity.index, icon: History },
+  {
+    label: 'Bitácora',
+    href: routesPrivate.activity.index,
+    icon: History,
+    permission: Permission.VIEW_ACTIVITY,
+  },
 ];
 
 function getInitials(fullName?: string): string {
@@ -46,7 +61,6 @@ const UserMenu: React.FC = () => {
   const { t } = useTranslation();
   const isIphone = useIsIphone();
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
-  const canEditClinicalTemplate = !!user && CLINICAL_TEMPLATE_EDITOR_ROLES.includes(user.role);
 
   return (
     <>
@@ -102,23 +116,6 @@ const UserMenu: React.FC = () => {
               </Menu.Item>
             )}
 
-            {canEditClinicalTemplate && (
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
-                    href={routesPrivate.settings.clinicalHistory}
-                    className={tailwind(
-                      'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
-                      active && 'bg-ink-50',
-                    )}
-                  >
-                    <ClipboardList className="h-4 w-4" aria-hidden />
-                    {t(TEXT.CLINICAL_TEMPLATE.MENU)}
-                  </Link>
-                )}
-              </Menu.Item>
-            )}
-
             <Menu.Item>
               {({ active }) => (
                 <button
@@ -169,6 +166,17 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   children,
 }) => {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { can } = usePermissions();
+  const navigation = [
+    ...NAVIGATION,
+    {
+      label: t(TEXT.CLINICAL_TEMPLATE.NAV),
+      href: routesPrivate.settings.clinicalHistory,
+      icon: ClipboardList,
+      permission: Permission.EDIT_CLINICAL_TEMPLATE,
+    },
+  ].filter((item) => !item.permission || can(item.permission));
 
   const isActiveRoute = (href: string) =>
     router.pathname === href || router.pathname.startsWith(`${href}/`);
@@ -187,7 +195,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         </div>
 
         <nav className="mt-5 flex flex-col gap-1">
-          {NAVIGATION.map((item) => {
+          {navigation.map((item) => {
             const isActive = isActiveRoute(item.href);
             const Icon = item.icon;
 
@@ -264,7 +272,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         className="fixed inset-x-0 bottom-0 z-10 flex border-t border-ink-200 bg-white md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {NAVIGATION.map((item) => {
+        {navigation.map((item) => {
           const isActive = isActiveRoute(item.href);
           const Icon = item.icon;
 

@@ -13,6 +13,7 @@ import {
   PatientListPreset,
   PatientListSelection,
   applyPresetTo,
+  toNextAppointmentMonths,
   toPatientListFilters,
 } from './patient-list-selection';
 
@@ -40,7 +41,7 @@ function useCount(selection: PatientListSelection, preset: PatientListPreset, is
     COUNT_LIMIT,
     cardSelection.search,
     PatientStatusFilter.ALL,
-    cardSelection.months,
+    toNextAppointmentMonths(cardSelection),
     toPatientListFilters(cardSelection),
     isEnabled,
   );

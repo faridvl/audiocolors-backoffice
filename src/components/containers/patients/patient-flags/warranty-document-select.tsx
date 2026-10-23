@@ -69,7 +69,7 @@ export const WarrantyDocumentSelect: React.FC<{ patient: Patient }> = ({ patient
                 <Button
                   variant={ButtonVariant.CARD}
                   onClick={() => preview.handleOpenPreview(item)}
-                  aria-label={t(TEXT.PATIENTS.FLAGS.WARRANTY_DOCUMENT.VIEW, { name: item.name })}
+                  aria-label={t(TEXT.PATIENTS.FLAGS.WARRANTY_DOCUMENT.VIEW, { name: item.displayName })}
                   className="min-h-[52px] w-full gap-3 px-3 py-2"
                 >
                   <KindIcon className="h-4 w-4 shrink-0 text-brand-700" aria-hidden />
@@ -79,7 +79,7 @@ export const WarrantyDocumentSelect: React.FC<{ patient: Patient }> = ({ patient
                       inline
                       className="truncate"
                     >
-                      {item.name}
+                      {item.displayName}
                     </Typography>
                     <Typography variant={TypographyVariant.HELPER} inline>
                       {item.uploadedAtLabel}

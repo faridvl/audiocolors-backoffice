@@ -45,7 +45,10 @@ export interface UpdateDocumentPayload {
 /** Documento ya normalizado para la UI. */
 export interface DocumentItem {
   uuid: string;
+  /** Nombre guardado, con extensión. */
   name: string;
+  /** Nombre que se muestra, sin extensión. */
+  displayName: string;
   url: string;
   category: DocumentCategory;
   categoryLabel: string;

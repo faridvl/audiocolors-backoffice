@@ -6,7 +6,7 @@ import {
   PatientDocument,
 } from '@/types/documents/document.types';
 import { formatDate, formatFileSize } from '@/shared/utils/formatters';
-import { repairFileName } from '@/shared/utils/file-name';
+import { repairFileName, stripFileExtension } from '@/shared/utils/file-name';
 
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
 
@@ -30,9 +30,12 @@ export function mapToDocumentItem(document: PatientDocument): DocumentItem {
     ? document.category
     : DocumentCategory.OTHER;
 
+  const name = repairFileName(document.originalName);
+
   return {
     uuid: document.uuid,
-    name: repairFileName(document.originalName),
+    name,
+    displayName: stripFileExtension(name),
     url: document.url,
     category,
     categoryLabel: DOCUMENT_CATEGORY_LABELS[category],
