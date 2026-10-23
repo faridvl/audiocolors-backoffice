@@ -65,22 +65,66 @@ export function toTemplateFields(values: ClinicalTemplateFormValues): ClinicalFi
 }
 
 export interface ClinicalQuestionGroup {
+  /** Id de su primera pregunta: no cambia mientras se escribe el nombre de la sección. */
+  key: string;
   /** Vacía: las preguntas sueltas, sin título. */
   section: string;
   /** Posiciones en la lista de preguntas del formulario. */
   indexes: number[];
 }
 
+const sameSection = (first: string, second: string) => first.trim() === second.trim();
+
 /** Agrupa por sección en el orden en que aparece cada una, como en la hoja. */
 export function groupQuestionsBySection(
   questions: ClinicalQuestionFormValues[],
 ): ClinicalQuestionGroup[] {
-  const groups = new Map<string, number[]>();
+  const groups: ClinicalQuestionGroup[] = [];
   questions.forEach((question, index) => {
-    const section = question.section.trim();
-    groups.set(section, [...(groups.get(section) ?? []), index]);
+    const group = groups.find((candidate) => sameSection(candidate.section, question.section));
+    if (group) group.indexes.push(index);
+    else groups.push({ key: question.id, section: question.section, indexes: [index] });
   });
-  return Array.from(groups, ([section, indexes]) => ({ section, indexes }));
+  return groups;
+}
+
+/**
+ * Mueve una pregunta delante de otra (y pasa a su sección) o, sin `beforeIndex`,
+ * al final de `section`.
+ */
+export function moveQuestion(
+  questions: ClinicalQuestionFormValues[],
+  fromIndex: number,
+  section: string,
+  beforeIndex: number | null,
+): ClinicalQuestionFormValues[] {
+  const moved = { ...questions[fromIndex], section };
+  const rest = questions.filter((_, index) => index !== fromIndex);
+
+  let insertAt: number;
+  if (beforeIndex !== null) {
+    insertAt = beforeIndex > fromIndex ? beforeIndex - 1 : beforeIndex;
+  } else {
+    const lastInSection = rest.reduce(
+      (last, question, index) => (sameSection(question.section, section) ? index : last),
+      -1,
+    );
+    insertAt = lastInSection === -1 ? rest.length : lastInSection + 1;
+  }
+
+  rest.splice(insertAt, 0, moved);
+  return rest;
+}
+
+/** Cambia el nombre de una sección en todas sus preguntas. */
+export function renameSection(
+  questions: ClinicalQuestionFormValues[],
+  indexes: number[],
+  name: string,
+): ClinicalQuestionFormValues[] {
+  return questions.map((question, index) =>
+    indexes.includes(index) ? { ...question, section: name } : question,
+  );
 }
 
 export function buildEmptyQuestion(section: string): ClinicalQuestionFormValues {

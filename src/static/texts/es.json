@@ -33,7 +33,7 @@
     "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
     "title": "Preguntas de la historia clínica",
     "templateName": "Historia clínica",
-    "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Lo que cambies se usa en las historias que se llenen desde ahora: las ya llenas no cambian.",
+    "intro": "Estas son las preguntas de la hoja que se llena la primera vez que viene un paciente. Arrastra una pregunta por su asa para cambiarla de lugar o de sección, y toca el nombre de una sección para cambiarlo. Lo que cambies se usa en las historias que se llenen desde ahora: las ya llenas no cambian.",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",
     "forbidden": "Solo un administrador puede cambiar las preguntas de la historia clínica.",
@@ -57,9 +57,11 @@
     "nav": "Historia clínica",
     "labelPlaceholder": "Escribe la pregunta",
     "detailPlaceholder": "Si es Sí, qué se pregunta (por ejemplo: ¿Qué tonalidad?)",
-    "noSection": "Sin sección",
+    "noSection": "Sin título (las preguntas se muestran sueltas)",
     "newSection": "Nombre de una sección nueva",
-    "addSection": "Agregar sección"
+    "addSection": "Agregar sección",
+    "sectionName": "Nombre de la sección",
+    "dragHandle": "Arrastrar para mover la pregunta"
   },
   "auth": {
     "login": {

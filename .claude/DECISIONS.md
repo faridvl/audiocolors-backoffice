@@ -343,7 +343,10 @@ todo en No.
 - **Preguntas configurables**: un OWNER o ADMIN las cambia en
   "Historia clínica" del menú lateral (solo lo ven ellos,
   `/configuracion/historia-clinica`): preguntas agrupadas por sección, una
-  fila por pregunta, agregar dentro de cada sección o crear una sección. Sin plantilla guardada se usa la hoja
+  fila por pregunta, agregar dentro de cada sección o crear una sección.
+  Las preguntas se mueven arrastrando su asa (arrastre nativo del navegador,
+  como la agenda de escritorio; en el celular no se arrastra) y el nombre de
+  cada sección se edita en su título. Sin plantilla guardada se usa la hoja
   estándar. Cada historia guarda la copia de sus preguntas
   (`templateSnapshot`) y se lee siempre con ellas; las llenadas antes, sin
   copia, se leen con la hoja estándar, nunca con las preguntas actuales (si no,

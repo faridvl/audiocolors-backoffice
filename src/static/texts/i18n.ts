@@ -45,6 +45,8 @@ export const TEXT = {
     DETAIL_LABEL: 'clinicalTemplate.detailLabel',
     DETAIL_PLACEHOLDER: 'clinicalTemplate.detailPlaceholder',
     NO_SECTION: 'clinicalTemplate.noSection',
+    SECTION_NAME: 'clinicalTemplate.sectionName',
+    DRAG_HANDLE: 'clinicalTemplate.dragHandle',
     NEW_SECTION: 'clinicalTemplate.newSection',
     ADD_SECTION: 'clinicalTemplate.addSection',
     REMOVE: 'clinicalTemplate.remove',

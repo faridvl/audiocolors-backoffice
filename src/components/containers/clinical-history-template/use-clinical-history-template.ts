@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -38,7 +38,6 @@ export function useClinicalHistoryTemplate() {
     [template, t],
   );
   const validationSchema = useMemo(() => buildClinicalTemplateSchema(t), [t]);
-  const [newSectionName, setNewSectionName] = useState('');
 
   const handleSubmit = (values: ClinicalTemplateFormValues) => {
     executeSaveTemplate(
@@ -72,8 +71,5 @@ export function useClinicalHistoryTemplate() {
     refetch,
     isPending,
     handleSubmit,
-    newSectionName,
-    handleNewSectionNameChange: setNewSectionName,
-    clearNewSectionName: () => setNewSectionName(''),
   };
 }
