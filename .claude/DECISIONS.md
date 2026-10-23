@@ -458,9 +458,11 @@ agenda; lo que domina es el color de la sede.
 **Decisión (2026-10-23):** las novedades de cada versión llegan como
 notificaciones en una bandeja ("Notificaciones" en el menú del usuario, con
 contador rojo y un punto en el avatar mientras haya sin leer). Se pueden volver a
-abrir y "Limpiar" las saca de la bandeja. En el celular la bandeja ocupa la
-pantalla; en computadora es una ventana. Cada cambio lleva un emoji para darle
-vida sin dejar de ser sobrio. La versión actual se ve al pie del menú.
+abrir y "Limpiar" las saca de la bandeja. La bandeja es un desplegable que sale
+del avatar, como en cualquier sitio. Cada versión agrupa sus cambios en
+Novedades, Mejoras y Correcciones, con "Tema: descripción" y sin emojis: es un
+sistema médico y lo lee el personal de la clínica. La versión actual se ve al
+pie del menú.
 
 **Leídas y limpiadas** se guardan en el navegador, por usuario. En otro
 dispositivo se vuelven a ver una vez. Si hace falta que se sincronice entre

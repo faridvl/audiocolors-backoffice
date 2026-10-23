@@ -78,6 +78,7 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | `ui-audit` | Auditar la interfaz contra las reglas antes de un push |
 | `nueva-seccion` | Añadir un CRUD completo siguiendo los patrones del proyecto |
 | `novedades` | Imagen de "Novedades" para el cliente con los cambios de una entrega, y su registro en `docs/novedades/HISTORIAL.md` (qué commits cubre cada entrega, para no mezclarlas) |
+| `nueva-version` | Antes del PR a main: bump, borrador del changelog de Notificaciones para que el usuario lo apruebe, cargarlo y abrir el PR |
 | `commit` | Redactar el mensaje de commit (qué se hizo / qué se probó). Skill de usuario, no vive en este repo — aplica en cualquier proyecto de la cuenta |
 
 No dupliques como skill algo que ya resuelve un comando o un agente existente
