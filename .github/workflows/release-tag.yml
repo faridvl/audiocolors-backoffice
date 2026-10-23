@@ -1,0 +1,28 @@
+name: "[Release] Etiqueta de versión"
+
+# Cada salida a producción queda marcada en git con su versión (v1.0.0, v1.1.0…).
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Crear la etiqueta si todavía no existe
+        run: |
+          VERSION="v$(node -p "require('./package.json').version")"
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "La etiqueta $VERSION ya existe."
+          else
+            git tag "$VERSION"
+            git push origin "$VERSION"
+            echo "Etiqueta $VERSION creada."
+          fi

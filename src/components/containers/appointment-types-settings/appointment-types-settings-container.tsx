@@ -49,7 +49,7 @@ export const AppointmentTypesSettingsContainer: React.FC = () => {
   }
 
   return (
-    <div className="flex max-w-2xl flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       {appointmentTypes.length === 0 ? (
         <Typography variant={TypographyVariant.BODY} className="py-6 text-center text-ink-500">
           {t(TEXT.SETTINGS.APPOINTMENT_TYPES.EMPTY)}

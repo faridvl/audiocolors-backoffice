@@ -1,0 +1,21 @@
+name: "[CHECK] Versión documentada"
+
+# Un PR a main es una salida a producción: tiene que subir la versión y traer sus novedades.
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Versión mayor que main y con sus novedades
+        run: node scripts/release.mjs check --base origin/main

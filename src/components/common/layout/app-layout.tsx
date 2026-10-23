@@ -17,8 +17,8 @@ import {
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
 import { CountBadge } from '@/components/common/badge/count-badge';
-import { ReleaseNotesModal } from '@/components/containers/release-notes/release-notes-modal';
-import { useReleaseNotes } from '@/components/containers/release-notes/use-release-notes';
+import { NotificationsPanel } from '@/components/containers/notifications/notifications-panel';
+import { useNotifications } from '@/components/containers/notifications/use-notifications';
 import { SETTINGS_SECTIONS } from '@/components/containers/settings/settings-sections';
 import { TEXT } from '@/static/texts/i18n';
 import { routesPrivate } from '@/shared/navigation/routes';
@@ -67,7 +67,7 @@ const UserMenu: React.FC = () => {
   const { t } = useTranslation();
   const isIphone = useIsIphone();
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
-  const releaseNotes = useReleaseNotes(user?.uuid);
+  const notifications = useNotifications(user?.uuid);
 
   return (
     <>
@@ -76,7 +76,7 @@ const UserMenu: React.FC = () => {
           <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
             {getInitials(user?.fullName)}
             {/* Invita a abrir el menú: ahí está la novedad sin ver. */}
-            {releaseNotes.unseenCount > 0 && (
+            {notifications.unreadCount > 0 && (
               <span
                 className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-danger ring-2 ring-white"
                 aria-hidden
@@ -134,17 +134,19 @@ const UserMenu: React.FC = () => {
               {({ active }) => (
                 <button
                   type="button"
-                  onClick={releaseNotes.handleOpen}
+                  onClick={notifications.handleOpen}
                   className={tailwind(
                     'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
                     active && 'bg-ink-50',
                   )}
                 >
                   <Bell className="h-4 w-4" aria-hidden />
-                  <span className="flex-1">{t(TEXT.RELEASE_NOTES.MENU)}</span>
+                  <span className="flex-1">{t(TEXT.NOTIFICATIONS.MENU)}</span>
                   <CountBadge
-                    count={releaseNotes.unseenCount}
-                    ariaLabel={t(TEXT.RELEASE_NOTES.UNSEEN, { count: releaseNotes.unseenCount })}
+                    count={notifications.unreadCount}
+                    ariaLabel={t(TEXT.NOTIFICATIONS.UNREAD_COUNT, {
+                      count: notifications.unreadCount,
+                    })}
                   />
                 </button>
               )}
@@ -165,14 +167,29 @@ const UserMenu: React.FC = () => {
                 </button>
               )}
             </Menu.Item>
+
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="border-t border-ink-100 px-3 pb-1 pt-2 text-ink-400"
+            >
+              {t(TEXT.LAYOUT.VERSION, { version: process.env.NEXT_PUBLIC_APP_VERSION })}
+            </Typography>
           </Menu.Items>
         </Transition>
       </Menu>
 
       {isCalendarSyncOpen && <CalendarSyncSheet onClose={() => setIsCalendarSyncOpen(false)} />}
 
-      {releaseNotes.isOpen && (
-        <ReleaseNotesModal releases={releaseNotes.releases} onClose={releaseNotes.handleClose} />
+      {notifications.isOpen && (
+        <NotificationsPanel
+          notifications={notifications.notifications}
+          selected={notifications.selected}
+          isUnread={notifications.isUnread}
+          onSelect={notifications.handleSelect}
+          onBack={notifications.handleBack}
+          onClear={notifications.handleClear}
+          onClose={notifications.handleClose}
+        />
       )}
     </>
   );
@@ -304,6 +321,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         <main
           className={tailwind(
             'flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 py-5 md:px-6',
+            // El lugar de la barra queda reservado: al pasar de una página corta a una larga el contenido no se corre.
+            '[scrollbar-gutter:stable]',
             'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6',
           )}
         >

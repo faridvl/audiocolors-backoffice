@@ -43,6 +43,8 @@ completo.
 yarn dev         # servidor en :3000
 yarn lint        # ESLint
 yarn typecheck   # tsc --noEmit
+yarn release:bump X.Y.Z   # antes de un PR a main (RULES.md §10)
+yarn release:check        # versión mayor que main y con sus novedades
 ```
 
 Antes de cada commit: `yarn lint && yarn typecheck` limpios.

@@ -451,7 +451,26 @@ y el interruptor de control, que avisa qué cambia al guardar. Sin agregar ni
 borrar tipos, y sin color: el color del tipo solo se ve como un punto en la
 agenda; lo que domina es el color de la sede.
 
-**Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
+---
+
+## D23 · Notificaciones y versiones
+
+**Decisión (2026-10-23):** las novedades de cada versión llegan como
+notificaciones en una bandeja ("Notificaciones" en el menú del usuario, con
+contador rojo y un punto en el avatar mientras haya sin leer). Se pueden volver a
+abrir y "Limpiar" las saca de la bandeja. En el celular la bandeja ocupa la
+pantalla; en computadora es una ventana. Cada cambio lleva un emoji para darle
+vida sin dejar de ser sobrio. La versión actual se ve al pie del menú.
+
+**Leídas y limpiadas** se guardan en el navegador, por usuario. En otro
+dispositivo se vuelven a ver una vez. Si hace falta que se sincronice entre
+dispositivos, guardarlo en el API.
+
+**Versiones:** `package.json` es la fuente; `yarn release:bump` y
+`yarn release:check` (RULES.md §10). El historial vive en `src/static/releases.ts`
+(nunca se borra una versión) y en las etiquetas `vX.Y.Z` de git.
+
+**D18 · Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
 muestra lo último (respuestas nuevas y preguntas agregadas) y "Modificada por X
 el día". El PDF en Archivos sigue generándose como registro de qué cambió y quién.
 Reemplaza "la original no se modifica nunca": la clínica quiere ver el estado

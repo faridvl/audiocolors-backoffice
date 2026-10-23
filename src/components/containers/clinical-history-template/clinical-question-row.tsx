@@ -56,7 +56,7 @@ export const ClinicalQuestionRow: React.FC<ClinicalQuestionRowProps> = ({
         <GripVertical className="h-4 w-4" aria-hidden />
       </button>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+        <div className="flex flex-col gap-2 xl:flex-row xl:items-start">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <Field
               name={`${name}.label`}
@@ -73,7 +73,7 @@ export const ClinicalQuestionRow: React.FC<ClinicalQuestionRowProps> = ({
               as="select"
               name={`${name}.kind`}
               aria-label={t(TEXT.CLINICAL_TEMPLATE.KIND)}
-              className={tailwind(inputBaseClasses, 'min-w-0 flex-1 sm:w-56 sm:flex-none')}
+              className={tailwind(inputBaseClasses, 'min-w-0 flex-1 xl:w-56 xl:flex-none')}
             >
               {Object.values(ClinicalQuestionKind).map((kind) => (
                 <option key={kind} value={kind}>
