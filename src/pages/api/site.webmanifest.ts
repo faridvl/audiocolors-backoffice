@@ -3,8 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 /** Manifest dinámico según el host: dev usa ícono y colores distintos de producción. */
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const host = req.headers.host ?? '';
-  const isDev =
-    host.includes('dev-backoffice') || host.includes('localhost') || host.includes('127.0.0.1');
+  const isDev = host.includes('dev-backoffice') || host.includes('localhost') || host.includes('127.0.0.1');
   const iconSuffix = isDev ? '-dev' : '';
   const themeColor = isDev ? '#0a0a0a' : '#1f6fb1';
 
