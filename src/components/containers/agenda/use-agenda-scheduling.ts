@@ -11,21 +11,26 @@ import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-
 import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-months-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
-import { formatHour } from '@/shared/utils/dates';
+import { formatMinuteOfDay } from '@/shared/utils/dates';
 import { EMPTY_VALUE, getFullName } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
 import { Patient } from '@/types/patients/patient';
-import { buildSlotTimes, resolveSlotHour, resolveTypeDuration } from './agenda-presenter';
+import {
+  buildSlotTimes,
+  resolveAppointmentDuration,
+  resolveStartMinute,
+  resolveTypeDuration,
+} from './agenda-presenter';
 
 /** Algo que se está guardando: se muestra en su destino mientras tanto. */
 export interface SavingItem {
   /** UUID del paciente (si venía de "Por confirmar") o de la cita. */
   id: string;
   title: string;
-  /** Día y horario destino; hora null si vuelve a "Por confirmar". */
+  /** Día y minuto del día destino; null si vuelve a "Por confirmar". */
   dayKey: string;
-  hour: number | null;
+  startMinute: number | null;
 }
 
 /** Lo que se refresca después de cualquier movimiento: citas, pacientes, meses y bitácora. */
@@ -80,10 +85,10 @@ export function useAgendaScheduling() {
     }
   };
 
-  const confirmPending = (patient: Patient, dayKey: string, hour: number) => {
+  const confirmPending = (patient: Patient, dayKey: string, startMinute: number) => {
     const name = getFullName(patient.firstName, patient.lastName);
 
-    return track({ id: patient.uuid, title: name, dayKey, hour }, async () => {
+    return track({ id: patient.uuid, title: name, dayKey, startMinute }, async () => {
       const appointment = await executeCreateNextAppointmentAsync({
         patientUuid: patient.uuid,
         date: dayKey,
@@ -100,7 +105,7 @@ export function useAgendaScheduling() {
           appointmentUuid: appointment.id,
           ...buildSlotTimes(
             dayKey,
-            hour,
+            startMinute,
             resolveTypeDuration(appointmentTypes, patient.tentativeAppointmentTypeUuid),
           ),
         });
@@ -109,31 +114,35 @@ export function useAgendaScheduling() {
         return;
       }
 
-      toast.success(t(TEXT.AGENDA.BOARD.TOASTS.CONFIRMED, { name, hour: formatHour(hour) }));
+      toast.success(
+        t(TEXT.AGENDA.BOARD.TOASTS.CONFIRMED, { name, hour: formatMinuteOfDay(startMinute) }),
+      );
     });
   };
 
-  const moveAppointment = (appointment: Appointment, dayKey: string, hour: number) => {
-    if (resolveSlotHour(appointment) === hour) return Promise.resolve();
+  const moveAppointment = (appointment: Appointment, dayKey: string, startMinute: number) => {
+    if (resolveStartMinute(appointment) === startMinute) return Promise.resolve();
     const name = appointment.patientName ?? EMPTY_VALUE;
 
-    return track({ id: appointment.id, title: name, dayKey, hour }, async () => {
+    return track({ id: appointment.id, title: name, dayKey, startMinute }, async () => {
       await executeUpdateAppointmentTimeAsync({
         appointmentUuid: appointment.id,
         ...buildSlotTimes(
           dayKey,
-          hour,
-          resolveTypeDuration(appointmentTypes, appointment.typeUUID),
+          startMinute,
+          resolveAppointmentDuration(appointment, appointmentTypes),
         ),
       });
-      toast.success(t(TEXT.AGENDA.BOARD.TOASTS.MOVED, { name, hour: formatHour(hour) }));
+      toast.success(
+        t(TEXT.AGENDA.BOARD.TOASTS.MOVED, { name, hour: formatMinuteOfDay(startMinute) }),
+      );
     });
   };
 
   const returnToPending = (appointment: Appointment, dayKey: string, monthKey: string) => {
     const name = appointment.patientName ?? EMPTY_VALUE;
 
-    return track({ id: appointment.id, title: name, dayKey, hour: null }, async () => {
+    return track({ id: appointment.id, title: name, dayKey, startMinute: null }, async () => {
       // Primero el mes: si esto falla, la cita sigue intacta.
       await executeSetTentativeMonthAsync({
         patientUuid: appointment.patientUUID,

@@ -12,7 +12,7 @@ import { AppointmentListRow } from '../agenda-list-row';
 import { RowDensity } from '../agenda-styles';
 import { AgendaError, AgendaLoading } from '../agenda-states';
 import { AgendaState } from '../use-agenda';
-import { HourSlot } from './hour-slot';
+import { DayTimeline } from './day-timeline';
 import { AgendaBoardState } from './use-agenda-board';
 
 /** Posición de la ventana sobre el calendario, según el lado que le toca. */
@@ -78,7 +78,7 @@ export const DayPanel: React.FC<DayPanelProps> = ({ agenda, board, side, onClose
       className={tailwind(
         // Nunca más ancha que la tarjeta del calendario (si no, se mete bajo el menú
         // lateral), pero sí más alta: así el día entero entra sin scroll.
-        'absolute top-3 z-20 flex max-h-[calc(100dvh-9rem)] min-h-[calc(100%-1.5rem)] w-80 max-w-[calc(100%-1.5rem)] flex-col rounded-card border border-ink-200 bg-white shadow-xl motion-safe:animate-fade-in',
+        'absolute top-3 z-20 flex max-h-[calc(100dvh-9rem)] min-h-[calc(100%-1.5rem)] w-96 max-w-[calc(100%-1.5rem)] flex-col rounded-card border border-ink-200 bg-white shadow-xl motion-safe:animate-fade-in',
         SIDE_STYLES[side],
       )}
     >
@@ -116,11 +116,7 @@ export const DayPanel: React.FC<DayPanelProps> = ({ agenda, board, side, onClose
         {!agenda.isLoading && !agenda.isError && (
           <>
             <UnscheduledBlock agenda={agenda} board={board} />
-            <div>
-              {board.slots.map((slot) => (
-                <HourSlot key={slot.hour} slot={slot} agenda={agenda} board={board} />
-              ))}
-            </div>
+            <DayTimeline agenda={agenda} board={board} />
           </>
         )}
       </div>
