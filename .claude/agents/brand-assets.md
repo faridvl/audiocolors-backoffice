@@ -59,8 +59,9 @@ Y **mira el resultado** con la herramienta Read antes de darlo por bueno.
 `#e3211e` rojo · `#ef7f2b` naranja · `#ffce33` amarillo · `#66b335` verde ·
 `#1f6fb1` azul · `#613f90` morado
 
-Para medir uno nuevo: contar píxeles del JPEG original agrupando por color,
-descartando grises (`max-min < 60`) y casi-blancos.
+Para un color nuevo: tomarlo del `Audio Colors Manual de Marca.pdf`, página
+"PALETA DE COLORES" (ver `.claude/BRAND.md`), no contar píxeles de un JPEG ni
+estimarlo a ojo. El `.ai` es la fuente del logo, no de la paleta.
 
 ## Reglas al generar
 

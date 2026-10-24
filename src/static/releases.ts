@@ -36,7 +36,7 @@ const fix = change(ReleaseChangeKind.FIXED);
 /**
  * Versiones publicadas, de la más nueva a la más antigua. Cada una llega a la
  * clínica como una notificación. Una nueva se crea con `yarn release:bump X.Y.Z`
- * y `yarn release:check` la exige antes de un PR a main (RULES.md §10).
+ * y `yarn release:check` la exige antes de un PR a main (RULES.md §8).
  */
 export const RELEASES: Release[] = [
   // release:next — `yarn release:bump` agrega la versión nueva acá arriba.

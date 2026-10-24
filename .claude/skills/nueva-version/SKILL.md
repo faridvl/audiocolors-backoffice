@@ -5,7 +5,7 @@ description: Prepara una versión nueva de AudioColors antes del PR de develop a
 
 # Nueva versión
 
-Cada PR de `develop` a `main` es una versión (RULES.md §10). La clínica la ve
+Cada PR de `develop` a `main` es una versión (RULES.md §8). La clínica la ve
 como una notificación en el menú del usuario: "Versión X.Y.Z" con sus cambios
 agrupados en **Novedades**, **Mejoras** y **Correcciones**.
 

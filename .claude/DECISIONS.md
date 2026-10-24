@@ -65,6 +65,10 @@ existe para un SaaS multi-tenant que algún día será multi-idioma.
 **Cuándo deja de valer:** si AudioColors pide inglés, o si este repo se
 generaliza a más clínicas.
 
+**Actualización (2026-09-16):** revertida. Los textos pasan a `i18next` +
+`react-i18next` con el patrón de Zynka (`TEXT` en `src/static/texts/i18n.ts` y
+`es.json`), migrando cada pantalla que se toca. Implementado el 2026-09-24.
+
 ---
 
 ## D6 · Detalle de paciente nuevo, no portado
@@ -85,6 +89,11 @@ inventario, citas. Reutilizarlo arrastraba medio sistema.
 
 **Por qué:** el logo de AudioColors es multicolor sobre blanco. Un chrome
 oscuro o azulado compite con él. El naranja saturaba como acento general.
+
+**Actualización:** el acento hoy es azul `#1f6fb1` (`tailwind.config.js`), la R
+del logo. Pasó de verde a azul `#1e6cae` en `561b488` (2026-09-15) y se ajustó al
+`#1f6fb1` del manual en `50c99cf` (2026-09-18). Porqué no registrado: ningún doc
+ni mensaje de commit explica el cambio.
 
 ---
 
@@ -119,7 +128,7 @@ Ambas requieren cambio en el API (ver D24).
 
 ## Pendientes antes de producción
 
-1. **Cambiar las contraseñas temporales** (`Password1` para ambos usuarios).
+1. **Cambiar las contraseñas temporales** (la tiene el usuario; P0-1 cambiarla antes de entregar).
 2. **Desplegar** en Vercel con el subdominio `backoffice.audiocolorscr.com`
    (proyecto aparte del landing; las variables `NEXT_PUBLIC_*` se inyectan en
    build, así que hay que redeployar si se añaden después).
@@ -368,6 +377,9 @@ todo en No.
 - **Editar va en el menú "⋯"** de la tarjeta (`ActionMenu`): es una acción
   poco frecuente.
 
+**Actualización:** D19 da también a `DOCTOR` el permiso de cambiar las preguntas
+(`permissions.ts`).
+
 ---
 
 ## D19 · Permisos por rol: el empleado no ve lo clínico
@@ -376,7 +388,7 @@ todo en No.
 empleado). El empleado (recepción, secretaría) ve pacientes, contactos, citas,
 agenda y archivos; no ve historia clínica, Control de evolución, Bitácora ni
 las preguntas de la historia clínica. El médico sí puede cambiar las preguntas.
-Ver RULES.md §9.
+Ver RULES.md §7.
 
 **Por qué:** pedido de la clínica, pensando en más clínicas y más personal. Los
 datos de salud son sensibles (Ley 8968), así que el API también lo bloquea
@@ -395,7 +407,7 @@ desarrollo que toque roles o pantallas nuevas.
 
 **Decisión:**
 - **Roles fijos, definidos por nosotros:** `OWNER`, `ADMIN`, `DOCTOR`, `STAFF`.
-  Cada rol trae permisos por defecto (los de RULES.md §9).
+  Cada rol trae permisos por defecto (los de RULES.md §7).
 - **El administrador de cada clínica ajusta los permisos de cada rol**, solo
   para su clínica, desde Configuración → Usuarios y permisos.
 - **Por rol, no por persona**, al principio. Excepciones por usuario solo si un
@@ -474,7 +486,7 @@ dispositivo se vuelven a ver una vez. Si hace falta que se sincronice entre
 dispositivos, guardarlo en el API.
 
 **Versiones:** `package.json` es la fuente; `yarn release:bump` y
-`yarn release:check` (RULES.md §10). El historial vive en `src/static/releases.ts`
+`yarn release:check` (RULES.md §8). El historial vive en `src/static/releases.ts`
 (nunca se borra una versión) y en las etiquetas `vX.Y.Z` de git.
 
 **D18 · Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
@@ -493,3 +505,19 @@ API (agenda, garantía, historia clínica, permisos, tipos de cita) salieron por
 ramas con PR a `develop` y dejaron el sistema mejor. Desde ahora el API se
 cambia como el front: rama propia, PR a `develop` y, al pasar a `main`, la
 acción `[Release] Production` aplica las migraciones.
+
+---
+
+## D25 · Contexto a pedido y sin contraseñas en los docs
+
+**Decisión (2026-10-24):** `CLAUDE.md` importa solo `HANDOFF.md`, `RULES.md` y
+`ARCHITECTURE.md`; `DECISIONS.md`, `STATUS.md`, `BRAND.md` y los docs de `docs/`
+se leen a pedido (tabla "Leer a pedido" de `CLAUDE.md`). `RULES.md` queda con las
+reglas propias de este repo y remite a las skills `estandares-*` donde coinciden.
+La contraseña temporal de los usuarios ya no se escribe en ningún doc. Es
+urgente: ya está en el historial de git de un repo público; la única solución es
+cambiarla cuanto antes (P0-1), no reescribir el historial.
+
+**Por qué:** cada mensaje cargaba unas 1.570 líneas de contexto fijo. Con una
+sesión coordinadora y varios agentes, ese costo se paga en cada uno; el contexto
+fijo tiene que ser poco y lo demás se lee cuando se necesita.

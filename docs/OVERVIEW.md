@@ -38,8 +38,8 @@ Nació como **recorte** de `next-audiology-files` (Zynka), el SaaS multi-tenant 
 | Formularios | Formik + Yup |
 | Notificaciones | Sonner |
 | Tipografía | Fira Sans |
-| i18n | `i18next` + `react-i18next`, migración en curso (ver [§5.2 RULES.md](../.claude/RULES.md)) |
-| Backend | `standard-saas-api` (compartido con Zynka, **no se modifica**) |
+| i18n | `i18next` + `react-i18next`, migración en curso (ver [§4 RULES.md](../.claude/RULES.md)) |
+| Backend | `standard-saas-api` (compartido con Zynka; se cambia con rama y PR a `develop` del API, D24) |
 | Almacenamiento de archivos | Cloudflare R2 |
 | Despliegue | Vercel — `[PENDIENTE]`, ver [.claude/STATUS.md](../.claude/STATUS.md) |
 
@@ -161,7 +161,7 @@ Registro público, recuperación de contraseña, citas/agenda como módulo propi
 1. `GET /patients/:uuid` — datos del paciente
 2. `GET /patients/:uuid/documents` — archivos adjuntos
 3. Header: nombre del paciente como título, "Expediente" como subtítulo, acciones (editar/volver) en el header — nunca en el contenido
-4. Franja de datos resumidos con enlace "Ver todos los datos" (los documentos son lo que se consulta a diario, ver [regla 3.4 RULES.md](../.claude/RULES.md))
+4. Franja de datos resumidos, siempre visibles (los documentos son lo que se consulta a diario, ver [§3.3 RULES.md](../.claude/RULES.md))
 5. Notas y contactos como secciones expandibles
 
 ### 4.3 Subida de documento
@@ -185,7 +185,7 @@ Registro público, recuperación de contraseña, citas/agenda como módulo propi
 5. `authorizeServerSidePage()` comprueba la cookie en `getServerSideProps`
 6. Un 401 con token presente cierra sesión y redirige a `/login?expired=true`
 
-### 5.2 Multi-tenant sin tocar el API
+### 5.2 Multi-tenant
 
 AudioColors es un tenant más del mismo backend que Zynka. El aislamiento lo resuelve el **JWT**: cada controller del API lee `tenantUuid` del token, y el frontend **nunca lo envía**. Un frontend nuevo, logueado con un usuario de AudioColors, solo ve datos de AudioColors automáticamente (ver [D1 en DECISIONS.md](../.claude/DECISIONS.md)).
 
@@ -195,7 +195,7 @@ AudioColors es un tenant más del mismo backend que Zynka. El aislamiento lo res
 | `tenantId` | `12` |
 | `businessType` | `AUDIOLOGY` |
 
-Usuarios: `admin@audiocolors.com` (OWNER, Matthew Arias Mena) · `maria@audiocolors.com` (ADMIN, Maria Duran Arias). Contraseña temporal `Password1` — **pendiente cambiar antes de entregar** (P0-1 en STATUS.md).
+Usuarios: `admin@audiocolors.com` (OWNER, Matthew Arias Mena) · `maria@audiocolors.com` (ADMIN, Maria Duran Arias). Contraseña temporal: la tiene el usuario; P0-1 cambiarla antes de entregar (ver STATUS.md).
 
 ---
 
@@ -211,7 +211,7 @@ Usuarios: `admin@audiocolors.com` (OWNER, Matthew Arias Mena) · `maria@audiocol
 <div className="bg-brand">
 ```
 
-`brand` (azul `#1f6fb1`, la R del logo) es el único acento. `ink` son grises neutros sin tinte azul. `success` es teal, no verde, para no confundirse con la marca. Verificación: `grep -rEo "(bg|text|border)-\[#[0-9a-fA-F]{3,8}\]" src/` debe dar 0. Excepción única: `rainbow-stripe.tsx`, que pinta los 6 colores de marca como dato de identidad. Ver [regla 1 en RULES.md](../.claude/RULES.md).
+`brand` (azul `#1f6fb1`, la R del logo) es el único acento. `ink` son grises neutros sin tinte azul. `success` es teal, no verde, para no confundirse con la marca. Verificación: `grep -rEo "(bg|text|border)-\[#[0-9a-fA-F]{3,8}\]" src/` debe dar 0. Excepción única: `rainbow-stripe.tsx`, que pinta los 6 colores de marca como dato de identidad. Ver [§2 en RULES.md](../.claude/RULES.md) y [BRAND.md](../.claude/BRAND.md).
 
 ### 6.2 Cuatro estados de lista, siempre
 
@@ -267,7 +267,7 @@ Los colores de marca **se miden** del manual oficial (`AUDIOCOLORS LOGO Y VARIAN
 
 Logo: dos archivos (`logo-audiocolors.png` fondo claro, `logo-audiocolors-dark.png` fondo oscuro), nunca un filtro CSS tipo `brightness-0 invert`. Favicon: solo la oreja del logo, sin los puntos de color, fondo transparente. Al componente se le pasa siempre la altura (`<BrandLogo height={40} />`), nunca ancho y alto juntos.
 
-Ver detalle completo en [.claude/BRAND.md](../.claude/BRAND.md) y [regla 2 en RULES.md](../.claude/RULES.md).
+Ver detalle completo en [.claude/BRAND.md](../.claude/BRAND.md) y [Reglas de uso del logo en BRAND.md](../.claude/BRAND.md).
 
 ---
 
@@ -283,7 +283,7 @@ Ver detalle completo en [.claude/BRAND.md](../.claude/BRAND.md) y [regla 2 en RU
 
 ### 9.2 Estado de paciente
 
-Activo / inactivo. Un paciente inactivo no se puede reactivar ni eliminar del todo desde el frontend — limitación del API (§7.3). El filtro "Inactivos" existe pero su conteo no es exacto hasta que el API soporte paginación real de ese estado.
+Activo / inactivo / fallecido. Un paciente inactivo no se puede reactivar ni eliminar del todo desde el frontend — limitación del API (RULES.md §6). El filtro "Inactivos" existe pero su conteo no es exacto hasta que el API soporte paginación real de ese estado.
 
 ### 9.3 Documentos adjuntos
 
@@ -325,7 +325,7 @@ const { t } = useTranslation();
 <title>{t(TEXT.AUTH.LOGIN.PAGE_TITLE)}</title>
 ```
 
-Keys tipadas en `src/static/texts/i18n.ts` (`TEXT` const, anidado por módulo), traducciones espejo en `es.json`. Un schema de Yup usado por un solo hook se arma dentro del hook con `useMemo`; si lo comparten varios hooks, se exporta como función factory que recibe `t`. **Nunca** `i18n.t()` importado directo — esquiva el ciclo de vida de React. Ver [regla 5.2–5.4 en RULES.md](../.claude/RULES.md) para el detalle completo.
+Keys tipadas en `src/static/texts/i18n.ts` (`TEXT` const, anidado por módulo), traducciones espejo en `es.json`. Un schema de Yup usado por un solo hook se arma dentro del hook con `useMemo`; si lo comparten varios hooks, se exporta como función factory que recibe `t`. **Nunca** `i18n.t()` importado directo — esquiva el ciclo de vida de React. Ver [§4 en RULES.md](../.claude/RULES.md) para el detalle completo.
 
 ### 10.4 Verificación antes de cada commit
 
@@ -347,11 +347,11 @@ Resumen de [.claude/DECISIONS.md](../.claude/DECISIONS.md) — el detalle comple
 | D2 | Back-office para personal de clínica, no portal de pacientes |
 | D3 | Alta de tenant por `POST /auth/register`, nunca por INSERT directo (contraseñas con bcrypt) |
 | D4 | Base de datos en blanco al entregar, sin migrar datos de prueba de Zynka |
-| D5 | Sin i18n — **revertida el 2026-09-16**, ver §5.2 de RULES.md |
+| D5 | Sin i18n — **revertida el 2026-09-16**, ver §4 de RULES.md |
 | D6 | Detalle de paciente escrito de nuevo (~130 líneas) en vez de portar el de Zynka (1052 líneas, 6 queries) |
-| D7 | Acento único verde `#66ae36` con grises neutros, en vez de azul/naranja heredados |
+| D7 | Acento único con grises neutros: verde `#66ae36` al inicio, hoy azul `#1f6fb1` (ver D7) |
 | D8 | Estándares de UI tomados de un back-office de referencia, con ajustes: page size 10, sidebar blanco, sin sistema `NewForm` |
-| D9 | Limitaciones del API (soft delete, filtro inactivos) no se arreglan en este repo — requieren cambio compartido con Zynka |
+| D9 | Limitaciones del API (soft delete, filtro inactivos) requieren un cambio en el API (rama y PR a `develop`, D24) |
 
 ---
 

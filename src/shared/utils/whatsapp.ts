@@ -1,4 +1,4 @@
-/** Código de país de Costa Rica: los teléfonos se guardan con 8 dígitos, sin él. */
+/** Código de país de Costa Rica: se antepone a un teléfono local de 8 dígitos para armar el enlace. */
 const DEFAULT_COUNTRY_CODE = '506';
 const LOCAL_PHONE_LENGTH = 8;
 

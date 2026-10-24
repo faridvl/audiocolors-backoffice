@@ -11,8 +11,8 @@ andamiaje ya existe: se reutiliza, no se reinventa.
 ## Antes de escribir código
 
 1. **Comprobar que el endpoint existe** en `standard-saas-api`. Si no existe,
-   **parar y avisar**: el API se comparte con Zynka y no se toca desde aquí
-   (regla 7 de `.claude/RULES.md`).
+   **parar y avisar**; si el usuario aprueba el cambio, va en
+   `standard-saas-api`, con rama propia y PR a `develop` (RULES.md §6, D24).
 2. Leer el DTO/controller del API para conocer los campos exactos.
 3. Comprobar si Zynka (`next-audiology-files`) ya tiene algo portable — suele
    tenerlo, pero **revisa su tamaño y dependencias antes de copiar**: su detalle
@@ -51,6 +51,10 @@ Registrarlas en `src/shared/navigation/routes.ts` y en `useNavigation()`.
 | Detalle | `containers/patients/patient-detail/` |
 | Query paginada | `shared/api/querys/patients-query.ts` |
 | Mutation | `shared/api/mutations/patients/create-patient-mutation.ts` |
+| Esquema Yup con textos | `containers/clinical-history-template/clinical-template-form.ts` (factory con `t`) |
+
+El módulo de pacientes tiene deuda de i18n (P1-5): no se copia tal cual en texto
+ni en esquema (`patient-validation.ts` tiene el esquema a nivel de módulo).
 
 ## Componentes que ya existen — no rehacer
 
@@ -70,6 +74,9 @@ Registrarlas en `src/shared/navigation/routes.ts` y en `useNavigation()`.
       "no hay datos" vs "sin resultados"
 - [ ] Botón de crear a la derecha de la barra de filtros, `w-full sm:w-auto`
 - [ ] Búsqueda con debounce de 300 ms que resetea a página 1
+- [ ] Todo texto en `TEXT` + `es.json`, nada suelto
+- [ ] `permission` en `NAVIGATION` (`app-layout.tsx`) y `RequirePermission` en la
+      pantalla si no es para todos los roles (RULES.md §7)
 - [ ] Colores por token, cero hex sueltos
 - [ ] Texto en español **con tildes** — escribir con Write o Python UTF-8,
       no con heredocs de bash
@@ -78,5 +85,5 @@ Registrarlas en `src/shared/navigation/routes.ts` y en `useNavigation()`.
 
 ## Al terminar
 
-Actualizar `.claude/STATUS.md`: mover lo hecho a Completado y ajustar el
-próximo paso.
+Actualizar `.claude/HANDOFF.md` (qué sigue) y `.claude/STATUS.md`: mover lo hecho
+a Completado y ajustar el próximo paso.

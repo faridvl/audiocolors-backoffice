@@ -2,123 +2,120 @@
 
 ## Qué es
 
-Back-office de **AudioColors** (centro auditivo, Costa Rica). Frontend
-únicamente. Alcance deliberadamente mínimo: **pacientes y sus archivos**.
+Back-office de **AudioColors** (centro auditivo, Costa Rica). Solo frontend: consume
+`standard-saas-api`, compartido con Zynka. Lo usa el personal de la clínica; no hay
+registro público y las cuentas las crea el administrador. Datos del tenant, repos
+relacionados y usuarios: ver `CLAUDE.md`.
 
-No es un portal de pacientes: lo usa el personal de la clínica, no hay registro
-público y las cuentas las crea el administrador.
+## Alcance actual (v1.0.0)
 
-## De dónde viene
+- **Pacientes:** lista con resumen y filtros, alta, edición, estado (activo, inactivo,
+  fallecido), indicadores, contactos y notas.
+- **Expediente:** datos del paciente, próxima cita (mes tentativo → día confirmado),
+  archivos adjuntos (subir, renombrar, rotar, cambiar de sección), historia clínica
+  (hoja por secciones, PDF de cambios con jsPDF en el navegador, D18) y Control de evolución.
+- **Agenda** (`/agenda`): franja semanal y pestañas en móvil; en escritorio, línea de
+  tiempo del día con arrastre (D10); calendario del iPhone (`calendar-feed`).
+- **Bitácora** (`/bitacora`): actividad de pacientes, con resumen y filtros.
+- **Configuración** (`/configuracion`): tipos de cita e historia clínica (D21, D22).
+- **Notificaciones y versiones:** bandeja con las novedades de cada versión (D23).
+- **Permisos por rol:** `OWNER`, `ADMIN`, `DOCTOR`, `STAFF` (RULES.md §7).
 
-Recorte de `next-audiology-files` (Zynka), el SaaS multi-tenant en construcción,
-para poder entregar a un cliente real sin esperar a que Zynka esté completo.
-
-| Repo | Ubicación | Rol |
-|---|---|---|
-| API | `E:\Proyectos\node\standard-saas-api` | Backend compartido |
-| Zynka | `D:\Documentos\Proyectos\React\next-audiology-files` | Origen del código |
-| Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
-| Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotos |
+Sin audiograma ni inventario.
 
 ## Stack
 
-Next.js 14 (Pages Router) · TypeScript · Tailwind · TanStack Query 5 ·
-Formik + Yup · Sonner · Fira Sans
-
-Sin audiograma ni inventario. El único PDF que se genera es la historia clínica
-editada (jsPDF en el navegador, ver D18). Citas: próxima cita por paciente
-(mes tentativo → día confirmado) y la agenda del día en `/agenda`.
+Next.js 14 (Pages Router) · React 18 · TypeScript · Tailwind 3 · TanStack Query 5 ·
+Formik + Yup · i18next · Sonner · Fira Sans · jsPDF. Detalle de las diferencias con
+los estándares globales: RULES.md §1.
 
 ## Estructura
 
 ```
 src/
-├── pages/                    rutas (en español: /pacientes)
-│   ├── _app.tsx              QueryClient + Toaster + metadatos
-│   ├── _document.tsx         favicons + fuente Fira Sans
-│   ├── index.tsx             redirige según haya sesión
-│   ├── login/
-│   ├── agenda/               semana, citas del día y por confirmar
-│   ├── bitacora/
-│   └── pacientes/
-│       ├── index.tsx         lista
-│       ├── nuevo.tsx         alta
-│       └── [uuid]/
-│           ├── index.tsx     expediente (datos + archivos)
-│           └── editar.tsx
+├── pages/                    rutas finas, en español
+│   ├── _app.tsx              QueryClient + Toaster + i18n + metadatos
+│   ├── _document.tsx         favicons, splash y fuente
+│   ├── api/site.webmanifest.ts
+│   ├── index.tsx  login/  agenda/  bitacora/
+│   ├── configuracion/        index, historia-clinica, tipos-de-cita
+│   └── pacientes/            index, nuevo, [uuid]/{index, editar}
 ├── components/
-│   ├── common/
-│   │   ├── brand/            logo, franja de colores
-│   │   ├── button/  input/  typography/
-│   │   ├── form/             FormViewSection + FormViewLabel
-│   │   ├── layout/           AppLayout (privado), SplitScreenLayout (público)
-│   │   └── table/            ResponsiveTable + Pagination
+│   ├── common/               action-menu, badge, brand, button, checkbox, color-dot,
+│   │                         drop-zone, filter-bar, filter-dropdown, form, input,
+│   │                         layout (AppLayout, SplitScreenLayout), month-grid,
+│   │                         permission (RequirePermission), pill-select,
+│   │                         segmented-control, switch, table, tabs, typography
 │   └── containers/
-│       ├── login/  documents/
-│       └── patients/         list · create · edit · detail · form · validation
+│       ├── login/  documents/  notifications/  patient-activity/
+│       ├── agenda/           móvil, desktop/, calendar-sync/
+│       ├── settings/         navegación de Configuración
+│       ├── appointment-types-settings/  clinical-history-template/
+│       └── patients/         list, create, edit, detail, contacts, flags, notes,
+│                             status, background (historia clínica),
+│                             schedule-appointment, form, validation
 ├── shared/
-│   ├── api/                  client, querys/, mutations/
-│   ├── design/tokens.ts      significado de cada token
-│   ├── navigation/routes.ts
-│   └── utils/                cookies, formatters
+│   ├── api/                  api-service-client.ts (ApiError), config.ts (URLs),
+│   │                         querys/, mutations/ (use-api-mutation.ts)
+│   ├── auth/permissions.ts   Permission y ROLE_PERMISSIONS
+│   ├── design/tokens.ts      significado de cada token y BRAND_COLORS
+│   ├── i18n/i18n.ts          inicialización de i18next
+│   ├── navigation/routes.ts  routesPrivate / routesPublic
+│   └── utils/                cookies, dates, formatters, file-name, whatsapp, calendar-feed
 ├── hocs/auth.tsx             guard de página privada
-├── hooks/                    use-session, use-logout, use-navigation
-└── types/                    auth, patients, documents, system
+├── hooks/                    use-session, use-permissions, use-navigation, use-logout…
+├── static/                   releases.ts (versiones) y texts/ (i18n.ts + es.json)
+└── types/                    por dominio: appointments, auth, branches, patients…
 ```
 
-## Patrón de componentes
+Cada feature son dos archivos: `{feature}-container.tsx` (solo JSX) y
+`use-{feature}.ts` (queries, mutations, estado, handlers). El container nunca
+importa React Query.
 
-Cada feature son dos archivos:
+## Autenticación y permisos
 
-```
-{feature}-container.tsx    solo JSX — importa el hook y renderiza
-use-{feature}.ts           queries, mutations, estado, handlers
-```
+1. `POST /auth/login` → `{ access_token, user }`.
+2. Cookies `SESSION_ACCESS_TOKEN` (7 días) y `SESSION_USER_NAME`.
+3. Cada request lleva `Authorization: Bearer <token>`.
+4. `useSession()` → `GET /auth/me` (`staleTime` 30 min).
+5. `authorizeServerSidePage()` comprueba la cookie en `getServerSideProps`. **Solo
+   comprueba que exista**: firma y expiración las valida el API.
+6. Un 401 con token presente cierra sesión y redirige a `/login?expired=true`.
+7. `usePermissions().can(...)` lee `shared/auth/permissions.ts`; debe coincidir con
+   `CLINICAL_ACCESS_ROLES` del API. En la historia clínica, un 403 (`ApiError`) oculta la tarjeta y no se reintenta.
 
-El container **nunca** importa React Query directamente.
-
-## Autenticación
-
-1. `POST /auth/login` → `{ access_token, user }`
-2. Se guarda en cookie `SESSION_ACCESS_TOKEN` (7 días) + `SESSION_USER_NAME`
-3. Cada request lleva `Authorization: Bearer <token>`
-4. `useSession()` → `GET /auth/me` (staleTime 30 min)
-5. `authorizeServerSidePage()` comprueba la cookie en `getServerSideProps`
-6. Un 401 con token presente cierra sesión y redirige a `/login?expired=true`
-
-**El guard solo comprueba que la cookie exista** — no valida firma ni
-expiración. La validación real la hace el API.
-
-## Multi-tenant
-
-AudioColors es un tenant del mismo backend que Zynka. **El aislamiento lo
-resuelve el JWT**: cada controller del API lee `tenantUuid` del token y el
-frontend nunca lo envía.
-
-| Dato | Valor |
-|---|---|
-| `tenantUuid` | `9e781ab3-f1db-4311-a9a2-ae2afb595718` |
-| `tenantId` | `12` |
-| `businessType` | `AUDIOLOGY` |
+**Multi-tenant:** el aislamiento lo resuelve el JWT; el frontend nunca envía `tenantUuid`.
 
 ## Endpoints consumidos
 
-| Método | Endpoint | Servicio |
-|---|---|---|
-| POST | `/auth/login` | Identity |
-| GET | `/auth/me` | Identity |
-| GET/POST | `/patients` | Medical Records |
-| GET/PATCH | `/patients/:uuid` | Medical Records |
-| GET/POST | `/patients/:uuid/documents` | Medical Records |
-| DELETE | `/patients/:uuid/documents/:documentUuid` | Medical Records |
+Dos servicios: Identity (`NEXT_PUBLIC_IDENTITY_API_URL`) y Medical Records
+(`NEXT_PUBLIC_MEDICAL_RECORDS_API_URL`).
 
-Disponibles pero sin usar: `POST /patients/bulk` (importación masiva, hasta 500
-con deduplicación por cédula) — quedó fuera porque la base arranca vacía.
+| Recurso | Endpoints |
+|---|---|
+| Identity | `POST /auth/login`, `GET /auth/me` |
+| Pacientes | `GET/POST /patients`, `GET/PATCH /patients/:uuid`, `PUT /patients/:uuid/status`, `PUT /patients/:uuid/flags` |
+| Contactos y notas | `GET/PUT /patients/:uuid/contacts`, `GET/POST /patients/:uuid/notes` |
+| Historia clínica del paciente | `GET/PUT /patients/:uuid/background` |
+| Próxima cita | `POST /patients/:uuid/next-appointment`, `PUT /patients/:uuid/next-appointment/tentative-month` |
+| Archivos | `GET/POST /patients/:uuid/documents`, `PATCH/DELETE /patients/:uuid/documents/:documentUuid` |
+| Citas | `GET /appointments`, `GET /appointments/months`, `PATCH /appointments/:uuid` |
+| Catálogos | `GET /branches`, `GET /appointment-types`, `PATCH /appointment-types/:uuid` |
+| Plantilla de historia clínica | `GET /clinical-templates/speciality/:speciality`, `POST /clinical-templates`, `PATCH /clinical-templates/:uuid` |
+| Bitácora | `GET /patient-activity`, `/patient-activity/actors`, `/patient-activity/summary`, `/patient-activity/months` |
+| Calendario del iPhone | `GET/POST /calendar-feed`, `PATCH /calendar-feed/calendars` |
+
+Disponible sin usar: `POST /patients/bulk` (importación masiva, hasta 500 con
+deduplicación por cédula).
+
+## React Query
+
+`staleTime` según la query: de 30 s (`appointments-query.ts`) a 30 min
+(`use-session.ts`); la mayoría, de 2 a 5 min. `patients-query.ts` y
+`calendar-feed-query.ts` no definen uno (0) y el `QueryClient` de `_app.tsx` no
+tiene default (solo `refetchOnWindowFocus: false` y `retry: 1`).
 
 ## Almacenamiento de archivos
 
-Cloudflare R2, **ya configurado y operativo** en el entorno del API. Los
-archivos quedan en URLs públicas del tipo
-`https://pub-<id>.r2.dev/medical_records/<tenant>/<patient>/documentos/<archivo>`.
-
-Límite 20 MB por archivo; solo imágenes y PDF.
+Cloudflare R2, operado por el API. Límite 20 MB por archivo; solo imágenes y PDF. El
+upload va por `fetch` directo (con `FormData` el navegador fija el `Content-Type`).

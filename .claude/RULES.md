@@ -1,97 +1,59 @@
 # RULES.md
 
-Reglas duras del proyecto. Cada una existe porque se rompió algo concreto —
-en Zynka, en este repo, o durante la sesión que lo creó. No son preferencias
-de estilo: romperlas reintroduce un defecto que ya se pagó.
+Reglas duras de **este** repo. Orden: RULES.md manda sobre las skills `estandares-*`.
+El código existente no es regla: si difiere de una skill y no está en §1, se
+pregunta al usuario y, si lo confirma, se anota en §1. Lo que una skill ya dice
+igual no se repite: se remite a ella.
 
 ---
 
-## 1. Colores
+## 1. Dónde este repo difiere de los estándares
 
-### 1.1 Ningún hex suelto en el JSX
+No aplicar el estándar global a ciegas. Aquí:
 
-```tsx
-// ❌ NUNCA
-<div className="bg-[#1f6fb1]">
-<span style={{ color: '#e3211e' }}>
-
-// ✅ SIEMPRE
-<div className="bg-brand">
-<span className="text-danger">
-```
-
-**Por qué:** Zynka terminó con **dos paletas rivales** — `#2563EB` declarado en
-tokens y `#1E3A8A` / `#0B3C5D` / `#14B8A6` escritos a mano en ~60 sitios, uno de
-ellos dentro del componente `Button` base. Re-brandear exigía cazarlos a mano.
-
-**Excepción única:** `rainbow-stripe.tsx`, que pinta los 6 colores de marca desde
-`BRAND_COLORS`. Son datos de identidad, no decisiones de interfaz.
-
-**Verificación:**
-```bash
-grep -rEo "(bg|text|border)-\[#[0-9a-fA-F]{3,8}\]" src/ | wc -l   # debe dar 0
-```
-
-### 1.2 Los colores de marca se miden, no se estiman
-
-Los seis colores del logo son los del manual de marca oficial (`PALETA DE
-COLORES`). Una primera versión los estimó contando píxeles del JPEG original y
-los seis quedaron ligeramente distintos.
-
-Viven en `src/shared/design/tokens.ts` → `BRAND_COLORS`. Si hace falta uno nuevo,
-se mide del archivo de marca; no se inventa.
-
-### 1.3 Un solo acento
-
-`brand` (azul `#1f6fb1`, la R del logo) es el **único** color de acento: acción
-primaria, estado activo y foco. Los grises son `ink`, **neutros sin tinte azul** —
-un chrome azulado compite con un logo multicolor.
-
-`success` es teal (`#0d9488`), no verde, para no confundirse con la marca.
+| Estándar global | Este repo |
+|---|---|
+| Next 16 App Router, `src/app/` | **Next 14 Pages Router**, `src/pages/` (rutas en español: `/pacientes`); React 18 |
+| Tailwind 4, tokens en `@theme` de `globals.css` | **Tailwind 3**, tokens en `tailwind.config.js` + `src/shared/design/tokens.ts` |
+| react-hook-form + Zod | **Formik + Yup** (`useFormik`, esquemas `Yup`) |
+| npm, `npm run` | **yarn** |
+| ESLint 9 / TypeScript 7 nativo | ESLint 8 vía `next lint`; TypeScript 5 con `tsc --noEmit` |
+| `lint` + `typecheck` + `build` al cerrar | **Sin `next build`** para validar: solo `yarn lint && yarn typecheck` |
+| Route Handler → Service → Repository → Drizzle/Neon, `AppError`, `withErrorHandling` | **Solo frontend** que consume `standard-saas-api`: no hay capa de servidor propia ni base de datos aquí. Ver §6 |
+| Cloudflare Workers + OpenNext, R2 | Vercel (pendiente, P0-2); los archivos viven en el R2 del API |
+| `middleware.ts`, `shared/config/server-env.ts` | Guard por página con `getServerSideProps` (§5) y `NEXT_PUBLIC_*` |
+| Estructura de `src/` con `app/` | Igual en `components/` y `shared/`, pero con `src/pages/`, `src/hocs/auth.tsx` y `src/hooks/` (ver ARCHITECTURE.md) |
+| React Query: `staleTime` 5 min | TanStack Query 5; `staleTime` según la query, de 30 s (`appointments-query.ts`) a 30 min (`use-session.ts`); `patients-query.ts` y `calendar-feed-query.ts` no definen uno (0) y el `QueryClient` de `_app.tsx` no tiene default (solo `refetchOnWindowFocus: false` y `retry: 1`) |
+| Debounce de búsqueda 400 ms | **300 ms** (`use-patient-activity.ts`, `use-patient-picker.ts`) |
+| Teléfonos con `PhoneField`, `+506 8888-7777`, solo dígitos con código de país | Sin `PhoneField`. `patient.phone` se guarda como `+506 XXXX-XXXX` (`COUNTRY_PREFIX` en `patient-validation.ts`) y los contactos como `XXXX-XXXX` (`formatPhone`, `resolveContactsForSave`); en edición se aceptan números extranjeros. No cambiar el formato del dato: lo comparte Zynka |
+| Fechas: DB en UTC, negocio en `America/Costa_Rica`, `timeZone` al formatear | Hora local del navegador (`src/shared/utils/dates.ts`, `CLINIC_LOCALE = 'es-CR'`), sin `timeZone` al formatear; solo la bitácora manda el `timeZone` del navegador al API |
+| Dato vacío: "Sin registrar" | `EMPTY_VALUE = '—'` (`src/shared/utils/formatters.ts`) en la agenda y otras vistas compactas; "Sin registrar" solo en `FormViewSection`. Pendiente de decisión del usuario |
 
 ---
 
-## 2. Marca y assets
+## 2. Colores y marca
 
-### 2.1 El logo sale de los vectores, no de un JPEG
+Ver skill `estandares-frontend` (Colores y UI): sin hex en el JSX, solo tokens;
+`brand` único acento; `ink` neutros; variantes por enum.
 
-El manual de marca (`AUDIOCOLORS LOGO Y VARIANTES.ai`) tiene 24 variantes
-vectoriales y se lee con **PyMuPDF** (`import fitz`), que está disponible en el
-entorno. Un JPEG reescalado se ve blando; el vector no.
-
-Al convertir a PNG con transparencia: **renderizar sin alfa sobre fondo opaco y
-derivar el alfa de la distancia al fondo.** Renderizar con alfa directamente
-produce píxeles de color basura (`rgb(0,255,0)` con alfa 1-4) que ensucian los
-bordes y dan aspecto lavado.
-
-### 2.2 Dos archivos, no un filtro CSS
-
-Fondo claro → `logo-audiocolors.png` ("audio" gris).
-Fondo oscuro → `logo-audiocolors-dark.png` ("audio" blanco).
-
-Nunca `brightness-0 invert`: aplana también las letras de color y mata la marca.
-
-### 2.3 El favicon es un símbolo, no el logo entero
-
-El logo completo a 32px es una mancha ilegible. El favicon usa **solo la oreja**,
-sin los puntos de color (a ese tamaño son ruido) y con **fondo transparente**.
-
-### 2.4 Al logo se le pasa la altura, nunca el ancho
-
-```tsx
-<BrandLogo height={40} />           // ✅ el ancho sale de la proporción 2.49:1
-<BrandLogo className="h-11 w-32" /> // ❌ deforma o recorta
-```
-
-**Por qué:** fijar ambos a mano cortó la "S" del logo en el sidebar.
+- Los tokens viven en `tailwind.config.js` y se documentan en `src/shared/design/tokens.ts`.
+- **Excepción única:** `rainbow-stripe.tsx`, que pinta los 6 colores de marca desde
+  `BRAND_COLORS`. Son datos de identidad, no decisiones de interfaz.
+- **Por qué:** Zynka llegó a tener dos paletas rivales: ~60 hex escritos a mano,
+  uno dentro del componente `Button`, y re-brandear exigía cazarlos.
+- **Verificación:**
+  ```bash
+  grep -rEo "(bg|text|border)-\[#[0-9a-fA-F]{3,8}\]" src/ | wc -l   # debe dar 0
+  ```
+- **Logo:** dos archivos (no `brightness-0 invert`) y a `BrandLogo` solo se le pasa
+  la altura; detalle en `BRAND.md`.
+- **Antes de tocar logo, favicon o colores de marca, leer `BRAND.md`.**
 
 ---
 
 ## 3. Layout y navegación
 
 ### 3.1 Las acciones de un registro van en el header
-
-Patrón de un back-office de referencia, verificado en producción:
 
 | Contexto | Dónde |
 |---|---|
@@ -102,8 +64,9 @@ Patrón de un back-office de referencia, verificado en producción:
 **Por qué:** un enlace "volver" gasta una fila entera del contenido, y en móvil
 los botones dentro de una tarjeta compiten por el ancho con los datos.
 
-Regla para el número de acciones: *1 en desktop → botón visible; más de
-1, o móvil → menú de tres puntos*.
+Número de acciones: *1 en desktop → botón visible; más de 1, o móvil → menú de
+tres puntos*. (Excepción vigente: las acciones frecuentes del paciente van a la
+vista, D17.)
 
 ### 3.2 El título del header es el nombre del registro
 
@@ -111,192 +74,88 @@ En una página de detalle, el header muestra el nombre del paciente y "Expedient
 como subtítulo. Hace de rastro de navegación y evita repetir el nombre dentro del
 contenido.
 
-### 3.3 Nada de scroll horizontal en tablas
-
-En móvil, `ResponsiveTable` renderiza **tarjetas de pares etiqueta/valor**. Una
-tabla de 5 columnas en un teléfono es ilegible y el scroll lateral esconde justo
-la columna que se necesita.
-
-### 3.4 Lo importante arriba
+### 3.3 Lo importante arriba
 
 En el expediente, la tarjeta del paciente va en tres franjas: quién es (nombre,
 cédula, edad), lo de uso diario (próxima cita y contactos) y al pie nacimiento y
 sede. Todo visible siempre, sin "ver más". Correo, dirección y fecha de registro
 no se muestran (ver D11). El azul queda solo para las acciones.
 
----
+### 3.4 Tablas y listas
 
-## 4. Estados de interfaz
-
-### 4.1 Cuatro estados, siempre
-
-Toda lista resuelve: **cargando · error · vacío-sin-datos · vacío-por-filtros**.
-`ResponsiveTable` los implementa; no se reimplementan por pantalla.
-
-### 4.2 "No hay datos" y "los filtros no arrojan nada" son distintos
-
-Mensajes distintos, y **solo el primero ofrece el botón de crear**. Ofrecer
-"Nuevo paciente" cuando la búsqueda no encontró nada confunde.
-
-### 4.3 Un campo vacío nunca se deja en blanco
-
-"Sin registrar" en gris. Un hueco sin marca se confunde con un error de carga.
+Ver skill `estandares-frontend`: sin scroll horizontal (tablas → tarjetas) y los
+cuatro estados de lista, donde solo el vacío ofrece "crear". Aquí los resuelve
+`ResponsiveTable` (pasar `hasActiveFilters`); no se reimplementan por pantalla.
 
 ---
 
-## 5. Texto
+## 4. Texto e i18n
 
-### 5.1 Español con tildes y ñ
+Ver skill `estandares-frontend` (i18n y Colores y UI): todo texto visible sale de
+i18n con tildes y ñ, orden de búsqueda de keys (`TEXT.GENERAL` primero), plurales,
+`Typography` para tamaño y peso, "Sin registrar" en datos vacíos, y escribir
+texto con Write o Python UTF-8, no heredocs. En este repo:
 
-`años`, no `anios`. `Cédula`, `Teléfono`, `sesión`, `contraseña`.
-
-**Por qué:** al escribir archivos con heredocs de shell se evitaron los acentos y
-llegaron al texto visible. Hubo que corregir ~20 archivos después.
-
-**Al escribir texto visible en español, usar la herramienta Write o un script
-Python con `encoding='utf-8'`, no heredocs de bash.**
-
-### 5.2 i18n con `i18next` + `es.json`, patrón de Zynka
-
-**Decisión revertida (2026-09-16):** este proyecto declaraba "sin i18n,
-mono-idioma" — se revierte. Los textos hoy están hardcodeados directo en el
-JSX (~17 de 29 archivos `.tsx`); hay que migrar al mismo patrón que usa Zynka
-(`next-audiology-files`), que es la base de este repo y de magastore:
-
-- `i18next` + `react-i18next`, inicializado por *side-effect import* en
-  `_app.tsx` (`import '@/shared/i18n/i18n';`), sin `I18nextProvider` explícito.
-- Keys tipadas en `src/static/texts/i18n.ts` — `export const TEXT = {...} as const`,
-  anidado por módulo (`PATIENTS.LIST.COLUMNS.NAME`, `AUTH.LOGIN.TITLE`, etc.).
-- Traducciones en `src/static/texts/es.json`, JSON anidado espejo de `TEXT`.
-- Uso: `const { t } = useTranslation()` en el componente, `t(TEXT.MODULO.CLAVE)`.
-  Interpolación con `{{variable}}` en el JSON y segundo argumento de `t()`
-  (ej. `t(TEXT.PATIENTS.DETAIL.COUNT, { count })`).
-
-**Ojo:** magastore-backoffice tiene esta infraestructura instalada pero con
-**0% de uso real** (es una copia sin terminar del setup de Zynka, incluso su
-`es.json` dice `"business.name": "Zynka"`). La referencia de patrón *en uso*
-real es Zynka (~30% de cobertura), no magastore.
-
-Implementado (2026-09-24): `src/shared/i18n/i18n.ts` + `src/static/texts/`.
-Migración pantalla por pantalla, no de una vez — cada vez que se toca una
-pantalla se migran sus textos sueltos.
-
-### 5.3 Antes de agregar una key nueva a i18n
-
-1. Buscar si el texto ya existe en `TEXT.GENERAL` (botones, paginación,
-   mensajes de validación comunes tipo "Requerido", "Correo inválido").
-2. Si existe, reutilizar esa key — no crear una nueva con el mismo valor.
-3. Si el texto es genérico pero no está todavía (ej. "Reintentar",
-   "Guardando..."), agregarlo a `GENERAL` en vez de duplicarlo por módulo.
-4. Si es específico de una pantalla (un subtítulo, un placeholder con
-   contexto propio), va bajo su módulo (`AUTH.LOGIN`, `PATIENTS.LIST`).
-
-### 5.4 Siempre `t()` del hook — nunca `i18n.t()` importado directo
-
-```tsx
-// ✅ En un componente
-const { t } = useTranslation();
-<title>{t(TEXT.AUTH.LOGIN.PAGE_TITLE)}</title>
-
-// ✅ Schema de Yup usado por un solo hook — se arma DENTRO del hook con
-// useMemo para tener acceso a t(), no como constante de módulo
-export function useLogin() {
-  const { t } = useTranslation();
-  const loginValidationSchema = useMemo(
-    () => Yup.object({ email: Yup.string().required(t(TEXT.AUTH.LOGIN.VALIDATION.EMAIL_REQUIRED)) }),
-    [t],
-  );
-  return { loginValidationSchema, /* ... */ };
-}
-
-// ✅ Schema compartido por varios hooks (ej. patient-validation.ts, usado por
-// create Y edit) — se exporta una función factory que recibe `t`, cada hook
-// la llama dentro de su propio useMemo
-export function buildPatientCreateSchema(t: TFunction) {
-  return Yup.object({
-    firstName: Yup.string().required(t(TEXT.PATIENTS.VALIDATION.FIRST_NAME_REQUIRED)),
-  });
-}
-// en el hook: const schema = useMemo(() => buildPatientCreateSchema(t), [t]);
-
-// ❌ NUNCA import i18n from '@/shared/i18n/i18n' + i18n.t(...) para evitar
-// pasar por el hook — ni a nivel de módulo ni dentro de un componente
-// ❌ NUNCA un schema armado a nivel de módulo con t() de un useTranslation()
-// capturado fuera de cualquier función (no compila / no tiene t disponible)
-```
-
-**Por qué:** `i18n.t()` importado directo esquiva el ciclo de vida de React
-(no se recalcula si cambia el idioma, no reporta como dependencia de hooks).
-Un schema de validación a nivel de módulo no tiene acceso a `t()` porque
-`useTranslation()` es un hook — la solución nunca es importar `i18n` directo,
-sino mover el schema dentro del hook que lo usa (`useMemo`) o, si lo comparten
-varios hooks, exportarlo como función factory que recibe `t` como parámetro.
-
-### 5.5 El texto sale de la variante tipográfica
-
-```tsx
-<Typography variant={TypographyVariant.HEADER}>        // ✅
-<Typography className="text-2xl font-bold">            // ❌
-<h1 className="text-2xl font-bold">                    // ❌
-```
-
-Las 9 variantes ya traen su salto responsive. Pasar tamaños por `className`
-rompe la escala.
+- **"Sin registrar" en gris (`ink`):** un hueco sin marca se confunde con un error
+  de carga.
+- `i18next` + `react-i18next`, inicializado por *side-effect import* en `_app.tsx`
+  (`import '@/shared/i18n/i18n';`), sin `I18nextProvider`. Hay un único idioma
+  (`src/static/texts/es.json`, con `TEXT` en `src/static/texts/i18n.ts`); no existe
+  `i18n-config.ts` ni `getT()` de servidor.
+- Interpolación con `{{variable}}` en el JSON y segundo argumento de `t()`
+  (`t(TEXT.PATIENTS.DETAIL.COUNT, { count })`).
+- **Esquemas Yup, no Zod:** se arman con `t`, dentro del hook con `useMemo` o como
+  factory que recibe `t` (ejemplo: `buildClinicalTemplateSchema(t)` en
+  `src/components/containers/clinical-history-template/clinical-template-form.ts`).
+  Nunca `i18n.t()` importado directo ni un esquema a nivel de módulo con `t()`:
+  `i18n.t()` importado se salta el ciclo de vida de React y no re-renderiza.
+  `patient-validation.ts` todavía tiene el esquema a nivel de módulo (pendiente P1-5).
+- Migración pantalla por pantalla: cada pantalla que se toca migra sus textos
+  sueltos (pendiente P1-5: lista, formulario y validación de pacientes).
+- Las 9 variantes de `Typography` ya traen su salto responsive: nunca tamaños por
+  `className` ni `<h1 className="text-2xl ...">`.
 
 ---
 
-## 6. Código
+## 5. Código
 
-1. **Container + hook.** `{feature}-container.tsx` solo renderiza;
-   `use-{feature}.ts` tiene queries, mutations, estado y handlers. El container
-   nunca importa React Query.
-2. **Sin `any`.** Tipo en `src/types/` y pasarlo como genérico. `unknown` +
-   narrowing si la forma es incierta.
-3. **Enums para valores discretos**, no uniones de strings literales.
-4. **`isLoading`**, nunca `loading`.
-5. **Sin abreviaciones**: `patient` no `p`, `error` no `err`.
-6. **Guard en toda página privada:**
+Ver skill `estandares-frontend` (Código): container + hook (el container nunca
+importa React Query), sin `any`, enums, `isLoading`, sin abreviaciones, nada
+quemado, errores de red → toast desde el hook (listas y detalle ofrecen
+"Reintentar"), componentes genéricos antes que etiquetas sueltas. Además, aquí:
+
+1. **Guard en toda página privada:**
    `export const getServerSideProps = authorizeServerSidePage();`
-7. **Navegación** por `useNavigation()` o `<Link href={routesPrivate...}>`.
-8. **Errores de red → toast desde el hook**, no pantalla de error. Excepción:
-   listas y detalle, que ofrecen "Reintentar".
-9. **Nada quemado.** Ni números mágicos ni strings sueltos: valores discretos
-   en enums, parámetros (horas, duraciones, límites, opacidades, locale) en
-   constantes con nombre, texto visible en i18n. Un `'es-CR'`, un `30` o un
-   `'1a'` en medio del código no dicen qué son ni dónde cambiarlos.
-10. **Lo reutilizable va a `utils` o a un helper.** Fechas, formatos y cálculos
-    genéricos → `src/shared/utils/`. Tokens de estilo (colores, opacidad,
-    franjas) → `src/shared/design/tokens.ts`. Mapas de estilo de un módulo
-    (`Record<Enum, string>`) → un archivo `{modulo}-styles.ts`, no dentro de
-    un componente ni de un hook.
-11. **Componentes, no archivos largos.** Un componente por archivo; el
-    container solo compone. Si un bloque de JSX tiene nombre propio (una
-    lista, una ficha, una fila), es un componente.
-12. **Componentes genéricos antes que etiquetas sueltas.** Texto con
-    `Typography`, acciones con `Button` (hay variante `CARD` para filas
-    clicables), píldoras con `Badge`/`BranchBadge`, puntos de color con
-    `ColorDot`. Un `<span>` o `<button>` con clases a mano repite estilos que
-    ya existen y se desalinea del resto. Si falta el genérico, se crea en
-    `src/components/common/`.
-
-13. **El estado del paciente es `status`, nunca `isActive`.** Las consultas de
-    pacientes van con `PatientStatusFilter.ALL` (como el listado) y filtran por
-    `filters.status`; ninguna pantalla muestra ni filtra por `isActive`, que es
-    el borrado lógico viejo. Mezclarlos escondía de la agenda a pacientes que
-    el resto de la app mostraba como activos (ver `DECISIONS.md`, 2026-10-04).
-
-**Por qué 9-12:** pedido explícito al construir la agenda de escritorio
-(2026-09-29): el mismo color de sede con `'1a'` estaba copiado en tres
-pantallas y el container de la agenda llegó a casi 600 líneas.
+2. **Navegación** por `useNavigation()` o `<Link href={routesPrivate...}>`.
+3. **Lo reutilizable va a `utils` o a un helper.** Fechas, formatos y cálculos
+   genéricos → `src/shared/utils/`. Tokens de estilo (colores, opacidad,
+   franjas) → `src/shared/design/tokens.ts`. Mapas de estilo de un módulo
+   (`Record<Enum, string>`) → un archivo `{modulo}-styles.ts`, no dentro de un
+   componente ni de un hook.
+4. **Componentes, no archivos largos.** Si un bloque de JSX tiene nombre propio
+   (una lista, una ficha, una fila), es un componente. Un componente por archivo; el
+   container solo compone. El container de la agenda
+   llegó a casi 600 líneas antes de separarlo.
+5. **Genéricos propios:** `Button` (variante `CARD` para filas clicables),
+   `Badge`/`BranchBadge` para píldoras, `ColorDot` para puntos de color. Un
+   `<span>` o `<button>` con clases a mano se desalinea del resto; si falta el
+   genérico, se crea en `src/components/common/`.
+6. **El estado del paciente es `status`, nunca `isActive`.** Las consultas de
+   pacientes van con `PatientStatusFilter.ALL` (como el listado) y filtran por
+   `filters.status`; ninguna pantalla muestra ni filtra por `isActive`, que es
+   el borrado lógico viejo. Mezclarlos escondía de la agenda a pacientes que
+   el resto de la app mostraba como activos (ver `DECISIONS.md`, 2026-10-04).
+7. **Sin `any`:** el tipo va en `src/types/` y se pasa como genérico; `unknown` +
+   narrowing si la forma es incierta.
 
 ---
 
-## 7. El API
+## 6. El API
 
 Este frontend consume `standard-saas-api`. Cuando una funcionalidad lo necesita,
 el API se cambia en su propia rama con PR a `develop`, igual que el front; las
 migraciones a producción las aplica la acción `[Release] Production` al
-mergear a `main`.
+mergear a `main` (D24).
 
 ### Comportamientos verificados del API
 
@@ -316,7 +175,7 @@ mergear a `main`.
 
 ---
 
-## 9. Roles y permisos
+## 7. Roles y permisos
 
 Pensado para varias clínicas (multi-tenant): cada usuario tiene un rol y lo que
 ve sale de ese rol, nunca del nombre de la clínica.
@@ -334,13 +193,13 @@ ve sale de ese rol, nunca del nombre de la clínica.
 - Una pantalla entera va dentro de `RequirePermission`; un bloque del expediente
   se renderiza solo con el permiso, para que ni siquiera pida sus datos.
 - Una entrada del menú lateral lleva `permission` y se oculta sin él.
-- **El API valida lo mismo** (`CLINICAL_ACCESS_ROLES` en medical-records): ocultar
-  en pantalla no protege datos clínicos (Ley 8968). Un permiso nuevo se agrega
-  en los dos lados.
+- **`permissions.ts` debe coincidir con `CLINICAL_ACCESS_ROLES` del API**
+  (medical-records): ocultar en pantalla no protege datos clínicos (Ley 8968). Un
+  permiso nuevo se agrega en los dos lados.
 
 ---
 
-## 10. Versiones y notificaciones de novedades
+## 8. Versiones y notificaciones de novedades
 
 Cada salida a producción (PR de `develop` a `main`) es una **versión** y llega a
 la clínica como una notificación en la bandeja del menú del usuario.
@@ -357,13 +216,14 @@ Todo el proceso está en la skill `nueva-version`.
 4. Al mergear a main, `[Release] Etiqueta de versión` marca el commit con `vX.Y.Z`.
 
 **Cómo se escriben:** pensadas para el personal de la clínica, no para
-desarrolladores. Tono sobrio de sistema médico: "Tema: descripción", sin emojis. Generales, sin detalle técnico ni de cómo funciona por dentro
-("Una hoja nueva para la primera visita del paciente", no "guarda la copia de las
-preguntas en templateSnapshot"). Pocas palabras por cambio.
+desarrolladores. Tono sobrio de sistema médico: "Tema: descripción", sin emojis.
+Generales, sin detalle técnico ni de cómo funciona por dentro ("Una hoja nueva
+para la primera visita del paciente", no "guarda la copia de las preguntas en
+templateSnapshot"). Pocas palabras por cambio.
 
 ---
 
-## 8. Antes de cada commit
+## 9. Antes de cada commit
 
 ```bash
 yarn lint && yarn typecheck

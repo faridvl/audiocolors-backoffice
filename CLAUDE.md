@@ -1,68 +1,42 @@
 # CLAUDE.md
 
-Guía para Claude Code en este repositorio. Este archivo es un índice — el
-contenido detallado vive en los módulos de abajo, cargados automáticamente
-vía `@import`. Se edita ahí, no acá, para mantener las responsabilidades
-separadas.
+**AudioColors · Gestión Clínica**: back-office de una clínica auditiva en Costa
+Rica, solo frontend (consume `standard-saas-api`). Lo usa el personal; no hay
+registro público. Recorte de Zynka (`next-audiology-files`).
 
-## Reglas permanentes (siempre activas)
-
+@.claude/HANDOFF.md
 @.claude/RULES.md
-@.claude/STATUS.md
 @.claude/ARCHITECTURE.md
-@.claude/DECISIONS.md
-@.claude/BRAND.md
-
-Sin esto no se sabe qué está decidido, qué está roto ni por qué el código
-está como está.
-
-## Qué es esto
-
-**AudioColors · Gestión Clínica** — back-office de una clínica auditiva en Costa
-Rica. Frontend únicamente. Alcance mínimo a propósito: **pacientes y sus
-archivos adjuntos**.
-
-No es un portal de pacientes: lo usa el personal de la clínica, no hay registro
-público y las cuentas las crea el administrador.
-
-Nació como recorte de `next-audiology-files` (Zynka, el SaaS multi-tenant en
-construcción) para entregar a un cliente real sin esperar a que Zynka esté
-completo.
 
 ## Las tres reglas que más se rompen
 
-1. **Todo texto visible sale de i18n.** `t(TEXT.MODULO.CLAVE)` con su espejo en
-   `es.json`; nunca un string en el JSX (RULES.md §5.2).
-2. **Colores por token, nunca hex suelto.** `bg-brand`, no `bg-[#66ae36]`.
-3. **Español con tildes.** `años`, no `anios`. Al escribir texto visible usa la
-   herramienta Write o Python con UTF-8, no heredocs de bash.
+1. **Todo texto visible sale de i18n:** `t(TEXT.MODULO.CLAVE)` con su espejo en `es.json`.
+2. **Colores por token, nunca hex suelto:** `bg-brand`, no `bg-[#1f6fb1]`.
+3. **Español con tildes.** Escribir con Write o Python UTF-8, no heredocs de bash.
 
 ## Comandos
+`yarn dev` (:3000 fijo, el CORS del API lo exige) · `yarn lint` · `yarn typecheck`
+· `yarn release:bump X.Y.Z` (antes de un PR a main) · `yarn release:check`.
+Antes de cada commit: `yarn lint && yarn typecheck`. **No** correr `next build`.
 
-```bash
-yarn dev         # servidor en :3000
-yarn lint        # ESLint
-yarn typecheck   # tsc --noEmit
-yarn release:bump X.Y.Z   # antes de un PR a main (RULES.md §10)
-yarn release:check        # versión mayor que main y con sus novedades
-```
-
-Antes de cada commit: `yarn lint && yarn typecheck` limpios.
-**No** correr `next build` para validar cambios.
+## Leer a pedido
+| Archivo | Cuándo |
+|---|---|
+| `.claude/DECISIONS.md` | Antes de cambiar algo ya decidido (D1–D25) |
+| `.claude/STATUS.md` | Para ver fases, pendientes y datos del entorno |
+| `.claude/BRAND.md` | Antes de tocar logo, favicon, colores de marca o assets |
+| `docs/ALTA-TENANT.md` | Al dar de alta una clínica o sus usuarios |
+| `docs/AMBIENTE-LOCAL.md` | Para levantar API y bases en local |
+| `docs/OVERVIEW.md` | Para una vista general de todo el proyecto |
+| `docs/novedades/HISTORIAL.md` | Al preparar novedades: qué commits cubre cada entrega (solo local, no versionado) |
 
 ## Tenant
-
-`tenantUuid` `9e781ab3-f1db-4311-a9a2-ae2afb595718` · `tenantId` `12` ·
-`businessType` `AUDIOLOGY`
-
-Usuarios (contraseñas temporales, cambiar antes de entregar):
-`admin@audiocolors.com` (OWNER) · `maria@audiocolors.com` (ADMIN)
-
-Alta de tenant y usuarios: [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md).
-Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB.
+`tenantUuid` `9e781ab3-f1db-4311-a9a2-ae2afb595718` · `tenantId` `12` · `businessType` `AUDIOLOGY`.
+Usuarios: `admin@audiocolors.com` (OWNER) · `maria@audiocolors.com` (ADMIN). Contraseña
+temporal: la tiene el usuario; P0-1 cambiarla antes de entregar. Nunca insertar usuarios
+directo en la DB (bcrypt): ver `docs/ALTA-TENANT.md`.
 
 ## Repos relacionados
-
 | Repo | Ubicación | Rol |
 |---|---|---|
 | API | `E:\Proyectos\node\standard-saas-api` | Backend compartido |
@@ -70,23 +44,15 @@ Las contraseñas van con bcrypt — **nunca** insertar usuarios directo en la DB
 | Landing | `D:\Documentos\Proyectos\React\landing-audiocolors` | Identidad visual |
 | Marca | `D:\Documentos\audio colors\docs audio colors` | Manual `.ai`, fotografía |
 
-## Agentes y skills
-
-| Nombre | Para qué |
-|---|---|
-| `brand-assets` | Regenerar logo, favicon o variantes desde el manual vectorial |
-| `ui-audit` | Auditar la interfaz contra las reglas antes de un push |
-| `nueva-seccion` | Añadir un CRUD completo siguiendo los patrones del proyecto |
-| `novedades` | Imagen de "Novedades" para el cliente con los cambios de una entrega, y su registro en `docs/novedades/HISTORIAL.md` (qué commits cubre cada entrega, para no mezclarlas) |
-| `nueva-version` | Antes del PR a main: bump, borrador del changelog de Notificaciones para que el usuario lo apruebe, cargarlo y abrir el PR |
-| `commit` | Redactar el mensaje de commit (qué se hizo / qué se probó). Skill de usuario, no vive en este repo — aplica en cualquier proyecto de la cuenta |
-
-No dupliques como skill algo que ya resuelve un comando o un agente existente
-en la cuenta — evita mecanismos redundantes para la misma tarea.
+## Agentes y skills del repo
+`brand-assets` (regenerar logo, favicon o variantes desde el manual vectorial) ·
+`ui-audit` (auditar la UI contra las reglas antes de un push) · `nueva-seccion` (CRUD
+completo con los patrones del repo) · `novedades` (solo local, no versionado: imagen de novedades para el
+cliente y su registro en `HISTORIAL.md`) · `nueva-version` (bump, changelog aprobado por el usuario y PR
+a main). `commit` es skill global de la cuenta. No duplicar como skill algo que ya resuelve
+un comando o un agente de la cuenta.
 
 ## Al cerrar una etapa
-
-1. Actualizar `.claude/STATUS.md` — mover lo hecho a Completado, ajustar el
-   próximo paso.
-2. Si se tomó una decisión que alguien podría querer revertir sin contexto,
-   anotarla en `.claude/DECISIONS.md`.
+Actualizar `.claude/HANDOFF.md` (qué sigue, preguntas abiertas), `.claude/STATUS.md`
+(mover lo hecho a Completado) y, si se tomó una decisión que alguien podría querer
+revertir sin contexto, `.claude/DECISIONS.md`.

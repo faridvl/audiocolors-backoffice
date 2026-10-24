@@ -69,9 +69,7 @@ Roles disponibles: `OWNER`, `ADMIN`, `DOCTOR`, `STAFF`. El usuario hereda el ten
 | OWNER | Matthew Arias Mena | `admin@audiocolors.com` |
 | ADMIN | Maria Duran Arias | `maria@audiocolors.com` |
 
-Ambos con contraseña temporal `Password1`.
-
-**Pendiente antes de entregar a la clínica:** cambiar ambas contraseñas por unas reales. Se hace con `PATCH /users/:uuid` enviando `password`.
+**Pendiente antes de entregar a la clínica (P0-1):** la tiene el usuario; P0-1 cambiarla antes de entregar, en ambas cuentas. Se hace con `PATCH /users/:uuid` enviando `password`.
 
 ---
 

@@ -2,7 +2,7 @@
 
 > Documento vivo. Actualizar al cierre de cada etapa, antes de `git push`.
 
-**Última actualización:** 2026-10-20 · **Branch:** `feature/ajustes-expediente`
+**Última actualización:** 2026-10-24 · **Branch:** `develop` · **Versión:** 1.0.0
 
 ---
 
@@ -37,8 +37,8 @@ Defectos de Zynka corregidos al portar:
 - Color primario hardcodeado dentro del componente `Button`
 
 ### Etapa 2 — Identidad
-Colores **medidos** del logo (los seis estimados estaban mal). Verde `#66ae36`
-como acento, grises neutros, interfaz clara. Logo extraído de los vectores del
+Colores **medidos** del logo (los seis estimados estaban mal). Acento verde `#66ae36`
+(hoy azul `#1f6fb1`, ver D7), grises neutros, interfaz clara. Logo extraído de los vectores del
 manual de marca. Favicon: la oreja sola.
 
 ### Etapa 3 — Estándares de UI
@@ -93,6 +93,17 @@ Cambios en el API: `feature/editar-tipo-cita` (ya en `develop`) y
 antes de mergear). Probado de punta a punta con el API y una base Postgres
 locales.
 
+### Etapa 8 — Versión 1.0.0
+Publicada el 2026-10-23 (back-office #24, API #16): historia clínica, Configuración,
+agenda por horario, permisos por rol y bandeja de notificaciones/novedades por
+versión (`yarn release:bump` / `release:check`). `develop` y `main` quedan iguales.
+El detalle de cada cambio y los commits que cubre están en
+`docs/novedades/HISTORIAL.md` (solo local, no versionado).
+
+### Migración a i18n (antes P1-4)
+`i18next` + `react-i18next` instalados, `src/shared/i18n/i18n.ts` y
+`src/static/texts/` (`TEXT` + `es.json`) en uso. Queda el resto de pacientes (P1-5).
+
 ---
 
 ## 📋 Pendientes
@@ -100,7 +111,7 @@ locales.
 ### 🔴 Antes de entregar
 | # | Tarea | Notas |
 |---|---|---|
-| P0-1 | **Cambiar las contraseñas temporales** | Ambos usuarios tienen `Password1`. `PATCH /users/:uuid` con `password` |
+| P0-1 | **Cambiar las contraseñas temporales** | La tiene el usuario; P0-1 cambiarla antes de entregar. **Urgente:** ya está en el historial de un repo público; cambiarla cuanto antes. `PATCH /users/:uuid` con `password` |
 | P0-2 | **Desplegar** | Ver "Próximo paso" |
 | P0-3 | **Duración de los tipos de cita en producción** | Al pasar a producción, revisar en Configuración → Tipos de cita: Cita 60 min, Control y Mantenimiento 30, y Control marcado como control |
 
@@ -111,7 +122,6 @@ locales.
 | P1-2 | Limpiar el paciente inactivo huérfano | Requiere acceso a DB: el API no permite reactivar ni borrar del todo (ver D9) |
 | P1-3 | Paginación real del filtro "Inactivos" | Hoy filtra en cliente y su conteo no es exacto. Requiere cambio en el API |
 | P1-5 | Migrar a i18n el resto del módulo de pacientes | Lista (`patient-list-container`, `use-patient-list`), formulario y mensajes de `patient-validation` siguen con texto suelto |
-| P1-4 | **Migrar a i18n** (`i18next` + `es.json`, patrón de Zynka) | Revierte la regla anterior de "sin i18n" — ver RULES.md §5.2. Instalar `i18next`/`react-i18next`, crear `src/shared/i18n/i18n.ts` + `src/static/texts/i18n.ts` (`TEXT` const) + `es.json`, y migrar los ~17 archivos `.tsx` con strings hardcodeados. Magastore NO sirve de referencia de uso real (tiene el setup pero 0% adoptado); usar Zynka como modelo de convención de keys. |
 
 ### 🔵 Próximas etapas (decididas, sin empezar)
 | # | Tarea | Notas |
@@ -135,6 +145,6 @@ locales.
 | `tenantUuid` | `9e781ab3-f1db-4311-a9a2-ae2afb595718` |
 | OWNER | Matthew Arias Mena · `admin@audiocolors.com` |
 | ADMIN | Maria Duran Arias · `maria@audiocolors.com` |
-| Contraseña | `Password1` (temporal — ver P0-1) |
+| Contraseña | Temporal: la tiene el usuario; P0-1 cambiarla antes de entregar |
 
 Datos de prueba: 1 paciente activo con 1 PDF + 1 paciente inactivo huérfano.
