@@ -66,3 +66,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   sincronizarlas entre dispositivos, guardándolas en el API? (D23)
 - Logo definitivo en SVG desde Illustrator (P1-1) y limpiar el paciente inactivo
   huérfano (P1-2, requiere acceso a la base).
+
+## Sin verificar (2026-10-24, recorte del contexto)
+
+- Solo cambiaron docs y 4 comentarios: lint y typecheck limpios, sin navegador ni build.
+- Falta comprobar en una sesión real que los agentes trabajen bien con el CLAUDE.md corto y que
+  la tabla de RULES §1 (dónde el repo difiere de los estándares) no deje huecos.
