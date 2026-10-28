@@ -40,6 +40,34 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   notificaciones/novedades por versión. `develop` = `main`.
 - Contexto de Claude recortado (rama `chore/contexto-claude`): `CLAUDE.md` es un
   índice y solo se importan este traspaso, `RULES.md` y `ARCHITECTURE.md` (D25).
+- **Lote de cambios pedido el 2026-10-28 (todavía recibiendo; no empezar hasta
+  que el usuario diga que son todos).** Rama `feature/preguntas-y-mantenimientos`,
+  que ya trae sin commitear el acordeón de Historia clínica. Cada punto es una etapa:
+  1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
+     (nombre provisional), en Configuración y en el detalle del paciente.
+  2. El usuario crea sus propias secciones dentro de Preguntas (p. ej. Historia
+     clínica, Cuestionario de satisfacción). El API ya guarda varias plantillas
+     por tenant (`name`, `speciality`, `fields`), pero el front pide una por
+     especialidad y las respuestas del paciente son una sola historia: revisar.
+  3. Las respuestas Sí/No del detalle no arrancan en "No": ninguna viene marcada.
+  4. Tab nuevo "Mantenimiento": mantenimientos 1, 2, 3, 4, cada uno asistido
+     (azul) o perdido (rojo).
+  5. Intentos de contacto: registrar si se llamó 1, 2 o 3 veces al paciente.
+  6. Un paciente puede tener más de una sede (hoy `branchUuid` es una sola).
+  7. Teléfonos extranjeros (hoy la máscara es de 8 dígitos de Costa Rica).
+  8. Audífonos en laboratorio (modal "Indicadores del paciente" → pestaña
+     Laboratorio, hoy un switch que se guarda al tocarlo): al marcarlo, pedir la
+     fecha de envío (un solo día).
+  9. **Pendiente de definir:** al desmarcarlo queda la fecha de entrega y un
+     historial corto de envíos/entregas, con nota opcional. Hoy la clínica lo anota
+     a mano en Control de evolución ("Se hace entrega de audífonos..."); la idea es
+     sacarlo de ahí. Duda: esa nota, ¿es la misma del control de evolución o solo
+     vive en este historial?
+  10. Pre-registro rápido desde "Agendar cita" cuando la búsqueda da "Ningún
+      paciente coincide": nombre, teléfono, cédula y sede; el expediente se
+      completa cuando llega a la cita.
+  11. Exploración física (otoscopia OD/OI) sale de la historia clínica a una
+      tarjeta propia, debajo de la ficha técnica y encima de Historia clínica.
 
 ## Qué sigue
 

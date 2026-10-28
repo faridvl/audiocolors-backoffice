@@ -57,6 +57,7 @@ export function usePatientBackground(patientUuid: string) {
   }
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return {
     background: background ?? null,
@@ -73,7 +74,12 @@ export function usePatientBackground(patientUuid: string) {
     },
     authorship,
     isUpdating,
-    handleStartUpdate: () => setIsUpdating(true),
+    isExpanded,
+    handleToggleExpanded: () => setIsExpanded((current) => !current),
+    handleStartUpdate: () => {
+      setIsUpdating(true);
+      setIsExpanded(true);
+    },
     handleCloseUpdate: () => setIsUpdating(false),
   };
 }
