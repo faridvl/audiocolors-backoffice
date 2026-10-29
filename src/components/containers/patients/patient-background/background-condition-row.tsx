@@ -33,11 +33,11 @@ export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-ink-100 py-1.5 last:border-b-0">
+    <div className="flex items-center justify-between gap-3 border-b border-ink-100 py-1 last:border-b-0">
       <Typography variant={TypographyVariant.BODY}>{label}</Typography>
       <SegmentedControl
         ariaLabel={label}
-        size={SegmentedControlSize.COMPACT}
+        size={SegmentedControlSize.REGULAR}
         value={toYesNo(answer)}
         onChange={(value) => onChange(value === toYesNo(answer) ? null : value === YesNo.YES)}
         options={[

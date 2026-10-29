@@ -10,7 +10,7 @@ import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { buildStandardFields, resolveAnswers, withoutPhysicalExam } from './clinical-history';
 
-export function usePatientBackground(patientUuid: string) {
+export function usePatientBackground(patientUuid: string, onExpand: () => void) {
   const { t } = useTranslation();
   const resolveAuthorLabel = useResolveAuthorLabel();
   const {
@@ -61,7 +61,7 @@ export function usePatientBackground(patientUuid: string) {
   }
 
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   return {
     background: background ?? null,
@@ -78,11 +78,11 @@ export function usePatientBackground(patientUuid: string) {
     },
     authorship,
     isUpdating,
-    isExpanded,
-    handleToggleExpanded: () => setIsExpanded((current) => !current),
+    isSaving,
+    handleSavingChange: setIsSaving,
     handleStartUpdate: () => {
       setIsUpdating(true);
-      setIsExpanded(true);
+      onExpand();
     },
     handleCloseUpdate: () => setIsUpdating(false),
   };

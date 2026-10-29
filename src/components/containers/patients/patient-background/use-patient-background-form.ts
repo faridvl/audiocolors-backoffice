@@ -176,7 +176,7 @@ export function usePatientBackgroundForm({
                 refreshAfterUpdate();
               },
               onError: () => {
-                toast.error(t(TEXT.PATIENTS.BACKGROUND.UPDATE.PDF_UPLOAD_ERROR));
+                toast.warning(t(TEXT.PATIENTS.BACKGROUND.UPDATE.PDF_UPLOAD_ERROR));
                 refreshAfterUpdate();
               },
             },

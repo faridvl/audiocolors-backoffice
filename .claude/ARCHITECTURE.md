@@ -17,7 +17,8 @@ relacionados y usuarios: ver `CLAUDE.md`.
 - **Agenda** (`/agenda`): franja semanal y pestañas en móvil; en escritorio, línea de
   tiempo del día con arrastre (D10); calendario del iPhone (`calendar-feed`).
 - **Bitácora** (`/bitacora`): actividad de pacientes, con resumen y filtros.
-- **Configuración** (`/configuracion`): tipos de cita e historia clínica (D21, D22).
+- **Configuración** (`/configuracion`): tipos de cita y Preguntas, que por ahora contiene la historia clínica
+  (D21, D22). `/configuracion/historia-clinica` redirige a `/configuracion/preguntas`.
 - **Notificaciones y versiones:** bandeja con las novedades de cada versión (D23).
 - **Permisos por rol:** `OWNER`, `ADMIN`, `DOCTOR`, `STAFF` (RULES.md §7).
 
@@ -38,7 +39,7 @@ src/
 │   ├── _document.tsx         favicons, splash y fuente
 │   ├── api/site.webmanifest.ts
 │   ├── index.tsx  login/  agenda/  bitacora/
-│   ├── configuracion/        index, historia-clinica, tipos-de-cita
+│   ├── configuracion/        index, preguntas, tipos-de-cita  (historia-clinica solo redirige)
 │   └── pacientes/            index, nuevo, [uuid]/{index, editar}
 ├── components/
 │   ├── common/               action-menu, badge, brand, button, checkbox, color-dot,

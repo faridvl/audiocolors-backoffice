@@ -118,9 +118,9 @@
         "title": "Tipos de cita",
         "description": "Nombre y duración de cada tipo de cita."
       },
-      "CLINICAL_HISTORY": {
-        "title": "Historia clínica",
-        "description": "Preguntas de la hoja de la primera visita. Los cambios no afectan las historias ya llenas."
+      "QUESTIONS": {
+        "title": "Preguntas",
+        "description": "Las preguntas que la clínica hace a sus pacientes. Los cambios no afectan las respuestas ya guardadas."
       }
     },
     "appointmentTypes": {
@@ -144,8 +144,21 @@
       "minutesShort": "{{count}} min"
     }
   },
+  "questions": {
+    "title": "Preguntas",
+    "pageTitle": "Preguntas · AudioColors Gestión Clínica",
+    "clinicalHistory": "Historia clínica",
+    "unfilledSection": "{{title}} sin llenar",
+    "unfilledSections_one": "{{count}} sección sin llenar",
+    "unfilledSections_other": "{{count}} secciones sin llenar",
+    "draftSection": "{{title}} · borrador sin guardar",
+    "pendingWithDraft_one": "{{count}} sección pendiente · borrador sin guardar",
+    "pendingWithDraft_other": "{{count}} secciones pendientes · borrador sin guardar",
+    "sectionsCount_one": "{{count}} sección",
+    "sectionsCount_other": "{{count}} secciones",
+    "unsavedChanges": "Hay cambios sin guardar"
+  },
   "clinicalTemplate": {
-    "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
     "templateName": "Historia clínica",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",

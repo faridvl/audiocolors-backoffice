@@ -574,3 +574,20 @@ manda la otoscopía en `answers`: así ningún orden de despliegue borra el dato
 
 **Pendiente de confirmar:** si la clínica quiere un historial de otoscopías por
 visita en vez de la última (hoy el rastro queda en la bitácora).
+
+---
+
+## D29 · Acordeón "Preguntas" (2026-10-28)
+
+**Decisión:** la historia clínica vive dentro de una tarjeta "Preguntas"
+(nombre provisional, `questions.title` en es.json), cerrada por defecto, en el
+expediente y en Configuración (`/configuracion/preguntas`; la ruta vieja
+`/configuracion/historia-clinica` redirige). Acordeón genérico en
+`components/common/accordion` (variantes tarjeta, anidada y sin borde; monta el
+contenido la primera vez que se abre y lo deja montado). Las secciones son una
+lista que arma cada hook (`{ key, title, subtitle, render }`), lista para sumar
+las secciones propias de la clínica. Dentro de Preguntas se abre una sección a la
+vez; el subtítulo cerrado dice lo pendiente (sin llenar, borrador sin guardar).
+
+**Por qué:** la clínica va a sumar cuestionarios propios junto a la historia; un
+solo lugar para todos evita una tarjeta más por cuestionario en el expediente.

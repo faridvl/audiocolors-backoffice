@@ -9,8 +9,8 @@ import { ChangePatientStatusModal } from '@/components/containers/patients/patie
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
-import { PatientBackgroundContainer } from '@/components/containers/patients/patient-background/patient-background-container';
 import { PatientPhysicalExamContainer } from '@/components/containers/patients/patient-physical-exam/patient-physical-exam-container';
+import { PatientQuestionsContainer } from '@/components/containers/patients/patient-questions/patient-questions-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { useNavigation } from '@/hooks/use-navigation';
@@ -71,7 +71,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
       {can(Permission.VIEW_CLINICAL_RECORD) && (
         <>
           <PatientPhysicalExamContainer patientUuid={patient.uuid} />
-          <PatientBackgroundContainer patientUuid={patient.uuid} />
+          <PatientQuestionsContainer patientUuid={patient.uuid} />
           <PatientNotesContainer patientUuid={patient.uuid} />
         </>
       )}

@@ -39,7 +39,7 @@ export const PatientPhysicalExamContainer: React.FC<PatientPhysicalExamContainer
 
   return (
     <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <Typography variant={TypographyVariant.SUBTITLE}>
           {t(TEXT.PATIENTS.BACKGROUND.OTOSCOPY_TITLE)}
         </Typography>
@@ -48,7 +48,7 @@ export const PatientPhysicalExamContainer: React.FC<PatientPhysicalExamContainer
             variant={ButtonVariant.SECONDARY}
             onClick={handleStartEdit}
             icon={<Pencil className="h-4 w-4 text-ink-500" aria-hidden />}
-            className="shrink-0 whitespace-nowrap"
+            className="w-full shrink-0 whitespace-nowrap sm:w-auto"
           >
             {t(isEmpty ? TEXT.PATIENTS.PHYSICAL_EXAM.REGISTER : TEXT.PATIENTS.PHYSICAL_EXAM.EDIT)}
           </Button>

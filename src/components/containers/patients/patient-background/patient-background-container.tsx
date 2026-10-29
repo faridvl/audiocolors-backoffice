@@ -1,21 +1,31 @@
 import React from 'react';
-import { AlertTriangle, ChevronDown, Loader2, Pencil } from 'lucide-react';
+import { AlertTriangle, Loader2, Pencil } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ActionMenu } from '@/components/common/action-menu/action-menu';
+import {
+  Accordion,
+  AccordionHeadingLevel,
+  AccordionVariant,
+} from '@/components/common/accordion/accordion';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { QuestionSectionControls } from '@/components/containers/questions/question-sections';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientBackgroundForm } from './patient-background-form';
 import { PatientBackgroundSummary } from './patient-background-summary';
 import { BackgroundFormMode } from './use-patient-background-form';
 import { usePatientBackground } from './use-patient-background';
 
-interface PatientBackgroundContainerProps {
+interface PatientBackgroundContainerProps extends QuestionSectionControls {
   patientUuid: string;
+  onDirtyChange: (isDirty: boolean) => void;
 }
 
 export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProps> = ({
   patientUuid,
+  isExpanded,
+  onToggle,
+  onExpand,
+  onDirtyChange,
 }) => {
   const { t } = useTranslation();
   const {
@@ -29,59 +39,47 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
     refetch,
     authorship,
     isUpdating,
-    isExpanded,
-    handleToggleExpanded,
+    isSaving,
+    handleSavingChange,
     handleStartUpdate,
     handleCloseUpdate,
-  } = usePatientBackground(patientUuid);
+  } = usePatientBackground(patientUuid, onExpand);
 
   if (isHidden) return null;
 
   // Se llena una sola vez y queda fija; editarla después genera un PDF en Archivos.
   const isReady = !isLoading && !isError;
-  const isFormVisible = isExpanded && isReady && (!background || isUpdating);
+  const isFormVisible = isReady && (!background || isUpdating);
 
   return (
-    <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <button
-          type="button"
-          onClick={handleToggleExpanded}
-          aria-expanded={isExpanded}
-          className="flex min-w-0 flex-1 items-start gap-2 text-left"
-        >
-          <ChevronDown
-            className={`mt-1 h-4 w-4 shrink-0 text-ink-500 transition-transform ${
-              isExpanded ? '' : '-rotate-90'
-            }`}
-            aria-hidden
-          />
-          <div className="min-w-0">
-            <Typography variant={TypographyVariant.SUBTITLE}>
-              {t(TEXT.PATIENTS.BACKGROUND.TITLE)}
-            </Typography>
-            {isReady && !background && (
-              <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
-                {t(TEXT.PATIENTS.BACKGROUND.EMPTY)}
-              </Typography>
-            )}
-          </div>
-        </button>
-        {isReady && background && !isUpdating && (
-          <ActionMenu
-            ariaLabel={t(TEXT.PATIENTS.BACKGROUND.ACTIONS)}
-            items={[
-              {
-                label: t(TEXT.PATIENTS.BACKGROUND.UPDATE.BUTTON),
-                icon: <Pencil className="h-4 w-4" aria-hidden />,
-                onClick: handleStartUpdate,
-              },
-            ]}
-          />
-        )}
-      </div>
+    <Accordion
+      variant={AccordionVariant.NESTED}
+      title={t(TEXT.PATIENTS.BACKGROUND.TITLE)}
+      isExpanded={isExpanded}
+      isToggleDisabled={isSaving}
+      headingLevel={AccordionHeadingLevel.H3}
+      onToggle={onToggle}
+      scrollsIntoViewOnExpand
+      action={
+        isReady && background && !isUpdating ? (
+          <Button
+            variant={ButtonVariant.SECONDARY}
+            onClick={handleStartUpdate}
+            icon={<Pencil className="h-4 w-4 text-ink-500" aria-hidden />}
+            className="shrink-0 whitespace-nowrap"
+          >
+            {t(TEXT.PATIENTS.BACKGROUND.UPDATE.BUTTON)}
+          </Button>
+        ) : undefined
+      }
+    >
+      {isReady && !background && (
+        <Typography variant={TypographyVariant.HELPER}>
+          {t(TEXT.PATIENTS.BACKGROUND.EMPTY)}
+        </Typography>
+      )}
 
-      {isExpanded && isLoading && (
+      {isLoading && (
         <div className="flex items-center justify-center gap-2 py-6">
           <Loader2 className="h-5 w-5 animate-spin text-brand" aria-hidden />
           <Typography variant={TypographyVariant.BODY}>
@@ -90,7 +88,7 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
         </div>
       )}
 
-      {isExpanded && isError && !isLoading && (
+      {isError && !isLoading && (
         <div className="flex flex-col items-center gap-2 py-6 text-center">
           <AlertTriangle className="h-8 w-8 text-danger" aria-hidden />
           <Typography variant={TypographyVariant.ACCENT}>
@@ -109,16 +107,18 @@ export const PatientBackgroundContainer: React.FC<PatientBackgroundContainerProp
           fields={formFields}
           mode={background ? BackgroundFormMode.UPDATE : BackgroundFormMode.FILL}
           onClose={handleCloseUpdate}
+          onSavingChange={handleSavingChange}
+          onDirtyChange={onDirtyChange}
         />
       )}
 
-      {isExpanded && isReady && background && !isUpdating && (
+      {isReady && background && !isUpdating && (
         <PatientBackgroundSummary
           fields={summaryFields}
           answers={answers}
           authorship={authorship}
         />
       )}
-    </section>
+    </Accordion>
   );
 };
