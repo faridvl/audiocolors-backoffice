@@ -3,6 +3,7 @@ import { Form, useFormikContext } from 'formik';
 import { Save, X } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
+import { FocusFirstError } from '@/components/common/form/focus-first-error';
 import { FormSelectField } from '@/components/common/form/form-select-field';
 import { FormViewSection } from '@/components/common/form/form-view-section';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
@@ -42,6 +43,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 
   return (
     <Form className="flex flex-col gap-6">
+      <FocusFirstError />
       <FormViewSection title="Datos personales">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField name="firstName" label="Nombre" required maxLength={60} />

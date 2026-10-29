@@ -1,6 +1,4 @@
-/** Código de país de Costa Rica: se antepone a un teléfono local de 8 dígitos para armar el enlace. */
-const DEFAULT_COUNTRY_CODE = '506';
-const LOCAL_PHONE_LENGTH = 8;
+import { toInternationalDigits } from '@/shared/utils/phone';
 
 /**
  * Enlace `wa.me` con el mensaje ya escrito. Abre WhatsApp (app o web) en la
@@ -8,11 +6,8 @@ const LOCAL_PHONE_LENGTH = 8;
  * Devuelve null si el teléfono no sirve para WhatsApp.
  */
 export function buildWhatsAppLink(phone: string | undefined, message: string): string | null {
-  const digits = (phone ?? '').replace(/\D/g, '');
-  if (!digits) return null;
-
-  const internationalNumber =
-    digits.length === LOCAL_PHONE_LENGTH ? `${DEFAULT_COUNTRY_CODE}${digits}` : digits;
+  const internationalNumber = toInternationalDigits(phone ?? '');
+  if (!internationalNumber) return null;
 
   return `https://wa.me/${internationalNumber}?text=${encodeURIComponent(message)}`;
 }

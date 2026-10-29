@@ -2,7 +2,6 @@ import React from 'react';
 import { Formik } from 'formik';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { patientEditValidationSchema } from '../patient-validation';
 import { PatientFormFields } from '../patient-form';
 import { usePatientEdit } from './use-patient-edit';
 
@@ -11,8 +10,16 @@ interface PatientEditContainerProps {
 }
 
 export const PatientEditContainer: React.FC<PatientEditContainerProps> = ({ uuid }) => {
-  const { initialValues, isLoading, isError, isPending, errorMessage, handleSubmit, handleCancel } =
-    usePatientEdit(uuid);
+  const {
+    initialValues,
+    validationSchema,
+    isLoading,
+    isError,
+    isPending,
+    errorMessage,
+    handleSubmit,
+    handleCancel,
+  } = usePatientEdit(uuid);
 
   if (isLoading) {
     return (
@@ -48,7 +55,7 @@ export const PatientEditContainer: React.FC<PatientEditContainerProps> = ({ uuid
 
       <Formik
         initialValues={initialValues}
-        validationSchema={patientEditValidationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
         enableReinitialize
       >

@@ -1,6 +1,14 @@
 import * as Yup from 'yup';
 import { DocumentType, PatientGender } from '@/types/patients/patient';
 import { PatientContact } from '@/types/patients/patient-contact';
+import {
+  formatPhoneForDisplay,
+  isSamePhone,
+  normalizePhone,
+  PhoneError,
+  toPatientPhone,
+  validatePhoneUnlessUnchanged,
+} from '@/shared/utils/phone';
 
 const NAME_REGEX = /^[a-zA-ZaeiouAEIOUuUnN\u00C0-\u017F\s]+$/;
 
@@ -16,13 +24,6 @@ export function formatNationalId(value: string): string {
   if (digits.length <= 1) return digits;
   if (digits.length <= 5) return `${digits.slice(0, 1)}-${digits.slice(1)}`;
   return `${digits.slice(0, 1)}-${digits.slice(1, 5)}-${digits.slice(5)}`;
-}
-
-/** Formatea un telefono local como XXXX-XXXX. */
-export function formatPhone(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 4) return digits;
-  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
 }
 
 const baseFields = {
@@ -48,36 +49,48 @@ const baseFields = {
 };
 
 const CONTACT_NAME_MAX_LENGTH = 80;
-const LOCAL_PHONE_PATTERN = /^\d{4}-\d{4}$/;
-const COUNTRY_PREFIX = '+506 ';
 
-const buildContactsField = (phoneField: Yup.StringSchema) =>
+const PHONE_ERROR_MESSAGES: Record<PhoneError, string> = {
+  [PhoneError.LOCAL_FORMAT]: 'Formato: 8888-8888. Si es de otro país, empieza con +.',
+  [PhoneError.INTERNATIONAL_FORMAT]:
+    'Revisa el número: con + y el código del país, de 8 a 15 dígitos.',
+  [PhoneError.COSTA_RICA_WITH_PLUS]: 'Parece un número de Costa Rica: escríbelo sin el +',
+};
+
+/** `unchangedPhones`: teléfonos que vienen de la base; si no se tocan, no se validan. */
+const buildContactsField = (unchangedPhones: ReadonlySet<string>) =>
   Yup.array()
     .of(
       Yup.object({
         name: Yup.string().max(CONTACT_NAME_MAX_LENGTH, 'Máximo 80 caracteres'),
-        phone: phoneField.required('El teléfono es obligatorio'),
+        phone: Yup.string()
+          .test('valid-phone', (value, context) => {
+            const error = validatePhoneUnlessUnchanged(value ?? '', unchangedPhones);
+            return error === null
+              ? true
+              : context.createError({ message: PHONE_ERROR_MESSAGES[error] });
+          })
+          .required('El teléfono es obligatorio'),
       }),
     )
     .min(1, 'Agrega al menos un contacto');
 
+const NO_UNCHANGED_PHONES: ReadonlySet<string> = new Set();
+
+const toUnchangedPhones = (contacts: PatientContactFormValues[]): ReadonlySet<string> =>
+  new Set(contacts.map((contact) => contact.phone).filter(Boolean));
+
 export const patientCreateValidationSchema = Yup.object({
   ...baseFields,
-  contacts: buildContactsField(Yup.string().matches(LOCAL_PHONE_PATTERN, 'Formato: XXXX-XXXX')),
+  contacts: buildContactsField(NO_UNCHANGED_PHONES),
 });
 
-// Pacientes viejos pueden tener un teléfono extranjero o sin el formato local.
-const editContactsField = buildContactsField(
-  Yup.string().matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido'),
-);
-
-export const patientEditValidationSchema = Yup.object({
-  ...baseFields,
-  contacts: editContactsField,
-});
+export const buildPatientEditValidationSchema = (initialContacts: PatientContactFormValues[]) =>
+  Yup.object({ ...baseFields, contacts: buildContactsField(toUnchangedPhones(initialContacts)) });
 
 /** Solo los contactos, para editarlos desde el expediente sin abrir el formulario entero. */
-export const patientContactsValidationSchema = Yup.object({ contacts: editContactsField });
+export const buildPatientContactsValidationSchema = (initialContacts: PatientContactFormValues[]) =>
+  Yup.object({ contacts: buildContactsField(toUnchangedPhones(initialContacts)) });
 
 export interface PatientContactFormValues {
   /** Presente solo si el contacto ya existía al abrir el formulario. */
@@ -113,29 +126,14 @@ export function resolveContactsForSave(
     .map((contact) => ({
       ...(contact.uuid && { uuid: contact.uuid }),
       name: (contact.name.trim() || patientFullName).slice(0, CONTACT_NAME_MAX_LENGTH),
-      phone: contact.phone.trim(),
+      phone: normalizePhone(contact.phone),
     }));
   const primaryPhone = filled[0]?.phone;
 
   return {
-    phone:
-      primaryPhone && LOCAL_PHONE_PATTERN.test(primaryPhone)
-        ? `${COUNTRY_PREFIX}${primaryPhone}`
-        : primaryPhone,
+    phone: primaryPhone ? toPatientPhone(primaryPhone) : undefined,
     contacts: filled,
   };
-}
-
-/** Teléfono del paciente como se escribe en un contacto: sin el prefijo del país. */
-export function toContactPhone(patientPhone: string): string {
-  return patientPhone.startsWith(COUNTRY_PREFIX)
-    ? patientPhone.slice(COUNTRY_PREFIX.length)
-    : patientPhone;
-}
-
-export function isSamePhone(first: string, second: string): boolean {
-  const lastDigits = (phone: string) => phone.replace(/\D/g, '').slice(-8);
-  return lastDigits(first) !== '' && lastDigits(first) === lastDigits(second);
 }
 
 /**
@@ -148,14 +146,18 @@ export function buildInitialContacts(
   patientPhone: string | undefined,
   patientFullName: string,
 ): PatientContactFormValues[] {
-  const formContacts = contacts.map(({ uuid, name, phone }) => ({ uuid, name, phone }));
+  const formContacts = contacts.map(({ uuid, name, phone }) => ({
+    uuid,
+    name,
+    phone: formatPhoneForDisplay(phone),
+  }));
   if (!patientPhone) {
     return formContacts.length > 0 ? formContacts : [{ name: '', phone: '' }];
   }
 
   const primary = formContacts.find((contact) => isSamePhone(contact.phone, patientPhone));
   if (!primary) {
-    return [{ name: patientFullName, phone: toContactPhone(patientPhone) }, ...formContacts];
+    return [{ name: patientFullName, phone: formatPhoneForDisplay(patientPhone) }, ...formContacts];
   }
   return [primary, ...formContacts.filter((contact) => contact !== primary)];
 }

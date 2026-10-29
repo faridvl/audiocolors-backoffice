@@ -25,6 +25,7 @@
       "unexpected": "Algo salió mal. Intenta de nuevo."
     },
     "notRegistered": "Sin registrar",
+    "phoneHint": "¿Otro país? Escribe + y el código. Ej.: +1 305 555 1234",
     "forbidden": "Tu usuario no tiene acceso a esta sección.",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
@@ -743,7 +744,6 @@
       "contact": "Contacto",
       "nameHint": "Vacío si es del paciente. Si es de un familiar: María (hija)",
       "phone": "Teléfono",
-      "phoneHint": "Formato: 8888-8888",
       "remove": "Quitar contacto",
       "add": "Agregar contacto",
       "saved": "Contactos guardados"

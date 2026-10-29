@@ -572,8 +572,10 @@ manda la otoscopía en `answers`: así ningún orden de despliegue borra el dato
 
 **Despliegue:** publicar primero el API (con su migración) y después el front.
 
-**Pendiente de confirmar:** si la clínica quiere un historial de otoscopías por
-visita en vez de la última (hoy el rastro queda en la bitácora).
+**Actualización (2026-10-28):** el usuario confirmó un historial de otoscopías
+por paciente (regla en HANDOFF): cada otoscopía es un registro nuevo con fecha y
+autor, corregible solo el mismo día; la tabla actual pasa a ser el primer registro
+de cada paciente. Etapa aparte, después del lote.
 
 ---
 
@@ -591,3 +593,25 @@ vez; el subtítulo cerrado dice lo pendiente (sin llenar, borrador sin guardar).
 
 **Por qué:** la clínica va a sumar cuestionarios propios junto a la historia; un
 solo lugar para todos evita una tarjeta más por cuestionario en el expediente.
+
+---
+
+## D30 · Teléfonos extranjeros (2026-10-28)
+
+**Decisión:** un solo campo de teléfono, sin selector de país. Si lo escrito empieza
+con `+` (o `00`), es de otro país y no lleva máscara; si no, es de Costa Rica
+(`XXXX-XXXX`) y el campo muestra un "+506" gris como adorno, que no es parte del
+valor. Un extranjero lleva de 8 a 15 dígitos; un `+` con 8 dígitos que parecen de
+Costa Rica da error. Se guarda compacto, `+` y solo dígitos (`+13055551234`), en
+paciente y contacto; Costa Rica sigue como `+506 XXXX-XXXX` (paciente) y
+`XXXX-XXXX` (contacto). Un dato viejo de la base que no se toca no se valida, para
+poder editar lo demás; si se toca, se valida normal. La máscara nunca corta un
+número. Todo vive en `shared/utils/phone.ts`.
+
+**Por qué:** compacto porque Zynka limita el teléfono a 15 caracteres, porque la
+búsqueda del API busca el texto literal (así se encuentra por dígitos) y porque
+la comparación entre contactos queda estable. Un número de 15 dígitos no cabe en
+Zynka, pero es rarísimo.
+
+**Pendiente del usuario:** si quiere un selector de país. Con un solo campo, otro
+país de 8 dígitos como Nicaragua (+505) solo se distingue por el `+`.

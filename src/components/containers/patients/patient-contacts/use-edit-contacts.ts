@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -15,10 +15,11 @@ import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
 import {
   buildInitialContacts,
-  isSamePhone,
+  buildPatientContactsValidationSchema,
   PatientContactFormValues,
   resolveContactsForSave,
 } from '@/components/containers/patients/patient-validation';
+import { isSamePhone } from '@/shared/utils/phone';
 import { buildPatientFullName } from './patient-name-fill-button';
 
 export interface EditContactsFormValues {
@@ -40,9 +41,18 @@ export function useEditContacts(patient: Patient, onClose: () => void) {
   useEscapeKey(onClose);
 
   const patientFullName = buildPatientFullName(patient.firstName, patient.lastName);
-  const initialValues: EditContactsFormValues | null = existingContacts
-    ? { contacts: buildInitialContacts(existingContacts, patient.phone, patientFullName) }
-    : null;
+  const initialValues = useMemo<EditContactsFormValues | null>(
+    () =>
+      existingContacts
+        ? { contacts: buildInitialContacts(existingContacts, patient.phone, patientFullName) }
+        : null,
+    [existingContacts, patient.phone, patientFullName],
+  );
+
+  const validationSchema = useMemo(
+    () => buildPatientContactsValidationSchema(initialValues?.contacts ?? []),
+    [initialValues],
+  );
 
   const syncContacts = (contacts: PatientContactFormValues[]) =>
     executeSyncPatientContacts(
@@ -82,6 +92,7 @@ export function useEditContacts(patient: Patient, onClose: () => void) {
 
   return {
     initialValues,
+    validationSchema,
     isLoading,
     isPending: isUpdatingPatient || isSyncingContacts,
     errorMessage,

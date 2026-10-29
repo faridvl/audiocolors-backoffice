@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { usePatientQuery, FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
@@ -14,6 +14,7 @@ import { DocumentType, UpdatePatientPayload } from '@/types/patients/patient';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import {
   buildInitialContacts,
+  buildPatientEditValidationSchema,
   PatientFormValues,
   resolveContactsForSave,
 } from '../patient-validation';
@@ -40,26 +41,34 @@ export function usePatientEdit(uuid: string) {
   const isLoading = isLoadingPatient || isLoadingContacts;
   const isPending = isUpdatingPatient || isSyncingContacts;
 
-  const initialValues: PatientFormValues | null =
-    patient && existingContacts
-      ? {
-          firstName: patient.firstName ?? '',
-          lastName: patient.lastName ?? '',
-          documentType: inferDocumentType(patient.documentId),
-          documentId: patient.documentId ?? '',
-          // <input type="date"> exige exactamente YYYY-MM-DD.
-          birthDate: patient.birthDate ? patient.birthDate.slice(0, 10) : '',
-          gender: patient.gender ?? '',
-          email: patient.email ?? '',
-          address: patient.address ?? '',
-          branchUuid: patient.branchUuid ?? '',
-          contacts: buildInitialContacts(
-            existingContacts,
-            patient.phone,
-            buildPatientFullName(patient.firstName, patient.lastName),
-          ),
-        }
-      : null;
+  const initialValues = useMemo<PatientFormValues | null>(
+    () =>
+      patient && existingContacts
+        ? {
+            firstName: patient.firstName ?? '',
+            lastName: patient.lastName ?? '',
+            documentType: inferDocumentType(patient.documentId),
+            documentId: patient.documentId ?? '',
+            // <input type="date"> exige exactamente YYYY-MM-DD.
+            birthDate: patient.birthDate ? patient.birthDate.slice(0, 10) : '',
+            gender: patient.gender ?? '',
+            email: patient.email ?? '',
+            address: patient.address ?? '',
+            branchUuid: patient.branchUuid ?? '',
+            contacts: buildInitialContacts(
+              existingContacts,
+              patient.phone,
+              buildPatientFullName(patient.firstName, patient.lastName),
+            ),
+          }
+        : null,
+    [patient, existingContacts],
+  );
+
+  const validationSchema = useMemo(
+    () => buildPatientEditValidationSchema(initialValues?.contacts ?? []),
+    [initialValues],
+  );
 
   const handleSubmit = (values: PatientFormValues) => {
     setErrorMessage(null);
@@ -108,6 +117,7 @@ export function usePatientEdit(uuid: string) {
   return {
     patient,
     initialValues,
+    validationSchema,
     isLoading,
     isError,
     isPending,

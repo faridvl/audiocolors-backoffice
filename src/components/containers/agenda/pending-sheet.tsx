@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalendarCheck, Phone, UserRound } from 'lucide-react';
 import { EMPTY_VALUE, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
+import { formatPhoneForDisplay } from '@/shared/utils/phone';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
 import { ActionSheet } from './action-sheet';
@@ -27,7 +28,10 @@ export const PendingSheet: React.FC<{ agenda: AgendaState; patient: Patient }> =
           label: t(TEXT.AGENDA.SHEET.TYPE),
           value: patient.tentativeAppointmentTypeName ?? t(TEXT.AGENDA.ROW.NO_TYPE),
         },
-        { label: t(TEXT.AGENDA.SHEET.PHONE), value: patient.phone ?? EMPTY_VALUE },
+        {
+          label: t(TEXT.AGENDA.SHEET.PHONE),
+          value: patient.phone ? formatPhoneForDisplay(patient.phone) : EMPTY_VALUE,
+        },
       ]}
       primaryAction={{
         label: t(TEXT.AGENDA.PENDING.SET_DAY),

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Field, ErrorMessage, useField } from 'formik';
+import { Field, useField } from 'formik';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -40,6 +40,8 @@ interface FormFieldProps {
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
   /** Botón de ícono dentro del campo, a la derecha (posicionado `absolute`, ancho `w-11`). */
   endAdornment?: React.ReactNode;
+  /** Texto gris dentro del campo, a la izquierda; no es parte del valor (p. ej. "+506"). */
+  startAdornment?: string;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -59,14 +61,19 @@ export const FormField: React.FC<FormFieldProps> = ({
   onChange,
   inputMode,
   endAdornment,
+  startAdornment,
 }) => {
   const { t } = useTranslation();
-  const [{ value }] = useField<unknown>(name);
+  const [{ value }, { error, touched }] = useField<unknown>(name);
   const [showPassword, setShowPassword] = useState(false);
   const isCountVisible = showCount && maxLength !== undefined;
   const length = typeof value === 'string' ? value.length : 0;
   const isPassword = as === 'input' && type === 'password';
   const resolvedType = isPassword && showPassword ? 'text' : type;
+  // El error reemplaza a la ayuda en el mismo lugar: si se apilaran, el botón de guardar bajaría.
+  const errorText = touched && typeof error === 'string' ? error : undefined;
+  const hasMessage = Boolean(errorText || hint);
+  const messageId = errorText ? `${name}-error` : hint ? `${name}-hint` : undefined;
 
   return (
     <div className={tailwind('flex flex-col gap-1.5', className)}>
@@ -88,15 +95,27 @@ export const FormField: React.FC<FormFieldProps> = ({
           disabled={disabled}
           maxLength={maxLength}
           inputMode={inputMode}
+          aria-invalid={errorText ? true : undefined}
+          aria-describedby={messageId}
           className={tailwind(
             inputBaseClasses,
             as === 'textarea' && 'min-h-[88px] resize-none',
             (isPassword || endAdornment) && 'pr-11',
+            startAdornment && 'pl-[4.5rem]',
           )}
           {...(onChange ? { onChange } : {})}
         >
           {children}
         </Field>
+
+        {startAdornment && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-2.5 left-0 flex items-center border-r border-ink-200 pl-3 pr-2 text-base font-medium text-ink-500"
+          >
+            {startAdornment}
+          </span>
+        )}
 
         {isPassword && (
           <button
@@ -116,9 +135,19 @@ export const FormField: React.FC<FormFieldProps> = ({
         {!isPassword && endAdornment}
       </div>
 
-      {(hint || isCountVisible) && (
+      {(hasMessage || isCountVisible) && (
         <div className="flex items-start justify-between gap-3">
-          {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
+          {errorText ? (
+            <Typography id={messageId} variant={TypographyVariant.ERROR}>
+              {errorText}
+            </Typography>
+          ) : (
+            hint && (
+              <Typography id={messageId} variant={TypographyVariant.HELPER}>
+                {hint}
+              </Typography>
+            )
+          )}
           {isCountVisible && (
             <Typography
               variant={TypographyVariant.HELPER}
@@ -133,10 +162,6 @@ export const FormField: React.FC<FormFieldProps> = ({
           )}
         </div>
       )}
-
-      <ErrorMessage name={name}>
-        {(message) => <Typography variant={TypographyVariant.ERROR}>{message}</Typography>}
-      </ErrorMessage>
     </div>
   );
 };

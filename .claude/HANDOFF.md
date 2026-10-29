@@ -45,6 +45,13 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Configuración. Se llenan varias veces: cada vez queda un registro con fecha y
   quién lo llenó, y el expediente muestra el historial. La historia clínica sigue
   igual (se llena una vez). Mismos permisos que la historia clínica.
+- Otoscopías (2026-10-28): historial por paciente. Cada otoscopía es un registro
+  con fecha, autor, OD y OI; "Nueva otoscopía" crea uno nuevo y nunca pisa el
+  anterior. La tarjeta muestra la última con "Nueva otoscopía" y "Ver anteriores"
+  (de la más reciente a la más vieja). Un registro se corrige solo el mismo día en
+  que se creó; después queda fijo. No va ligado a una cita. La otoscopía que ya
+  tiene cada paciente pasa a ser su primer registro. Se ve y se usa igual que el
+  historial de las secciones propias de Preguntas. Solo roles clínicos.
 
 ## En qué estamos
 
@@ -57,7 +64,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa, sin push. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2. Hechos: 3 (D26), 11 (D28), 1 (D29). Al publicar: primero el API con sus
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30). Al publicar: primero el API con sus
   migraciones, después el front. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
@@ -100,8 +107,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## Preguntas abiertas
 
-- Exploración física: ¿basta la última otoscopía (con el rastro en la bitácora)
-  o la clínica quiere un historial por visita? (D28)
+- Teléfonos: ¿hace falta un selector de país? Hoy un número de Nicaragua (+505,
+  también 8 dígitos) escrito sin + se guarda como de Costa Rica (D30).
+
 
 - Registros viejos con `isActive = false` y `status = ACTIVE`: ¿se reactivan o
   pasan a `INACTIVE`? Decidirlo en el API (DECISIONS, 2026-10-04).

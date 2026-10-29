@@ -23,6 +23,7 @@ import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { buildMonthOption, formatMonthLabel } from '@/shared/utils/formatters';
+import { toTelHref } from '@/shared/utils/phone';
 import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
@@ -436,7 +437,7 @@ export function useAgenda() {
   };
 
   const handleCallPatient = (patient: Patient) => {
-    if (patient.phone) window.location.href = `tel:${patient.phone.replace(/\s/g, '')}`;
+    if (patient.phone) window.location.href = toTelHref(patient.phone);
   };
 
   const handleSendWhatsApp = async (appointment: Appointment, dayKey: string) => {

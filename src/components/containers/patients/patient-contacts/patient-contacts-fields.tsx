@@ -3,12 +3,10 @@ import { FieldArray, useFormikContext } from 'formik';
 import { Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { FormField } from '@/components/common/input/input';
+import { PhoneField } from '@/components/common/phone-field/phone-field';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
-import {
-  formatPhone,
-  PatientContactFormValues,
-} from '@/components/containers/patients/patient-validation';
+import { PatientContactFormValues } from '@/components/containers/patients/patient-validation';
 import { PatientNameFillButton } from './patient-name-fill-button';
 
 const CONTACT_NAME_MAX_LENGTH = 80;
@@ -44,7 +42,8 @@ export const PatientContactsFields: React.FC<PatientContactsFieldsProps> = ({
                           ? t(TEXT.PATIENTS.CONTACTS.PRIMARY)
                           : t(TEXT.PATIENTS.CONTACTS.CONTACT)
                       }
-                      hint={t(TEXT.PATIENTS.CONTACTS.NAME_HINT)}
+                      // Las ayudas se muestran una sola vez, en el primer contacto.
+                      hint={index === 0 ? t(TEXT.PATIENTS.CONTACTS.NAME_HINT) : undefined}
                       maxLength={CONTACT_NAME_MAX_LENGTH}
                       endAdornment={
                         <PatientNameFillButton
@@ -60,16 +59,12 @@ export const PatientContactsFields: React.FC<PatientContactsFieldsProps> = ({
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <FormField
+                    <PhoneField
                       name={`contacts.${index}.phone`}
                       label={t(TEXT.PATIENTS.CONTACTS.PHONE)}
-                      hint={t(TEXT.PATIENTS.CONTACTS.PHONE_HINT)}
-                      inputMode="tel"
                       required
-                      onChange={(event) =>
-                        setFieldValue(`contacts.${index}.phone`, formatPhone(event.target.value))
-                      }
-                      className="sm:w-40"
+                      hint={index === 0 ? undefined : ''}
+                      className="sm:w-52"
                     />
                   </div>
                 </div>

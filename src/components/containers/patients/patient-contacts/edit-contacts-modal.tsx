@@ -4,7 +4,7 @@ import { Loader2, Phone } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { patientContactsValidationSchema } from '@/components/containers/patients/patient-validation';
+import { FocusFirstError } from '@/components/common/form/focus-first-error';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
 import { PatientContactsFields } from './patient-contacts-fields';
@@ -17,8 +17,15 @@ interface EditContactsModalProps {
 
 export const EditContactsModal: React.FC<EditContactsModalProps> = ({ patient, onClose }) => {
   const { t } = useTranslation();
-  const { initialValues, isLoading, isPending, errorMessage, patientFullName, handleSubmit } =
-    useEditContacts(patient, onClose);
+  const {
+    initialValues,
+    validationSchema,
+    isLoading,
+    isPending,
+    errorMessage,
+    patientFullName,
+    handleSubmit,
+  } = useEditContacts(patient, onClose);
 
   return (
     <div
@@ -55,10 +62,11 @@ export const EditContactsModal: React.FC<EditContactsModalProps> = ({ patient, o
         ) : (
           <Formik
             initialValues={initialValues}
-            validationSchema={patientContactsValidationSchema}
+            validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
             <Form className="mt-5 flex flex-col gap-5">
+              <FocusFirstError />
               <PatientContactsFields patientFullName={patientFullName} />
 
               {errorMessage && (

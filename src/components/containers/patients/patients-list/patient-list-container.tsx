@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { formatPhoneForDisplay } from '@/shared/utils/phone';
 import { Search, Pencil } from 'lucide-react';
 import { Patient, PatientFlag } from '@/types/patients/patient';
 import { TFunction } from 'i18next';
@@ -62,7 +63,7 @@ function buildColumns(branches: Branch[] | undefined, t: TFunction): TableColumn
       key: 'phone',
       header: 'Teléfono',
       width: '16%',
-      render: (patient) => patient.phone || '—',
+      render: (patient) => (patient.phone ? formatPhoneForDisplay(patient.phone) : '—'),
     },
     {
       key: 'branch',
