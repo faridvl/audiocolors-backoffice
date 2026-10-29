@@ -29,7 +29,8 @@
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
     "no": "No",
-    "unanswered": "Sin responder"
+    "unanswered": "Sin responder",
+    "unsavedChanges": "Tienes cambios sin guardar. ¿Descartarlos?"
   },
   "notifications": {
     "menu": "Notificaciones",
@@ -426,7 +427,8 @@
       "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
       "RENEW_PRESCRIPTION_CHANGED": "Renovar receta",
       "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
-      "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada"
+      "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada",
+      "PHYSICAL_EXAM_UPDATED": "Exploración física modificada"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -444,7 +446,9 @@
         "bloodType": "Tipo de sangre",
         "occupation": "Ocupación",
         "branchUuid": "Sede",
-        "warrantyDocumentUuid": "Archivo de la garantía"
+        "warrantyDocumentUuid": "Archivo de la garantía",
+        "otoscopyRight": "OD (oído derecho)",
+        "otoscopyLeft": "OI (oído izquierdo)"
       },
       "statuses": {
         "ACTIVE": "Activo",
@@ -647,6 +651,15 @@
         "edit": "Modificar paciente",
         "changeStatus": "Cambiar estado"
       }
+    },
+    "physicalExam": {
+      "loading": "Cargando exploración física...",
+      "loadError": "No se pudo cargar la exploración física",
+      "register": "Registrar otoscopía",
+      "empty": "Sin otoscopía registrada",
+      "edit": "Editar",
+      "saved": "Exploración física guardada",
+      "updatedBy": "Actualizada por {{author}} el {{date}}"
     },
     "background": {
       "title": "Historia clínica",

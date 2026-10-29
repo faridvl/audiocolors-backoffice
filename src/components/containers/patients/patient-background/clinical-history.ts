@@ -87,28 +87,20 @@ export function buildStandardFields(t: TFunction): ClinicalField[] {
           : undefined,
     })),
   );
-  const otoscopy = t(TEXT.PATIENTS.BACKGROUND.OTOSCOPY_TITLE);
-  const texts = [
-    {
-      id: BackgroundText.OTOSCOPY_RIGHT,
-      label: t(TEXT.PATIENTS.BACKGROUND.RIGHT_EAR),
-    },
-    {
-      id: BackgroundText.OTOSCOPY_LEFT,
-      label: t(TEXT.PATIENTS.BACKGROUND.LEFT_EAR),
-    },
-  ].map((field) => ({
-    ...field,
-    fieldType: ClinicalFieldType.TEXTAREA,
-    section: otoscopy,
-  }));
-
-  return [...booleans, ...texts].map((field, index) => ({
+  return booleans.map((field, index) => ({
     ...field,
     required: false,
     order: index,
   }));
 }
+
+/** La otoscopia vive en su propia tarjeta (exploración física): ya no es parte de la historia. */
+const PHYSICAL_EXAM_IDS: string[] = ['otoscopyRight', 'otoscopyLeft'];
+
+export const isPhysicalExamId = (id: string) => PHYSICAL_EXAM_IDS.includes(id);
+
+export const withoutPhysicalExam = (fields: ClinicalField[]) =>
+  fields.filter(({ id }) => !isPhysicalExamId(id));
 
 export const sortFields = (fields: ClinicalField[]) =>
   [...fields].sort((first, second) => first.order - second.order);
@@ -123,8 +115,6 @@ export function resolveAnswers(background: PatientBackground): Record<string, Cl
     value: background.tinnitus,
     detail: background.tinnitusTone,
   };
-  answers[BackgroundText.OTOSCOPY_RIGHT] = background.otoscopyRight ?? '';
-  answers[BackgroundText.OTOSCOPY_LEFT] = background.otoscopyLeft ?? '';
   return answers;
 }
 
@@ -198,12 +188,20 @@ export function collectRemovedQuestions(
   originalFields: ClinicalField[],
 ): RemovedQuestions {
   const currentIds = new Set(currentFields.map(({ id }) => id));
-  const removedAnswers = Object.entries(originalAnswers).filter(([id]) => !currentIds.has(id));
+  const removedAnswers = Object.entries(originalAnswers).filter(
+    ([id]) => !currentIds.has(id) && !isPhysicalExamId(id),
+  );
   const removedIds = new Set(removedAnswers.map(([id]) => id));
   return {
     answers: Object.fromEntries(removedAnswers),
     fields: originalFields.filter(({ id }) => removedIds.has(id)),
   };
+}
+
+/** Las columnas de otoscopia de la historia, que ya no se editan aquí. */
+export interface LegacyOtoscopy {
+  otoscopyRight: string | null;
+  otoscopyLeft: string | null;
 }
 
 const toNullableText = (value: string | undefined) => value?.trim() || null;
@@ -217,6 +215,7 @@ export function buildPayload(
   values: ClinicalHistoryFormValues,
   notes: string | null,
   removed?: RemovedQuestions,
+  legacyOtoscopy?: LegacyOtoscopy,
 ): SavePatientBackgroundPayload {
   const answers: Record<string, ClinicalAnswer> = {};
   fields.forEach(({ id, fieldType, detailLabel }) => {
@@ -242,9 +241,9 @@ export function buildPayload(
 
   return {
     ...conditions,
+    // Un API anterior pone en null lo que no llega: se devuelven tal como vinieron.
+    ...legacyOtoscopy,
     tinnitusTone: detailOf(answers[BackgroundCondition.TINNITUS]) || null,
-    otoscopyRight: toNullableText(textOf(answers[BackgroundText.OTOSCOPY_RIGHT])),
-    otoscopyLeft: toNullableText(textOf(answers[BackgroundText.OTOSCOPY_LEFT])),
     notes,
     answers,
     templateSnapshot: removed ? [...fields, ...removed.fields] : fields,

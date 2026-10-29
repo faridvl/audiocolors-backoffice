@@ -11,6 +11,7 @@ export const TEXT = {
     CHARACTER_COUNT: 'common.characterCount',
     YES: 'common.yes',
     NO: 'common.no',
+    UNSAVED_CHANGES: 'common.unsavedChanges',
     UNANSWERED: 'common.unanswered',
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
@@ -460,6 +461,15 @@ export const TEXT = {
         EDIT: 'patients.detail.actions.edit',
         CHANGE_STATUS: 'patients.detail.actions.changeStatus',
       },
+    },
+    PHYSICAL_EXAM: {
+      LOADING: 'patients.physicalExam.loading',
+      LOAD_ERROR: 'patients.physicalExam.loadError',
+      REGISTER: 'patients.physicalExam.register',
+      EMPTY: 'patients.physicalExam.empty',
+      EDIT: 'patients.physicalExam.edit',
+      SAVED: 'patients.physicalExam.saved',
+      UPDATED_BY: 'patients.physicalExam.updatedBy',
     },
     BACKGROUND: {
       TITLE: 'patients.background.title',

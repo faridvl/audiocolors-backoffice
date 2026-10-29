@@ -102,7 +102,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
           <VideoCandidateCheck patient={patient} />
         </div>
 
-        <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 lg:grid-cols-2">
           <NextAppointmentBlock
             patient={patient}
             onSchedule={isDeceased ? undefined : onScheduleAppointment}
@@ -119,7 +119,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
           </div>
         </div>
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-ink-100 pt-4 sm:grid-cols-4">
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-ink-100 pt-4">
           <PatientDatum
             label={t(TEXT.PATIENTS.DETAIL.FIELDS.BIRTH_DATE)}
             value={patient.birthDate ? formatDate(patient.birthDate) : null}

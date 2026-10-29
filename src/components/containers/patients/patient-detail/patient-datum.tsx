@@ -22,7 +22,7 @@ export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, classN
       <Typography
         variant={TypographyVariant.BODY}
         as="dd"
-        className={tailwind('break-words', !value && 'text-ink-400')}
+        className={tailwind(value ? 'break-words' : 'whitespace-nowrap text-ink-400')}
       >
         {value || t(TEXT.GENERAL.NOT_REGISTERED)}
       </Typography>

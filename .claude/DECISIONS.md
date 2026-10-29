@@ -551,3 +551,26 @@ las columnas): lo que no viene no se toca, un null explícito limpia.
 levanta otro en `127.0.0.1:3001` con `NEXT_DIST_DIR=.next-prueba`
 (`next.config.js` lee la variable; sin ella sigue en `.next`). Otro host para que
 las cookies no se pisen. Detalle en `docs/AMBIENTE-LOCAL.md`.
+
+---
+
+## D28 · Exploración física fuera de la historia clínica (2026-10-28)
+
+**Decisión:** la otoscopía (OD/OI) vive en una tabla propia del API,
+`PatientPhysicalExam` (una por paciente, la última anotada), con
+`GET/PUT /patients/:uuid/physical-exam` solo para `CLINICAL_ACCESS_ROLES`
+(guard de roles, no "todos menos STAFF"). En el expediente es una tarjeta entre
+la ficha y la historia clínica, editable cuando se quiera y sin PDF; cada cambio
+queda en la bitácora con antes y después. La migración copia lo que había en la
+historia (`answers` si es texto, si no la columna). La historia filtra los ids
+`otoscopyRight/otoscopyLeft` de plantillas, snapshots, PDF y cambios.
+
+**Por qué:** es un hallazgo que se actualiza en cada revisión, no un antecedente
+que se llena una vez. Las columnas viejas de `PatientBackground` se quedan (el
+front las reenvía sin cambios) y el API copia a la tabla nueva si un front viejo
+manda la otoscopía en `answers`: así ningún orden de despliegue borra el dato.
+
+**Despliegue:** publicar primero el API (con su migración) y después el front.
+
+**Pendiente de confirmar:** si la clínica quiere un historial de otoscopías por
+visita en vez de la última (hoy el rastro queda en la bitácora).

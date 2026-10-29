@@ -77,11 +77,25 @@ export function usePatientBackgroundForm({
     [fields, originalAnswers, background, t],
   );
 
+  const legacyOtoscopy = useMemo(
+    () =>
+      background
+        ? { otoscopyRight: background.otoscopyRight, otoscopyLeft: background.otoscopyLeft }
+        : undefined,
+    [background],
+  );
+
   const saveFirstTime = (values: ClinicalHistoryFormValues) => {
     executeSavePatientBackground(
       {
         patientUuid,
-        background: buildPayload(fields, values, background?.notes ?? null, removedQuestions),
+        background: buildPayload(
+          fields,
+          values,
+          background?.notes ?? null,
+          removedQuestions,
+          legacyOtoscopy,
+        ),
       },
       {
         onSuccess: () => {
@@ -139,7 +153,13 @@ export function usePatientBackgroundForm({
     executeSavePatientBackground(
       {
         patientUuid,
-        background: buildPayload(fields, values, background?.notes ?? null, removedQuestions),
+        background: buildPayload(
+          fields,
+          values,
+          background?.notes ?? null,
+          removedQuestions,
+          legacyOtoscopy,
+        ),
       },
       {
         onSuccess: () =>

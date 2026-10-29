@@ -13,6 +13,7 @@ import {
   Pencil,
   Phone,
   PhoneOff,
+  Stethoscope,
   UserCog,
   UserPlus,
   type LucideIcon,
@@ -87,6 +88,10 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: ClipboardList,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.PHYSICAL_EXAM_UPDATED]: {
+      icon: Stethoscope,
+      tone: ActionTone.NEUTRAL,
+    },
   };
 
 export function getActionLabel(t: TFunction, action: PatientActivityAction): string {
@@ -154,11 +159,21 @@ interface DetailContext {
   resolveBranchName: (branchUuid: string) => string | undefined;
 }
 
+/** Campos de texto libre de la exploración física: vacío es "Sin registrar" y el texto se acorta. */
+const PHYSICAL_EXAM_FIELDS = ['otoscopyRight', 'otoscopyLeft'];
+const MAX_FREE_TEXT_LENGTH = 80;
+
 function formatFieldValue(
   change: PatientFieldChange,
   value: string | null,
   context: DetailContext,
 ): string {
+  if (PHYSICAL_EXAM_FIELDS.includes(change.field)) {
+    if (!value) return context.t(TEXT.GENERAL.NOT_REGISTERED);
+    return value.length > MAX_FREE_TEXT_LENGTH
+      ? `${value.slice(0, MAX_FREE_TEXT_LENGTH).trimEnd()}…`
+      : value;
+  }
   if (!value) return context.t(TEXT.ACTIVITY.DETAIL.EMPTY_VALUE);
   if (change.field === 'branchUuid') return context.resolveBranchName(value) ?? value;
   if (change.field === 'gender') return GENDER_LABELS[value as PatientGender] ?? value;
@@ -187,6 +202,7 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
 
   switch (activity.action) {
     case PatientActivityAction.PATIENT_UPDATED:
+    case PatientActivityAction.PHYSICAL_EXAM_UPDATED:
       return detail.changes?.length ? formatChanges(detail.changes, context) : '—';
 
     case PatientActivityAction.CONTACT_ADDED:

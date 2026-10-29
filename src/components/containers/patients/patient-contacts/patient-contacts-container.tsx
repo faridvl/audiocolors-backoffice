@@ -15,8 +15,9 @@ const ContactLink: React.FC<{
     className="flex min-w-0 items-center gap-1.5 text-sm text-ink-600 hover:text-brand-700"
   >
     <Icon className="h-3.5 w-3.5 shrink-0 text-ink-400" aria-hidden />
-    <span className="truncate">
-      <span className="font-medium text-ink-800">{name}</span> {phone}
+    <span className="flex min-w-0 items-baseline gap-1">
+      <span className="truncate font-medium text-ink-800">{name}</span>
+      <span className="shrink-0 whitespace-nowrap">{phone}</span>
     </span>
   </a>
 );
@@ -61,7 +62,7 @@ export const PatientContactsContainer: React.FC<PatientContactsContainerProps> =
       <button
         type="button"
         onClick={onEdit}
-        className="flex w-fit items-center gap-1.5 text-sm text-ink-500 hover:text-brand-700 hover:underline"
+        className="flex w-fit items-center gap-1.5 whitespace-nowrap text-sm text-ink-500 hover:text-brand-700 hover:underline"
       >
         <Pencil className="h-3.5 w-3.5" aria-hidden />
         {t(TEXT.PATIENTS.DETAIL.EDIT_CONTACTS)}

@@ -10,6 +10,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
 import { PatientBackgroundContainer } from '@/components/containers/patients/patient-background/patient-background-container';
+import { PatientPhysicalExamContainer } from '@/components/containers/patients/patient-physical-exam/patient-physical-exam-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { useNavigation } from '@/hooks/use-navigation';
@@ -69,6 +70,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
       {/* El empleado ve los datos generales y los archivos, nada clínico. */}
       {can(Permission.VIEW_CLINICAL_RECORD) && (
         <>
+          <PatientPhysicalExamContainer patientUuid={patient.uuid} />
           <PatientBackgroundContainer patientUuid={patient.uuid} />
           <PatientNotesContainer patientUuid={patient.uuid} />
         </>

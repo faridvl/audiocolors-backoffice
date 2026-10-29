@@ -84,7 +84,7 @@ const UserMenu: React.FC = () => {
               />
             )}
           </span>
-          <span className="hidden text-left sm:flex sm:flex-col">
+          <span className="hidden text-left lg:flex lg:flex-col">
             <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
               {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
             </Typography>
@@ -103,7 +103,7 @@ const UserMenu: React.FC = () => {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="absolute right-0 z-20 mt-2 w-56 origin-top-right rounded-lg border border-ink-200 bg-white py-1 shadow-lg focus:outline-none">
-            <div className="border-b border-ink-100 px-3 py-2 sm:hidden">
+            <div className="border-b border-ink-100 px-3 py-2 lg:hidden">
               <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
                 {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
               </Typography>

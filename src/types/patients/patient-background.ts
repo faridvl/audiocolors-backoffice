@@ -32,12 +32,18 @@ export type BackgroundConditions = Record<BackgroundCondition, boolean>;
 
 export interface PatientBackgroundTexts {
   tinnitusTone: string | null;
+  /** Legado: la otoscopia ahora es la exploración física, aparte de la historia. */
   otoscopyRight: string | null;
   otoscopyLeft: string | null;
   notes: string | null;
 }
 
-export interface SavePatientBackgroundPayload extends BackgroundConditions, PatientBackgroundTexts {
+/** La otoscopia se manda tal como vino, solo para que un API anterior no la borre. */
+export interface SavePatientBackgroundPayload
+  extends
+    BackgroundConditions,
+    Omit<PatientBackgroundTexts, 'otoscopyRight' | 'otoscopyLeft'>,
+    Partial<Pick<PatientBackgroundTexts, 'otoscopyRight' | 'otoscopyLeft'>> {
   answers: Record<string, ClinicalAnswer>;
   templateSnapshot: ClinicalField[];
 }
