@@ -41,35 +41,37 @@ export const PatientBackgroundForm: React.FC<PatientBackgroundFormProps> = ({
       <Form className="flex flex-col gap-6">
         <PatientBackgroundFields fields={fields} />
 
-        <div className="flex flex-col gap-3 border-t border-ink-100 pt-4 sm:flex-row sm:items-center sm:justify-end">
-          {/* El texto se acomoda; los botones no se parten en dos líneas. */}
+        <div className="flex flex-col gap-3 border-t border-ink-100 pt-4 xl:flex-row xl:items-center xl:justify-end">
+          {/* La nota larga va encima de los botones hasta `xl`; los botones no se parten en dos líneas. */}
           <Typography
             variant={TypographyVariant.HELPER}
-            className="min-w-0 sm:flex-1 sm:text-right"
+            className="min-w-0 xl:flex-1 xl:text-right"
           >
             {t(
               isUpdate ? TEXT.PATIENTS.BACKGROUND.UPDATE.HINT : TEXT.PATIENTS.BACKGROUND.FINAL_HINT,
             )}
           </Typography>
-          {isUpdate && (
+          <div className="flex items-center justify-end gap-3">
+            {isUpdate && (
+              <Button
+                type="button"
+                variant={ButtonVariant.SECONDARY}
+                onClick={onClose}
+                disabled={isPending}
+                className="shrink-0 whitespace-nowrap"
+              >
+                {t(TEXT.GENERAL.BUTTONS.CANCEL)}
+              </Button>
+            )}
             <Button
-              type="button"
-              variant={ButtonVariant.SECONDARY}
-              onClick={onClose}
-              disabled={isPending}
+              type="submit"
+              variant={ButtonVariant.PRIMARY}
+              isLoading={isPending}
               className="shrink-0 whitespace-nowrap"
             >
-              {t(TEXT.GENERAL.BUTTONS.CANCEL)}
+              {t(isUpdate ? TEXT.PATIENTS.BACKGROUND.UPDATE.SUBMIT : TEXT.GENERAL.BUTTONS.SAVE)}
             </Button>
-          )}
-          <Button
-            type="submit"
-            variant={ButtonVariant.PRIMARY}
-            isLoading={isPending}
-            className="shrink-0 whitespace-nowrap"
-          >
-            {t(isUpdate ? TEXT.PATIENTS.BACKGROUND.UPDATE.SUBMIT : TEXT.GENERAL.BUTTONS.SAVE)}
-          </Button>
+          </div>
         </div>
       </Form>
     </Formik>

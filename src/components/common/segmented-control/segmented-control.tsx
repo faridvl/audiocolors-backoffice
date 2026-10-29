@@ -23,7 +23,8 @@ export interface SegmentedOption<TValue extends string> {
 
 interface SegmentedControlProps<TValue extends string> {
   options: SegmentedOption<TValue>[];
-  value: TValue;
+  /** Null cuando todavía no se eligió ninguna opción. */
+  value: TValue | null;
   onChange: (value: TValue) => void;
   ariaLabel: string;
   size?: SegmentedControlSize;

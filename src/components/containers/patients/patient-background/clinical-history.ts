@@ -14,7 +14,8 @@ import {
 
 /** Valores del formulario: Sí/No, el detalle de un Sí y los textos, por id de pregunta. */
 export interface ClinicalHistoryFormValues {
-  checks: Record<string, boolean>;
+  /** Null: la pregunta no se ha respondido. */
+  checks: Record<string, boolean | null>;
   details: Record<string, string>;
   texts: Record<string, string>;
 }
@@ -127,10 +128,21 @@ export function resolveAnswers(background: PatientBackground): Record<string, Cl
   return answers;
 }
 
-export function isYes(answer: ClinicalAnswer | undefined): boolean {
+/** Sí, No o sin responder (null) de una pregunta Sí/No. */
+export function yesNoOf(answer: ClinicalAnswer | undefined): boolean | null {
   if (typeof answer === 'boolean') return answer;
   if (answer && typeof answer === 'object') return answer.value;
-  return false;
+  return null;
+}
+
+export function isYes(answer: ClinicalAnswer | undefined): boolean {
+  return yesNoOf(answer) === true;
+}
+
+/** Texto de una respuesta Sí/No para mostrar en el resumen, el PDF y los cambios. */
+export function yesNoLabel(t: TFunction, answer: boolean | null): string {
+  if (answer === null) return t(TEXT.GENERAL.UNANSWERED);
+  return t(answer ? TEXT.GENERAL.YES : TEXT.GENERAL.NO);
 }
 
 export function detailOf(answer: ClinicalAnswer | undefined): string {
@@ -165,13 +177,33 @@ export function buildFormValues(
   };
   fields.forEach(({ id, fieldType }) => {
     if (fieldType === ClinicalFieldType.BOOLEAN) {
-      values.checks[id] = isYes(answers[id]);
+      values.checks[id] = yesNoOf(answers[id]);
       values.details[id] = detailOf(answers[id]);
     } else {
       values.texts[id] = textOf(answers[id]);
     }
   });
   return values;
+}
+
+/** Preguntas que la clínica quitó de la plantilla pero que la historia ya respondida conserva. */
+export interface RemovedQuestions {
+  answers: Record<string, ClinicalAnswer>;
+  fields: ClinicalField[];
+}
+
+export function collectRemovedQuestions(
+  currentFields: ClinicalField[],
+  originalAnswers: Record<string, ClinicalAnswer>,
+  originalFields: ClinicalField[],
+): RemovedQuestions {
+  const currentIds = new Set(currentFields.map(({ id }) => id));
+  const removedAnswers = Object.entries(originalAnswers).filter(([id]) => !currentIds.has(id));
+  const removedIds = new Set(removedAnswers.map(([id]) => id));
+  return {
+    answers: Object.fromEntries(removedAnswers),
+    fields: originalFields.filter(({ id }) => removedIds.has(id)),
+  };
 }
 
 const toNullableText = (value: string | undefined) => value?.trim() || null;
@@ -184,6 +216,7 @@ export function buildPayload(
   fields: ClinicalField[],
   values: ClinicalHistoryFormValues,
   notes: string | null,
+  removed?: RemovedQuestions,
 ): SavePatientBackgroundPayload {
   const answers: Record<string, ClinicalAnswer> = {};
   fields.forEach(({ id, fieldType, detailLabel }) => {
@@ -191,12 +224,17 @@ export function buildPayload(
       answers[id] = values.texts[id]?.trim() ?? '';
       return;
     }
-    const value = Boolean(values.checks[id]);
+    const value = values.checks[id] ?? null;
+    // Sin responder no se manda la clave: el API no acepta null.
+    if (value === null) return;
     // Sin Sí, un detalle escrito antes no tiene sentido guardarlo.
     answers[id] = detailLabel
       ? { value, detail: value ? toNullableText(values.details[id]) : null }
       : value;
   });
+
+  // El API reemplaza todo: sin esto, la respuesta de una pregunta ya quitada se perdería.
+  if (removed) Object.assign(answers, removed.answers);
 
   const conditions = Object.fromEntries(
     Object.values(BackgroundCondition).map((condition) => [condition, isYes(answers[condition])]),
@@ -209,6 +247,6 @@ export function buildPayload(
     otoscopyLeft: toNullableText(textOf(answers[BackgroundText.OTOSCOPY_LEFT])),
     notes,
     answers,
-    templateSnapshot: fields,
+    templateSnapshot: removed ? [...fields, ...removed.fields] : fields,
   };
 }

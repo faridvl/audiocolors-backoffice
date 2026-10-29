@@ -5,7 +5,13 @@ import {
   ClinicalField,
   ClinicalFieldType,
 } from '@/types/clinical-templates/clinical-template';
-import { ClinicalHistoryFormValues, detailOf, isYes, textOf } from './clinical-history';
+import {
+  ClinicalHistoryFormValues,
+  detailOf,
+  textOf,
+  yesNoLabel,
+  yesNoOf,
+} from './clinical-history';
 
 export interface BackgroundChange {
   label: string;
@@ -21,7 +27,6 @@ export function buildBackgroundChanges(
   values: ClinicalHistoryFormValues,
 ): BackgroundChange[] {
   const empty = t(TEXT.GENERAL.NOT_REGISTERED);
-  const yesNo = (value: boolean) => t(value ? TEXT.GENERAL.YES : TEXT.GENERAL.NO);
   const changes: BackgroundChange[] = [];
 
   fields.forEach(({ id, label, fieldType, detailLabel }) => {
@@ -32,9 +37,17 @@ export function buildBackgroundChanges(
       return;
     }
 
-    const wasYes = isYes(original[id]);
-    const isNowYes = Boolean(values.checks[id]);
-    if (wasYes !== isNowYes) changes.push({ label, before: yesNo(wasYes), after: yesNo(isNowYes) });
+    const previousAnswer = yesNoOf(original[id]);
+    const currentAnswer = values.checks[id] ?? null;
+    const wasYes = previousAnswer === true;
+    const isNowYes = currentAnswer === true;
+    if (previousAnswer !== currentAnswer) {
+      changes.push({
+        label,
+        before: yesNoLabel(t, previousAnswer),
+        after: yesNoLabel(t, currentAnswer),
+      });
+    }
 
     if (detailLabel) {
       const before = wasYes ? detailOf(original[id]) : '';

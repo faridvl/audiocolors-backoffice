@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import { TEXT } from '@/static/texts/i18n';
 import { ClinicalField } from '@/types/clinical-templates/clinical-template';
 import { BackgroundChange } from './background-changes';
-import { ClinicalHistoryFormValues, groupFields } from './clinical-history';
+import { ClinicalHistoryFormValues, groupFields, yesNoLabel } from './clinical-history';
 
 /** Medidas de la hoja A4 en milímetros. */
 const PAGE_WIDTH_MM = 210;
@@ -96,7 +96,8 @@ export async function buildClinicalHistoryPdf(input: ClinicalHistoryPdfInput): P
 
     // Sí/No en dos columnas, como la hoja en papel.
     group.booleans.forEach((field, index) => {
-      const isChecked = Boolean(values.checks[field.id]);
+      const answer = values.checks[field.id] ?? null;
+      const isChecked = answer === true;
       const column = index % 2;
       if (column === 0) ensureSpace(LINE_HEIGHT_MM);
       const x = MARGIN_MM + column * (COLUMN_WIDTH_MM + COLUMN_GAP_MM);
@@ -104,7 +105,7 @@ export async function buildClinicalHistoryPdf(input: ClinicalHistoryPdfInput): P
       doc.setFontSize(FontSize.BODY);
       doc.setTextColor(...(isChecked ? TEXT_RGB : MUTED_RGB));
       doc.text(field.label, x, y);
-      doc.text(t(isChecked ? TEXT.GENERAL.YES : TEXT.GENERAL.NO), x + COLUMN_WIDTH_MM, y, {
+      doc.text(yesNoLabel(t, answer), x + COLUMN_WIDTH_MM, y, {
         align: 'right',
       });
       if (column === 1 || index === group.booleans.length - 1) y += LINE_HEIGHT_MM;

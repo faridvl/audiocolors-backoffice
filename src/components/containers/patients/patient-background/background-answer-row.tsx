@@ -7,29 +7,34 @@ import { tailwind } from '@/utils/tailwind-utils';
 
 interface BackgroundAnswerRowProps {
   label: string;
-  isChecked: boolean;
+  /** Null cuando la pregunta no se respondió. */
+  answer: boolean | null;
   /** Detalle debajo de la fila cuando la respuesta es Sí (la tonalidad del acúfeno). */
   detail?: string | null;
 }
 
-/** Un antecedente ya respondido: el Sí resalta, el No queda apagado, como en la hoja. */
+/** Un antecedente ya respondido: el Sí resalta, el No y el sin responder quedan apagados. */
 export const BackgroundAnswerRow: React.FC<BackgroundAnswerRowProps> = ({
   label,
-  isChecked,
+  answer,
   detail,
 }) => {
   const { t } = useTranslation();
+  const isYes = answer === true;
 
   return (
     <div className="border-b border-ink-100 py-2 last:border-b-0">
       <div className="flex items-center justify-between gap-3">
         <Typography
-          variant={isChecked ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
-          className={tailwind(!isChecked && 'text-ink-400')}
+          variant={isYes ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
+          className={tailwind(
+            answer === false && 'text-ink-700',
+            answer === null && 'text-ink-600',
+          )}
         >
           {label}
         </Typography>
-        {isChecked ? (
+        {isYes ? (
           <Typography
             as="span"
             variant={TypographyVariant.BODY_SEMIBOLD}
@@ -39,12 +44,19 @@ export const BackgroundAnswerRow: React.FC<BackgroundAnswerRowProps> = ({
             {t(TEXT.GENERAL.YES)}
           </Typography>
         ) : (
-          <Typography as="span" variant={TypographyVariant.BODY} className="shrink-0 text-ink-400">
-            {t(TEXT.GENERAL.NO)}
+          <Typography
+            as="span"
+            variant={TypographyVariant.BODY}
+            className={tailwind(
+              'shrink-0',
+              answer === null ? 'italic text-ink-500' : 'text-ink-700',
+            )}
+          >
+            {t(answer === null ? TEXT.GENERAL.UNANSWERED : TEXT.GENERAL.NO)}
           </Typography>
         )}
       </div>
-      {isChecked && detail && (
+      {isYes && detail && (
         <Typography variant={TypographyVariant.HELPER} className="mt-0.5 text-ink-600">
           {detail}
         </Typography>

@@ -32,6 +32,19 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   cambió y quién (D18).
 - Calendario del iPhone: un calendario por sede, o por sede y tipo, solo en
   iPhone (DECISIONS, 2026-10-09).
+- Mantenimientos (2026-10-28): el expediente tiene los mantenimientos 1 a 4; el
+  personal marca cada uno a mano como asistido (azul) o perdido (rojo), o lo deja
+  sin marcar. No se calculan desde las citas.
+- Intentos de contacto (2026-10-28): un solo contador por paciente de cuántas
+  veces se le llamó (1, 2 o 3), que el personal sube y reinicia a mano. No va
+  ligado a una cita ni a un mantenimiento.
+- Sedes (2026-10-28): un paciente tiene una o más sedes; en los filtros de la
+  lista y la agenda aparece en todas, y cada cita se agenda en una de sus sedes.
+  Los pacientes actuales conservan la sede que tienen.
+- Secciones propias de Preguntas (2026-10-28): se crean, nombran y editan en
+  Configuración. Se llenan varias veces: cada vez queda un registro con fecha y
+  quién lo llenó, y el expediente muestra el historial. La historia clínica sigue
+  igual (se llena una vez). Mismos permisos que la historia clínica.
 
 ## En qué estamos
 
@@ -40,9 +53,11 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   notificaciones/novedades por versión. `develop` = `main`.
 - Contexto de Claude recortado (rama `chore/contexto-claude`): `CLAUDE.md` es un
   índice y solo se importan este traspaso, `RULES.md` y `ARCHITECTURE.md` (D25).
-- **Lote de cambios pedido el 2026-10-28 (todavía recibiendo; no empezar hasta
-  que el usuario diga que son todos).** Rama `feature/preguntas-y-mantenimientos`,
-  que ya trae sin commitear el acordeón de Historia clínica. Cada punto es una etapa:
+- **Lote de cambios pedido el 2026-10-28, en curso** (todo menos el punto 9).
+  Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
+  `E:\Proyectos\node\api-historia`), un commit por etapa, sin push. Se prueba
+  contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
+  5, 6, 2. Hechos: 3 (D26). Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
   2. El usuario crea sus propias secciones dentro de Preguntas (p. ej. Historia

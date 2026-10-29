@@ -14,13 +14,20 @@ enum YesNo {
 
 interface BackgroundConditionRowProps {
   label: string;
-  isChecked: boolean;
-  onChange: (isChecked: boolean) => void;
+  /** Null mientras la pregunta no se ha respondido: ninguna opción queda marcada. */
+  answer: boolean | null;
+  /** Null cuando se toca la opción ya elegida: la pregunta vuelve a quedar sin responder. */
+  onChange: (answer: boolean | null) => void;
+}
+
+function toYesNo(answer: boolean | null): YesNo | null {
+  if (answer === null) return null;
+  return answer ? YesNo.YES : YesNo.NO;
 }
 
 export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
   label,
-  isChecked,
+  answer,
   onChange,
 }) => {
   const { t } = useTranslation();
@@ -31,21 +38,22 @@ export const BackgroundConditionRow: React.FC<BackgroundConditionRowProps> = ({
       <SegmentedControl
         ariaLabel={label}
         size={SegmentedControlSize.COMPACT}
-        value={isChecked ? YesNo.YES : YesNo.NO}
-        onChange={(value) => onChange(value === YesNo.YES)}
+        value={toYesNo(answer)}
+        onChange={(value) => onChange(value === toYesNo(answer) ? null : value === YesNo.YES)}
         options={[
-          // Un "Sí" tiene que verse de un vistazo entre quince filas en "No".
+          // Un "Sí" tiene que verse de un vistazo entre quince filas.
           {
             value: YesNo.YES,
             label: t(TEXT.GENERAL.YES),
             selectedClassName: 'bg-brand text-white shadow-sm',
             unselectedClassName: 'font-normal text-ink-500 hover:text-ink-800',
           },
-          // El No es lo esperado: elegido queda discreto para no competir con los Sí.
           {
             value: YesNo.NO,
             label: t(TEXT.GENERAL.NO),
-            selectedClassName: 'bg-white text-ink-700 shadow-sm',
+            selectedClassName:
+              'bg-white font-semibold text-ink-800 shadow-sm ring-1 ring-inset ring-ink-500',
+            unselectedClassName: 'font-normal text-ink-500 hover:text-ink-800',
           },
         ]}
       />

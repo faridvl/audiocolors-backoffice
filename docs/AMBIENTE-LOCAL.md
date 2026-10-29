@@ -43,6 +43,19 @@ esta base local.
    NEXT_PUBLIC_IDENTITY_API_URL=http://localhost:7170 NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=http://localhost:7071 yarn dev
    ```
 
+### Sin cerrar el front de desarrollo
+
+Si `localhost:3000` ya corre contra el API de desarrollo (con su sesión abierta),
+se levanta un segundo front en `127.0.0.1:3001`. Otro host para que las cookies de
+sesión no se pisen, y otra carpeta de compilación para no chocar con la de `:3000`:
+
+```bash
+NEXT_DIST_DIR=.next-prueba NEXT_PUBLIC_IDENTITY_API_URL=http://localhost:7170 NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=http://localhost:7071 npx next dev -H 127.0.0.1 -p 3001
+```
+
+Los dos `.env` del API local necesitan
+`ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3001`.
+
 ## Si Docker Desktop no arranca
 
 Docker Desktop está en `D:\Docker\Programas\Docker Desktop.exe` (no en

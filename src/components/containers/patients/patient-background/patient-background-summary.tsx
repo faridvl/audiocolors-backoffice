@@ -5,7 +5,7 @@ import { TEXT } from '@/static/texts/i18n';
 import { ClinicalAnswer, ClinicalField } from '@/types/clinical-templates/clinical-template';
 import { tailwind } from '@/utils/tailwind-utils';
 import { BackgroundAnswerRow } from './background-answer-row';
-import { detailOf, groupFields, isYes, textOf } from './clinical-history';
+import { detailOf, groupFields, textOf, yesNoOf } from './clinical-history';
 import {
   CLINICAL_SECTIONS_COLUMNS,
   CLINICAL_SHEET_WIDTH,
@@ -61,7 +61,7 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
                   <BackgroundAnswerRow
                     key={field.id}
                     label={field.label}
-                    isChecked={isYes(answers[field.id])}
+                    answer={yesNoOf(answers[field.id])}
                     detail={detailOf(answers[field.id]) || null}
                   />
                 ))}

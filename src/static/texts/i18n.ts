@@ -11,6 +11,7 @@ export const TEXT = {
     CHARACTER_COUNT: 'common.characterCount',
     YES: 'common.yes',
     NO: 'common.no',
+    UNANSWERED: 'common.unanswered',
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
     },
@@ -466,6 +467,8 @@ export const TEXT = {
       LOAD_ERROR: 'patients.background.loadError',
       EMPTY: 'patients.background.empty',
       FINAL_HINT: 'patients.background.finalHint',
+      PROGRESS_MISSING: 'patients.background.progressMissing',
+      PROGRESS_DONE: 'patients.background.progressDone',
       HISTORY_TITLE: 'patients.background.historyTitle',
       OTOSCOPY_TITLE: 'patients.background.otoscopyTitle',
       RIGHT_EAR: 'patients.background.rightEar',

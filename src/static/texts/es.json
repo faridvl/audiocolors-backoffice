@@ -28,7 +28,8 @@
     "forbidden": "Tu usuario no tiene acceso a esta sección.",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "unanswered": "Sin responder"
   },
   "notifications": {
     "menu": "Notificaciones",
@@ -651,8 +652,11 @@
       "title": "Historia clínica",
       "loading": "Cargando historia clínica...",
       "loadError": "No se pudo cargar la historia clínica",
-      "empty": "Se llena una sola vez, la primera vez que viene el paciente. Marca Sí en lo que tenga o haya tenido.",
-      "finalHint": "Revísala antes de guardar: después ya no se puede modificar.",
+      "empty": "Se llena una sola vez, la primera vez que viene el paciente. Responde Sí o No en cada pregunta.",
+      "finalHint": "Revísala antes de guardar: si después la editas, queda un PDF con lo que cambió en Archivos.",
+      "progressMissing_one": "Falta {{count}} de {{total}} por responder",
+      "progressMissing_other": "Faltan {{count}} de {{total}} por responder",
+      "progressDone": "Listo: {{total}} de {{total}} respondidas",
       "historyTitle": "Antecedentes",
       "otoscopyTitle": "Exploración física (Otoscopia)",
       "rightEar": "OD (oído derecho)",

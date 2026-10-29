@@ -521,3 +521,33 @@ cambiarla cuanto antes (P0-1), no reescribir el historial.
 **Por qué:** cada mensaje cargaba unas 1.570 líneas de contexto fijo. Con una
 sesión coordinadora y varios agentes, ese costo se paga en cada uno; el contexto
 fijo tiene que ser poco y lo demás se lee cuando se necesita.
+
+---
+
+## D26 · Sí/No sin respuesta por defecto (2026-10-28)
+
+**Decisión:** las preguntas Sí/No de la historia clínica arrancan sin marcar y
+tienen tres estados: Sí, No y sin responder. Sin responder no se guarda: la
+clave se omite en `answers` (el API no acepta null ahí). Tocar la opción ya
+elegida la desmarca. Resumen, PDF y cambios dicen "Sin responder". Las 14
+columnas booleanas viejas de `PatientBackground` se siguen mandando (false si no
+es Sí): son legado y solo `answers` distingue lo no respondido.
+
+**Por qué:** un "No" que nadie marcó se leía como dato clínico. Las historias
+guardadas antes de este cambio tienen "No" explícito en lo que nadie tocó; no
+se pueden recuperar y se siguen mostrando como "No".
+
+**También:** al editar, las respuestas de preguntas que la clínica quitó de la
+plantilla se conservan (con su definición en `templateSnapshot`), y el API ya no
+borra `answers` ni `templateSnapshot` si un PUT no los trae (Zynka manda solo
+las columnas): lo que no viene no se toca, un null explícito limpia.
+
+---
+
+## D27 · Ambiente local con un segundo front (2026-10-28)
+
+**Decisión:** para probar contra el API local sin cerrar el `next dev` de
+`localhost:3000` (con la sesión del usuario contra el API de desarrollo), se
+levanta otro en `127.0.0.1:3001` con `NEXT_DIST_DIR=.next-prueba`
+(`next.config.js` lee la variable; sin ella sigue en `.next`). Otro host para que
+las cookies no se pisen. Detalle en `docs/AMBIENTE-LOCAL.md`.
