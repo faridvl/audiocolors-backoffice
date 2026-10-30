@@ -138,4 +138,6 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Falta comprobar en una sesión real que los agentes trabajen bien con el CLAUDE.md corto y que
   la tabla de RULES §1 (dónde el repo difiere de los estándares) no deje huecos.
 
+- Mantenimientos (D33): sin probar entre dos clínicas (la base local tiene una; la consulta filtra por clínica) ni con un
+  error 5xx en pantalla. Los commits del front y del API están solo en local. La migración se aplica antes de publicar.
 - Pre-registro rápido (modal Agendar): pie fijo y cuerpo con scroll en celulares bajos; ronda 2 de correcciones cerrada.
