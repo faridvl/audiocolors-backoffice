@@ -57,12 +57,12 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 - **v1.0.0 publicada el 2026-10-23** (back-office #24, API #16) con historia
   clínica, Configuración, agenda por horario, permisos por rol y bandeja de
-  notificaciones/novedades por versión. `develop` = `main`.
+  notificaciones/novedades por versión.
 - Contexto de Claude recortado (rama `chore/contexto-claude`): `CLAUDE.md` es un
   índice y solo se importan este traspaso, `RULES.md` y `ARCHITECTURE.md` (D25).
 - **Lote de cambios pedido el 2026-10-28, en curso** (todo menos el punto 9).
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
-  `E:\Proyectos\node\api-historia`), un commit por etapa; la rama está en origin, sin PR. Se prueba
+  `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
   5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33). Sigue el 5. Al publicar: primero el API con sus
   migraciones, después el front. Cada punto:
@@ -139,5 +139,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   la tabla de RULES §1 (dónde el repo difiere de los estándares) no deje huecos.
 
 - Mantenimientos (D33): sin probar entre dos clínicas (la base local tiene una; la consulta filtra por clínica) ni con un
-  error 5xx en pantalla. Los commits del front y del API están solo en local. La migración se aplica antes de publicar.
+  error 5xx en pantalla. La migración se aplica antes de publicar.
 - Pre-registro rápido (modal Agendar): pie fijo y cuerpo con scroll en celulares bajos; ronda 2 de correcciones cerrada.
