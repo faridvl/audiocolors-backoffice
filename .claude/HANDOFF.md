@@ -62,7 +62,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   índice y solo se importan este traspaso, `RULES.md` y `ARCHITECTURE.md` (D25).
 - **Lote de cambios pedido el 2026-10-28, en curso** (todo menos el punto 9).
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
-  `E:\Proyectos\node\api-historia`), un commit por etapa, sin push. Se prueba
+  `E:\Proyectos\node\api-historia`), un commit por etapa; la rama está en origin, sin PR. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
   5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31). Al publicar: primero el API con sus
   migraciones, después el front. Cada punto:
