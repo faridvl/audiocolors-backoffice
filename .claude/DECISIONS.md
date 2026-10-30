@@ -629,3 +629,20 @@ correrse como con medianoche UTC. "Listo" descartaba la fecha tocada y parecía
 guardarla.
 
 **Fuera de alcance:** lo que pasa al apagarlo (punto 9 del lote, sin definir).
+
+## D32 · Pre-registro rápido desde "Agendar cita" (2026-10-30)
+
+**Decisión:** si la búsqueda del selector no encuentra al paciente, se ofrece "Registrar
+paciente nuevo" con nombre, apellidos, cédula, teléfono y sede (opcional). Al guardar, el
+paciente queda elegido y sigue el modal de la cita. Lo escrito en la búsqueda se
+prellena: un nombre va a nombre y apellidos, un número va a la cédula. El teléfono es el
+contacto principal (D12) y acepta extranjeros (D30). Una cédula repetida se avisa en el
+campo. La sede usa el `branchUuid` único de hoy; el punto 6 la cambiará.
+
+**API:** `birthDate` pasó a opcional en el API (migración `20261030120000_patient_birth_date_optional`,
+aplicada solo en la base local). Hay que aplicarla en cada ambiente antes de publicar el front.
+
+**Revisable por el usuario:** la fecha de nacimiento SIGUE obligatoria al editar al paciente.
+Un pre-registrado queda sin ella (el expediente muestra "Sin registrar") y se le pedirá la primera
+vez que se edite. Si prefiere que sea opcional también en la edición, es un cambio pequeño en el
+esquema de `patient-validation.ts`.

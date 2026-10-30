@@ -90,7 +90,7 @@ export interface CreatePatientPayload {
   firstName: string;
   lastName: string;
   phone?: string;
-  birthDate: string;
+  birthDate?: string;
   address?: string;
   email?: string;
   gender?: string;

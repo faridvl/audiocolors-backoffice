@@ -10,7 +10,7 @@ import {
   validatePhoneUnlessUnchanged,
 } from '@/shared/utils/phone';
 
-const NAME_REGEX = /^[a-zA-ZaeiouAEIOUuUnN\u00C0-\u017F\s]+$/;
+export const NAME_REGEX = /^[a-zA-ZaeiouAEIOUuUnN\u00C0-\u017F\s]+$/;
 
 export const DOCUMENT_MASKS: Record<DocumentType, { maxLength: number; placeholder: string }> = {
   [DocumentType.NATIONAL]: { maxLength: 11, placeholder: '1-2345-6789' },
