@@ -474,7 +474,8 @@
       "RENEW_PRESCRIPTION_CHANGED": "Renovar receta",
       "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
       "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada",
-      "PHYSICAL_EXAM_UPDATED": "Exploración física modificada"
+      "PHYSICAL_EXAM_UPDATED": "Exploración física modificada",
+      "MAINTENANCE_CHANGED": "Mantenimiento"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -511,6 +512,11 @@
       "labShipment": {
         "sent": "Audífonos enviados al laboratorio el {{date}}",
         "dateChanged": "Fecha de envío cambiada: {{before}} → {{after}}"
+      },
+      "maintenance": {
+        "UNMARKED": "Mantenimiento {{number}}: sin marcar",
+        "ATTENDED": "Mantenimiento {{number}}: asistido",
+        "MISSED": "Mantenimiento {{number}}: perdido"
       },
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
@@ -582,11 +588,30 @@
     "flags": {
       "menu": "Indicadores",
       "title": "Indicadores del paciente",
-      "description": "Se guarda al tocar cada opción. Los audífonos piden la fecha de envío.",
+      "description": "Se guarda al tocar cada opción.",
       "done": "Listo",
       "sections": {
         "lab": "Laboratorio",
-        "warranty": "Estado de garantía"
+        "warranty": "Garantía",
+        "maintenance": "Mantenimiento"
+      },
+      "maintenance": {
+        "rowTitle": "Mantenimiento {{number}}",
+        "hint": "Elige Sin marcar para quitar la marca.",
+        "options": {
+          "UNMARKED": "Sin marcar",
+          "ATTENDED": "Asistido",
+          "MISSED": "Perdido"
+        },
+        "toasts": {
+          "UNMARKED": "Mantenimiento {{number}} sin marcar",
+          "ATTENDED": "Mantenimiento {{number}} marcado como asistido",
+          "MISSED": "Mantenimiento {{number}} marcado como perdido"
+        },
+        "pills": {
+          "ATTENDED": "Mant. {{number}}: asistido",
+          "MISSED": "Mant. {{number}}: perdido"
+        }
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",

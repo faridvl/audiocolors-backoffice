@@ -652,3 +652,18 @@ muestra "Sin registrar") y obligarla al editar empujaría a inventar fechas en u
 clínico. El formulario completo de crear paciente la sigue exigiendo. Si se edita sin fecha, no se
 envía. Consecuencia: `POST /patients` y `POST /patients/bulk` aceptan pacientes sin fecha por API
 directa, aunque las pantallas la siguen pidiendo.
+
+## D33 · Mantenimientos 1 a 4 marcados a mano (2026-10-30)
+
+**Decisión:** el modal "Indicadores del paciente" suma la pestaña Mantenimiento, con cuatro filas:
+sin marcar, asistido (azul) o perdido (rojo). Cada toque se guarda solo y el expediente muestra una
+píldora "Mant. N" por cada uno marcado. Tocar la píldora abre esa pestaña; el botón Indicadores
+sigue abriendo en Laboratorio. Son cuatro columnas en `patient` y
+`PUT /patients/:uuid/maintenances/:number`; cada cambio real deja `MAINTENANCE_CHANGED` en la bitácora.
+
+**Sin validar a propósito:** STAFF puede marcar (no es dato clínico, aunque no ve la bitácora), se
+puede marcar un paciente inactivo o fallecido y marcar el 3 sin el 1 y el 2. No se guarda la fecha del
+mantenimiento: solo queda la del cambio en la bitácora.
+
+**Por qué:** la clínica lo pidió como una marca manual que no se calcula desde las citas. Una
+validación de orden o de estado impediría registrar lo que ya pasó.

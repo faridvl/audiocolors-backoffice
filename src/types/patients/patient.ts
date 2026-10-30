@@ -36,6 +36,40 @@ export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   [DocumentType.PASSPORT]: 'Pasaporte',
 };
 
+/** Cómo quedó un mantenimiento. Sin marcar es null en el API. */
+export enum MaintenanceStatus {
+  ATTENDED = 'ATTENDED',
+  MISSED = 'MISSED',
+}
+
+/** Opciones que ve el personal por mantenimiento: las dos del API más "sin marcar". */
+export enum MaintenanceChoice {
+  UNMARKED = 'UNMARKED',
+  ATTENDED = 'ATTENDED',
+  MISSED = 'MISSED',
+}
+
+export const MAINTENANCE_NUMBERS = [1, 2, 3, 4] as const;
+export type MaintenanceNumber = (typeof MAINTENANCE_NUMBERS)[number];
+
+export const MAINTENANCE_STATUS_FIELDS: Record<
+  MaintenanceNumber,
+  'maintenance1Status' | 'maintenance2Status' | 'maintenance3Status' | 'maintenance4Status'
+> = {
+  1: 'maintenance1Status',
+  2: 'maintenance2Status',
+  3: 'maintenance3Status',
+  4: 'maintenance4Status',
+};
+
+export function getMaintenanceChoice(
+  patient: Patient,
+  maintenanceNumber: MaintenanceNumber,
+): MaintenanceChoice {
+  const status = patient[MAINTENANCE_STATUS_FIELDS[maintenanceNumber]];
+  return status ? MaintenanceChoice[status] : MaintenanceChoice.UNMARKED;
+}
+
 export interface Patient {
   uuid: string;
   firstName: string;
@@ -46,6 +80,11 @@ export interface Patient {
   hearingAidsInLabSince?: string | null;
   warrantyActiveSince?: string | null;
   videoCandidateSince?: string | null;
+  /** Mantenimientos 1 a 4: marcados a mano; undefined (API viejo) o null es sin marcar. */
+  maintenance1Status?: MaintenanceStatus | null;
+  maintenance2Status?: MaintenanceStatus | null;
+  maintenance3Status?: MaintenanceStatus | null;
+  maintenance4Status?: MaintenanceStatus | null;
   warrantyExpiredSince?: string | null;
   renewPrescriptionSince?: string | null;
   /** Documento (categoría WARRANTY) elegido como el de la garantía. */

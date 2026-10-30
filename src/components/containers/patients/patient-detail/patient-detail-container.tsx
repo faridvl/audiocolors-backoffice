@@ -5,6 +5,7 @@ import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { PatientStatus } from '@/types/patients/patient';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlagsModal } from '@/components/containers/patients/patient-flags/patient-flags-modal';
+import { PatientFlagSection } from '@/components/containers/patients/patient-flags/use-patient-flags';
 import { ChangePatientStatusModal } from '@/components/containers/patients/patient-status/change-patient-status-modal';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -30,7 +31,8 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
-  const [isEditingFlags, setIsEditingFlags] = useState(false);
+  // Pestaña con la que abre el modal de indicadores; null = cerrado.
+  const [flagsSection, setFlagsSection] = useState<PatientFlagSection | null>(null);
   const [isEditingContacts, setIsEditingContacts] = useState(false);
 
   if (isLoading) {
@@ -62,7 +64,8 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         patient={patient}
         onScheduleAppointment={() => setIsSchedulingAppointment(true)}
         onChangeStatus={() => setIsChangingStatus(true)}
-        onEditFlags={() => setIsEditingFlags(true)}
+        onEditFlags={() => setFlagsSection(PatientFlagSection.LAB)}
+        onEditMaintenance={() => setFlagsSection(PatientFlagSection.MAINTENANCE)}
         onEditContacts={() => setIsEditingContacts(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
       />
@@ -92,8 +95,12 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         <EditContactsModal patient={patient} onClose={() => setIsEditingContacts(false)} />
       )}
 
-      {isEditingFlags && (
-        <PatientFlagsModal patient={patient} onClose={() => setIsEditingFlags(false)} />
+      {flagsSection && (
+        <PatientFlagsModal
+          patient={patient}
+          initialSection={flagsSection}
+          onClose={() => setFlagsSection(null)}
+        />
       )}
 
       {isSchedulingAppointment && (

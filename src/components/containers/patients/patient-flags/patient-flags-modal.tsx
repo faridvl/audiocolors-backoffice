@@ -9,26 +9,34 @@ import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PatientFlag } from '@/types/patients/patient';
 import { LabShipmentDate } from './lab-shipment-date';
-import { usePatientFlags } from './use-patient-flags';
+import { PatientMaintenanceList } from './patient-maintenance-list';
+import { PatientFlagSection, usePatientFlags } from './use-patient-flags';
 import { WarrantyDocumentSelect } from './warranty-document-select';
 
 interface PatientFlagsModalProps {
   patient: Patient;
+  /** Pestaña con la que se abre; por defecto, Laboratorio. */
+  initialSection?: PatientFlagSection;
   onClose: () => void;
 }
 
 /** Prender o apagar los indicadores: cada switch guarda al tocarlo, sin botón de guardar. */
-export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, onClose }) => {
+export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
+  patient,
+  initialSection,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const {
     sections,
     activeSection,
     activeFlags,
     isWarrantySection,
+    isMaintenanceSection,
     labShipment,
     handleToggle,
     handleSectionChange,
-  } = usePatientFlags(patient);
+  } = usePatientFlags(patient, initialSection);
   useEscapeKey(onClose);
 
   return (
@@ -40,11 +48,10 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
       onClick={onClose}
     >
       <div
-        // Con varias garantías la lista crece: el modal hace scroll en vez de salirse de la pantalla.
-        className="max-h-[92dvh] w-full max-w-sm overflow-y-auto rounded-card bg-white p-6"
+        className="flex max-h-full w-full max-w-sm flex-col rounded-card bg-white"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex shrink-0 items-start gap-3 px-6 pb-4 pt-6">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10">
             <Ear className="h-5 w-5 text-brand-700" aria-hidden />
           </span>
@@ -58,59 +65,75 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
           </div>
         </div>
 
-        <Tabs
-          items={sections.map((section) => ({ value: section.key, label: section.title }))}
-          value={activeSection}
-          onChange={handleSectionChange}
-          ariaLabel={t(TEXT.PATIENTS.FLAGS.TITLE)}
-          className="mt-5"
-        />
-        <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
-          {activeFlags.map((item) => {
-            const isLab = item.flag === PatientFlag.HEARING_AIDS_IN_LAB;
-            return (
-              <div key={item.flag}>
-                <Switch
-                  isChecked={item.isOn}
-                  onChange={(isOn) => handleToggle(item.flag, isOn)}
-                  label={item.label}
-                  description={item.description}
-                  isLoading={item.isUpdating && !labShipment.isEditing}
-                  className="w-full py-2"
-                />
-                {isLab && labShipment.isEditing && (
-                  <LabShipmentDate
-                    date={labShipment.date}
-                    maxDate={labShipment.maxDate}
-                    isSaving={labShipment.isSaving}
-                    isSaveDisabled={labShipment.isSaveDisabled}
-                    onDateChange={labShipment.handleDateChange}
-                    onSave={labShipment.handleSave}
-                    onCancel={labShipment.handleCancel}
-                  />
-                )}
-                {isLab && labShipment.isLabOn && !labShipment.isEditing && (
-                  <Button
-                    variant={ButtonVariant.GHOST}
-                    onClick={labShipment.handleStartDateChange}
-                    className="mb-2 min-h-[36px] px-2 py-1 text-brand-700"
-                  >
-                    {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.CHANGE_DATE)}
-                  </Button>
-                )}
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-2">
+          <Tabs
+            items={sections.map((section) => ({
+              value: section.key,
+              label: section.title,
+            }))}
+            value={activeSection}
+            onChange={handleSectionChange}
+            ariaLabel={t(TEXT.PATIENTS.FLAGS.TITLE)}
+            className="mt-1"
+          />
+          {isMaintenanceSection ? (
+            <>
+              <Typography variant={TypographyVariant.BODY} className="mt-3 text-ink-500">
+                {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.HINT)}
+              </Typography>
+              <div className="mt-2 rounded-lg border border-ink-200 px-3">
+                <PatientMaintenanceList patient={patient} />
               </div>
-            );
-          })}
+            </>
+          ) : (
+            <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
+              {activeFlags.map((item) => {
+                const isLab = item.flag === PatientFlag.HEARING_AIDS_IN_LAB;
+                return (
+                  <div key={item.flag}>
+                    <Switch
+                      isChecked={item.isOn}
+                      onChange={(isOn) => handleToggle(item.flag, isOn)}
+                      label={item.label}
+                      description={item.description}
+                      isLoading={item.isUpdating && !labShipment.isEditing}
+                      className="w-full py-2"
+                    />
+                    {isLab && labShipment.isEditing && (
+                      <LabShipmentDate
+                        date={labShipment.date}
+                        maxDate={labShipment.maxDate}
+                        isSaving={labShipment.isSaving}
+                        isSaveDisabled={labShipment.isSaveDisabled}
+                        onDateChange={labShipment.handleDateChange}
+                        onSave={labShipment.handleSave}
+                        onCancel={labShipment.handleCancel}
+                      />
+                    )}
+                    {isLab && labShipment.isLabOn && !labShipment.isEditing && (
+                      <Button
+                        variant={ButtonVariant.GHOST}
+                        onClick={labShipment.handleStartDateChange}
+                        className="mb-2 min-h-[36px] px-2 py-1 text-brand-700"
+                      >
+                        {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.CHANGE_DATE)}
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {isWarrantySection && (
+            <div className="mt-4">
+              <WarrantyDocumentSelect patient={patient} />
+            </div>
+          )}
         </div>
-        {isWarrantySection && (
-          <div className="mt-4">
-            <WarrantyDocumentSelect patient={patient} />
-          </div>
-        )}
 
         {/* Mientras se edita la fecha, "Listo" se leería como guardarla y la descartaría. */}
         {!labShipment.isEditing && (
-          <div className="mt-5 flex justify-end">
+          <div className="flex shrink-0 justify-end px-6 pb-6 pt-3">
             <Button
               variant={ButtonVariant.SECONDARY}
               onClick={onClose}

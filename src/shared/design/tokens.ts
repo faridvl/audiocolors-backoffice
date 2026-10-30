@@ -13,6 +13,8 @@ import type { CSSProperties } from 'react';
  * - `brand` (azul #1f6fb1, la R del logo) es el UNICO acento: accion
  *   primaria, estado activo y foco.
  * - `ink` es una escala de grises NEUTROS, sin tinte azul.
+ * - `danger` es el rojo de relleno y de iconos; el texto rojo y el relleno que lleva
+ *   texto blanco usan `danger-700` (contraste de 4.5:1 o más sobre blanco).
  * - La franja de 6 colores es un gesto de bienvenida: vive en el login, no en
  *   las pantallas de trabajo.
  * - Tipografia Fira Sans, la del manual de marca oficial.

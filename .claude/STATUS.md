@@ -106,6 +106,12 @@ El detalle de cada cambio y los commits que cubre están en
 
 ---
 
+### Lote del 2026-10-28 — Mantenimientos (D33)
+Pestaña Mantenimiento en Indicadores, píldoras en el expediente y registro en la bitácora. Avance
+del lote en `HANDOFF.md`.
+
+---
+
 ## 📋 Pendientes
 
 ### 🔴 Antes de entregar

@@ -3,10 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
+import { PatientMaintenancePills } from '@/components/containers/patients/patient-flags/patient-maintenance-pills';
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { calculateAge, formatCalendarDate, formatDate, getFullName } from '@/shared/utils/formatters';
+import {
+  calculateAge,
+  formatCalendarDate,
+  formatDate,
+  getFullName,
+} from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import {
   GENDER_LABELS,
@@ -32,6 +38,7 @@ interface PatientSummaryProps {
   onScheduleAppointment: () => void;
   onChangeStatus: () => void;
   onEditFlags: () => void;
+  onEditMaintenance: () => void;
   onEditContacts: () => void;
   onEdit: () => void;
 }
@@ -46,6 +53,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
   onScheduleAppointment,
   onChangeStatus,
   onEditFlags,
+  onEditMaintenance,
   onEditContacts,
   onEdit,
 }) => {
@@ -99,6 +107,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
 
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
           <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
+          <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
           <VideoCandidateCheck patient={patient} />
         </div>
 

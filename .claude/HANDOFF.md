@@ -64,7 +64,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa; la rama está en origin, sin PR. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32). Al publicar: primero el API con sus
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33). Sigue el 5. Al publicar: primero el API con sus
   migraciones, después el front. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.

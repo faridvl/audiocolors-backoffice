@@ -24,6 +24,7 @@ export enum PatientActivityAction {
   VIDEO_CANDIDATE_CHANGED = 'VIDEO_CANDIDATE_CHANGED',
   WARRANTY_EXPIRED_CHANGED = 'WARRANTY_EXPIRED_CHANGED',
   RENEW_PRESCRIPTION_CHANGED = 'RENEW_PRESCRIPTION_CHANGED',
+  MAINTENANCE_CHANGED = 'MAINTENANCE_CHANGED',
   CLINICAL_HISTORY_CREATED = 'CLINICAL_HISTORY_CREATED',
   CLINICAL_HISTORY_UPDATED = 'CLINICAL_HISTORY_UPDATED',
   PHYSICAL_EXAM_UPDATED = 'PHYSICAL_EXAM_UPDATED',
@@ -68,6 +69,9 @@ export interface PatientActivityDetail {
   isOn?: boolean;
   /** Audífonos en laboratorio: día de envío (`date`) y el anterior si se corrigió (`previousDate`). */
   previousDate?: string;
+  /** MAINTENANCE_CHANGED: qué mantenimiento (1 a 4) y cómo quedó (null = sin marcar). */
+  number?: number;
+  status?: string | null;
 }
 
 export interface PatientActivity {

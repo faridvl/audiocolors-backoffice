@@ -24,6 +24,7 @@ export interface PatientFlagItem {
 export enum PatientFlagSection {
   LAB = 'lab',
   WARRANTY = 'warranty',
+  MAINTENANCE = 'maintenance',
 }
 
 const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
@@ -33,14 +34,18 @@ const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
     PatientFlag.WARRANTY_EXPIRED,
     PatientFlag.RENEW_PRESCRIPTION,
   ],
+  [PatientFlagSection.MAINTENANCE]: [],
 };
 
-export function usePatientFlags(patient: Patient) {
+export function usePatientFlags(
+  patient: Patient,
+  initialSection: PatientFlagSection = PatientFlagSection.LAB,
+) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { executeUpdatePatientFlag } = useUpdatePatientFlagMutation();
   const [updatingFlag, setUpdatingFlag] = useState<PatientFlag | null>(null);
-  const [activeSection, setActiveSection] = useState(PatientFlagSection.LAB);
+  const [activeSection, setActiveSection] = useState(initialSection);
   // Fecha de envío en edición (null = el campo está cerrado): al prender los audífonos no se
   // guarda hasta confirmarla.
   const [shipmentDate, setShipmentDate] = useState<string | null>(null);
@@ -88,6 +93,12 @@ export function usePatientFlags(patient: Patient) {
     setShipmentDate(
       patient.hearingAidsInLabSince ? toDayKey(new Date(patient.hearingAidsInLabSince)) : today,
     );
+  };
+
+  // La fecha abierta es de Laboratorio: al cambiar de pestaña se descarta.
+  const handleSectionChange = (section: PatientFlagSection) => {
+    setActiveSection(section);
+    setShipmentDate(null);
   };
 
   const handleSaveShipmentDate = () => {
@@ -141,6 +152,7 @@ export function usePatientFlags(patient: Patient) {
       handleCancel: () => setShipmentDate(null),
     },
     isWarrantySection: activeSection === PatientFlagSection.WARRANTY,
-    handleSectionChange: setActiveSection,
+    isMaintenanceSection: activeSection === PatientFlagSection.MAINTENANCE,
+    handleSectionChange,
   };
 }

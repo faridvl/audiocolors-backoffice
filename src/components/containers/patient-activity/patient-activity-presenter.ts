@@ -22,10 +22,11 @@ import {
   ShieldCheck,
   FileClock,
   Video,
+  Wrench,
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
-import { GENDER_LABELS, PatientGender } from '@/types/patients/patient';
+import { GENDER_LABELS, MaintenanceChoice, PatientGender } from '@/types/patients/patient';
 import {
   PatientActivity,
   PatientActivityAction,
@@ -90,6 +91,10 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     },
     [PatientActivityAction.PHYSICAL_EXAM_UPDATED]: {
       icon: Stethoscope,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_CHANGED]: {
+      icon: Wrench,
       tone: ActionTone.NEUTRAL,
     },
   };
@@ -316,6 +321,12 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
     case PatientActivityAction.RENEW_PRESCRIPTION_CHANGED:
       return context.t(
         `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
+      );
+
+    case PatientActivityAction.MAINTENANCE_CHANGED:
+      return context.t(
+        `${TEXT.ACTIVITY.DETAIL.MAINTENANCE_PREFIX}.${detail.status ?? MaintenanceChoice.UNMARKED}`,
+        { number: detail.number },
       );
 
     case PatientActivityAction.PATIENT_CREATED:

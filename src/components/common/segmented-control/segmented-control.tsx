@@ -28,6 +28,10 @@ interface SegmentedControlProps<TValue extends string> {
   onChange: (value: TValue) => void;
   ariaLabel: string;
   size?: SegmentedControlSize;
+  /** Deshabilita todas las opciones (p. ej. mientras se guarda). */
+  isDisabled?: boolean;
+  /** Ocupa todo el ancho y reparte las opciones en partes iguales. */
+  isFullWidth?: boolean;
   className?: string;
 }
 
@@ -38,6 +42,8 @@ export function SegmentedControl<TValue extends string>({
   onChange,
   ariaLabel,
   size = SegmentedControlSize.REGULAR,
+  isDisabled = false,
+  isFullWidth = false,
   className,
 }: SegmentedControlProps<TValue>) {
   return (
@@ -45,7 +51,8 @@ export function SegmentedControl<TValue extends string>({
       role="radiogroup"
       aria-label={ariaLabel}
       className={tailwind(
-        'inline-flex shrink-0 rounded-lg border border-ink-200 bg-ink-50 p-0.5',
+        'rounded-lg border border-ink-200 bg-ink-50 p-0.5',
+        isFullWidth ? 'flex w-full' : 'inline-flex shrink-0',
         className,
       )}
     >
@@ -57,10 +64,12 @@ export function SegmentedControl<TValue extends string>({
             type="button"
             role="radio"
             aria-checked={isSelected}
+            disabled={isDisabled}
             onClick={() => onChange(option.value)}
             className={tailwind(
-              'rounded-md text-sm font-semibold transition-colors',
+              'rounded-md text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60',
               SIZE_STYLES[size],
+              isFullWidth && 'flex-1',
               'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand',
               isSelected
                 ? (option.selectedClassName ?? 'bg-white text-ink-900 shadow-sm')
