@@ -633,16 +633,22 @@ guardarla.
 ## D32 · Pre-registro rápido desde "Agendar cita" (2026-10-30)
 
 **Decisión:** si la búsqueda del selector no encuentra al paciente, se ofrece "Registrar
-paciente nuevo" con nombre, apellidos, cédula, teléfono y sede (opcional). Al guardar, el
+paciente nuevo" con nombre, apellidos (mínimo 2 letras), cédula, teléfono y sede. Al guardar, el
 paciente queda elegido y sigue el modal de la cita. Lo escrito en la búsqueda se
 prellena: un nombre va a nombre y apellidos, un número va a la cédula. El teléfono es el
 contacto principal (D12) y acepta extranjeros (D30). Una cédula repetida se avisa en el
-campo. La sede usa el `branchUuid` único de hoy; el punto 6 la cambiará.
+campo. La sede es obligatoria; solo si la clínica no tiene ninguna se sigue sin ella. La cédula se
+normaliza como en el formulario completo (9 dígitos quedan X-XXXX-XXXX; si no, sin espacios ni
+guiones) para no duplicar expedientes. Mientras guarda no se puede cerrar ni volver. La sede usa
+el `branchUuid` único de hoy; el punto 6 la cambiará.
 
 **API:** `birthDate` pasó a opcional en el API (migración `20261030120000_patient_birth_date_optional`,
 aplicada solo en la base local). Hay que aplicarla en cada ambiente antes de publicar el front.
+`PATCH /patients/:uuid` ahora la guarda (fecha real y no futura, si no 400; omitida no cambia lo
+guardado) y `POST /patients` aplica la misma validación.
 
-**Revisable por el usuario:** la fecha de nacimiento SIGUE obligatoria al editar al paciente.
-Un pre-registrado queda sin ella (el expediente muestra "Sin registrar") y se le pedirá la primera
-vez que se edite. Si prefiere que sea opcional también en la edición, es un cambio pequeño en el
-esquema de `patient-validation.ts`.
+**Fecha de nacimiento opcional al editar:** un pre-registrado queda sin ella (el expediente
+muestra "Sin registrar") y obligarla al editar empujaría a inventar fechas en un expediente
+clínico. El formulario completo de crear paciente la sigue exigiendo. Si se edita sin fecha, no se
+envía. Consecuencia: `POST /patients` y `POST /patients/bulk` aceptan pacientes sin fecha por API
+directa, aunque las pantallas la siguen pidiendo.

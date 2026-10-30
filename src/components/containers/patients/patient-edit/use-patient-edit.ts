@@ -81,7 +81,7 @@ export function usePatientEdit(uuid: string) {
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
       phone,
-      birthDate: values.birthDate,
+      ...(values.birthDate && { birthDate: values.birthDate }),
       documentId: values.documentId.trim(),
       email: values.email.trim().toLowerCase(),
       gender: values.gender,

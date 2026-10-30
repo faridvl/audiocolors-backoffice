@@ -19,6 +19,7 @@ import { getBranchStripeColor } from '@/shared/design/tokens';
 import { DOCUMENT_MASKS, formatNationalId, PatientFormValues } from './patient-validation';
 
 interface PatientFormProps {
+  isBirthDateRequired?: boolean;
   submitLabel: string;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -27,6 +28,7 @@ interface PatientFormProps {
 export const PatientFormFields: React.FC<PatientFormProps> = ({
   submitLabel,
   isSubmitting,
+  isBirthDateRequired = true,
   onCancel,
 }) => {
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
@@ -67,7 +69,13 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             required
           />
 
-          <FormField name="birthDate" label="Fecha de nacimiento" type="date" required />
+          <FormField
+            name="birthDate"
+            label="Fecha de nacimiento"
+            type="date"
+            required={isBirthDateRequired}
+            optional={!isBirthDateRequired}
+          />
 
           <FormField name="gender" label="Género" as="select" optional>
             <option value="">Sin especificar</option>

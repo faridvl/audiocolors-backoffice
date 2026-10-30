@@ -255,6 +255,9 @@ export const TEXT = {
         ERRORS: {
           FIRST_NAME_REQUIRED: 'agenda.picker.create.errors.firstNameRequired',
           LAST_NAME_REQUIRED: 'agenda.picker.create.errors.lastNameRequired',
+          FIRST_NAME_MIN: 'agenda.picker.create.errors.firstNameMin',
+          LAST_NAME_MIN: 'agenda.picker.create.errors.lastNameMin',
+          BRANCH_REQUIRED: 'agenda.picker.create.errors.branchRequired',
           NAME_LETTERS: 'agenda.picker.create.errors.nameLetters',
           NAME_MAX: 'agenda.picker.create.errors.nameMax',
           DOCUMENT_REQUIRED: 'agenda.picker.create.errors.documentRequired',

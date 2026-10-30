@@ -13,6 +13,7 @@ import { CreatePatientPayload, Patient } from '@/types/patients/patient';
 import {
   buildPatientQuickCreateSchema,
   buildQuickCreateInitialValues,
+  normalizeQuickCreateDocument,
   PatientQuickCreateValues,
 } from './patient-quick-create-form';
 
@@ -24,9 +25,13 @@ export function usePatientQuickCreate(searchTerm: string, onCreated: (patient: P
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { executeCreatePatient, isPending } = useCreatePatientMutation();
-  const { data: branches } = useBranchesQuery();
+  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery();
 
-  const validationSchema = useMemo(() => buildPatientQuickCreateSchema(t), [t]);
+  const isBranchRequired = isLoadingBranches || (branches?.length ?? 0) > 0;
+  const validationSchema = useMemo(
+    () => buildPatientQuickCreateSchema(t, isBranchRequired),
+    [t, isBranchRequired],
+  );
   // Se calcula al abrir el formulario: lo que se siga escribiendo en la búsqueda no lo cambia.
   const initialValues = useMemo(
     () => buildQuickCreateInitialValues(searchTerm),
@@ -49,7 +54,7 @@ export function usePatientQuickCreate(searchTerm: string, onCreated: (patient: P
       firstName,
       lastName,
       phone,
-      documentId: values.documentId.trim(),
+      documentId: normalizeQuickCreateDocument(values.documentId),
       ...(values.branchUuid && { branchUuid: values.branchUuid }),
       contacts: contacts.map(({ name, phone: contactPhone }) => ({
         name,

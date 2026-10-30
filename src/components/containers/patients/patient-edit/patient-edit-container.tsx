@@ -62,6 +62,7 @@ export const PatientEditContainer: React.FC<PatientEditContainerProps> = ({ uuid
         <PatientFormFields
           submitLabel="Guardar cambios"
           isSubmitting={isPending}
+          isBirthDateRequired={false}
           onCancel={handleCancel}
         />
       </Formik>

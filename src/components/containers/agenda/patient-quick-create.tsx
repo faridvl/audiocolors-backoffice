@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -17,6 +17,7 @@ interface PatientQuickCreateFormProps {
   searchTerm: string;
   onCreated: (patient: Patient) => void;
   onBack: () => void;
+  onSavingChange: (isSaving: boolean) => void;
 }
 
 /** Pre-registro: solo lo necesario para agendar; el expediente se completa en la cita. */
@@ -24,10 +25,15 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
   searchTerm,
   onCreated,
   onBack,
+  onSavingChange,
 }) => {
   const { t } = useTranslation();
   const { initialValues, validationSchema, handleSubmit, isPending, branches } =
     usePatientQuickCreate(searchTerm, onCreated);
+
+  useEffect(() => {
+    onSavingChange(isPending);
+  }, [isPending, onSavingChange]);
 
   return (
     <Formik
@@ -57,7 +63,8 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
             label: branch.name,
             accentColor: getBranchStripeColor(branch.name),
           }))}
-          optional
+          required={branches.length > 0}
+          optional={branches.length === 0}
         />
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

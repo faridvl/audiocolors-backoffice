@@ -6,7 +6,7 @@ import { PatientFlagPills } from '@/components/containers/patients/patient-flags
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { calculateAge, formatDate, getFullName } from '@/shared/utils/formatters';
+import { calculateAge, formatCalendarDate, formatDate, getFullName } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import {
   GENDER_LABELS,
@@ -122,7 +122,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-ink-100 pt-4">
           <PatientDatum
             label={t(TEXT.PATIENTS.DETAIL.FIELDS.BIRTH_DATE)}
-            value={patient.birthDate ? formatDate(patient.birthDate) : null}
+            value={patient.birthDate ? formatCalendarDate(patient.birthDate) : null}
           />
           <PatientDatum label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH)} value={branchName} />
         </dl>

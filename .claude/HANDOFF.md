@@ -102,7 +102,10 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 3. **P0-3** revisar en producción los tipos de cita en Configuración → Tipos de
    cita: la clínica edita sus duraciones (hoy Cita 60 min, Control y
    Mantenimiento 30) y Control debe estar marcado como control.
-4. Luego **P3-1** (Configuración: faltan sedes y usuarios, D21) y **P3-2**
+4. **Antes de publicar** (pre-registro, etapa 6): la migración `birthDate` opcional va antes
+   que el front en cada ambiente. Zynka (`next-audiology-files`,
+   `use-patient-summary-header.ts:28-43,70`) muestra una edad falsa cuando `birthDate` es null.
+5. Luego **P3-1** (Configuración: faltan sedes y usuarios, D21) y **P3-2**
    (permisos configurables por el administrador, D20).
 
 ## Preguntas abiertas

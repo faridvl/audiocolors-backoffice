@@ -26,6 +26,12 @@ export function formatNationalId(value: string): string {
   return `${digits.slice(0, 1)}-${digits.slice(1, 5)}-${digits.slice(5)}`;
 }
 
+function isPastOrPresentDate(value: string | undefined): boolean {
+  if (!value) return false;
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
+}
+
 const baseFields = {
   firstName: Yup.string()
     .matches(NAME_REGEX, 'Solo letras y espacios')
@@ -39,11 +45,7 @@ const baseFields = {
   email: Yup.string().email('Correo inválido'),
   birthDate: Yup.string()
     .required('La fecha de nacimiento es obligatoria')
-    .test('not-future', 'La fecha no puede ser futura', (value) => {
-      if (!value) return false;
-      const parsed = new Date(value);
-      return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
-    }),
+    .test('not-future', 'La fecha no puede ser futura', isPastOrPresentDate),
   address: Yup.string().max(240, 'Máximo 240 caracteres'),
   gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opción'),
 };
@@ -86,7 +88,16 @@ export const patientCreateValidationSchema = Yup.object({
 });
 
 export const buildPatientEditValidationSchema = (initialContacts: PatientContactFormValues[]) =>
-  Yup.object({ ...baseFields, contacts: buildContactsField(toUnchangedPhones(initialContacts)) });
+  Yup.object({
+    ...baseFields,
+    // Al editar es opcional: obligarla empujaría a inventar fechas en un expediente clínico.
+    birthDate: Yup.string().test(
+      'not-future',
+      'La fecha no puede ser futura',
+      (value) => !value || isPastOrPresentDate(value),
+    ),
+    contacts: buildContactsField(toUnchangedPhones(initialContacts)),
+  });
 
 /** Solo los contactos, para editarlos desde el expediente sin abrir el formulario entero. */
 export const buildPatientContactsValidationSchema = (initialContacts: PatientContactFormValues[]) =>

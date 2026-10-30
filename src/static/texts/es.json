@@ -329,6 +329,9 @@
         "errors": {
           "firstNameRequired": "El nombre es obligatorio",
           "lastNameRequired": "El apellido es obligatorio",
+          "firstNameMin": "El nombre debe tener al menos 2 letras",
+          "lastNameMin": "El apellido debe tener al menos 2 letras",
+          "branchRequired": "Elige una sede",
           "nameLetters": "Solo letras y espacios",
           "nameMax": "Máximo 60 caracteres",
           "documentRequired": "La cédula es obligatoria",

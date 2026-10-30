@@ -50,7 +50,7 @@ export interface Patient {
   renewPrescriptionSince?: string | null;
   /** Documento (categoría WARRANTY) elegido como el de la garantía. */
   warrantyDocumentUuid?: string | null;
-  birthDate: string;
+  birthDate?: string | null;
   email?: string;
   gender?: string;
   documentId?: string;

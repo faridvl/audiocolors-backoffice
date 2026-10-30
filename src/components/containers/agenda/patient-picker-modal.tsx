@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2, Search, UserPlus, UserRound, X } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -33,6 +33,11 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
     startCreating,
     stopCreating,
   } = usePatientPicker();
+  // Cerrar a mitad de un guardado crearía el paciente sin dejarlo elegido.
+  const [isSaving, setIsSaving] = useState(false);
+  const handleClose = () => {
+    if (!isSaving) onClose();
+  };
 
   return (
     <div
@@ -40,7 +45,7 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
       aria-modal="true"
       aria-label={t(TEXT.AGENDA.PICKER.TITLE)}
       className="fixed inset-0 z-50 flex items-start justify-center bg-ink-900/70 p-4 pt-[12vh]"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="w-full max-w-md rounded-card bg-white p-5"
@@ -59,9 +64,10 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
+            disabled={isSaving}
             aria-label={t(TEXT.AGENDA.PICKER.CLOSE)}
-            className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-ink-500 hover:bg-ink-100"
+            className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-ink-500 hover:bg-ink-100 disabled:opacity-40"
           >
             <X className="h-4 w-4" aria-hidden />
           </button>
@@ -72,6 +78,7 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
             searchTerm={searchTerm}
             onCreated={onPick}
             onBack={stopCreating}
+            onSavingChange={setIsSaving}
           />
         ) : (
           <>
