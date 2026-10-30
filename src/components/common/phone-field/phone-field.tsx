@@ -1,12 +1,15 @@
-import React from 'react';
-import { useField } from 'formik';
-import { useTranslation } from 'react-i18next';
-import { FormField } from '@/components/common/input/input';
-import { TEXT } from '@/static/texts/i18n';
-import { formatPhoneInput, shouldShowCountryPrefix } from '@/shared/utils/phone';
+import React from "react";
+import { useField } from "formik";
+import { useTranslation } from "react-i18next";
+import { FormField } from "@/components/common/input/input";
+import { TEXT } from "@/static/texts/i18n";
+import {
+  formatPhoneInput,
+  shouldShowCountryPrefix,
+} from "@/shared/utils/phone";
 
 /** Código que el sistema asume cuando el número no empieza con `+`. */
-const DEFAULT_COUNTRY_LABEL = '+506';
+const DEFAULT_COUNTRY_LABEL = "+506";
 
 interface PhoneFieldProps {
   name: string;
@@ -14,6 +17,8 @@ interface PhoneFieldProps {
   required?: boolean;
   /** Reemplaza la ayuda por defecto (cómo escribir un número de otro país); '' la oculta. */
   hint?: string;
+  /** Deja la ayuda a la vista aunque haya error. */
+  isHintAlwaysVisible?: boolean;
   className?: string;
 }
 
@@ -26,6 +31,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
   label,
   required = false,
   hint,
+  isHintAlwaysVisible,
   className,
 }) => {
   const { t } = useTranslation();
@@ -36,9 +42,12 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
       name={name}
       label={label}
       hint={hint ?? t(TEXT.GENERAL.PHONE_HINT)}
+      isHintAlwaysVisible={isHintAlwaysVisible}
       inputMode="tel"
       required={required}
-      startAdornment={shouldShowCountryPrefix(value) ? DEFAULT_COUNTRY_LABEL : undefined}
+      startAdornment={
+        shouldShowCountryPrefix(value) ? DEFAULT_COUNTRY_LABEL : undefined
+      }
       onChange={(event) => void setValue(formatPhoneInput(event.target.value))}
       className={className}
     />

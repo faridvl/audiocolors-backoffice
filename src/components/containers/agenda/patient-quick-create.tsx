@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
-import { Form, Formik } from 'formik';
-import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Save } from 'lucide-react';
-import { Button, ButtonVariant } from '@/components/common/button/button';
-import { FormField } from '@/components/common/input/input';
-import { FormSelectField } from '@/components/common/form/form-select-field';
-import { FocusFirstError } from '@/components/common/form/focus-first-error';
-import { PhoneField } from '@/components/common/phone-field/phone-field';
-import { getBranchStripeColor } from '@/shared/design/tokens';
-import { TEXT } from '@/static/texts/i18n';
-import { Patient } from '@/types/patients/patient';
-import { DOCUMENT_MAX_LENGTH } from './patient-quick-create-form';
-import { usePatientQuickCreate } from './use-patient-quick-create';
+import React, { useEffect } from "react";
+import { Form, Formik } from "formik";
+import { useTranslation } from "react-i18next";
+import { ArrowLeft, Save } from "lucide-react";
+import { Button, ButtonVariant } from "@/components/common/button/button";
+import { FormField } from "@/components/common/input/input";
+import { FormSelectField } from "@/components/common/form/form-select-field";
+import { FocusFirstError } from "@/components/common/form/focus-first-error";
+import { PhoneField } from "@/components/common/phone-field/phone-field";
+import { getBranchStripeColor } from "@/shared/design/tokens";
+import { TEXT } from "@/static/texts/i18n";
+import { Patient } from "@/types/patients/patient";
+import { DOCUMENT_MAX_LENGTH } from "./patient-quick-create-form";
+import { usePatientQuickCreate } from "./use-patient-quick-create";
 
 interface PatientQuickCreateFormProps {
   searchTerm: string;
@@ -31,6 +31,8 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
   const { initialValues, validationSchema, handleSubmit, isPending, branches } =
     usePatientQuickCreate(searchTerm, onCreated);
 
+  const isBranchRequired = branches.length > 0;
+
   useEffect(() => {
     onSavingChange(isPending);
   }, [isPending, onSavingChange]);
@@ -41,33 +43,52 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <Form className="mt-4 flex flex-col gap-4">
+      <Form className="mt-4 flex min-h-0 flex-1 flex-col gap-4">
         <FocusFirstError />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <FormField name="firstName" label={t(TEXT.AGENDA.PICKER.CREATE.FIRST_NAME)} required />
-          <FormField name="lastName" label={t(TEXT.AGENDA.PICKER.CREATE.LAST_NAME)} required />
+        <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-1">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              name="firstName"
+              label={t(TEXT.AGENDA.PICKER.CREATE.FIRST_NAME)}
+              required
+            />
+            <FormField
+              name="lastName"
+              label={t(TEXT.AGENDA.PICKER.CREATE.LAST_NAME)}
+              required
+            />
+          </div>
+          <PhoneField
+            name="phone"
+            label={t(TEXT.AGENDA.PICKER.CREATE.PHONE)}
+            required
+            isHintAlwaysVisible
+          />
+          <FormField
+            name="documentId"
+            label={t(TEXT.AGENDA.PICKER.CREATE.DOCUMENT_ID)}
+            maxLength={DOCUMENT_MAX_LENGTH}
+            required
+          />
+          <FormSelectField
+            name="branchUuid"
+            label={t(TEXT.AGENDA.PICKER.CREATE.BRANCH)}
+            placeholder={t(
+              isBranchRequired
+                ? TEXT.AGENDA.PICKER.CREATE.BRANCH_REQUIRED_PLACEHOLDER
+                : TEXT.AGENDA.PICKER.CREATE.BRANCH_PLACEHOLDER,
+            )}
+            options={branches.map((branch) => ({
+              value: branch.uuid,
+              label: branch.name,
+              accentColor: getBranchStripeColor(branch.name),
+            }))}
+            required={isBranchRequired}
+            optional={!isBranchRequired}
+          />
         </div>
-        <PhoneField name="phone" label={t(TEXT.AGENDA.PICKER.CREATE.PHONE)} required />
-        <FormField
-          name="documentId"
-          label={t(TEXT.AGENDA.PICKER.CREATE.DOCUMENT_ID)}
-          maxLength={DOCUMENT_MAX_LENGTH}
-          required
-        />
-        <FormSelectField
-          name="branchUuid"
-          label={t(TEXT.AGENDA.PICKER.CREATE.BRANCH)}
-          placeholder={t(TEXT.AGENDA.PICKER.CREATE.BRANCH_PLACEHOLDER)}
-          options={branches.map((branch) => ({
-            value: branch.uuid,
-            label: branch.name,
-            accentColor: getBranchStripeColor(branch.name),
-          }))}
-          required={branches.length > 0}
-          optional={branches.length === 0}
-        />
 
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <div className="flex shrink-0 flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button
             variant={ButtonVariant.SECONDARY}
             onClick={onBack}

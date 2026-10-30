@@ -249,6 +249,7 @@ export const TEXT = {
         DOCUMENT_ID: 'agenda.picker.create.documentId',
         BRANCH: 'agenda.picker.create.branch',
         BRANCH_PLACEHOLDER: 'agenda.picker.create.branchPlaceholder',
+        BRANCH_REQUIRED_PLACEHOLDER: 'agenda.picker.create.branchRequiredPlaceholder',
         SUBMIT: 'agenda.picker.create.submit',
         BACK: 'agenda.picker.create.back',
         SAVED: 'agenda.picker.create.saved',

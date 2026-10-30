@@ -137,3 +137,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Solo cambiaron docs y 4 comentarios: lint y typecheck limpios, sin navegador ni build.
 - Falta comprobar en una sesión real que los agentes trabajen bien con el CLAUDE.md corto y que
   la tabla de RULES §1 (dónde el repo difiere de los estándares) no deje huecos.
+
+- Pre-registro rápido (modal Agendar): pie fijo y cuerpo con scroll en celulares bajos; ronda 2 de correcciones cerrada.

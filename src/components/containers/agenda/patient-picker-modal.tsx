@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Loader2, Search, UserPlus, UserRound, X } from 'lucide-react';
-import { Button, ButtonVariant } from '@/components/common/button/button';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { inputBaseClasses } from '@/components/common/input/input';
-import { EMPTY_VALUE, formatMonthLabel, getFullName } from '@/shared/utils/formatters';
-import { tailwind } from '@/utils/tailwind-utils';
-import { TEXT } from '@/static/texts/i18n';
-import { Patient } from '@/types/patients/patient';
-import { PatientQuickCreateForm } from './patient-quick-create';
-import { usePatientPicker } from './use-patient-picker';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Loader2, Search, UserPlus, UserRound, X } from "lucide-react";
+import { Button, ButtonVariant } from "@/components/common/button/button";
+import {
+  Typography,
+  TypographyVariant,
+} from "@/components/common/typography/typography";
+import { inputBaseClasses } from "@/components/common/input/input";
+import {
+  EMPTY_VALUE,
+  formatMonthLabel,
+  getFullName,
+} from "@/shared/utils/formatters";
+import { tailwind } from "@/utils/tailwind-utils";
+import { TEXT } from "@/static/texts/i18n";
+import { Patient } from "@/types/patients/patient";
+import { PatientQuickCreateForm } from "./patient-quick-create";
+import { usePatientPicker } from "./use-patient-picker";
 
 interface PatientPickerModalProps {
   onPick: (patient: Patient) => void;
@@ -21,7 +28,10 @@ interface PatientPickerModalProps {
  * es el mismo modal de próxima cita del expediente, para que haya una sola
  * forma de agendar.
  */
-export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, onClose }) => {
+export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({
+  onPick,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const {
     searchTerm,
@@ -44,21 +54,27 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
       role="dialog"
       aria-modal="true"
       aria-label={t(TEXT.AGENDA.PICKER.TITLE)}
-      className="fixed inset-0 z-50 flex items-start justify-center bg-ink-900/70 p-4 pt-[12vh]"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-ink-900/70 p-4 sm:pt-[12vh]"
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-md rounded-card bg-white p-5"
+        className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white p-5"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex shrink-0 items-start justify-between gap-3">
           <div>
             <Typography variant={TypographyVariant.ACCENT}>
-              {t(isCreating ? TEXT.AGENDA.PICKER.CREATE.TITLE : TEXT.AGENDA.PICKER.TITLE)}
+              {t(
+                isCreating
+                  ? TEXT.AGENDA.PICKER.CREATE.TITLE
+                  : TEXT.AGENDA.PICKER.TITLE,
+              )}
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>
               {t(
-                isCreating ? TEXT.AGENDA.PICKER.CREATE.DESCRIPTION : TEXT.AGENDA.PICKER.DESCRIPTION,
+                isCreating
+                  ? TEXT.AGENDA.PICKER.CREATE.DESCRIPTION
+                  : TEXT.AGENDA.PICKER.DESCRIPTION,
               )}
             </Typography>
           </div>
@@ -81,8 +97,8 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
             onSavingChange={setIsSaving}
           />
         ) : (
-          <>
-            <div className="relative mt-4">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="relative mt-4 shrink-0">
               <Search
                 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
                 aria-hidden
@@ -94,7 +110,7 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
                 onChange={(event) => setSearchTerm(event.target.value)}
                 placeholder={t(TEXT.AGENDA.PICKER.SEARCH_PLACEHOLDER)}
                 aria-label={t(TEXT.AGENDA.PICKER.SEARCH_ARIA)}
-                className={tailwind(inputBaseClasses, 'pl-9 pr-9')}
+                className={tailwind(inputBaseClasses, "pl-9 pr-9")}
               />
               {isSearching && hasEnoughText && (
                 <Loader2
@@ -104,16 +120,22 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
               )}
             </div>
 
-            <div className="mt-3 flex flex-col gap-1">
+            <div className="mt-3 flex min-h-0 flex-col gap-1 overflow-y-auto">
               {!hasEnoughText && (
-                <Typography variant={TypographyVariant.HELPER} className="px-1 py-2">
+                <Typography
+                  variant={TypographyVariant.HELPER}
+                  className="px-1 py-2"
+                >
                   {t(TEXT.AGENDA.PICKER.HINT)}
                 </Typography>
               )}
 
               {hasEnoughText && !isSearching && patients.length === 0 && (
                 <>
-                  <Typography variant={TypographyVariant.HELPER} className="px-1 py-2">
+                  <Typography
+                    variant={TypographyVariant.HELPER}
+                    className="px-1 py-2"
+                  >
                     {t(TEXT.AGENDA.PICKER.EMPTY)}
                   </Typography>
                   <Button
@@ -138,10 +160,16 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
                     <UserRound className="h-4 w-4 text-ink-500" aria-hidden />
                   </span>
                   <span className="flex min-w-0 flex-col">
-                    <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
+                    <Typography
+                      variant={TypographyVariant.BODY_SEMIBOLD}
+                      className="truncate"
+                    >
                       {getFullName(patient.firstName, patient.lastName)}
                     </Typography>
-                    <Typography variant={TypographyVariant.HELPER} className="truncate">
+                    <Typography
+                      variant={TypographyVariant.HELPER}
+                      className="truncate"
+                    >
                       {[
                         patient.documentId,
                         patient.tentativeAppointmentMonth
@@ -149,13 +177,13 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({ onPick, 
                           : null,
                       ]
                         .filter(Boolean)
-                        .join(' · ') || EMPTY_VALUE}
+                        .join(" · ") || EMPTY_VALUE}
                     </Typography>
                   </span>
                 </button>
               ))}
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
