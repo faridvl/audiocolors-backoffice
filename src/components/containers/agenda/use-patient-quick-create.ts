@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -21,16 +21,23 @@ import {
 const isDuplicateDocumentError = (message: string): boolean =>
   message.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes('cedula');
 
-export function usePatientQuickCreate(searchTerm: string, onCreated: (patient: Patient) => void) {
+export function usePatientQuickCreate(
+  searchTerm: string,
+  onCreated: (patient: Patient) => void,
+  onSearchDocument: (documentId: string) => void,
+) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { executeCreatePatient, isPending } = useCreatePatientMutation();
   const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery();
 
+  // Cédula que el API rechazó por repetida.
+  const [duplicateDocument, setDuplicateDocument] = useState<string | null>(null);
+
   const isBranchRequired = isLoadingBranches || (branches?.length ?? 0) > 0;
   const validationSchema = useMemo(
-    () => buildPatientQuickCreateSchema(t, isBranchRequired),
-    [t, isBranchRequired],
+    () => buildPatientQuickCreateSchema(t, isBranchRequired, duplicateDocument),
+    [t, isBranchRequired, duplicateDocument],
   );
   // Se calcula al abrir el formulario: lo que se siga escribiendo en la búsqueda no lo cambia.
   const initialValues = useMemo(
@@ -70,6 +77,7 @@ export function usePatientQuickCreate(searchTerm: string, onCreated: (patient: P
       },
       onError: (error: Error) => {
         if (isDuplicateDocumentError(error.message)) {
+          setDuplicateDocument(values.documentId.trim());
           helpers.setFieldError(
             'documentId',
             t(TEXT.AGENDA.PICKER.CREATE.ERRORS.DOCUMENT_DUPLICATE),
@@ -81,7 +89,13 @@ export function usePatientQuickCreate(searchTerm: string, onCreated: (patient: P
     });
   };
 
+  const duplicateDocumentMessage = t(TEXT.AGENDA.PICKER.CREATE.ERRORS.DOCUMENT_DUPLICATE);
+  const handleSearchDocument = (documentId: string) =>
+    onSearchDocument(normalizeQuickCreateDocument(documentId));
+
   return {
+    duplicateDocumentMessage,
+    handleSearchDocument,
     initialValues,
     validationSchema,
     handleSubmit,

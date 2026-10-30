@@ -58,15 +58,28 @@ const buildNameField = (t: TFunction, requiredKey: string, minKey: string) =>
     .max(NAME_MAX_LENGTH, t(ERRORS.NAME_MAX))
     .required(t(requiredKey));
 
-/** `isBranchRequired`: la clínica tiene sedes (o aún se cargan); sin ninguna se sigue sin sede. */
-export const buildPatientQuickCreateSchema = (t: TFunction, isBranchRequired: boolean) =>
+/**
+ * `isBranchRequired`: la clínica tiene sedes (o aún se cargan); sin ninguna se sigue sin sede.
+ * `duplicateDocument`: cédula que el API ya rechazó por repetida; el error se mantiene al validar
+ * de nuevo (p. ej. al salir del campo), si no el enlace de búsqueda desaparecería al tocarlo.
+ */
+export const buildPatientQuickCreateSchema = (
+  t: TFunction,
+  isBranchRequired: boolean,
+  duplicateDocument: string | null,
+) =>
   Yup.object({
     firstName: buildNameField(t, ERRORS.FIRST_NAME_REQUIRED, ERRORS.FIRST_NAME_MIN),
     lastName: buildNameField(t, ERRORS.LAST_NAME_REQUIRED, ERRORS.LAST_NAME_MIN),
     documentId: Yup.string()
       .trim()
       .max(DOCUMENT_MAX_LENGTH, t(ERRORS.DOCUMENT_MAX))
-      .required(t(ERRORS.DOCUMENT_REQUIRED)),
+      .required(t(ERRORS.DOCUMENT_REQUIRED))
+      .test(
+        'not-duplicate',
+        t(ERRORS.DOCUMENT_DUPLICATE),
+        (value) => duplicateDocument === null || value !== duplicateDocument,
+      ),
     phone: Yup.string()
       .test('valid-phone', (value, context) => {
         const error = validatePhone(value ?? '');

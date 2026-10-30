@@ -327,6 +327,7 @@
         "submit": "Registrar y agendar",
         "back": "Volver a la búsqueda",
         "saved": "Paciente registrado",
+        "searchExisting": "Buscar a este paciente",
         "errors": {
           "firstNameRequired": "El nombre es obligatorio",
           "lastNameRequired": "El apellido es obligatorio",

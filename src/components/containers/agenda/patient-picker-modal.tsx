@@ -45,6 +45,10 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({
   } = usePatientPicker();
   // Cerrar a mitad de un guardado crearía el paciente sin dejarlo elegido.
   const [isSaving, setIsSaving] = useState(false);
+  const handleSearchDocument = (documentId: string) => {
+    setSearchTerm(documentId);
+    stopCreating();
+  };
   const handleClose = () => {
     if (!isSaving) onClose();
   };
@@ -94,6 +98,7 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({
             searchTerm={searchTerm}
             onCreated={onPick}
             onBack={stopCreating}
+            onSearchDocument={handleSearchDocument}
             onSavingChange={setIsSaving}
           />
         ) : (

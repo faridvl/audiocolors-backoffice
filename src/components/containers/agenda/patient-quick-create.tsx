@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, Formik } from "formik";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Search } from "lucide-react";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { FormField } from "@/components/common/input/input";
 import { FormSelectField } from "@/components/common/form/form-select-field";
@@ -17,6 +17,7 @@ interface PatientQuickCreateFormProps {
   searchTerm: string;
   onCreated: (patient: Patient) => void;
   onBack: () => void;
+  onSearchDocument: (documentId: string) => void;
   onSavingChange: (isSaving: boolean) => void;
 }
 
@@ -25,11 +26,19 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
   searchTerm,
   onCreated,
   onBack,
+  onSearchDocument,
   onSavingChange,
 }) => {
   const { t } = useTranslation();
-  const { initialValues, validationSchema, handleSubmit, isPending, branches } =
-    usePatientQuickCreate(searchTerm, onCreated);
+  const {
+    initialValues,
+    validationSchema,
+    handleSubmit,
+    isPending,
+    branches,
+    duplicateDocumentMessage,
+    handleSearchDocument,
+  } = usePatientQuickCreate(searchTerm, onCreated, onSearchDocument);
 
   const isBranchRequired = branches.length > 0;
 
@@ -43,72 +52,87 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <Form className="mt-4 flex min-h-0 flex-1 flex-col gap-4">
-        <FocusFirstError />
-        <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-1">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              name="firstName"
-              label={t(TEXT.AGENDA.PICKER.CREATE.FIRST_NAME)}
+      {({ values, errors }) => (
+        <Form className="mt-4 flex min-h-0 flex-1 flex-col gap-4">
+          <FocusFirstError />
+          <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-1">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <FormField
+                name="firstName"
+                label={t(TEXT.AGENDA.PICKER.CREATE.FIRST_NAME)}
+                required
+              />
+              <FormField
+                name="lastName"
+                label={t(TEXT.AGENDA.PICKER.CREATE.LAST_NAME)}
+                required
+              />
+            </div>
+            <PhoneField
+              name="phone"
+              label={t(TEXT.AGENDA.PICKER.CREATE.PHONE)}
               required
+              isHintAlwaysVisible
             />
-            <FormField
-              name="lastName"
-              label={t(TEXT.AGENDA.PICKER.CREATE.LAST_NAME)}
-              required
+            <div className="flex flex-col gap-1">
+              <FormField
+                name="documentId"
+                label={t(TEXT.AGENDA.PICKER.CREATE.DOCUMENT_ID)}
+                maxLength={DOCUMENT_MAX_LENGTH}
+                required
+              />
+              {errors.documentId === duplicateDocumentMessage && (
+                <Button
+                  variant={ButtonVariant.GHOST}
+                  onClick={() => handleSearchDocument(values.documentId)}
+                  icon={<Search className="h-4 w-4" aria-hidden />}
+                  className="self-start"
+                >
+                  {t(TEXT.AGENDA.PICKER.CREATE.SEARCH_EXISTING)}
+                </Button>
+              )}
+            </div>
+            <FormSelectField
+              name="branchUuid"
+              label={t(TEXT.AGENDA.PICKER.CREATE.BRANCH)}
+              placeholder={t(
+                isBranchRequired
+                  ? TEXT.AGENDA.PICKER.CREATE.BRANCH_REQUIRED_PLACEHOLDER
+                  : TEXT.AGENDA.PICKER.CREATE.BRANCH_PLACEHOLDER,
+              )}
+              options={branches.map((branch) => ({
+                value: branch.uuid,
+                label: branch.name,
+                accentColor: getBranchStripeColor(branch.name),
+              }))}
+              isSheetOnMobile
+              required={isBranchRequired}
+              optional={!isBranchRequired}
             />
           </div>
-          <PhoneField
-            name="phone"
-            label={t(TEXT.AGENDA.PICKER.CREATE.PHONE)}
-            required
-            isHintAlwaysVisible
-          />
-          <FormField
-            name="documentId"
-            label={t(TEXT.AGENDA.PICKER.CREATE.DOCUMENT_ID)}
-            maxLength={DOCUMENT_MAX_LENGTH}
-            required
-          />
-          <FormSelectField
-            name="branchUuid"
-            label={t(TEXT.AGENDA.PICKER.CREATE.BRANCH)}
-            placeholder={t(
-              isBranchRequired
-                ? TEXT.AGENDA.PICKER.CREATE.BRANCH_REQUIRED_PLACEHOLDER
-                : TEXT.AGENDA.PICKER.CREATE.BRANCH_PLACEHOLDER,
-            )}
-            options={branches.map((branch) => ({
-              value: branch.uuid,
-              label: branch.name,
-              accentColor: getBranchStripeColor(branch.name),
-            }))}
-            required={isBranchRequired}
-            optional={!isBranchRequired}
-          />
-        </div>
 
-        <div className="flex shrink-0 flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button
-            variant={ButtonVariant.SECONDARY}
-            onClick={onBack}
-            disabled={isPending}
-            icon={<ArrowLeft className="h-4 w-4" aria-hidden />}
-            className="w-full sm:w-auto"
-          >
-            {t(TEXT.AGENDA.PICKER.CREATE.BACK)}
-          </Button>
-          <Button
-            type="submit"
-            variant={ButtonVariant.PRIMARY}
-            isLoading={isPending}
-            icon={<Save className="h-4 w-4" aria-hidden />}
-            className="w-full sm:w-auto"
-          >
-            {t(TEXT.AGENDA.PICKER.CREATE.SUBMIT)}
-          </Button>
-        </div>
-      </Form>
+          <div className="flex shrink-0 flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              onClick={onBack}
+              disabled={isPending}
+              icon={<ArrowLeft className="h-4 w-4" aria-hidden />}
+              className="w-full sm:w-auto"
+            >
+              {t(TEXT.AGENDA.PICKER.CREATE.BACK)}
+            </Button>
+            <Button
+              type="submit"
+              variant={ButtonVariant.PRIMARY}
+              isLoading={isPending}
+              icon={<Save className="h-4 w-4" aria-hidden />}
+              className="w-full sm:w-auto"
+            >
+              {t(TEXT.AGENDA.PICKER.CREATE.SUBMIT)}
+            </Button>
+          </div>
+        </Form>
+      )}
     </Formik>
   );
 };

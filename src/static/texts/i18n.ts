@@ -253,6 +253,7 @@ export const TEXT = {
         SUBMIT: 'agenda.picker.create.submit',
         BACK: 'agenda.picker.create.back',
         SAVED: 'agenda.picker.create.saved',
+        SEARCH_EXISTING: 'agenda.picker.create.searchExisting',
         ERRORS: {
           FIRST_NAME_REQUIRED: 'agenda.picker.create.errors.firstNameRequired',
           LAST_NAME_REQUIRED: 'agenda.picker.create.errors.lastNameRequired',
