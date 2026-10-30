@@ -107,9 +107,16 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
    `use-patient-summary-header.ts:28-43,70`) muestra una edad falsa cuando `birthDate` es null.
 5. Luego **P3-1** (Configuración: faltan sedes y usuarios, D21) y **P3-2**
    (permisos configurables por el administrador, D20).
+6. **Pruebas guardadas en el repo** (2026-10-30, para gastar menos en navegador): empezar con un
+   test del API (editar y volver a leer) y un flujo de Playwright, el del pre-registro; comando
+   que deje el ambiente listo con sesión iniciada y `data-testid` en lo que se prueba.
 
 ## Preguntas abiertas
 
+- Nombres de roles (2026-10-30, no hacerlo todavía): hoy OWNER, ADMIN, DOCTOR y STAFF. El usuario
+  los quiere más claros (Administrador, Profesional, Recepción, Secretario o Empleado) y busca un
+  estándar global de nombres. Propuesta a revisar: código fijo en inglés (`PRACTITIONER` viene de
+  FHIR) y el nombre visible desde `es.json`.
 - Teléfonos: ¿hace falta un selector de país? Hoy un número de Nicaragua (+505,
   también 8 dígitos) escrito sin + se guarda como de Costa Rica (D30).
 
