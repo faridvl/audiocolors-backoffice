@@ -98,7 +98,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <PatientFlagPills patient={patient} flags={MODAL_FLAGS} onClick={onEditFlags} />
+          <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
           <VideoCandidateCheck patient={patient} />
         </div>
 

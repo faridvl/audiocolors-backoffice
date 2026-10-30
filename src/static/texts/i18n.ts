@@ -361,6 +361,8 @@ export const TEXT = {
       /** Prefijo: `${FLAG_ON_PREFIX}.${PatientActivityAction}` al prender un indicador. */
       FLAG_ON_PREFIX: 'activity.detail.flagOn',
       FLAG_OFF_PREFIX: 'activity.detail.flagOff',
+      LAB_SENT: 'activity.detail.labShipment.sent',
+      LAB_DATE_CHANGED: 'activity.detail.labShipment.dateChanged',
     },
   },
   DOCUMENTS: {
@@ -437,6 +439,13 @@ export const TEXT = {
       VALUE_PREFIX: 'patients.flags.values',
       /** Texto del indicador apagado, solo los que se nombran así (`Sin garantía`). */
       OFF_PREFIX: 'patients.flags.offValues',
+      LAB_SHIPMENT: {
+        DATE_LABEL: 'patients.flags.labShipment.dateLabel',
+        SHIPPED_ON: 'patients.flags.labShipment.shippedOn',
+        CHANGE_DATE: 'patients.flags.labShipment.changeDate',
+        DATE_UPDATED: 'patients.flags.labShipment.dateUpdated',
+        SINCE_VALUE: 'patients.flags.labShipment.sinceValue',
+      },
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',
       TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
       WARRANTY_DOCUMENT: {

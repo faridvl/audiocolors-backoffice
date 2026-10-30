@@ -14,6 +14,15 @@ export function formatDate(isoDate?: string): string {
   });
 }
 
+/** Formatea una fecha ISO como "12 mar", sin año. Devuelve '—' si no es valida. */
+export function formatShortDate(isoDate?: string): string {
+  if (!isoDate) return '—';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '—';
+
+  return parsed.toLocaleDateString('es-CR', { day: 'numeric', month: 'short' });
+}
+
 const MONTH_LABELS = [
   'enero',
   'febrero',

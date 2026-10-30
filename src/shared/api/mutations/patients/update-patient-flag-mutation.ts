@@ -7,6 +7,8 @@ interface UpdatePatientFlagVariables {
   patientUuid: string;
   flag: PatientFlag;
   isOn: boolean;
+  /** Solo audífonos en laboratorio: día de envío, "YYYY-MM-DD". */
+  date?: string;
 }
 
 /** Prende o apaga un indicador del paciente (audífonos en laboratorio, garantía activa). */
@@ -16,9 +18,10 @@ export function useUpdatePatientFlagMutation() {
     UpdatePatientFlagVariables
   >({
     mutationKey: ['updatePatientFlag'],
-    mutationFn: ({ patientUuid, flag, isOn }) =>
+    mutationFn: ({ patientUuid, flag, isOn, date }) =>
       ApiServiceClient(env.API.MEDICAL_RECORDS_URL).put<Patient>(`/patients/${patientUuid}/flags`, {
         [flag]: isOn,
+        ...(date && { hearingAidsInLabDate: date }),
       }),
   });
 

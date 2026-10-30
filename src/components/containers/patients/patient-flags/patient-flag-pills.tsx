@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { tailwind } from '@/utils/tailwind-utils';
 import { TEXT } from '@/static/texts/i18n';
-import { EMPTY_VALUE } from '@/shared/utils/formatters';
+import { EMPTY_VALUE, formatShortDate } from '@/shared/utils/formatters';
 import { Patient, PATIENT_FLAG_SINCE_FIELDS, PatientFlag } from '@/types/patients/patient';
 
 const FLAG_TONES: Record<PatientFlag, string> = {
@@ -40,8 +40,10 @@ export const PatientFlagPills: React.FC<{
   patient: Patient;
   /** Qué indicadores mostrar; por defecto todos. */
   flags?: PatientFlag[];
+  /** Los audífonos en laboratorio dicen desde qué día (el expediente; la lista va corta). */
+  showDates?: boolean;
   onClick?: () => void;
-}> = ({ patient, flags = Object.values(PatientFlag), onClick }) => {
+}> = ({ patient, flags = Object.values(PatientFlag), showDates = false, onClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -50,9 +52,15 @@ export const PatientFlagPills: React.FC<{
         .filter((flag) => isFlagOn(patient, flag) || isOffLabelShown(patient, flag))
         .map((flag) => {
           const isOn = isFlagOn(patient, flag);
-          const label = isOn
-            ? t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`)
-            : t(`${TEXT.PATIENTS.FLAGS.OFF_PREFIX}.${flag}`);
+          const showsLabDate =
+            showDates && flag === PatientFlag.HEARING_AIDS_IN_LAB && patient.hearingAidsInLabSince;
+          const label = showsLabDate
+            ? t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.SINCE_VALUE, {
+                date: formatShortDate(patient.hearingAidsInLabSince ?? undefined),
+              })
+            : isOn
+              ? t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`)
+              : t(`${TEXT.PATIENTS.FLAGS.OFF_PREFIX}.${flag}`);
           const className = tailwind(PILL_CLASSES, isOn ? FLAG_TONES[flag] : OFF_TONE);
           return onClick ? (
             <button

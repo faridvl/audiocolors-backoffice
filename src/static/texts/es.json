@@ -476,6 +476,10 @@
         "WARRANTY_EXPIRED_CHANGED": "Garantía marcada como expirada",
         "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta"
       },
+      "labShipment": {
+        "sent": "Audífonos enviados al laboratorio el {{date}}",
+        "dateChanged": "Fecha de envío cambiada: {{before}} → {{after}}"
+      },
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
@@ -546,7 +550,7 @@
     "flags": {
       "menu": "Indicadores",
       "title": "Indicadores del paciente",
-      "description": "Se guarda al tocar cada opción.",
+      "description": "Se guarda al tocar cada opción. Los audífonos piden la fecha de envío.",
       "done": "Listo",
       "sections": {
         "lab": "Laboratorio",
@@ -589,6 +593,13 @@
       },
       "offValues": {
         "hasActiveWarranty": "Sin garantía"
+      },
+      "labShipment": {
+        "dateLabel": "Fecha de envío",
+        "shippedOn": "Enviados el {{date}}",
+        "changeDate": "Cambiar fecha",
+        "dateUpdated": "Fecha de envío actualizada",
+        "sinceValue": "En laboratorio desde el {{date}}"
       },
       "warrantyDocument": {
         "label": "Archivo de la garantía",

@@ -31,7 +31,7 @@ import {
   PatientActivityAction,
   PatientFieldChange,
 } from '@/types/patient-activity/patient-activity';
-import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
+import { formatDate, formatMonthLabel, formatShortDate } from '@/shared/utils/formatters';
 import { repairFileName, stripFileExtension } from '@/shared/utils/file-name';
 
 enum ActionTone {
@@ -142,12 +142,24 @@ export function groupConsecutiveUploads(activities: PatientActivity[]): Activity
   return rows;
 }
 
+/** "2026-10-02" -> fecha local a medianoche, o null si no es un día. */
+function parseDayKey(dayKey?: string): Date | null {
+  if (!dayKey) return null;
+  const [year, month, day] = dayKey.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
 /** "2026-10-02" -> "02 oct 2026", leído como día local (no UTC). */
 function formatDayKey(dayKey?: string): string {
-  if (!dayKey) return '—';
-  const [year, month, day] = dayKey.split('-').map(Number);
-  if (!year || !month || !day) return '—';
-  return formatDate(new Date(year, month - 1, day).toISOString());
+  const date = parseDayKey(dayKey);
+  return date ? formatDate(date.toISOString()) : '—';
+}
+
+/** "2026-10-02" -> "2 oct", sin año. */
+function formatDayKeyShort(dayKey?: string): string {
+  const date = parseDayKey(dayKey);
+  return date ? formatShortDate(date.toISOString()) : '—';
 }
 
 function joinParts(...parts: (string | null | undefined)[]): string {
@@ -283,6 +295,21 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
     }
 
     case PatientActivityAction.HEARING_AIDS_LAB_CHANGED:
+      if (detail.isOn && detail.date) {
+        // Un cambio solo de fecha trae `previousDate`; un envío nuevo, solo `date`.
+        return detail.previousDate
+          ? context.t(TEXT.ACTIVITY.DETAIL.LAB_DATE_CHANGED, {
+              before: formatDayKeyShort(detail.previousDate),
+              after: formatDayKeyShort(detail.date),
+            })
+          : context.t(TEXT.ACTIVITY.DETAIL.LAB_SENT, {
+              date: formatDayKey(detail.date),
+            });
+      }
+      return context.t(
+        `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
+      );
+
     case PatientActivityAction.WARRANTY_CHANGED:
     case PatientActivityAction.VIDEO_CANDIDATE_CHANGED:
     case PatientActivityAction.WARRANTY_EXPIRED_CHANGED:

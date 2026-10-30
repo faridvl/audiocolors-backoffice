@@ -615,3 +615,17 @@ Zynka, pero es rarísimo.
 
 **Pendiente del usuario:** si quiere un selector de país. Con un solo campo, otro
 país de 8 dígitos como Nicaragua (+505) solo se distingue por el `+`.
+
+## D31 · Fecha de envío al laboratorio (2026-10-30)
+
+**Decisión:** al encender "Audífonos en laboratorio" se pide la fecha de envío: un
+solo día, por defecto hoy y nunca posterior a hoy en hora de Costa Rica (el API
+también lo rechaza). Se puede cambiar después, y la bitácora registra el envío y
+cada cambio de fecha. El día se guarda en `hearingAidsInLabSince` a mediodía UTC.
+Mientras se edita la fecha, el modal oculta "Listo" y solo ofrece Cancelar y Guardar.
+
+**Por qué:** a mediodía UTC cae en el mismo día en cualquier zona de América, sin
+correrse como con medianoche UTC. "Listo" descartaba la fecha tocada y parecía
+guardarla.
+
+**Fuera de alcance:** lo que pasa al apagarlo (punto 9 del lote, sin definir).

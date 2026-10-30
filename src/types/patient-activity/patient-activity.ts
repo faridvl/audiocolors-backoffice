@@ -66,6 +66,8 @@ export interface PatientActivityDetail {
   reason?: string | null;
   /** Indicadores (audífonos, garantía): true al prenderlo, false al apagarlo. */
   isOn?: boolean;
+  /** Audífonos en laboratorio: día de envío (`date`) y el anterior si se corrigió (`previousDate`). */
+  previousDate?: string;
 }
 
 export interface PatientActivity {

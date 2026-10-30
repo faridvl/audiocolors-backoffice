@@ -7,7 +7,8 @@ import { Tabs } from '@/components/common/tabs/tabs';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
-import { Patient } from '@/types/patients/patient';
+import { Patient, PatientFlag } from '@/types/patients/patient';
+import { LabShipmentDate } from './lab-shipment-date';
 import { usePatientFlags } from './use-patient-flags';
 import { WarrantyDocumentSelect } from './warranty-document-select';
 
@@ -24,6 +25,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
     activeSection,
     activeFlags,
     isWarrantySection,
+    labShipment,
     handleToggle,
     handleSectionChange,
   } = usePatientFlags(patient);
@@ -64,16 +66,41 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
           className="mt-5"
         />
         <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
-          {activeFlags.map((item) => (
-            <Switch
-              key={item.flag}
-              isChecked={item.isOn}
-              onChange={(isOn) => handleToggle(item.flag, isOn)}
-              label={item.label}
-              isLoading={item.isUpdating}
-              className="w-full py-2"
-            />
-          ))}
+          {activeFlags.map((item) => {
+            const isLab = item.flag === PatientFlag.HEARING_AIDS_IN_LAB;
+            return (
+              <div key={item.flag}>
+                <Switch
+                  isChecked={item.isOn}
+                  onChange={(isOn) => handleToggle(item.flag, isOn)}
+                  label={item.label}
+                  description={item.description}
+                  isLoading={item.isUpdating && !labShipment.isEditing}
+                  className="w-full py-2"
+                />
+                {isLab && labShipment.isEditing && (
+                  <LabShipmentDate
+                    date={labShipment.date}
+                    maxDate={labShipment.maxDate}
+                    isSaving={labShipment.isSaving}
+                    isSaveDisabled={labShipment.isSaveDisabled}
+                    onDateChange={labShipment.handleDateChange}
+                    onSave={labShipment.handleSave}
+                    onCancel={labShipment.handleCancel}
+                  />
+                )}
+                {isLab && labShipment.isLabOn && !labShipment.isEditing && (
+                  <Button
+                    variant={ButtonVariant.GHOST}
+                    onClick={labShipment.handleStartDateChange}
+                    className="mb-2 min-h-[36px] px-2 py-1 text-brand-700"
+                  >
+                    {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.CHANGE_DATE)}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
         </div>
         {isWarrantySection && (
           <div className="mt-4">
@@ -81,11 +108,18 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({ patient, o
           </div>
         )}
 
-        <div className="mt-5 flex justify-end">
-          <Button variant={ButtonVariant.SECONDARY} onClick={onClose} className="w-full sm:w-auto">
-            {t(TEXT.PATIENTS.FLAGS.DONE)}
-          </Button>
-        </div>
+        {/* Mientras se edita la fecha, "Listo" se leería como guardarla y la descartaría. */}
+        {!labShipment.isEditing && (
+          <div className="mt-5 flex justify-end">
+            <Button
+              variant={ButtonVariant.SECONDARY}
+              onClick={onClose}
+              className="w-full sm:w-auto"
+            >
+              {t(TEXT.PATIENTS.FLAGS.DONE)}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
