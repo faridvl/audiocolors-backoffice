@@ -496,6 +496,7 @@ export const TEXT = {
         RESET: 'patients.flags.contact.reset',
         TOAST: 'patients.flags.contact.toast',
         TOAST_RESET: 'patients.flags.contact.toastReset',
+        TOAST_CONFLICT: 'patients.flags.contact.toastConflict',
         PILL: 'patients.flags.contact.pill',
       },
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',

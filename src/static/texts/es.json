@@ -519,7 +519,7 @@
         "ATTENDED": "Mantenimiento {{number}}: asistido",
         "MISSED": "Mantenimiento {{number}}: perdido"
       },
-      "contactAttempts": "{{before}} → {{after}}",
+      "contactAttempts": "Intentos: {{before}} → {{after}}",
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
@@ -604,9 +604,9 @@
         "value": "{{count}} de {{max}}",
         "register": "Registrar intento",
         "reset": "Reiniciar",
-        "toast_one": "Intento de contacto registrado",
-        "toast_other": "{{count}} intentos de contacto registrados",
+        "toast": "Intento {{count}} de {{max}} registrado",
         "toastReset": "Intentos de contacto reiniciados",
+        "toastConflict": "Otra persona actualizó este contador. Revisa el valor y vuelve a intentarlo.",
         "pill": "Contacto: {{count}}"
       },
       "maintenance": {

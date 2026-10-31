@@ -12,6 +12,7 @@ const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 export enum HttpStatus {
   FORBIDDEN = 403,
   NOT_FOUND = 404,
+  CONFLICT = 409,
 }
 
 /** Error del API con su status, para distinguir p. ej. un 403 de rol de una falla real. */

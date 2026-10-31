@@ -50,7 +50,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="flex max-h-full w-full max-w-sm flex-col rounded-card bg-white"
+        className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-start gap-3 px-6 pb-4 pt-6">
@@ -67,7 +67,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-2">
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-6 pb-2">
           <Tabs
             items={sections.map((section) => ({
               value: section.key,
