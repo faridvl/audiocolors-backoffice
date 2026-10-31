@@ -70,6 +70,9 @@ export function getMaintenanceChoice(
   return status ? MaintenanceChoice[status] : MaintenanceChoice.UNMARKED;
 }
 
+/** Tope del contador de intentos de contacto (0 = sin intentos). */
+export const MAX_CONTACT_ATTEMPTS = 3;
+
 export interface Patient {
   uuid: string;
   firstName: string;
@@ -85,6 +88,8 @@ export interface Patient {
   maintenance2Status?: MaintenanceStatus | null;
   maintenance3Status?: MaintenanceStatus | null;
   maintenance4Status?: MaintenanceStatus | null;
+  /** Veces que se llamó al paciente (0 a 3); si falta cuenta como 0. */
+  contactAttempts?: number;
   warrantyExpiredSince?: string | null;
   renewPrescriptionSince?: string | null;
   /** Documento (categoría WARRANTY) elegido como el de la garantía. */

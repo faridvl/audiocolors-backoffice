@@ -25,6 +25,7 @@ export enum PatientFlagSection {
   LAB = 'lab',
   WARRANTY = 'warranty',
   MAINTENANCE = 'maintenance',
+  CONTACT = 'contact',
 }
 
 const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
@@ -35,6 +36,7 @@ const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
     PatientFlag.RENEW_PRESCRIPTION,
   ],
   [PatientFlagSection.MAINTENANCE]: [],
+  [PatientFlagSection.CONTACT]: [],
 };
 
 export function usePatientFlags(
@@ -153,6 +155,7 @@ export function usePatientFlags(
     },
     isWarrantySection: activeSection === PatientFlagSection.WARRANTY,
     isMaintenanceSection: activeSection === PatientFlagSection.MAINTENANCE,
+    isContactSection: activeSection === PatientFlagSection.CONTACT,
     handleSectionChange,
   };
 }

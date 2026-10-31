@@ -25,6 +25,7 @@ export enum PatientActivityAction {
   WARRANTY_EXPIRED_CHANGED = 'WARRANTY_EXPIRED_CHANGED',
   RENEW_PRESCRIPTION_CHANGED = 'RENEW_PRESCRIPTION_CHANGED',
   MAINTENANCE_CHANGED = 'MAINTENANCE_CHANGED',
+  CONTACT_ATTEMPTS_CHANGED = 'CONTACT_ATTEMPTS_CHANGED',
   CLINICAL_HISTORY_CREATED = 'CLINICAL_HISTORY_CREATED',
   CLINICAL_HISTORY_UPDATED = 'CLINICAL_HISTORY_UPDATED',
   PHYSICAL_EXAM_UPDATED = 'PHYSICAL_EXAM_UPDATED',
@@ -72,6 +73,9 @@ export interface PatientActivityDetail {
   /** MAINTENANCE_CHANGED: qué mantenimiento (1 a 4) y cómo quedó (null = sin marcar). */
   number?: number;
   status?: string | null;
+  /** CONTACT_ATTEMPTS_CHANGED: intentos de contacto ahora y antes. */
+  count?: number;
+  previousCount?: number;
 }
 
 export interface PatientActivity {

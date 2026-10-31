@@ -475,7 +475,8 @@
       "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
       "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada",
       "PHYSICAL_EXAM_UPDATED": "Exploración física modificada",
-      "MAINTENANCE_CHANGED": "Mantenimiento"
+      "MAINTENANCE_CHANGED": "Mantenimiento",
+      "CONTACT_ATTEMPTS_CHANGED": "Intentos de contacto"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -518,6 +519,7 @@
         "ATTENDED": "Mantenimiento {{number}}: asistido",
         "MISSED": "Mantenimiento {{number}}: perdido"
       },
+      "contactAttempts": "{{before}} → {{after}}",
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
@@ -593,7 +595,19 @@
       "sections": {
         "lab": "Laboratorio",
         "warranty": "Garantía",
-        "maintenance": "Mantenimiento"
+        "maintenance": "Mantenimiento",
+        "contact": "Contacto"
+      },
+      "contact": {
+        "title": "Intentos de contacto",
+        "none": "Sin intentos",
+        "value": "{{count}} de {{max}}",
+        "register": "Registrar intento",
+        "reset": "Reiniciar",
+        "toast_one": "Intento de contacto registrado",
+        "toast_other": "{{count}} intentos de contacto registrados",
+        "toastReset": "Intentos de contacto reiniciados",
+        "pill": "Contacto: {{count}}"
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",

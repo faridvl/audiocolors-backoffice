@@ -9,6 +9,7 @@ import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PatientFlag } from '@/types/patients/patient';
 import { LabShipmentDate } from './lab-shipment-date';
+import { PatientContactAttempts } from './patient-contact-attempts';
 import { PatientMaintenanceList } from './patient-maintenance-list';
 import { PatientFlagSection, usePatientFlags } from './use-patient-flags';
 import { WarrantyDocumentSelect } from './warranty-document-select';
@@ -33,6 +34,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
     activeFlags,
     isWarrantySection,
     isMaintenanceSection,
+    isContactSection,
     labShipment,
     handleToggle,
     handleSectionChange,
@@ -85,6 +87,10 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
                 <PatientMaintenanceList patient={patient} />
               </div>
             </>
+          ) : isContactSection ? (
+            <div className="mt-3 rounded-lg border border-ink-200 px-3">
+              <PatientContactAttempts patient={patient} />
+            </div>
           ) : (
             <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
               {activeFlags.map((item) => {

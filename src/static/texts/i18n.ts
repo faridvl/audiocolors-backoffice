@@ -397,6 +397,7 @@ export const TEXT = {
       LAB_DATE_CHANGED: 'activity.detail.labShipment.dateChanged',
       /** Prefijo: `${MAINTENANCE_PREFIX}.${MaintenanceChoice}`. */
       MAINTENANCE_PREFIX: 'activity.detail.maintenance',
+      CONTACT_ATTEMPTS: 'activity.detail.contactAttempts',
     },
   },
   DOCUMENTS: {
@@ -486,6 +487,16 @@ export const TEXT = {
         OPTION_PREFIX: 'patients.flags.maintenance.options',
         TOAST_PREFIX: 'patients.flags.maintenance.toasts',
         PILL_PREFIX: 'patients.flags.maintenance.pills',
+      },
+      CONTACT: {
+        TITLE: 'patients.flags.contact.title',
+        NONE: 'patients.flags.contact.none',
+        VALUE: 'patients.flags.contact.value',
+        REGISTER: 'patients.flags.contact.register',
+        RESET: 'patients.flags.contact.reset',
+        TOAST: 'patients.flags.contact.toast',
+        TOAST_RESET: 'patients.flags.contact.toastReset',
+        PILL: 'patients.flags.contact.pill',
       },
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',
       TOAST_OFF_PREFIX: 'patients.flags.toastsOff',

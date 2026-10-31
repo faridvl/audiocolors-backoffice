@@ -23,6 +23,7 @@ import {
   FileClock,
   Video,
   Wrench,
+  PhoneCall,
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
@@ -95,6 +96,10 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     },
     [PatientActivityAction.MAINTENANCE_CHANGED]: {
       icon: Wrench,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.CONTACT_ATTEMPTS_CHANGED]: {
+      icon: PhoneCall,
       tone: ActionTone.NEUTRAL,
     },
   };
@@ -328,6 +333,12 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
         `${TEXT.ACTIVITY.DETAIL.MAINTENANCE_PREFIX}.${detail.status ?? MaintenanceChoice.UNMARKED}`,
         { number: detail.number },
       );
+
+    case PatientActivityAction.CONTACT_ATTEMPTS_CHANGED:
+      return context.t(TEXT.ACTIVITY.DETAIL.CONTACT_ATTEMPTS, {
+        before: detail.previousCount ?? 0,
+        after: detail.count ?? 0,
+      });
 
     case PatientActivityAction.PATIENT_CREATED:
     default:
