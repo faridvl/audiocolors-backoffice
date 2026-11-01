@@ -43,7 +43,10 @@ export interface ScheduleAppointmentOptions {
   patientUuid: string;
   tentativeMonth?: string | null;
   tentativeTypeUuid?: string | null;
+  /** Sede preferida (el filtro de la agenda): solo cuenta si el paciente la tiene. */
   branchUuid?: string | null;
+  /** Sede de la cita vigente: al reagendar es la inicial y se ofrece aunque el paciente ya no la tenga. */
+  nextAppointmentBranchUuid?: string | null;
   nextAppointmentAt?: string | null;
   nextAppointmentTypeName?: string | null;
   initialMode?: ScheduleMode;
@@ -55,6 +58,7 @@ export function useScheduleAppointment({
   tentativeMonth,
   tentativeTypeUuid,
   branchUuid,
+  nextAppointmentBranchUuid,
   nextAppointmentAt,
   nextAppointmentTypeName,
   initialMode,
@@ -100,14 +104,18 @@ export function useScheduleAppointment({
   // se conserva en la lista aunque el paciente la haya perdido, para no cambiarla sin avisar.
   const { data: patient } = usePatientQuery(patientUuid);
   const { data: branches } = useBranchesQuery();
-  const [pickedBranchUuid, setPickedBranchUuid] = useState(branchUuid ?? '');
+  // Solo lo que el usuario elige: la sede inicial se deriva, así llega bien aunque el paciente cargue después.
+  const [pickedBranchUuid, setPickedBranchUuid] = useState('');
   const patientBranchUuids = patient ? getPatientBranchUuids(patient) : [];
   const branchOptionUuids =
-    branchUuid && !patientBranchUuids.includes(branchUuid)
-      ? [...patientBranchUuids, branchUuid]
+    nextAppointmentBranchUuid && !patientBranchUuids.includes(nextAppointmentBranchUuid)
+      ? [...patientBranchUuids, nextAppointmentBranchUuid]
       : patientBranchUuids;
-  const selectedBranchUuid =
-    pickedBranchUuid || (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
+  const initialBranchUuid =
+    nextAppointmentBranchUuid ||
+    (branchUuid && patientBranchUuids.includes(branchUuid) ? branchUuid : '') ||
+    (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
+  const selectedBranchUuid = pickedBranchUuid || initialBranchUuid;
   const branchOptions = branchOptionUuids.map((uuid) => {
     const name = branches?.find((branch) => branch.uuid === uuid)?.name ?? '';
     return { value: uuid, label: name, accentColor: getBranchStripeColor(name) };

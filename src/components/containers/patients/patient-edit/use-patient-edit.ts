@@ -9,6 +9,7 @@ import {
   FETCH_PATIENT_CONTACTS_KEY,
 } from '@/shared/api/querys/patient-contacts-query';
 import { useSyncPatientContactsMutation } from '@/shared/api/mutations/patients/sync-patient-contacts-mutation';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import {
   DocumentType,
@@ -69,9 +70,11 @@ export function usePatientEdit(uuid: string) {
     [patient, existingContacts],
   );
 
+  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery();
+  const isBranchRequired = isLoadingBranches || (branches?.length ?? 0) > 0;
   const validationSchema = useMemo(
-    () => buildPatientEditValidationSchema(initialValues?.contacts ?? []),
-    [initialValues],
+    () => buildPatientEditValidationSchema(initialValues?.contacts ?? [], isBranchRequired),
+    [initialValues, isBranchRequired],
   );
 
   const handleSubmit = (values: PatientFormValues) => {

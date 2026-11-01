@@ -2,12 +2,12 @@ import React from 'react';
 import { Formik } from 'formik';
 import { AlertCircle } from 'lucide-react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { patientCreateValidationSchema } from '../patient-validation';
 import { PatientFormFields } from '../patient-form';
 import { usePatientCreate, patientCreateInitialValues } from './use-patient-create';
 
 export const PatientCreateContainer: React.FC = () => {
-  const { handleSubmit, isPending, errorMessage, handleCancel } = usePatientCreate();
+  const { handleSubmit, isPending, errorMessage, handleCancel, validationSchema } =
+    usePatientCreate();
 
   return (
     <div className="mx-auto w-full max-w-3xl">
@@ -25,7 +25,7 @@ export const PatientCreateContainer: React.FC = () => {
 
       <Formik
         initialValues={patientCreateInitialValues}
-        validationSchema={patientCreateValidationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         <PatientFormFields

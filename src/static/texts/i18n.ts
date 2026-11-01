@@ -7,6 +7,7 @@ export const TEXT = {
       RETRY: 'common.buttons.retry',
     },
     NOT_REGISTERED: 'common.notRegistered',
+    OPTIONAL: 'common.optional',
     PHONE_HINT: 'common.phoneHint',
     FORBIDDEN: 'common.forbidden',
     CHARACTER_COUNT: 'common.characterCount',

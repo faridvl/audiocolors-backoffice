@@ -147,4 +147,4 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   abrir desde la píldora a 375 px ni cerrar y reabrir el modal con un guardado en curso. La migración se aplica antes de publicar.
 - Pre-registro rápido (modal Agendar): pie fijo y cuerpo con scroll en celulares bajos; ronda 2 de correcciones cerrada.
 
-- Varias sedes (D35): probado en pantalla crear con dos sedes, verlas en expediente y lista, agendar eligiendo sede y quitar una sede al editar. Sin probar: la sede de la cita al reagendar desde el expediente (el detalle del paciente no trae la sede de su próxima cita; falta exponerla en el API), paciente viejo de una sola sede, 375 px, y filtros con una sede que excluya al paciente.
+- Varias sedes (D35): probado en pantalla crear con dos sedes, verlas en expediente y lista, agendar eligiendo sede y quitar una sede al editar. Sin probar: paciente viejo de una sola sede, 375 px, y filtros con una sede que excluya al paciente.

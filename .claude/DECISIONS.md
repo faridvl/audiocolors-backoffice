@@ -691,4 +691,8 @@ que de dos guardados simultáneos solo uno gana y queda un solo registro en la b
 - Editar un paciente sin sedes exige elegir al menos una. Un paciente que ya no tiene sedes se agenda sin mandar sede.
 - Al agendar solo se ofrecen las sedes del paciente; si tiene una sola, ya va elegida y no se muestra el selector.
 - La sede que ya traía una cita se conserva como opción aunque el paciente la haya perdido, para no cambiarla en silencio.
-  Pendiente: el detalle del paciente no trae la sede de su próxima cita, así que el modal de reagendar desde el expediente todavía no la conoce.
+  El API la entrega como `nextAppointmentBranchUuid` (lista y detalle) y el modal de reagendar, desde el expediente y desde la agenda, arranca con esa sede.
+- Sin cita previa y con dos o más sedes, la sede arranca vacía y es obligatoria, salvo que el filtro de sede de la agenda sea una sede del paciente. Con una sola va elegida.
+- Desde el tablero, la cita queda en la sede del filtro activo; con "Todas las sedes" cae en la principal del paciente.
+- Los pendientes sin sede aparecen con "Todas las sedes".
+- El formulario de paciente exige sede solo si hay sedes para elegir: con la consulta de sedes fallida o una clínica sin sedes se puede guardar.

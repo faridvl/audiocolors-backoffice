@@ -86,6 +86,7 @@ export interface ScheduleTarget {
   tentativeMonth?: string | null;
   typeUuid?: string | null;
   branchUuid?: string | null;
+  nextAppointmentBranchUuid?: string | null;
   nextAppointmentAt?: string | null;
   initialMode: ScheduleMode;
 }
@@ -212,7 +213,7 @@ export function useAgenda() {
             // El expediente deja anotar el mes a un paciente inactivo (solo el
             // fallecido queda fuera): si tiene mes, hay que llamarlo igual.
             patient.status !== PatientStatus.DECEASED &&
-            getPatientBranchUuids(patient).some(matchesBranch) &&
+            (branchFilter === ALL_BRANCHES || getPatientBranchUuids(patient).some(matchesBranch)) &&
             // El que se está confirmando ya se muestra en su horario.
             !scheduling.savingIds.has(patient.uuid),
         )
@@ -222,7 +223,7 @@ export function useAgenda() {
             'es',
           ),
         ),
-    [monthPatients, pendingMonthKey, matchesBranch, scheduling.savingIds],
+    [monthPatients, pendingMonthKey, branchFilter, matchesBranch, scheduling.savingIds],
   );
 
   const openAppointment = selectedAppointments.find(
@@ -426,7 +427,8 @@ export function useAgenda() {
       patientUuid: patient.uuid,
       tentativeMonth: patient.tentativeAppointmentMonth,
       typeUuid: patient.tentativeAppointmentTypeUuid,
-      branchUuid: pickPatientBranchUuid(patient, branchFilter),
+      branchUuid: branchFilter === ALL_BRANCHES ? undefined : branchFilter,
+      nextAppointmentBranchUuid: patient.nextAppointmentBranchUuid,
       nextAppointmentAt: patient.nextAppointmentAt,
       initialMode: ScheduleMode.DAY,
     });
@@ -438,7 +440,8 @@ export function useAgenda() {
       patientUuid: patient.uuid,
       tentativeMonth: patient.tentativeAppointmentMonth,
       typeUuid: patient.tentativeAppointmentTypeUuid,
-      branchUuid: pickPatientBranchUuid(patient, branchFilter),
+      branchUuid: branchFilter === ALL_BRANCHES ? undefined : branchFilter,
+      nextAppointmentBranchUuid: patient.nextAppointmentBranchUuid,
       nextAppointmentAt: patient.nextAppointmentAt,
       initialMode: ScheduleMode.DAY,
     });

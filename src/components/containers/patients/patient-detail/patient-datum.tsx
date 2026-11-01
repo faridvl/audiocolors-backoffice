@@ -15,13 +15,15 @@ interface PatientDatumProps {
 /** Dato del expediente con su etiqueta encima; vacío dice "Sin registrar". */
 export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, children, className }) => {
   const { t } = useTranslation();
+  // Un arreglo vacío es truthy: sin esto dejaría un `dd` sin contenido.
+  const hasChildren = React.Children.toArray(children).length > 0;
 
   return (
     <div className={tailwind('flex min-w-0 flex-col gap-0.5', className)}>
       <Typography variant={TypographyVariant.HELPER} as="dt">
         {label}
       </Typography>
-      {children ? (
+      {hasChildren ? (
         <dd className="flex flex-wrap gap-1">{children}</dd>
       ) : (
         <Typography

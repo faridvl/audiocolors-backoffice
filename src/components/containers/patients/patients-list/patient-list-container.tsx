@@ -67,7 +67,7 @@ function buildColumns(branches: Branch[] | undefined, t: TFunction): TableColumn
     },
     {
       key: 'branch',
-      header: 'Sedes',
+      header: t(TEXT.PATIENTS.FORM.BRANCHES_LABEL),
       width: '16%',
       render: (patient) => {
         const branchNames = getPatientBranchUuids(patient)

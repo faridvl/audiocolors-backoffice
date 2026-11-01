@@ -16,6 +16,8 @@ interface BadgeProps {
   children: React.ReactNode;
   /** Color pleno del texto; el fondo es el mismo color, suave. Sin él, gris neutro. */
   accentColor?: string;
+  /** Color del texto si debe ser más oscuro que `accentColor` (p. ej. un amarillo). */
+  textColor?: string;
   size?: BadgeSize;
   className?: string;
 }
@@ -24,13 +26,14 @@ interface BadgeProps {
 export const Badge: React.FC<BadgeProps> = ({
   children,
   accentColor,
+  textColor,
   size = BadgeSize.SMALL,
   className,
 }) => (
   <span
     style={
       accentColor
-        ? { backgroundColor: withAlpha(accentColor, ColorAlpha.SOFT), color: accentColor }
+        ? { backgroundColor: withAlpha(accentColor, ColorAlpha.SOFT), color: textColor ?? accentColor }
         : undefined
     }
     className={tailwind(

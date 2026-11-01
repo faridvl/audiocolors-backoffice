@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { FormikHelpers } from 'formik';
@@ -7,7 +7,12 @@ import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { CreatePatientPayload, DocumentType } from '@/types/patients/patient';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
-import { PatientFormValues, resolveContactsForSave } from '../patient-validation';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import {
+  buildPatientCreateValidationSchema,
+  PatientFormValues,
+  resolveContactsForSave,
+} from '../patient-validation';
 
 export const patientCreateInitialValues: PatientFormValues = {
   firstName: '',
@@ -45,6 +50,12 @@ export function usePatientCreate() {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { executeCreatePatient, isPending } = useCreatePatientMutation();
+  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery();
+  const isBranchRequired = isLoadingBranches || (branches?.length ?? 0) > 0;
+  const validationSchema = useMemo(
+    () => buildPatientCreateValidationSchema(isBranchRequired),
+    [isBranchRequired],
+  );
 
   const handleSubmit = (values: PatientFormValues, helpers: FormikHelpers<PatientFormValues>) => {
     setErrorMessage(null);
@@ -90,5 +101,6 @@ export function usePatientCreate() {
     isPending,
     errorMessage,
     handleCancel: navigation.patients.list,
+    validationSchema,
   };
 }

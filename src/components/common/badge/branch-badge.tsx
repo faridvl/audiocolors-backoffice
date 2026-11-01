@@ -1,5 +1,5 @@
 import React from 'react';
-import { getBranchStripeColor } from '@/shared/design/tokens';
+import { getBranchStripeColor, getBranchTextColor } from '@/shared/design/tokens';
 import { Badge, BadgeSize } from './badge';
 
 interface BranchBadgeProps {
@@ -13,7 +13,12 @@ export const BranchBadge: React.FC<BranchBadgeProps> = ({ name, size, className 
   if (!name) return null;
 
   return (
-    <Badge accentColor={getBranchStripeColor(name)} size={size} className={className}>
+    <Badge
+      accentColor={getBranchStripeColor(name)}
+      textColor={getBranchTextColor(name)}
+      size={size}
+      className={className}
+    >
       {name}
     </Badge>
   );

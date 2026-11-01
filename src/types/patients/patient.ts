@@ -115,6 +115,8 @@ export interface Patient {
   nextAppointmentAt?: string | null;
   /** Nombre del tipo de la próxima cita CONFIRMED (Cita, Control, Mantenimiento). */
   nextAppointmentType?: string | null;
+  /** Sede de la próxima cita CONFIRMED, aunque el paciente ya no la tenga. */
+  nextAppointmentBranchUuid?: string | null;
   /**
    * Mes tentativo de la próxima cita ("YYYY-MM"), cuando la clínica anotó el
    * mes pero el paciente todavía no confirmó el día. Excluyente con
@@ -160,7 +162,7 @@ export interface CreatePatientPayload {
   email?: string;
   gender?: string;
   documentId?: string;
-  /** La primera es la principal; el API exige al menos una. */
+  /** La primera es la principal; el API acepta omitirla o mandar `[]`. */
   branchUuids?: string[];
   contacts?: CreatePatientContactPayload[];
 }

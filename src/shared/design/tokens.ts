@@ -134,6 +134,24 @@ export function getBranchStripeColor(branchName: string | undefined): string | u
   return city ? BRANCH_CITY_COLORS[city] : undefined;
 }
 
+/**
+ * Texto de la píldora de sede. El amarillo de Quepos no da contraste sobre su
+ * fondo suave, así que esa sede lleva un tono más oscuro; las demás, el color pleno.
+ */
+const BRANCH_CITY_TEXT_COLORS: Partial<Record<BranchCity, string>> = {
+  [BranchCity.QUEPOS]: '#8a6a00',
+};
+
+/** Color del texto de la píldora de una sede; `undefined` si la sede no tiene color. */
+export function getBranchTextColor(branchName: string | undefined): string | undefined {
+  if (!branchName) return undefined;
+  const normalizedName = normalize(branchName);
+  const city = Object.values(BranchCity).find((candidate) =>
+    normalizedName.includes(normalize(candidate)),
+  );
+  return city ? (BRANCH_CITY_TEXT_COLORS[city] ?? BRANCH_CITY_COLORS[city]) : undefined;
+}
+
 /** Opacidad en hex que se agrega a un color `#rrggbb`: fondo suave de una píldora. */
 export enum ColorAlpha {
   /** ~10 %: fondo de una píldora con el texto en el color pleno. */

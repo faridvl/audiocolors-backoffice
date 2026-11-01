@@ -7,6 +7,7 @@ import {
   PillSelectVariant,
 } from '@/components/common/pill-select/pill-select';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
 
 interface FormMultiSelectFieldProps {
@@ -41,7 +42,7 @@ export const FormMultiSelectField: React.FC<FormMultiSelectFieldProps> = ({
       <Typography variant={TypographyVariant.BODY}>
         {label}
         {required && <span className="ml-0.5 text-danger">*</span>}
-        {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
+        {optional && <span className="ml-1 text-ink-400">{t(TEXT.GENERAL.OPTIONAL)}</span>}
       </Typography>
 
       <PillSelect

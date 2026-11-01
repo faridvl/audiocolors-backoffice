@@ -33,7 +33,7 @@ function isPastOrPresentDate(value: string | undefined): boolean {
   return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
 }
 
-const baseFields = {
+const buildBaseFields = (isBranchRequired: boolean) => ({
   firstName: Yup.string()
     .matches(NAME_REGEX, 'Solo letras y espacios')
     .max(60, 'Máximo 60 caracteres')
@@ -49,8 +49,11 @@ const baseFields = {
     .test('not-future', 'La fecha no puede ser futura', isPastOrPresentDate),
   address: Yup.string().max(240, 'Máximo 240 caracteres'),
   gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opción'),
-  branchUuids: Yup.array().of(Yup.string().required()).min(1, TEXT.PATIENTS.FORM.BRANCHES_REQUIRED),
-};
+  // Sin sedes que elegir (clínica sin sedes o consulta fallida) no se puede exigir una.
+  branchUuids: isBranchRequired
+    ? Yup.array().of(Yup.string().required()).min(1, TEXT.PATIENTS.FORM.BRANCHES_REQUIRED)
+    : Yup.array().of(Yup.string().required()),
+});
 
 const CONTACT_NAME_MAX_LENGTH = 80;
 
@@ -84,14 +87,18 @@ const NO_UNCHANGED_PHONES: ReadonlySet<string> = new Set();
 const toUnchangedPhones = (contacts: PatientContactFormValues[]): ReadonlySet<string> =>
   new Set(contacts.map((contact) => contact.phone).filter(Boolean));
 
-export const patientCreateValidationSchema = Yup.object({
-  ...baseFields,
-  contacts: buildContactsField(NO_UNCHANGED_PHONES),
-});
-
-export const buildPatientEditValidationSchema = (initialContacts: PatientContactFormValues[]) =>
+export const buildPatientCreateValidationSchema = (isBranchRequired: boolean) =>
   Yup.object({
-    ...baseFields,
+    ...buildBaseFields(isBranchRequired),
+    contacts: buildContactsField(NO_UNCHANGED_PHONES),
+  });
+
+export const buildPatientEditValidationSchema = (
+  initialContacts: PatientContactFormValues[],
+  isBranchRequired: boolean,
+) =>
+  Yup.object({
+    ...buildBaseFields(isBranchRequired),
     // Al editar es opcional: obligarla empujaría a inventar fechas en un expediente clínico.
     birthDate: Yup.string().test(
       'not-future',

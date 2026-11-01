@@ -43,6 +43,7 @@ export function useAgendaBoard(agenda: AgendaState) {
     selectedAppointments,
     pendingPatients,
     pendingMonthKey,
+    branchFilter,
     scheduling,
   } = agenda;
   const { savingItems, savingIds } = scheduling;
@@ -97,7 +98,9 @@ export function useAgendaBoard(agenda: AgendaState) {
 
     const { patient, appointment } = findPayloadTarget(payload);
     deferFromDragEvent(() => {
-      if (patient) void scheduling.confirmPending(patient, selectedDayKey, startMinute);
+      if (patient) {
+        void scheduling.confirmPending(patient, selectedDayKey, startMinute, branchFilter);
+      }
       if (appointment && canMoveAppointment(appointment, selectedTiming)) {
         void scheduling.moveAppointment(appointment, selectedDayKey, startMinute);
       }
@@ -158,7 +161,7 @@ export function useAgendaBoard(agenda: AgendaState) {
   /** Tocar la línea de tiempo con un paciente marcado lo confirma ahí. */
   const handleTapAt = (startMinute: number) => {
     if (!selectedPending || !isDayOpen) return;
-    void scheduling.confirmPending(selectedPending, selectedDayKey, startMinute);
+    void scheduling.confirmPending(selectedPending, selectedDayKey, startMinute, branchFilter);
     setSelectedPendingUuid(null);
   };
 
