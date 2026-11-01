@@ -64,8 +64,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34; solo en la rama, sin push). El 6 está hecho (D35): API `9f33ca2` y front en la rama, sin push. Sigue: cuestionador (también lee el API `9f33ca2`, que aún no revisó), revisor-ux y qa (el qa incluye STAFF del punto 5). **El usuario pidió (2026-10-31): al terminar el punto 6, push de todo** (la rama `feature/preguntas-y-mantenimientos` en los dos repos, puntos 5 y 6); no incluye merge. Al publicar: primero el API con sus
-  migraciones, después el front. Cada punto:
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34) y 6 (D35), con la rama subida en los dos repos (2026-11-01), sin merge a `develop`. Sigue: definir los 4 checks del punto 5 (Preguntas abiertas), después el punto 2 y las otoscopías. Al publicar: primero el API con sus
+  migraciones, después el front; tras desplegar, contar pacientes con `branchUuid` sin fila en `PatientBranch` y repetir el backfill, y revisar sedes de otra clínica en una copia de producción. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
   2. El usuario crea sus propias secciones dentro de Preguntas (p. ej. Historia
@@ -147,4 +147,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   abrir desde la píldora a 375 px ni cerrar y reabrir el modal con un guardado en curso. La migración se aplica antes de publicar.
 - Pre-registro rápido (modal Agendar): pie fijo y cuerpo con scroll en celulares bajos; ronda 2 de correcciones cerrada.
 
-- Varias sedes (D35): probado en pantalla crear con dos sedes, verlas en expediente y lista, agendar eligiendo sede y quitar una sede al editar. Sin probar: paciente viejo de una sola sede, 375 px, y filtros con una sede que excluya al paciente.
+- Varias sedes (D35): probado en pantalla crear con dos sedes, verlas en expediente y lista, agendar eligiendo sede, quitar una sede al editar, tablero con filtro en sede secundaria (clic y arrastre), filtro que excluye, sin sedes para elegir y 375 px sin scroll horizontal. El recorrido completo sale de varias corridas, no de una sola. Sin probar: cita visible con filtro de la sede secundaria tras recargar, dos clínicas y Zynka real. En la base local quedan pacientes de prueba "PruebaSedes".
+- Búsqueda de pacientes: nombre y apellido juntos ("PruebaSedes Cuatro") dan "Sin resultados", porque el API (`patient.storage.ts`) compara cada campo por separado. No viene de este lote; falta corregirlo.
