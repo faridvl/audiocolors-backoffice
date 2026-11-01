@@ -32,12 +32,11 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   cambió y quién (D18).
 - Calendario del iPhone: un calendario por sede, o por sede y tipo, solo en
   iPhone (DECISIONS, 2026-10-09).
-- Mantenimientos (2026-10-28): el expediente tiene los mantenimientos 1 a 4; el
-  personal marca cada uno a mano como asistido (azul) o perdido (rojo), o lo deja
-  sin marcar. No se calculan desde las citas.
-- Intentos de contacto (2026-10-28): un solo contador por paciente de cuántas
-  veces se le llamó (1, 2 o 3), que el personal sube y reinicia a mano. No va
-  ligado a una cita ni a un mantenimiento.
+- Mantenimientos (2026-11-01, reemplaza lo anterior): al entregar audífonos el paciente
+  tiene 4 envíos gratis al laboratorio, uno cada 6 meses. En el modal "Indicadores del
+  paciente", pestaña Mantenimiento: Mantenimiento 1 a 4 en horizontal, cada uno con su
+  check y su nota opcional; en celular se apilan. Se marcan a mano, no se calculan. Ya no
+  hay contador de intentos: lo de "se llamó" va en la nota.
 - Sedes (2026-10-28): un paciente tiene una o más sedes; en los filtros de la
   lista y la agenda aparece en todas, y cada cita se agenda en una de sus sedes.
   Los pacientes actuales conservan la sede que tienen.
@@ -64,7 +63,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34) y 6 (D35), con la rama subida en los dos repos (2026-11-01), sin merge a `develop`. Sigue: definir los 4 checks del punto 5 (Preguntas abiertas), después el punto 2 y las otoscopías. Al publicar: primero el API con sus
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34) y 6 (D35), con la rama subida en los dos repos (2026-11-01), sin merge a `develop`. Corrección del punto 5 (check y nota por mantenimiento, D36; reemplaza D33 y D34) hecha y commiteada en local: front `865dd34` + `34cf16a`, API `672ea01` + `d101e85`, sin push; pasó cuestionador, revisor-ux y qa en el navegador. Sin probar: otra clínica (no hay segunda en local) y eventos viejos en la bitácora. Conocido: dos PUT idénticos en el mismo milisegundo dejan dos eventos en la bitácora (el API compara sin transacción); la base queda bien. Pendientes del usuario: si el extracto de la nota se queda en la bitácora, si STAFF escribe notas, si hace falta contar "perdidos" y "Mantenimientos" o "Mantenimiento N de 4" en la píldora. Después, el punto 2 y las otoscopías. Al publicar: primero el API con sus
   migraciones, después el front; tras desplegar, contar pacientes con `branchUuid` sin fila en `PatientBranch` y repetir el backfill, y revisar sedes de otra clínica en una copia de producción. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
@@ -113,9 +112,6 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## Preguntas abiertas
 
-- Intentos de contacto (2026-10-31): el usuario corrigió que no es un contador de 1 a 3, sino 4 checks. Falta que
-  aclare qué representa cada check (llamadas 1 a 4, uno por mantenimiento u otra cosa) y si van en orden. Lo hecho (D34)
-  queda como está hasta entonces.
 - Nombres de roles (2026-10-30, no hacerlo todavía): hoy OWNER, ADMIN, DOCTOR y STAFF. El usuario
   los quiere más claros (Administrador, Profesional, Recepción, Secretario o Empleado) y busca un
   estándar global de nombres. Propuesta a revisar: código fijo en inglés (`PRACTITIONER` viene de

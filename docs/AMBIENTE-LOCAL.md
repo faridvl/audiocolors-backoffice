@@ -34,6 +34,9 @@ se leen de `.env.e2e.local` (`E2E_EMAIL`, `E2E_PASSWORD`, ignorado por git) y la
 `E2E_BASE_URL` (por defecto `http://localhost:3000`). La cuenta existe en esta base y en
 la de desarrollo.
 
+El API solo acepta peticiones desde los orígenes de `ALLOWED_ORIGINS` (`http://localhost:3000`):
+un front en `127.0.0.1` o en otro puerto se queda en `/login` sin mostrar el motivo.
+
 ## Levantar
 
 1. Abrir Docker Desktop (el contenedor arranca solo).
