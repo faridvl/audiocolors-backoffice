@@ -696,3 +696,30 @@ que de dos guardados simultáneos solo uno gana y queda un solo registro en la b
 - Desde el tablero, la cita queda en la sede del filtro activo; con "Todas las sedes" cae en la principal del paciente.
 - Los pendientes sin sede aparecen con "Todas las sedes".
 - El formulario de paciente exige sede solo si hay sedes para elegir: con la consulta de sedes fallida o una clínica sin sedes se puede guardar.
+
+## D36 · Mantenimientos con check y nota (2026-11-01)
+
+**Decisión:** al entregar audífonos el paciente tiene 4 mantenimientos gratis, uno cada 6 meses. Cada
+Mantenimiento 1 a 4 tiene un check marcado a mano y una nota opcional (máx. 500 caracteres). Reemplaza a
+D33 (estado asistido/perdido) y a D34 (intentos de contacto): ya no hay contador y lo de "se llamó" va en
+la nota. `PUT /patients/:uuid/maintenances/:number` recibe `{ done?, note? }` (al menos uno; nota vacía
+se guarda como `null`); se retiró `PUT /patients/:uuid/contact-attempts`. Son ocho columnas en `patient`
+(`maintenanceNDone`, `maintenanceNNote`). La bitácora deja `MAINTENANCE_CHECK_CHANGED` y
+`MAINTENANCE_NOTE_CHANGED`; los eventos viejos `MAINTENANCE_CHANGED` y `CONTACT_ATTEMPTS_CHANGED` se
+siguen leyendo.
+
+**Migración de datos:** asistido pasa a check marcado; perdido queda sin check y con la nota "Perdido",
+para no perder ese dato; los contadores de intentos de contacto se descartan.
+
+**Sin validar a propósito:** igual que en D33, STAFF puede marcar, se puede marcar un paciente inactivo o
+fallecido y marcar el 3 sin el 1 y el 2.
+
+**Por qué:** la clínica pidió un seguimiento más simple: una marca por mantenimiento y un espacio libre
+para anotar llamadas o lo que haga falta.
+
+**Diseño del modal y la ficha:**
+
+- La ficha del paciente muestra una sola píldora "Mantenimientos 2 de 4" (también con 0) en lugar de una por mantenimiento; al tocarla se abre el modal en esa pestaña.
+- El modal tiene el mismo ancho en las tres pestañas (el que necesita Mantenimiento) para que no salte al cambiar. Los mantenimientos van en una fila en pantallas anchas, 2x2 en tableta y apilados en celular.
+- No hay toasts de éxito al guardar un check o una nota: se confirma con "Guardado" junto al campo. El toast queda solo para errores.
+- El check y la nota se guardan con mutaciones separadas, para que guardar uno no pise el estado ni los avisos del otro. Cerrar el modal (Escape, fondo o "Listo") guarda la nota pendiente igual que al salir del campo; si falla con el modal ya cerrado, el toast cita el texto de la nota.

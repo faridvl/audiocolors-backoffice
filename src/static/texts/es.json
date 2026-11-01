@@ -612,17 +612,14 @@
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
-        "hint": "Marca cada mantenimiento cuando se haga. Si llamaron al paciente, anótalo en la nota.",
+        "hint": "Marca cada mantenimiento cuando se haga. Si se llamó al paciente, anótalo en la nota.",
         "done": "Hecho",
         "noteLabel": "Nota (opcional)",
-        "notePlaceholder": "Por ejemplo: se le llamó y quedó para la otra semana",
         "saving": "Guardando…",
+        "saved": "Guardado",
         "noteError": "No se pudo guardar la nota. Toca fuera del campo para reintentar.",
-        "toastDone": "Mantenimiento {{number}} marcado como hecho",
-        "toastUndone": "Mantenimiento {{number}} sin marcar",
-        "toastNoteSaved": "Nota del mantenimiento {{number}} guardada",
-        "toastNoteRemoved": "Nota del mantenimiento {{number}} borrada",
-        "pill": "Mant. {{number}}"
+        "noteUnsavedToast": "La nota del mantenimiento {{number}} no se guardó: {{note}}",
+        "pill": "Mantenimientos {{count}} de {{total}}"
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",

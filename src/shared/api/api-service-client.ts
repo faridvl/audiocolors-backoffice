@@ -6,7 +6,7 @@ import { routesPublic } from '@/shared/navigation/routes';
 const NETWORK_ERROR_MESSAGE =
   process.env.NODE_ENV === 'development'
     ? 'No se pudo conectar con el API. En local, la app tiene que correr en http://localhost:3000: el API rechaza otros puertos.'
-    : 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
+    : 'No hay conexión. Revisa tu internet e inténtalo de nuevo.';
 const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
 export enum HttpStatus {

@@ -8,7 +8,6 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PatientFlag } from '@/types/patients/patient';
-import { tailwind } from '@/utils/tailwind-utils';
 import { LabShipmentDate } from './lab-shipment-date';
 import { PatientMaintenanceList } from './patient-maintenance-list';
 import { PatientFlagSection, usePatientFlags } from './use-patient-flags';
@@ -38,7 +37,12 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
     handleToggle,
     handleSectionChange,
   } = usePatientFlags(patient, initialSection);
-  useEscapeKey(onClose);
+  // Soltar el foco antes de cerrar hace que la nota a medio escribir se guarde igual que al salir del campo.
+  const handleClose = () => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    onClose();
+  };
+  useEscapeKey(handleClose);
 
   return (
     <div
@@ -46,13 +50,10 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
       aria-modal="true"
       aria-label={t(TEXT.PATIENTS.FLAGS.TITLE)}
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
-        className={tailwind(
-          'flex max-h-full w-full flex-col rounded-card bg-white',
-          isMaintenanceSection ? 'max-w-md sm:max-w-4xl' : 'max-w-md',
-        )}
+        className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white sm:max-w-4xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-start gap-3 px-6 pb-4 pt-6">
@@ -140,7 +141,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
           <div className="flex shrink-0 justify-end px-6 pb-6 pt-3">
             <Button
               variant={ButtonVariant.SECONDARY}
-              onClick={onClose}
+              onClick={handleClose}
               className="w-full sm:w-auto"
             >
               {t(TEXT.PATIENTS.FLAGS.DONE)}
