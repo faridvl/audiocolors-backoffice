@@ -7,11 +7,13 @@ import { tailwind } from '@/utils/tailwind-utils';
 interface PatientDatumProps {
   label: string;
   value?: string | null;
+  /** Contenido propio en vez del texto (p. ej. insignias); si va, `value` se ignora. */
+  children?: React.ReactNode;
   className?: string;
 }
 
 /** Dato del expediente con su etiqueta encima; vacío dice "Sin registrar". */
-export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, className }) => {
+export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, children, className }) => {
   const { t } = useTranslation();
 
   return (
@@ -19,13 +21,17 @@ export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, classN
       <Typography variant={TypographyVariant.HELPER} as="dt">
         {label}
       </Typography>
-      <Typography
-        variant={TypographyVariant.BODY}
-        as="dd"
-        className={tailwind(value ? 'break-words' : 'whitespace-nowrap text-ink-400')}
-      >
-        {value || t(TEXT.GENERAL.NOT_REGISTERED)}
-      </Typography>
+      {children ? (
+        <dd className="flex flex-wrap gap-1">{children}</dd>
+      ) : (
+        <Typography
+          variant={TypographyVariant.BODY}
+          as="dd"
+          className={tailwind(value ? 'break-words' : 'whitespace-nowrap text-ink-400')}
+        >
+          {value || t(TEXT.GENERAL.NOT_REGISTERED)}
+        </Typography>
+      )}
     </div>
   );
 };

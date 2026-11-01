@@ -453,6 +453,11 @@ export const TEXT = {
   },
   PATIENTS: {
     LIST: {},
+    FORM: {
+      BRANCHES_LABEL: 'patients.form.branchesLabel',
+      BRANCHES_PLACEHOLDER: 'patients.form.branchesPlaceholder',
+      BRANCHES_REQUIRED: 'patients.form.branchesRequired',
+    },
     SUMMARY: {
       TENTATIVE: 'patients.summary.tentative',
       CONFIRMED: 'patients.summary.confirmed',
@@ -620,10 +625,13 @@ export const TEXT = {
       TYPE_LABEL: 'patients.schedule.typeLabel',
       TYPE_PLACEHOLDER: 'patients.schedule.typePlaceholder',
       NO_TYPES: 'patients.schedule.noTypes',
+      BRANCH_LABEL: 'patients.schedule.branchLabel',
+      BRANCH_PLACEHOLDER: 'patients.schedule.branchPlaceholder',
       BACK: 'patients.schedule.back',
       VALIDATION: {
         MONTH_REQUIRED: 'patients.schedule.validation.monthRequired',
         TYPE_REQUIRED: 'patients.schedule.validation.typeRequired',
+        BRANCH_REQUIRED: 'patients.schedule.validation.branchRequired',
         DATE_REQUIRED: 'patients.schedule.validation.dateRequired',
         DATE_PAST: 'patients.schedule.validation.datePast',
       },

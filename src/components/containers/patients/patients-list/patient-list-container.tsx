@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { formatPhoneForDisplay } from '@/shared/utils/phone';
 import { Search, Pencil } from 'lucide-react';
-import { Patient, PatientFlag } from '@/types/patients/patient';
+import { getPatientBranchUuids, Patient, PatientFlag } from '@/types/patients/patient';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
@@ -67,12 +67,20 @@ function buildColumns(branches: Branch[] | undefined, t: TFunction): TableColumn
     },
     {
       key: 'branch',
-      header: 'Sede',
+      header: 'Sedes',
       width: '16%',
       render: (patient) => {
-        const branchName = branches?.find((branch) => branch.uuid === patient.branchUuid)?.name;
-        if (!branchName) return EMPTY_VALUE;
-        return <BranchBadge name={branchName} size={BadgeSize.REGULAR} />;
+        const branchNames = getPatientBranchUuids(patient)
+          .map((branchUuid) => branches?.find((branch) => branch.uuid === branchUuid)?.name)
+          .filter((name): name is string => Boolean(name));
+        if (branchNames.length === 0) return EMPTY_VALUE;
+        return (
+          <div className="flex flex-wrap gap-1">
+            {branchNames.map((name) => (
+              <BranchBadge key={name} name={name} size={BadgeSize.REGULAR} />
+            ))}
+          </div>
+        );
       },
     },
     {
@@ -169,7 +177,9 @@ export const PatientListContainer: React.FC = () => {
   const { t } = useTranslation();
   const columns = useMemo(() => buildColumns(branches, t), [branches, t]);
   const getRowAccentColor = (patient: Patient) =>
-    getBranchStripeColor(branches?.find((branch) => branch.uuid === patient.branchUuid)?.name);
+    getBranchStripeColor(
+      branches?.find((branch) => branch.uuid === getPatientBranchUuids(patient)[0])?.name,
+    );
 
   const createButton = (
     <Button variant={ButtonVariant.PRIMARY} onClick={navigateToCreate} className="w-full sm:w-auto">

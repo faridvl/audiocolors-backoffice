@@ -15,7 +15,7 @@ export interface PatientQuickCreateValues {
   lastName: string;
   phone: string;
   documentId: string;
-  branchUuid: string;
+  branchUuids: string[];
 }
 
 const PHONE_ERROR_KEYS: Record<PhoneError, string> = {
@@ -46,7 +46,7 @@ export function buildQuickCreateInitialValues(searchTerm: string): PatientQuickC
     lastName: restOfName.join(' '),
     phone: '',
     documentId: isName ? '' : term.slice(0, DOCUMENT_MAX_LENGTH),
-    branchUuid: '',
+    branchUuids: [],
   };
 }
 
@@ -86,7 +86,7 @@ export const buildPatientQuickCreateSchema = (
         return error === null ? true : context.createError({ message: t(PHONE_ERROR_KEYS[error]) });
       })
       .required(t(ERRORS.PHONE_REQUIRED)),
-    branchUuid: isBranchRequired
-      ? Yup.string().required(t(ERRORS.BRANCH_REQUIRED))
-      : Yup.string(),
+    branchUuids: isBranchRequired
+      ? Yup.array().of(Yup.string().required()).min(1, t(ERRORS.BRANCH_REQUIRED))
+      : Yup.array().of(Yup.string().required()),
   });

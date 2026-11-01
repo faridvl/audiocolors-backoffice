@@ -1,10 +1,11 @@
 import React from 'react';
 import { Form, useFormikContext } from 'formik';
 import { Save, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormField } from '@/components/common/input/input';
 import { FocusFirstError } from '@/components/common/form/focus-first-error';
-import { FormSelectField } from '@/components/common/form/form-select-field';
+import { FormMultiSelectField } from '@/components/common/form/form-multi-select-field';
 import { FormViewSection } from '@/components/common/form/form-view-section';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import { PatientContactsFields } from '@/components/containers/patients/patient-contacts/patient-contacts-fields';
@@ -15,6 +16,7 @@ import {
   PatientGender,
 } from '@/types/patients/patient';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { TEXT } from '@/static/texts/i18n';
 import { getBranchStripeColor } from '@/shared/design/tokens';
 import { DOCUMENT_MASKS, formatNationalId, PatientFormValues } from './patient-validation';
 
@@ -31,6 +33,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
   isBirthDateRequired = true,
   onCancel,
 }) => {
+  const { t } = useTranslation();
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
   const patientFullName = buildPatientFullName(values.firstName, values.lastName);
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
@@ -86,16 +89,16 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             ))}
           </FormField>
 
-          <FormSelectField
-            name="branchUuid"
-            label="Sede"
-            placeholder="Sin especificar"
+          <FormMultiSelectField
+            name="branchUuids"
+            label={t(TEXT.PATIENTS.FORM.BRANCHES_LABEL)}
+            placeholder={t(TEXT.PATIENTS.FORM.BRANCHES_PLACEHOLDER)}
             options={(branches ?? []).map((branch) => ({
               value: branch.uuid,
               label: branch.name,
               accentColor: getBranchStripeColor(branch.name),
             }))}
-            optional
+            required
           />
         </div>
       </FormViewSection>

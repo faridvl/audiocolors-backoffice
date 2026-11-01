@@ -157,3 +157,8 @@ Pestaña Contacto en Indicadores, píldora "Contacto: N" en el expediente y regi
 | Contraseña | Temporal: la tiene el usuario; P0-1 cambiarla antes de entregar |
 
 Datos de prueba: 1 paciente activo con 1 PDF + 1 paciente inactivo huérfano.
+
+## Varias sedes por paciente (punto 6, D35)
+
+- Hecho: formulario, pre-registro, expediente, lista y agenda con varias sedes; el API ya las guarda (`9f33ca2`).
+- Sin publicar: rama `feature/preguntas-y-mantenimientos`; la migración `20261031140000_patient_branches` va antes que el front.

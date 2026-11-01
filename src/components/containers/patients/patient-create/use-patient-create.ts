@@ -18,7 +18,7 @@ export const patientCreateInitialValues: PatientFormValues = {
   gender: '',
   email: '',
   address: '',
-  branchUuid: '',
+  branchUuids: [],
   contacts: [{ name: '', phone: '' }],
 };
 
@@ -62,7 +62,7 @@ export function usePatientCreate() {
       ...(values.email.trim() && { email: values.email.trim().toLowerCase() }),
       ...(values.gender && { gender: values.gender }),
       ...(values.address.trim() && { address: values.address.trim() }),
-      ...(values.branchUuid && { branchUuid: values.branchUuid }),
+      branchUuids: values.branchUuids,
       contacts: contacts.map(({ name, phone: contactPhone }) => ({ name, phone: contactPhone })),
     };
 

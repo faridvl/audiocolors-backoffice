@@ -98,7 +98,10 @@ export interface Patient {
   email?: string;
   gender?: string;
   documentId?: string;
+  /** Sede principal: la primera de `branchUuids`. */
   branchUuid?: string | null;
+  /** Todas las sedes del paciente, la principal primero; un API viejo no la manda. */
+  branchUuids?: string[];
   isActive: boolean;
   /** Estado para la clínica. Los pacientes previos al campo llegan como ACTIVE. */
   status?: PatientStatus;
@@ -125,6 +128,24 @@ export interface Patient {
   tentativeAppointmentTypeName?: string | null;
 }
 
+/** Sedes del paciente, con la principal primero; un paciente de un API viejo solo trae `branchUuid`. */
+export function getPatientBranchUuids(
+  patient: Pick<Patient, 'branchUuid' | 'branchUuids'>,
+): string[] {
+  if (patient.branchUuids?.length) return patient.branchUuids;
+  return patient.branchUuid ? [patient.branchUuid] : [];
+}
+
+/** La sede preferida si el paciente la tiene; si no, su principal. */
+export function pickPatientBranchUuid(
+  patient: Pick<Patient, 'branchUuid' | 'branchUuids'>,
+  preferredBranchUuid?: string | null,
+): string | undefined {
+  const branchUuids = getPatientBranchUuids(patient);
+  if (preferredBranchUuid && branchUuids.includes(preferredBranchUuid)) return preferredBranchUuid;
+  return branchUuids[0];
+}
+
 export interface CreatePatientContactPayload {
   name: string;
   phone: string;
@@ -139,7 +160,8 @@ export interface CreatePatientPayload {
   email?: string;
   gender?: string;
   documentId?: string;
-  branchUuid?: string | null;
+  /** La primera es la principal; el API exige al menos una. */
+  branchUuids?: string[];
   contacts?: CreatePatientContactPayload[];
 }
 

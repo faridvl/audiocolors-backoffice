@@ -321,9 +321,9 @@
         "lastName": "Apellidos",
         "phone": "Teléfono",
         "documentId": "Cédula",
-        "branch": "Sede",
+        "branch": "Sedes",
         "branchPlaceholder": "Sin especificar",
-        "branchRequiredPlaceholder": "Elige una sede",
+        "branchRequiredPlaceholder": "Elige una o más sedes",
         "submit": "Registrar y agendar",
         "back": "Volver a la búsqueda",
         "saved": "Paciente registrado",
@@ -333,7 +333,7 @@
           "lastNameRequired": "El apellido es obligatorio",
           "firstNameMin": "El nombre debe tener al menos 2 letras",
           "lastNameMin": "El apellido debe tener al menos 2 letras",
-          "branchRequired": "Elige una sede",
+          "branchRequired": "Elige al menos una sede",
           "nameLetters": "Solo letras y espacios",
           "nameMax": "Máximo 60 caracteres",
           "documentRequired": "La cédula es obligatoria",
@@ -494,6 +494,7 @@
         "bloodType": "Tipo de sangre",
         "occupation": "Ocupación",
         "branchUuid": "Sede",
+        "branchUuids": "Sedes",
         "warrantyDocumentUuid": "Archivo de la garantía",
         "otoscopyRight": "OD (oído derecho)",
         "otoscopyLeft": "OI (oído izquierdo)"
@@ -581,6 +582,11 @@
     }
   },
   "patients": {
+    "form": {
+      "branchesLabel": "Sedes",
+      "branchesPlaceholder": "Elige una o más sedes",
+      "branchesRequired": "Elige al menos una sede"
+    },
     "summary": {
       "tentative": "Citas tentativas este mes",
       "confirmed": "Citas confirmadas este mes",
@@ -709,12 +715,15 @@
       "hourNone": "Sin hora",
       "typeLabel": "Tipo de cita",
       "typePlaceholder": "Seleccione un tipo",
+      "branchLabel": "Sede",
+      "branchPlaceholder": "Elige la sede de la cita",
       "noTypes": "No hay tipos de cita configurados. Pide a soporte que los agregue.",
       "back": "Volver",
       "validation": {
         "monthRequired": "Elige el mes tentativo",
         "typeRequired": "El tipo de cita es obligatorio",
         "dateRequired": "La fecha es obligatoria",
+        "branchRequired": "Elige la sede de la cita",
         "datePast": "La fecha no puede ser en el pasado"
       },
       "toasts": {
@@ -741,7 +750,8 @@
       "fields": {
         "documentId": "Cédula",
         "birthDate": "Nacimiento",
-        "branch": "Sede"
+        "branch_one": "Sede",
+        "branch_other": "Sedes"
       },
       "actions": {
         "edit": "Modificar paciente",

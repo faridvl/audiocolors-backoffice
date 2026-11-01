@@ -198,19 +198,28 @@ function formatFieldValue(
   }
   if (!value) return context.t(TEXT.ACTIVITY.DETAIL.EMPTY_VALUE);
   if (change.field === 'branchUuid') return context.resolveBranchName(value) ?? value;
+  if (change.field === 'branchUuids') {
+    return value
+      .split(',')
+      .map((branchUuid) => context.resolveBranchName(branchUuid) ?? branchUuid)
+      .join(', ');
+  }
   if (change.field === 'gender') return GENDER_LABELS[value as PatientGender] ?? value;
   return value;
 }
 
 function formatChanges(changes: PatientFieldChange[], context: DetailContext): string {
-  const visible = changes.slice(0, MAX_VISIBLE_CHANGES).map((change) => {
+  // El API anota la sede principal y la lista completa: con la lista, la principal sobra.
+  const hasBranchList = changes.some((change) => change.field === 'branchUuids');
+  const shown = hasBranchList ? changes.filter((change) => change.field !== 'branchUuid') : changes;
+  const visible = shown.slice(0, MAX_VISIBLE_CHANGES).map((change) => {
     const label = context.t(`${TEXT.ACTIVITY.DETAIL.FIELD_PREFIX}.${change.field}`);
     const before = formatFieldValue(change, change.before, context);
     const after = formatFieldValue(change, change.after, context);
     return `${label}: ${before} → ${after}`;
   });
 
-  const hidden = changes.length - visible.length;
+  const hidden = shown.length - visible.length;
   if (hidden > 0) visible.push(context.t(TEXT.ACTIVITY.DETAIL.MORE, { count: hidden }));
 
   return visible.join(' · ');

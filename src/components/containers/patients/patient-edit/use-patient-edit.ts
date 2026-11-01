@@ -10,7 +10,11 @@ import {
 } from '@/shared/api/querys/patient-contacts-query';
 import { useSyncPatientContactsMutation } from '@/shared/api/mutations/patients/sync-patient-contacts-mutation';
 import { useNavigation } from '@/hooks/use-navigation';
-import { DocumentType, UpdatePatientPayload } from '@/types/patients/patient';
+import {
+  DocumentType,
+  getPatientBranchUuids,
+  UpdatePatientPayload,
+} from '@/types/patients/patient';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import {
   buildInitialContacts,
@@ -54,7 +58,7 @@ export function usePatientEdit(uuid: string) {
             gender: patient.gender ?? '',
             email: patient.email ?? '',
             address: patient.address ?? '',
-            branchUuid: patient.branchUuid ?? '',
+            branchUuids: getPatientBranchUuids(patient),
             contacts: buildInitialContacts(
               existingContacts,
               patient.phone,
@@ -86,7 +90,7 @@ export function usePatientEdit(uuid: string) {
       email: values.email.trim().toLowerCase(),
       gender: values.gender,
       address: values.address.trim(),
-      branchUuid: values.branchUuid || null,
+      branchUuids: values.branchUuids,
     };
 
     executeUpdatePatient(

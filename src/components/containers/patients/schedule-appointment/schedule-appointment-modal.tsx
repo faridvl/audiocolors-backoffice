@@ -22,8 +22,8 @@ import {
  *    volver y de que seria, sin dia. El paciente todavia no confirma nada.
  * 2. **Dia confirmado** — recepcion llama; si el paciente acepta se fija el
  *    dia y, si se sabe, la hora, con el tipo ya precargado del apunte
- *    tentativo (se puede cambiar), y el apunte se limpia. La sede es siempre
- *    la habitual del paciente, no se elige aqui.
+ *    tentativo (se puede cambiar), y el apunte se limpia. La sede se elige
+ *    solo si el paciente tiene más de una.
  *
  * Los dos modos son excluyentes a proposito: un paciente no puede estar a la
  * vez con cita agendada y pendiente de confirmar.
@@ -37,6 +37,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
     hour,
     hourOptions,
     selectedTypeUuid,
+    selectedBranchUuid,
+    branchOptions,
+    hasBranchChoice,
     appointmentTypes,
     hasNoAppointmentTypes,
     hasNextAppointment,
@@ -50,6 +53,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
     handleDateChange,
     handleHourChange,
     handleTypeChange,
+    handleBranchChange,
     handleBack,
     handleSubmit,
   } = useScheduleAppointment(props);
@@ -150,6 +154,23 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
                   {t(TEXT.PATIENTS.SCHEDULE.NO_TYPES)}
                 </Typography>
               )}
+            </div>
+          )}
+
+          {mode === ScheduleMode.DAY && hasBranchChoice && (
+            <div className="flex flex-col gap-1.5">
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
+                {t(TEXT.PATIENTS.SCHEDULE.BRANCH_LABEL)}
+                <span className="ml-0.5 text-danger">*</span>
+              </Typography>
+              <PillSelect
+                variant={PillSelectVariant.FIELD}
+                ariaLabel={t(TEXT.PATIENTS.SCHEDULE.BRANCH_LABEL)}
+                value={selectedBranchUuid}
+                onChange={handleBranchChange}
+                placeholder={t(TEXT.PATIENTS.SCHEDULE.BRANCH_PLACEHOLDER)}
+                options={branchOptions}
+              />
             </div>
           )}
 

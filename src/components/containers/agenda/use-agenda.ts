@@ -27,7 +27,12 @@ import { toTelHref } from '@/shared/utils/phone';
 import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
-import { Patient, PatientStatus } from '@/types/patients/patient';
+import {
+  getPatientBranchUuids,
+  Patient,
+  PatientStatus,
+  pickPatientBranchUuid,
+} from '@/types/patients/patient';
 import { ScheduleMode } from '@/components/containers/patients/schedule-appointment/use-schedule-appointment';
 import {
   addDays,
@@ -207,7 +212,7 @@ export function useAgenda() {
             // El expediente deja anotar el mes a un paciente inactivo (solo el
             // fallecido queda fuera): si tiene mes, hay que llamarlo igual.
             patient.status !== PatientStatus.DECEASED &&
-            matchesBranch(patient.branchUuid) &&
+            getPatientBranchUuids(patient).some(matchesBranch) &&
             // El que se está confirmando ya se muestra en su horario.
             !scheduling.savingIds.has(patient.uuid),
         )
@@ -294,6 +299,10 @@ export function useAgenda() {
       branchUuid ? branches?.find((branch) => branch.uuid === branchUuid)?.name : undefined,
     [branches],
   );
+
+  /** Sede con la que se muestra y se agenda al paciente: la del filtro si la tiene, si no la principal. */
+  const resolvePatientBranchName = (patient: Patient) =>
+    resolveBranchName(pickPatientBranchUuid(patient, branchFilter));
 
   /** Color de marca de la sede de una cita, para los puntos del calendario. */
   const resolveBranchColor = useCallback(
@@ -401,7 +410,12 @@ export function useAgenda() {
 
   const handleConfirmAt = (dayKey: string, hour: number) => {
     if (!confirmTarget) return;
-    void scheduling.confirmPending(confirmTarget, dayKey, hour * MINUTES_IN_HOUR);
+    void scheduling.confirmPending(
+      confirmTarget,
+      dayKey,
+      hour * MINUTES_IN_HOUR,
+      branchFilter,
+    );
     setConfirmTarget(null);
   };
 
@@ -412,7 +426,7 @@ export function useAgenda() {
       patientUuid: patient.uuid,
       tentativeMonth: patient.tentativeAppointmentMonth,
       typeUuid: patient.tentativeAppointmentTypeUuid,
-      branchUuid: patient.branchUuid,
+      branchUuid: pickPatientBranchUuid(patient, branchFilter),
       nextAppointmentAt: patient.nextAppointmentAt,
       initialMode: ScheduleMode.DAY,
     });
@@ -424,7 +438,7 @@ export function useAgenda() {
       patientUuid: patient.uuid,
       tentativeMonth: patient.tentativeAppointmentMonth,
       typeUuid: patient.tentativeAppointmentTypeUuid,
-      branchUuid: patient.branchUuid,
+      branchUuid: pickPatientBranchUuid(patient, branchFilter),
       nextAppointmentAt: patient.nextAppointmentAt,
       initialMode: ScheduleMode.DAY,
     });
@@ -501,6 +515,7 @@ export function useAgenda() {
     hasBranches: (branches?.length ?? 0) > 1,
     resolveTypeColor,
     resolveBranchName,
+    resolvePatientBranchName,
     resolveBranchColor,
     matchesBranch,
     resolveScheduledBy,

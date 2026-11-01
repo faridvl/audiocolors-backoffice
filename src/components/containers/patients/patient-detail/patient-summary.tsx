@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
@@ -17,6 +18,7 @@ import {
 import { TEXT } from '@/static/texts/i18n';
 import {
   GENDER_LABELS,
+  getPatientBranchUuids,
   Patient,
   PatientFlag,
   PatientGender,
@@ -75,9 +77,9 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
     .filter(Boolean)
     .join(' · ');
 
-  const branchName = patient.branchUuid
-    ? (branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null)
-    : null;
+  const branchNames = getPatientBranchUuids(patient)
+    .map((branchUuid) => branches?.find((branch) => branch.uuid === branchUuid)?.name)
+    .filter((name): name is string => Boolean(name));
 
   // A un paciente fallecido no se le agendan citas (el API lo rechaza).
   const isDeceased = patient.status === PatientStatus.DECEASED;
@@ -137,7 +139,13 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             label={t(TEXT.PATIENTS.DETAIL.FIELDS.BIRTH_DATE)}
             value={patient.birthDate ? formatCalendarDate(patient.birthDate) : null}
           />
-          <PatientDatum label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH)} value={branchName} />
+          <PatientDatum
+            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, { count: branchNames.length })}
+          >
+            {branchNames.map((name) => (
+              <BranchBadge key={name} name={name} />
+            ))}
+          </PatientDatum>
         </dl>
       </div>
 

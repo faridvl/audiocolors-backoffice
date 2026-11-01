@@ -15,7 +15,7 @@ import { formatMinuteOfDay } from '@/shared/utils/dates';
 import { EMPTY_VALUE, getFullName } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
-import { Patient } from '@/types/patients/patient';
+import { Patient, pickPatientBranchUuid } from '@/types/patients/patient';
 import {
   buildSlotTimes,
   resolveAppointmentDuration,
@@ -85,7 +85,12 @@ export function useAgendaScheduling() {
     }
   };
 
-  const confirmPending = (patient: Patient, dayKey: string, startMinute: number) => {
+  const confirmPending = (
+    patient: Patient,
+    dayKey: string,
+    startMinute: number,
+    preferredBranchUuid?: string | null,
+  ) => {
     const name = getFullName(patient.firstName, patient.lastName);
 
     return track({ id: patient.uuid, title: name, dayKey, startMinute }, async () => {
@@ -95,7 +100,9 @@ export function useAgendaScheduling() {
         ...(patient.tentativeAppointmentTypeUuid && {
           typeUUID: patient.tentativeAppointmentTypeUuid,
         }),
-        ...(patient.branchUuid && { branchUUID: patient.branchUuid }),
+        ...(pickPatientBranchUuid(patient, preferredBranchUuid) && {
+          branchUUID: pickPatientBranchUuid(patient, preferredBranchUuid),
+        }),
       });
 
       // El día ya quedó confirmado: si la hora falla, se avisa distinto para

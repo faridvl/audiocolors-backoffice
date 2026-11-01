@@ -62,7 +62,7 @@ export function usePatientQuickCreate(
       lastName,
       phone,
       documentId: normalizeQuickCreateDocument(values.documentId),
-      ...(values.branchUuid && { branchUuid: values.branchUuid }),
+      ...(values.branchUuids.length > 0 && { branchUuids: values.branchUuids }),
       contacts: contacts.map(({ name, phone: contactPhone }) => ({
         name,
         phone: contactPhone,

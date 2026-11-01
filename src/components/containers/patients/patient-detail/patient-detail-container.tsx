@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
-import { PatientStatus } from '@/types/patients/patient';
+import { PatientStatus, pickPatientBranchUuid } from '@/types/patients/patient';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlagsModal } from '@/components/containers/patients/patient-flags/patient-flags-modal';
 import { PatientFlagSection } from '@/components/containers/patients/patient-flags/use-patient-flags';
@@ -109,7 +109,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
           patientUuid={patient.uuid}
           tentativeMonth={patient.tentativeAppointmentMonth}
           tentativeTypeUuid={patient.tentativeAppointmentTypeUuid}
-          branchUuid={patient.branchUuid}
+          branchUuid={pickPatientBranchUuid(patient)}
           nextAppointmentAt={patient.nextAppointmentAt}
           nextAppointmentTypeName={patient.nextAppointmentType}
           onClose={() => setIsSchedulingAppointment(false)}

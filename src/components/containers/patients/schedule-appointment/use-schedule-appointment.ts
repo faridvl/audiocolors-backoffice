@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
@@ -25,6 +27,8 @@ import {
   toDayKey,
   toMonthKey,
 } from '@/shared/utils/dates';
+import { getBranchStripeColor } from '@/shared/design/tokens';
+import { getPatientBranchUuids } from '@/types/patients/patient';
 import { TEXT } from '@/static/texts/i18n';
 
 /** Los dos momentos del flujo: primero se anota el mes, despues el dia. */
@@ -92,6 +96,24 @@ export function useScheduleAppointment({
   const [typeUuid, setTypeUuid] = useState(tentativeTypeUuid ?? '');
   const [error, setError] = useState<string | null>(null);
 
+  // La cita solo puede ir en una sede del paciente. La sede que ya traía la cita
+  // se conserva en la lista aunque el paciente la haya perdido, para no cambiarla sin avisar.
+  const { data: patient } = usePatientQuery(patientUuid);
+  const { data: branches } = useBranchesQuery();
+  const [pickedBranchUuid, setPickedBranchUuid] = useState(branchUuid ?? '');
+  const patientBranchUuids = patient ? getPatientBranchUuids(patient) : [];
+  const branchOptionUuids =
+    branchUuid && !patientBranchUuids.includes(branchUuid)
+      ? [...patientBranchUuids, branchUuid]
+      : patientBranchUuids;
+  const selectedBranchUuid =
+    pickedBranchUuid || (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
+  const branchOptions = branchOptionUuids.map((uuid) => {
+    const name = branches?.find((branch) => branch.uuid === uuid)?.name ?? '';
+    return { value: uuid, label: name, accentColor: getBranchStripeColor(name) };
+  });
+  const hasBranchChoice = branchOptions.length > 1;
+
   // Al reagendar una cita confirmada el API da el tipo solo por nombre.
   const selectedTypeUuid =
     typeUuid || appointmentTypes?.find((type) => type.name === nextAppointmentTypeName)?.uuid || '';
@@ -154,6 +176,11 @@ export function useScheduleAppointment({
 
   const handleTypeChange = (nextTypeUuid: string) => {
     setTypeUuid(nextTypeUuid);
+    setError(null);
+  };
+
+  const handleBranchChange = (nextBranchUuid: string) => {
+    setPickedBranchUuid(nextBranchUuid);
     setError(null);
   };
 
@@ -221,6 +248,10 @@ export function useScheduleAppointment({
       setError(t(TEXT.PATIENTS.SCHEDULE.VALIDATION.TYPE_REQUIRED));
       return;
     }
+    if (hasBranchChoice && !selectedBranchUuid) {
+      setError(t(TEXT.PATIENTS.SCHEDULE.VALIDATION.BRANCH_REQUIRED));
+      return;
+    }
     setError(null);
     setIsSchedulingDay(true);
 
@@ -229,7 +260,7 @@ export function useScheduleAppointment({
         patientUuid,
         date,
         typeUUID: selectedTypeUuid,
-        ...(branchUuid ? { branchUUID: branchUuid } : {}),
+        ...(selectedBranchUuid ? { branchUUID: selectedBranchUuid } : {}),
       });
 
       if (hour === null) {
@@ -282,6 +313,9 @@ export function useScheduleAppointment({
       label: formatHour(slotHour),
     })),
     selectedTypeUuid,
+    selectedBranchUuid,
+    branchOptions,
+    hasBranchChoice,
     appointmentTypes: appointmentTypes ?? [],
     hasNoAppointmentTypes,
     hasNextAppointment,
@@ -295,6 +329,7 @@ export function useScheduleAppointment({
     handleDateChange,
     handleHourChange,
     handleTypeChange,
+    handleBranchChange,
     handleBack,
     handleSubmit,
   };

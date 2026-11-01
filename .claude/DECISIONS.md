@@ -684,3 +684,11 @@ clínico, y se puede registrar en un paciente inactivo o fallecido. Un paciente 
 **Por qué:** con un simple "sumar uno" o un valor sin comparar, dos personas con la pantalla abierta
 podían pisar el contador con un dato viejo. La comparación ocurre dentro de la misma actualización, así
 que de dos guardados simultáneos solo uno gana y queda un solo registro en la bitácora.
+
+## D35 · Varias sedes por paciente (2026-10-31)
+
+- Un paciente tiene una o más sedes (`branchUuids`). `branchUuid` sigue como la sede principal porque Zynka lo lee así.
+- Editar un paciente sin sedes exige elegir al menos una. Un paciente que ya no tiene sedes se agenda sin mandar sede.
+- Al agendar solo se ofrecen las sedes del paciente; si tiene una sola, ya va elegida y no se muestra el selector.
+- La sede que ya traía una cita se conserva como opción aunque el paciente la haya perdido, para no cambiarla en silencio.
+  Pendiente: el detalle del paciente no trae la sede de su próxima cita, así que el modal de reagendar desde el expediente todavía no la conoce.

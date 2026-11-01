@@ -1,17 +1,17 @@
-import React, { useEffect } from "react";
-import { Form, Formik } from "formik";
-import { useTranslation } from "react-i18next";
-import { ArrowLeft, Save, Search } from "lucide-react";
-import { Button, ButtonVariant } from "@/components/common/button/button";
-import { FormField } from "@/components/common/input/input";
-import { FormSelectField } from "@/components/common/form/form-select-field";
-import { FocusFirstError } from "@/components/common/form/focus-first-error";
-import { PhoneField } from "@/components/common/phone-field/phone-field";
-import { getBranchStripeColor } from "@/shared/design/tokens";
-import { TEXT } from "@/static/texts/i18n";
-import { Patient } from "@/types/patients/patient";
-import { DOCUMENT_MAX_LENGTH } from "./patient-quick-create-form";
-import { usePatientQuickCreate } from "./use-patient-quick-create";
+import React, { useEffect } from 'react';
+import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
+import { ArrowLeft, Save, Search } from 'lucide-react';
+import { Button, ButtonVariant } from '@/components/common/button/button';
+import { FormField } from '@/components/common/input/input';
+import { FormMultiSelectField } from '@/components/common/form/form-multi-select-field';
+import { FocusFirstError } from '@/components/common/form/focus-first-error';
+import { PhoneField } from '@/components/common/phone-field/phone-field';
+import { getBranchStripeColor } from '@/shared/design/tokens';
+import { TEXT } from '@/static/texts/i18n';
+import { Patient } from '@/types/patients/patient';
+import { DOCUMENT_MAX_LENGTH } from './patient-quick-create-form';
+import { usePatientQuickCreate } from './use-patient-quick-create';
 
 interface PatientQuickCreateFormProps {
   searchTerm: string;
@@ -62,11 +62,7 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
                 label={t(TEXT.AGENDA.PICKER.CREATE.FIRST_NAME)}
                 required
               />
-              <FormField
-                name="lastName"
-                label={t(TEXT.AGENDA.PICKER.CREATE.LAST_NAME)}
-                required
-              />
+              <FormField name="lastName" label={t(TEXT.AGENDA.PICKER.CREATE.LAST_NAME)} required />
             </div>
             <PhoneField
               name="phone"
@@ -92,8 +88,8 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
                 </Button>
               )}
             </div>
-            <FormSelectField
-              name="branchUuid"
+            <FormMultiSelectField
+              name="branchUuids"
               label={t(TEXT.AGENDA.PICKER.CREATE.BRANCH)}
               placeholder={t(
                 isBranchRequired

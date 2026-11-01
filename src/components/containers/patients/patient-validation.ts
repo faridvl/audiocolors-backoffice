@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { TEXT } from '@/static/texts/i18n';
 import { DocumentType, PatientGender } from '@/types/patients/patient';
 import { PatientContact } from '@/types/patients/patient-contact';
 import {
@@ -48,6 +49,7 @@ const baseFields = {
     .test('not-future', 'La fecha no puede ser futura', isPastOrPresentDate),
   address: Yup.string().max(240, 'Máximo 240 caracteres'),
   gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opción'),
+  branchUuids: Yup.array().of(Yup.string().required()).min(1, TEXT.PATIENTS.FORM.BRANCHES_REQUIRED),
 };
 
 const CONTACT_NAME_MAX_LENGTH = 80;
@@ -101,7 +103,9 @@ export const buildPatientEditValidationSchema = (initialContacts: PatientContact
 
 /** Solo los contactos, para editarlos desde el expediente sin abrir el formulario entero. */
 export const buildPatientContactsValidationSchema = (initialContacts: PatientContactFormValues[]) =>
-  Yup.object({ contacts: buildContactsField(toUnchangedPhones(initialContacts)) });
+  Yup.object({
+    contacts: buildContactsField(toUnchangedPhones(initialContacts)),
+  });
 
 export interface PatientContactFormValues {
   /** Presente solo si el contacto ya existía al abrir el formulario. */
@@ -119,7 +123,7 @@ export interface PatientFormValues {
   gender: string;
   email: string;
   address: string;
-  branchUuid: string;
+  branchUuids: string[];
   contacts: PatientContactFormValues[];
 }
 

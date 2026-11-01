@@ -64,7 +64,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34; solo en la rama, sin push). El 6 va a medias: API listo (`9f33ca2`, sin push, migración `20261031140000_patient_branches` solo en la base local; `branchUuid` sigue como sede principal por Zynka y se agrega `branchUuids`). Sigue el front del 6: reiniciar el API local (el proceso del 7071 es viejo), elegir varias sedes en formulario y pre-registro, mostrarlas en expediente y lista, y al agendar ofrecer solo las sedes del paciente. Después, cuestionador (también lee el API `9f33ca2`, que aún no revisó), revisor-ux y qa (el qa incluye STAFF del punto 5). **El usuario pidió (2026-10-31): al terminar el punto 6, push de todo** (la rama `feature/preguntas-y-mantenimientos` en los dos repos, puntos 5 y 6); no incluye merge. Al publicar: primero el API con sus
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34; solo en la rama, sin push). El 6 está hecho (D35): API `9f33ca2` y front en la rama, sin push. Sigue: cuestionador (también lee el API `9f33ca2`, que aún no revisó), revisor-ux y qa (el qa incluye STAFF del punto 5). **El usuario pidió (2026-10-31): al terminar el punto 6, push de todo** (la rama `feature/preguntas-y-mantenimientos` en los dos repos, puntos 5 y 6); no incluye merge. Al publicar: primero el API con sus
   migraciones, después el front. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
@@ -113,6 +113,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## Preguntas abiertas
 
+- Intentos de contacto (2026-10-31): el usuario corrigió que no es un contador de 1 a 3, sino 4 checks. Falta que
+  aclare qué representa cada check (llamadas 1 a 4, uno por mantenimiento u otra cosa) y si van en orden. Lo hecho (D34)
+  queda como está hasta entonces.
 - Nombres de roles (2026-10-30, no hacerlo todavía): hoy OWNER, ADMIN, DOCTOR y STAFF. El usuario
   los quiere más claros (Administrador, Profesional, Recepción, Secretario o Empleado) y busca un
   estándar global de nombres. Propuesta a revisar: código fijo en inglés (`PRACTITIONER` viene de
@@ -143,3 +146,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Intentos de contacto (D34): sin probar STAFF en pantalla ni por API (PUT 200, bitácora 403), dos clínicas,
   abrir desde la píldora a 375 px ni cerrar y reabrir el modal con un guardado en curso. La migración se aplica antes de publicar.
 - Pre-registro rápido (modal Agendar): pie fijo y cuerpo con scroll en celulares bajos; ronda 2 de correcciones cerrada.
+
+- Varias sedes (D35): probado en pantalla crear con dos sedes, verlas en expediente y lista, agendar eligiendo sede y quitar una sede al editar. Sin probar: la sede de la cita al reagendar desde el expediente (el detalle del paciente no trae la sede de su próxima cita; falta exponerla en el API), paciente viejo de una sola sede, 375 px, y filtros con una sede que excluya al paciente.
