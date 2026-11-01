@@ -110,6 +110,9 @@ El detalle de cada cambio y los commits que cubre están en
 Pestaña Mantenimiento en Indicadores, píldoras en el expediente y registro en la bitácora. Avance
 del lote en `HANDOFF.md`.
 
+### Lote del 2026-10-28 — Intentos de contacto (D34)
+Pestaña Contacto en Indicadores, píldora "Contacto: N" en el expediente y registro en la bitácora.
+
 ---
 
 ## 📋 Pendientes

@@ -667,3 +667,20 @@ mantenimiento: solo queda la del cambio en la bitácora.
 
 **Por qué:** la clínica lo pidió como una marca manual que no se calcula desde las citas. Una
 validación de orden o de estado impediría registrar lo que ya pasó.
+
+---
+
+## D34 · Intentos de contacto: contador con control de cambios (2026-10-31)
+
+**Decisión:** el modal "Indicadores del paciente" suma la pestaña Contacto, con un contador de 0 a 3,
+"Registrar intento" y "Reiniciar"; el expediente muestra la píldora "Contacto: N" si es mayor que 0.
+`PUT /patients/:uuid/contact-attempts` recibe el valor absoluto (`count`) y el que muestra la pantalla
+(`expectedCount`), los dos obligatorios. Si el guardado no coincide responde 409 y la pantalla avisa y
+refresca. Cada cambio real deja `CONTACT_ATTEMPTS_CHANGED` en la bitácora.
+
+**Sin validar a propósito:** STAFF puede registrar, porque llamar es tarea de recepción y no es dato
+clínico, y se puede registrar en un paciente inactivo o fallecido. Un paciente borrado da 404.
+
+**Por qué:** con un simple "sumar uno" o un valor sin comparar, dos personas con la pantalla abierta
+podían pisar el contador con un dato viejo. La comparación ocurre dentro de la misma actualización, así
+que de dos guardados simultáneos solo uno gana y queda un solo registro en la bitácora.
