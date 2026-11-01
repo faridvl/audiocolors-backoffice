@@ -26,6 +26,14 @@ Clínica "AudioColors (prueba local)", usuario OWNER `prueba@audiocolors.test`.
 La contraseña está en `.env.prueba.local` (ignorado por git). Solo existe en
 esta base local.
 
+## Iniciar sesión con Playwright
+
+`yarn e2e:login` entra con la cuenta OWNER `farid@audiocolors.com` y deja la sesión en
+`e2e/.auth/session.json`, reutilizable como `storageState`. El correo y la contraseña
+se leen de `.env.e2e.local` (`E2E_EMAIL`, `E2E_PASSWORD`, ignorado por git) y la URL de
+`E2E_BASE_URL` (por defecto `http://localhost:3000`). La cuenta existe en esta base y en
+la de desarrollo.
+
 ## Levantar
 
 1. Abrir Docker Desktop (el contenedor arranca solo).
