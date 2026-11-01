@@ -64,7 +64,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34; solo en la rama, sin push). Sigue el 6. Al publicar: primero el API con sus
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34; solo en la rama, sin push). El 6 va a medias: API listo (`9f33ca2`, sin push, migración `20261031140000_patient_branches` solo en la base local; `branchUuid` sigue como sede principal por Zynka y se agrega `branchUuids`). Sigue el front del 6: reiniciar el API local (el proceso del 7071 es viejo), elegir varias sedes en formulario y pre-registro, mostrarlas en expediente y lista, y al agendar ofrecer solo las sedes del paciente. Después, cuestionador, revisor-ux y qa (el qa incluye STAFF del punto 5). Al publicar: primero el API con sus
   migraciones, después el front. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
