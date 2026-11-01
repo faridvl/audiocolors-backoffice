@@ -26,6 +26,8 @@ export enum PatientActivityAction {
   RENEW_PRESCRIPTION_CHANGED = 'RENEW_PRESCRIPTION_CHANGED',
   MAINTENANCE_CHANGED = 'MAINTENANCE_CHANGED',
   CONTACT_ATTEMPTS_CHANGED = 'CONTACT_ATTEMPTS_CHANGED',
+  MAINTENANCE_CHECK_CHANGED = 'MAINTENANCE_CHECK_CHANGED',
+  MAINTENANCE_NOTE_CHANGED = 'MAINTENANCE_NOTE_CHANGED',
   CLINICAL_HISTORY_CREATED = 'CLINICAL_HISTORY_CREATED',
   CLINICAL_HISTORY_UPDATED = 'CLINICAL_HISTORY_UPDATED',
   PHYSICAL_EXAM_UPDATED = 'PHYSICAL_EXAM_UPDATED',
@@ -70,10 +72,13 @@ export interface PatientActivityDetail {
   isOn?: boolean;
   /** Audífonos en laboratorio: día de envío (`date`) y el anterior si se corrigió (`previousDate`). */
   previousDate?: string;
-  /** MAINTENANCE_CHANGED: qué mantenimiento (1 a 4) y cómo quedó (null = sin marcar). */
+  /** Mantenimientos: cuál es (1 a 4). */
   number?: number;
+  /** MAINTENANCE_CHECK_CHANGED: true al marcarlo, false al desmarcarlo. */
+  done?: boolean;
+  /** MAINTENANCE_CHANGED (registros viejos): cómo quedó, null = sin marcar. */
   status?: string | null;
-  /** CONTACT_ATTEMPTS_CHANGED: intentos de contacto ahora y antes. */
+  /** CONTACT_ATTEMPTS_CHANGED (registros viejos): intentos de contacto ahora y antes. */
   count?: number;
   previousCount?: number;
 }

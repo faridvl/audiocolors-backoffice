@@ -8,8 +8,8 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PatientFlag } from '@/types/patients/patient';
+import { tailwind } from '@/utils/tailwind-utils';
 import { LabShipmentDate } from './lab-shipment-date';
-import { PatientContactAttempts } from './patient-contact-attempts';
 import { PatientMaintenanceList } from './patient-maintenance-list';
 import { PatientFlagSection, usePatientFlags } from './use-patient-flags';
 import { WarrantyDocumentSelect } from './warranty-document-select';
@@ -34,7 +34,6 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
     activeFlags,
     isWarrantySection,
     isMaintenanceSection,
-    isContactSection,
     labShipment,
     handleToggle,
     handleSectionChange,
@@ -50,7 +49,10 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white"
+        className={tailwind(
+          'flex max-h-full w-full flex-col rounded-card bg-white',
+          isMaintenanceSection ? 'max-w-md sm:max-w-4xl' : 'max-w-md',
+        )}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex shrink-0 items-start gap-3 px-6 pb-4 pt-6">
@@ -83,14 +85,10 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
               <Typography variant={TypographyVariant.BODY} className="mt-3 text-ink-500">
                 {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.HINT)}
               </Typography>
-              <div className="mt-2 rounded-lg border border-ink-200 px-3">
+              <div className="mt-3">
                 <PatientMaintenanceList patient={patient} />
               </div>
             </>
-          ) : isContactSection ? (
-            <div className="mt-3 rounded-lg border border-ink-200 px-3">
-              <PatientContactAttempts patient={patient} />
-            </div>
           ) : (
             <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
               {activeFlags.map((item) => {

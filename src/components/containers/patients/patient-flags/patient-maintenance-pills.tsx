@@ -1,19 +1,10 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { tailwind } from '@/utils/tailwind-utils';
 import { TEXT } from '@/static/texts/i18n';
-import {
-  getMaintenanceChoice,
-  MAINTENANCE_NUMBERS,
-  MaintenanceChoice,
-  Patient,
-} from '@/types/patients/patient';
-import { MAINTENANCE_PILL_STYLES } from './patient-maintenance-styles';
+import { isMaintenanceDone, MAINTENANCE_NUMBERS, Patient } from '@/types/patients/patient';
 
-const PILL_CLASSES =
-  'inline-block w-fit whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium hover:underline';
-
-/** Solo los mantenimientos marcados ("Mant. 2: asistido"); al tocarlos se abre el modal. */
+/** Solo los mantenimientos hechos ("Mant. 2" con check); al tocarlos se abre el modal. */
 export const PatientMaintenancePills: React.FC<{
   patient: Patient;
   onClick: () => void;
@@ -22,22 +13,19 @@ export const PatientMaintenancePills: React.FC<{
 
   return (
     <>
-      {MAINTENANCE_NUMBERS.map((maintenanceNumber) => {
-        const choice = getMaintenanceChoice(patient, maintenanceNumber);
-        if (choice === MaintenanceChoice.UNMARKED) return null;
-        return (
-          <button
-            key={maintenanceNumber}
-            type="button"
-            onClick={onClick}
-            className={tailwind(PILL_CLASSES, MAINTENANCE_PILL_STYLES[choice])}
-          >
-            {t(`${TEXT.PATIENTS.FLAGS.MAINTENANCE.PILL_PREFIX}.${choice}`, {
-              number: maintenanceNumber,
-            })}
-          </button>
-        );
-      })}
+      {MAINTENANCE_NUMBERS.filter((maintenanceNumber) =>
+        isMaintenanceDone(patient, maintenanceNumber),
+      ).map((maintenanceNumber) => (
+        <button
+          key={maintenanceNumber}
+          type="button"
+          onClick={onClick}
+          className="inline-flex w-fit items-center gap-1 whitespace-nowrap rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700 hover:underline"
+        >
+          <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
+          {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.PILL, { number: maintenanceNumber })}
+        </button>
+      ))}
     </>
   );
 };

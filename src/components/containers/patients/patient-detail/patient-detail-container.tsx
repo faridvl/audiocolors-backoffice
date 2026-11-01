@@ -66,7 +66,6 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         onChangeStatus={() => setIsChangingStatus(true)}
         onEditFlags={() => setFlagsSection(PatientFlagSection.LAB)}
         onEditMaintenance={() => setFlagsSection(PatientFlagSection.MAINTENANCE)}
-        onEditContactAttempts={() => setFlagsSection(PatientFlagSection.CONTACT)}
         onEditContacts={() => setIsEditingContacts(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
       />

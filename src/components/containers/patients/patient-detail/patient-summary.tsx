@@ -4,7 +4,6 @@ import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
-import { PatientContactAttemptsPill } from '@/components/containers/patients/patient-flags/patient-contact-attempts-pill';
 import { PatientMaintenancePills } from '@/components/containers/patients/patient-flags/patient-maintenance-pills';
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
@@ -42,7 +41,6 @@ interface PatientSummaryProps {
   onChangeStatus: () => void;
   onEditFlags: () => void;
   onEditMaintenance: () => void;
-  onEditContactAttempts: () => void;
   onEditContacts: () => void;
   onEdit: () => void;
 }
@@ -58,7 +56,6 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
   onChangeStatus,
   onEditFlags,
   onEditMaintenance,
-  onEditContactAttempts,
   onEditContacts,
   onEdit,
 }) => {
@@ -113,7 +110,6 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
           <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
           <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
-          <PatientContactAttemptsPill patient={patient} onClick={onEditContactAttempts} />
           <VideoCandidateCheck patient={patient} />
         </div>
 

@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
-import { GENDER_LABELS, MaintenanceChoice, PatientGender } from '@/types/patients/patient';
+import { GENDER_LABELS, PatientGender } from '@/types/patients/patient';
 import {
   PatientActivity,
   PatientActivityAction,
@@ -100,6 +100,14 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     },
     [PatientActivityAction.CONTACT_ATTEMPTS_CHANGED]: {
       icon: PhoneCall,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_CHECK_CHANGED]: {
+      icon: Wrench,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_NOTE_CHANGED]: {
+      icon: Wrench,
       tone: ActionTone.NEUTRAL,
     },
   };
@@ -337,10 +345,27 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
         `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
       );
 
+    // Registros anteriores al check y la nota: asistido, perdido o sin marcar.
     case PatientActivityAction.MAINTENANCE_CHANGED:
       return context.t(
-        `${TEXT.ACTIVITY.DETAIL.MAINTENANCE_PREFIX}.${detail.status ?? MaintenanceChoice.UNMARKED}`,
+        `${TEXT.ACTIVITY.DETAIL.MAINTENANCE_PREFIX}.${detail.status ?? 'UNMARKED'}`,
         { number: detail.number },
+      );
+
+    case PatientActivityAction.MAINTENANCE_CHECK_CHANGED:
+      return context.t(
+        detail.done
+          ? TEXT.ACTIVITY.DETAIL.MAINTENANCE_DONE
+          : TEXT.ACTIVITY.DETAIL.MAINTENANCE_UNDONE,
+        { number: detail.number },
+      );
+
+    case PatientActivityAction.MAINTENANCE_NOTE_CHANGED:
+      return context.t(
+        detail.excerpt
+          ? TEXT.ACTIVITY.DETAIL.MAINTENANCE_NOTE
+          : TEXT.ACTIVITY.DETAIL.MAINTENANCE_NOTE_REMOVED,
+        { number: detail.number, excerpt: detail.excerpt },
       );
 
     case PatientActivityAction.CONTACT_ATTEMPTS_CHANGED:

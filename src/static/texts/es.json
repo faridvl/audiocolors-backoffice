@@ -477,7 +477,9 @@
       "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada",
       "PHYSICAL_EXAM_UPDATED": "Exploración física modificada",
       "MAINTENANCE_CHANGED": "Mantenimiento",
-      "CONTACT_ATTEMPTS_CHANGED": "Intentos de contacto"
+      "CONTACT_ATTEMPTS_CHANGED": "Intentos de contacto",
+      "MAINTENANCE_CHECK_CHANGED": "Mantenimiento",
+      "MAINTENANCE_NOTE_CHANGED": "Nota de mantenimiento"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -522,6 +524,10 @@
         "MISSED": "Mantenimiento {{number}}: perdido"
       },
       "contactAttempts": "Intentos: {{before}} → {{after}}",
+      "maintenanceDone": "Mantenimiento {{number}}: hecho",
+      "maintenanceUndone": "Mantenimiento {{number}}: sin marcar",
+      "maintenanceNote": "Mantenimiento {{number}}: {{excerpt}}",
+      "maintenanceNoteRemoved": "Mantenimiento {{number}}: nota borrada",
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
@@ -602,37 +608,21 @@
       "sections": {
         "lab": "Laboratorio",
         "warranty": "Garantía",
-        "maintenance": "Mantenimiento",
-        "contact": "Contacto"
-      },
-      "contact": {
-        "title": "Intentos de contacto",
-        "none": "Sin intentos",
-        "value": "{{count}} de {{max}}",
-        "register": "Registrar intento",
-        "reset": "Reiniciar",
-        "toast": "Intento {{count}} de {{max}} registrado",
-        "toastReset": "Intentos de contacto reiniciados",
-        "toastConflict": "Otra persona actualizó este contador. Revisa el valor y vuelve a intentarlo.",
-        "pill": "Contacto: {{count}}"
+        "maintenance": "Mantenimiento"
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
-        "hint": "Elige Sin marcar para quitar la marca.",
-        "options": {
-          "UNMARKED": "Sin marcar",
-          "ATTENDED": "Asistido",
-          "MISSED": "Perdido"
-        },
-        "toasts": {
-          "UNMARKED": "Mantenimiento {{number}} sin marcar",
-          "ATTENDED": "Mantenimiento {{number}} marcado como asistido",
-          "MISSED": "Mantenimiento {{number}} marcado como perdido"
-        },
-        "pills": {
-          "ATTENDED": "Mant. {{number}}: asistido",
-          "MISSED": "Mant. {{number}}: perdido"
-        }
+        "hint": "Marca cada mantenimiento cuando se haga. Si llamaron al paciente, anótalo en la nota.",
+        "done": "Hecho",
+        "noteLabel": "Nota (opcional)",
+        "notePlaceholder": "Por ejemplo: se le llamó y quedó para la otra semana",
+        "saving": "Guardando…",
+        "noteError": "No se pudo guardar la nota. Toca fuera del campo para reintentar.",
+        "toastDone": "Mantenimiento {{number}} marcado como hecho",
+        "toastUndone": "Mantenimiento {{number}} sin marcar",
+        "toastNoteSaved": "Nota del mantenimiento {{number}} guardada",
+        "toastNoteRemoved": "Nota del mantenimiento {{number}} borrada",
+        "pill": "Mant. {{number}}"
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",
