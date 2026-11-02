@@ -43,13 +43,22 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
   onDirtyChange,
 }) => {
   const { t } = useTranslation();
-  const { initialValues, fields, isEditing, isPending, isEmpty, clearEmptyError, handleSubmit } =
-    useQuestionnaireEntryForm({
-      patientUuid,
-      template,
-      entry,
-      onDone: onClose,
-    });
+  const {
+    initialValues,
+    fields,
+    isEditing,
+    isPending,
+    isEmpty,
+    staleMessage,
+    clearEmptyError,
+    handleSubmit,
+    handleSaveAsNew,
+  } = useQuestionnaireEntryForm({
+    patientUuid,
+    template,
+    entry,
+    onDone: onClose,
+  });
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
 
   useEffect(() => {
@@ -59,7 +68,7 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-      {({ dirty }) => (
+      {({ dirty, values }) => (
         <Form className="flex flex-col gap-6">
           <FormDirtyReporter onDirtyChange={onDirtyChange} />
           <EmptyErrorResetter onReset={clearEmptyError} />
@@ -73,6 +82,15 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
             <div role="alert">
               <Typography variant={TypographyVariant.ERROR}>
                 {t(TEXT.QUESTIONS.ENTRY_EMPTY_ERROR)}
+              </Typography>
+            </div>
+          )}
+
+          {staleMessage && (
+            <div role="alert" className="flex flex-col gap-1">
+              <Typography variant={TypographyVariant.ERROR}>{staleMessage}</Typography>
+              <Typography variant={TypographyVariant.HELPER}>
+                {t(TEXT.QUESTIONS.ENTRY_STALE_HINT)}
               </Typography>
             </div>
           )}
@@ -94,15 +112,28 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
               >
                 {t(TEXT.GENERAL.BUTTONS.CANCEL)}
               </Button>
-              <Button
-                type="submit"
-                variant={ButtonVariant.PRIMARY}
-                isLoading={isPending}
-                disabled={isPending}
-                className="shrink-0 whitespace-nowrap"
-              >
-                {t(isEditing ? TEXT.QUESTIONS.ENTRY_EDIT_SAVE : TEXT.QUESTIONS.ENTRY_SAVE)}
-              </Button>
+              {staleMessage ? (
+                <Button
+                  type="button"
+                  variant={ButtonVariant.PRIMARY}
+                  isLoading={isPending}
+                  disabled={isPending}
+                  onClick={() => handleSaveAsNew(values)}
+                  className="min-w-0"
+                >
+                  {t(TEXT.QUESTIONS.ENTRY_SAVE_AS_NEW)}
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  variant={ButtonVariant.PRIMARY}
+                  isLoading={isPending}
+                  disabled={isPending}
+                  className="shrink-0 whitespace-nowrap"
+                >
+                  {t(isEditing ? TEXT.QUESTIONS.ENTRY_EDIT_SAVE : TEXT.QUESTIONS.ENTRY_SAVE)}
+                </Button>
+              )}
             </div>
           </div>
 

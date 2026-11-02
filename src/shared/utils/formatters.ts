@@ -112,12 +112,7 @@ export function buildMonthOption(monthKey: string): {
 } {
   const label = formatMonthLabel(monthKey);
   const [year] = monthKey.split('-');
-  return {
-    value: monthKey,
-    label,
-    shortLabel: label.replace(` ${year}`, ''),
-    group: year,
-  };
+  return { value: monthKey, label, shortLabel: label.replace(` ${year}`, ''), group: year };
 }
 
 /** Edad en anios cumplidos a partir de la fecha de nacimiento. */

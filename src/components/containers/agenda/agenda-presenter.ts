@@ -149,16 +149,14 @@ export function resolveAppointmentActions(
     };
   }
 
-  // Sin marcar (hoy después de medianoche UTC, o un día pasado): lo único que
-  // queda por hacer es corregirla a atendida.
+  // Sin marcar (vencida o de un día pasado): lo único que queda por hacer es corregirla a atendida.
   return { primary: AppointmentAction.MARK_DONE, secondary: [] };
 }
 
 /**
  * Horarios de la vista de escritorio, en hora de la clínica: uno por hora, de
- * 8:00 a 17:00. El tope no es solo de negocio: el API filtra las citas por
- * día UTC, y en Costa Rica (UTC-6) una cita a las 18:00 ya cae en el día UTC
- * siguiente y desaparecería de su día.
+ * 8:00 a 17:00. El tope es de negocio (el horario de atención de la clínica);
+ * el API filtra las citas por el día de Costa Rica, así que no lo condiciona.
  */
 export enum SlotHour {
   FIRST = 8,

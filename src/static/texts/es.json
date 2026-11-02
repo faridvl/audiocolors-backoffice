@@ -189,6 +189,8 @@
     "entrySaved": "Registro guardado",
     "entryHint": "Lo puedes corregir hoy; después queda fijo.",
     "entryEditHint": "Solo se corrige el mismo día en que se llenó.",
+    "entryStaleHint": "Lo que escribiste sigue aquí. Puedes guardarlo como un registro nuevo.",
+    "entrySaveAsNew": "Guardar como nuevo registro",
     "entriesLoading": "Cargando registros...",
     "entriesLoadError": "No se pudieron cargar los registros",
     "entryEmptyError": "Responde al menos una pregunta para guardar el registro.",

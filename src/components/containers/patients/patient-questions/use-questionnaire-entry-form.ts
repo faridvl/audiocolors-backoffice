@@ -38,6 +38,8 @@ export function useQuestionnaireEntryForm({
   const { executeUpdateEntry, isPending: isUpdatePending } = useUpdateQuestionnaireEntryMutation();
   const [isSaving, setIsSaving] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
+  // Mensaje del API cuando el registro ya no se puede corregir; el formulario sigue abierto con lo escrito.
+  const [staleMessage, setStaleMessage] = useState<string | null>(null);
   // El ref corta el segundo clic del mismo instante, antes de que el estado se repinte.
   const savingRef = useRef(false);
 
@@ -57,7 +59,7 @@ export function useQuestionnaireEntryForm({
 
   const clearEmptyError = useCallback(() => setIsEmpty(false), []);
 
-  const handleSubmit = (values: ClinicalHistoryFormValues) => {
+  const save = (values: ClinicalHistoryFormValues, asNew: boolean) => {
     if (savingRef.current) return;
     const answers = buildAnswers(fields, values);
     if (!hasAnswerContent(answers)) {
@@ -70,14 +72,13 @@ export function useQuestionnaireEntryForm({
       void queryClient.invalidateQueries({
         queryKey: [FETCH_QUESTIONNAIRE_ENTRIES_KEY, patientUuid],
       });
+    const isUpdating = !!entry && !asNew;
     const handleSuccess = () => {
       toast.success(
-        t(isEditing ? TEXT.QUESTIONS.ENTRY_CORRECTED_SAVED : TEXT.QUESTIONS.ENTRY_SAVED),
+        t(isUpdating ? TEXT.QUESTIONS.ENTRY_CORRECTED_SAVED : TEXT.QUESTIONS.ENTRY_SAVED),
       );
       refreshEntries();
-      void queryClient.invalidateQueries({
-        queryKey: [FETCH_PATIENT_ACTIVITY_KEY],
-      });
+      void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
       releaseSaving();
       onDone();
     };
@@ -86,15 +87,17 @@ export function useQuestionnaireEntryForm({
       if (error instanceof ApiError) {
         // Si las preguntas cambiaron mientras se llenaba, se vuelve a pedir la plantilla vigente.
         if (error.status === HttpStatus.BAD_REQUEST) {
-          void queryClient.invalidateQueries({
-            queryKey: [FETCH_QUESTIONNAIRE_TEMPLATES_KEY],
-          });
+          void queryClient.invalidateQueries({ queryKey: [FETCH_QUESTIONNAIRE_TEMPLATES_KEY] });
         }
-        // El registro ya no se corrige (cambió el día) o ya no existe: se cierra y se muestra como quedó.
-        if (
-          isEditing &&
-          (error.status === HttpStatus.CONFLICT || error.status === HttpStatus.NOT_FOUND)
-        ) {
+        // Ya no se corrige (cambió el día): se queda lo escrito para guardarlo como registro nuevo.
+        if (isUpdating && error.status === HttpStatus.CONFLICT) {
+          refreshEntries();
+          setStaleMessage(error.message);
+          releaseSaving();
+          return;
+        }
+        // El registro ya no existe: se cierra y se muestra como quedó.
+        if (isUpdating && error.status === HttpStatus.NOT_FOUND) {
           refreshEntries();
           releaseSaving();
           onDone();
@@ -104,7 +107,7 @@ export function useQuestionnaireEntryForm({
       releaseSaving();
     };
 
-    if (entry) {
+    if (entry && !asNew) {
       executeUpdateEntry(
         { patientUuid, entryUuid: entry.uuid, changes: { answers } },
         { onSuccess: handleSuccess, onError: handleError },
@@ -117,13 +120,18 @@ export function useQuestionnaireEntryForm({
     );
   };
 
+  const handleSubmit = (values: ClinicalHistoryFormValues) => save(values, false);
+  const handleSaveAsNew = (values: ClinicalHistoryFormValues) => save(values, true);
+
   return {
     initialValues,
     fields,
     isEditing,
     isPending: isCreatePending || isUpdatePending || isSaving,
     isEmpty,
+    staleMessage,
     clearEmptyError,
     handleSubmit,
+    handleSaveAsNew,
   };
 }

@@ -125,6 +125,8 @@ export const TEXT = {
     ENTRY_CORRECTED: 'questions.entryCorrected',
     ENTRY_CORRECTED_SAVED: 'questions.entryCorrectedSaved',
     ENTRY_EDIT_HINT: 'questions.entryEditHint',
+    ENTRY_STALE_HINT: 'questions.entryStaleHint',
+    ENTRY_SAVE_AS_NEW: 'questions.entrySaveAsNew',
     ENTRY_SAVE: 'questions.entrySave',
     ENTRY_SAVED: 'questions.entrySaved',
     ENTRY_HINT: 'questions.entryHint',
