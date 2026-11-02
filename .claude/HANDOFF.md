@@ -67,36 +67,33 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   notificaciones/novedades por versión.
 - Contexto de Claude recortado (rama `chore/contexto-claude`): `CLAUDE.md` es un
   índice y solo se importan este traspaso, `RULES.md` y `ARCHITECTURE.md` (D25).
-- **Lote de cambios pedido el 2026-10-28, en curso** (todo menos el punto 9).
-  Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
-  `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
-  contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34), 6 (D35) y 2 (D38, secciones propias de Preguntas), con la rama subida en los dos repos (2026-11-01), sin merge a `develop`. Corrección del punto 5 (D40: tres estados e historial de notas por mantenimiento; reemplaza D33, D34 y D36) hecha en el API `3bfba0c` y en el front. Corrección de Preguntas (D38, guarda la versión anterior), mes y día de Costa Rica en citas (D39) y ajustes de diseño (D42) hechos y probados por qa (2026-11-01); la rama quedó subida en los dos repos, sin merge a `develop`. Sin probar por qa: el dato vacío en pantalla, la bitácora en pantalla, el filtro de pacientes por mes y mover una cita. Encontrados por qa y ya corregidos: `maintenance/upcoming` de noviembre traía un mantenimiento del 1 dic 00:00Z (API `5ef7247`, fin de mes en UTC), y una cita de las 18:30 salía en "Sin hora asignada" (D43: la grilla del día se amplía a las citas fuera de 8:00 a 18:00). Sin probar: otra clínica (no hay segunda en local) y eventos viejos en la bitácora. Conocido: dos PUT idénticos en el mismo milisegundo dejan dos eventos en la bitácora (el API compara sin transacción); la base queda bien. La bitácora dice "agregó una nota" sin copiar el texto (D40). Para el desarrollo futuro de roles y permisos (no preguntar antes): solo el profesional médico agrega notas (2026-11-01). Después, el punto 2 y las otoscopías. Al publicar: primero la migración del API,
-  después el API y al final el front; tras desplegar, contar pacientes con `branchUuid` sin fila en `PatientBranch` y repetir el backfill, y revisar sedes de otra clínica en una copia de producción. Cada punto:
-  1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
-     (nombre provisional), en Configuración y en el detalle del paciente.
-  2. El usuario crea sus propias secciones dentro de Preguntas (p. ej. Historia
-     clínica, Cuestionario de satisfacción). El API ya guarda varias plantillas
-     por tenant (`name`, `speciality`, `fields`), pero el front pide una por
-     especialidad y las respuestas del paciente son una sola historia: revisar.
-  3. Las respuestas Sí/No del detalle no arrancan en "No": ninguna viene marcada.
-  4. Tab nuevo "Mantenimiento": mantenimientos 1, 2, 3, 4, cada uno asistido
-     (azul) o perdido (rojo).
-  5. Intentos de contacto: registrar si se llamó 1, 2 o 3 veces al paciente.
-  6. Un paciente puede tener más de una sede (hoy `branchUuid` es una sola).
-  7. Teléfonos extranjeros (hoy la máscara es de 8 dígitos de Costa Rica).
-  8. Audífonos en laboratorio (modal "Indicadores del paciente" → pestaña
-     Laboratorio, hoy un switch que se guarda al tocarlo): al marcarlo, pedir la
-     fecha de envío (un solo día).
-  9. Al desmarcarlo queda la fecha de entrega y un historial corto de
-     envíos/entregas, con nota opcional. Hoy la clínica lo anota a mano en Control
-     de evolución ("Se hace entrega de audífonos..."). La nota es la misma del
-     control de evolución (2026-11-01): falta definir el diseño antes de construirlo.
-  10. Pre-registro rápido desde "Agendar cita" cuando la búsqueda da "Ningún
-      paciente coincide": nombre, teléfono, cédula y sede; el expediente se
-      completa cuando llega a la cita.
-  11. Exploración física (otoscopia OD/OI) sale de la historia clínica a una
-      tarjeta propia, debajo de la ficha técnica y encima de Historia clínica.
+- **Lote de cambios del 2026-10-28: terminado y en `develop` de los dos repos
+  (2026-11-02)**, sin pasar a `main`. Puntos 1 a 11 más el historial de
+  otoscopías (D26 a D45). La base de desarrollo ya tiene las migraciones del lote.
+  Probado en pantalla con Playwright (`e2e/otoscopia`, `laboratorio`,
+  `pendientes-lote`, `citas-y-clinica`): dato vacío, bitácora (incluida una
+  acción desconocida), filtro por mes en los bordes de Costa Rica, mover y
+  reagendar citas (incluida la de 18:30) y aislamiento entre clínicas por API.
+  Corregido al probar: una clínica podía crear notas y citas sobre pacientes o
+  tipos de otra (API `6025c00`).
+  Sin probar: STAFF en pantalla (no hay sesión STAFF en local), una segunda
+  clínica con su propio usuario y eventos viejos en la bitácora.
+  Conocido: dos PUT idénticos en el mismo milisegundo dejan dos eventos en la
+  bitácora. La bitácora copia el texto de las notas clínicas, no el de las notas
+  de mantenimiento (D40).
+  Para el desarrollo futuro de roles (no preguntar antes): solo el profesional
+  médico agrega notas (2026-11-01).
+- **Al publicar** (orden): la migración del API, el API y el front, juntos (si
+  pasa tiempo entre la migración y el API, correr la reconciliación de envíos al
+  laboratorio de `.claude/DATABASE.md` del API). Después: contar pacientes con
+  `branchUuid` sin fila en `PatientBranch` y repetir el backfill, y revisar sedes
+  de otra clínica en una copia de producción.
+- **Revisar en un lote aparte:** varios storages del API actualizan por `uuid`
+  sin filtrar por clínica (plantillas, controles, encuentros, envíos al
+  laboratorio, otoscopías, preguntas, paciente, unidades de producto). Hoy los
+  protege el use case; falta confirmarlo uno por uno.
+- **Hook `limitar-agente.mjs`** (neuron-agentes): qa no puede escribir pruebas;
+  falta la decisión del usuario para permitirle `e2e/` y `*.spec.*`.
 
 ## Qué sigue
 
@@ -122,10 +119,6 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Pacientes viejos con `isActive = false` y `status = ACTIVE` (D-2026-10-04): se dejan como están,
   sin archivar ni reactivar; no es prioridad (usuario, 2026-11-01).
 
-- Punto 2 (secciones propias, D38), commits locales sin push: API `8ff5065` + `83c83e7` (migración
-  `patient_questionnaire_entries` aplicada solo en Docker local), front `4f50e80` + `1b4f72f` + el de la etiqueta.
-  Pasó cuestionador, revisor-ux y qa (API y pantalla). Sin probar: STAFF (no hay usuario de prueba) y editar
-  la historia clínica ya llenada. En curso: corregir un registro el mismo día.
 - STAFF sigue pudiendo leer las plantillas
   (solo preguntas): el usuario lo deja así hasta el desarrollo de seguridad y roles (2026-11-01).
 - Nombres de roles (2026-10-30, no hacerlo todavía): hoy OWNER, ADMIN, DOCTOR y STAFF. El usuario
