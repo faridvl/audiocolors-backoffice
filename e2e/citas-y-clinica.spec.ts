@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import {
   APIRequestContext,
@@ -32,6 +34,10 @@ const TIMELINE_PIXELS_PER_MINUTE = 1.4;
 const DROP_OFFSET_PX = 5;
 const MOVE_DAYS_AHEAD = 14;
 const TUESDAY = 2;
+const DB_CONTAINER = "audiocolors-prueba-db";
+const DB_USER = "admin";
+const DB_NAME = "saas_medical_records";
+const NOTE_INTRUDER_TEXT = "intruso";
 
 const RESCHEDULE_HOUR_LABEL = /^10:00/;
 const RESCHEDULE_HOUR_TEXT = /10:00 a\. ?m\./;
@@ -85,6 +91,30 @@ function nextTuesday(): string {
     const dayKey = clinicDay(offset);
     if (new Date(`${dayKey}T12:00:00Z`).getUTCDay() === TUESDAY) return dayKey;
   }
+}
+
+/** Consulta SQL directa a la base local de pruebas; devuelve la primera celda sin formato. */
+function runSql(sql: string): string {
+  return execFileSync(
+    "docker",
+    [
+      "exec",
+      DB_CONTAINER,
+      "psql",
+      "-U",
+      DB_USER,
+      "-d",
+      DB_NAME,
+      "-At",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-c",
+      sql,
+    ],
+    { encoding: "utf-8" },
+  )
+    .split("\n")[0]
+    .trim();
 }
 
 function addDays(dayKey: string, days: number): string {
@@ -409,18 +439,120 @@ test("5. otra clínica: el paciente ajeno no se puede leer ni cambiar", async ()
   expect(await listResponse.text()).not.toContain(OTHER_CLINIC_PATIENT);
 });
 
-// Bug conocido del API: crea la nota en el tenant de la sesión sobre un paciente ajeno.
-// test.fail() lo mantiene a la vista: cuando el API responda 403/404 esta prueba avisa.
-test.fail(
-  "5b. otra clínica: no se puede agregar una nota al paciente ajeno",
-  async () => {
-    expectedStatuses = [HTTP_FORBIDDEN, HTTP_NOT_FOUND];
-    const response = await api.post(`/patients/${OTHER_CLINIC_PATIENT}/notes`, {
-      data: { text: "intruso" },
+test("5b. otra clínica: no se puede agregar una nota al paciente ajeno", async () => {
+  expectedStatuses = [HTTP_FORBIDDEN, HTTP_NOT_FOUND];
+  const response = await api.post(`/patients/${OTHER_CLINIC_PATIENT}/notes`, {
+    data: { text: NOTE_INTRUDER_TEXT },
+  });
+  expect(
+    [HTTP_FORBIDDEN, HTTP_NOT_FOUND],
+    `POST notes: ${response.status()} ${await response.text()}`,
+  ).toContain(response.status());
+
+  expect(
+    runSql(
+      `SELECT count(*) FROM "PatientNote" WHERE "patientUuid" = '${OTHER_CLINIC_PATIENT}' AND text = '${NOTE_INTRUDER_TEXT}'`,
+    ),
+  ).toBe("0");
+});
+
+test.describe("5c. otra clínica: la cita ajena no se puede ver, mover ni cancelar", () => {
+  const foreignAppointment = randomUUID();
+  const foreignStart = clinicInstant(
+    addDays(clinicDay(), MOVE_DAYS_AHEAD),
+    11 * MINUTES_IN_HOUR,
+  );
+  const foreignRow = () =>
+    runSql(
+      `SELECT status || '|' || to_char("startTime", 'YYYY-MM-DD"T"HH24:MI') FROM "Appointment" WHERE uuid = '${foreignAppointment}'`,
+    );
+  let initialRow = "";
+
+  test.beforeAll(() => {
+    // La clínica ajena no tiene tipos de cita: el tipo solo satisface la llave foránea.
+    runSql(
+      `INSERT INTO "Appointment" (uuid, "patientUUID", "userUUID", "tenantUUID", "typeUUID", speciality, status, date, "startTime", "endTime", "updatedAt")
+       SELECT '${foreignAppointment}', patient.uuid, 'usuario-ajeno', patient."tenantUuid", '${appointmentTypeUuid}', 'AUDIOLOGY', 'CONFIRMED',
+         '${foreignStart}', '${foreignStart}', '${foreignStart}'::timestamp + interval '30 minutes', now()
+       FROM "Patient" patient WHERE patient.uuid = '${OTHER_CLINIC_PATIENT}'`,
+    );
+    initialRow = foreignRow();
+    expect(initialRow).toContain("CONFIRMED");
+  });
+
+  test.afterAll(() => {
+    runSql(`DELETE FROM "Appointment" WHERE uuid = '${foreignAppointment}'`);
+    runSql(
+      `DELETE FROM "Appointment" WHERE "patientUUID" = '${OTHER_CLINIC_PATIENT}' AND "userUUID" <> 'usuario-ajeno'`,
+    );
+  });
+
+  test("leer, mover, cancelar y borrar responden 404 y la cita queda intacta", async () => {
+    expectedStatuses = [HTTP_NOT_FOUND];
+    const movedStart = new Date(
+      new Date(foreignStart).getTime() + MINUTES_IN_HOUR * 60 * 1000,
+    ).toISOString();
+    const movedEnd = new Date(
+      new Date(movedStart).getTime() + 30 * 60 * 1000,
+    ).toISOString();
+    const path = `/appointments/${foreignAppointment}`;
+
+    const attempts = [
+      { label: "GET", response: await api.get(path) },
+      {
+        label: "PATCH mover",
+        response: await api.patch(path, {
+          data: { startTime: movedStart, endTime: movedEnd },
+        }),
+      },
+      {
+        label: "PATCH cancelar",
+        response: await api.patch(path, { data: { status: "CANCELLED" } }),
+      },
+      { label: "DELETE", response: await api.delete(path) },
+    ];
+    for (const attempt of attempts) {
+      expect(
+        attempt.response.status(),
+        `${attempt.label}: ${await attempt.response.text()}`,
+      ).toBe(HTTP_NOT_FOUND);
+    }
+    expect(foreignRow()).toBe(initialRow);
+  });
+
+  test("agendar la próxima cita o crear una cita al paciente ajeno responde 404 y no toca sus citas", async () => {
+    expectedStatuses = [HTTP_NOT_FOUND];
+    const day = addDays(clinicDay(), MOVE_DAYS_AHEAD + 1);
+
+    const next = await api.post(
+      `/patients/${OTHER_CLINIC_PATIENT}/next-appointment`,
+      {
+        data: { date: day },
+      },
+    );
+    expect(next.status(), await next.text()).toBe(HTTP_NOT_FOUND);
+
+    const startIso = clinicInstant(day, 9 * MINUTES_IN_HOUR);
+    const created = await api.post("/appointments", {
+      data: {
+        patientUUID: OTHER_CLINIC_PATIENT,
+        typeUUID: appointmentTypeUuid,
+        speciality: "AUDIOLOGY",
+        status: "CONFIRMED",
+        date: startIso,
+        startTime: startIso,
+        endTime: new Date(
+          new Date(startIso).getTime() + 30 * 60 * 1000,
+        ).toISOString(),
+      },
     });
+    expect(created.status(), await created.text()).toBe(HTTP_NOT_FOUND);
+
     expect(
-      [HTTP_FORBIDDEN, HTTP_NOT_FOUND],
-      `POST notes: ${response.status()} ${await response.text()}`,
-    ).toContain(response.status());
-  },
-);
+      runSql(
+        `SELECT count(*) FROM "Appointment" WHERE "patientUUID" = '${OTHER_CLINIC_PATIENT}'`,
+      ),
+    ).toBe("1");
+    expect(foreignRow()).toBe(initialRow);
+  });
+});
