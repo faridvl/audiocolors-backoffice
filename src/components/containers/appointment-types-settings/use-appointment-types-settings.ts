@@ -7,6 +7,7 @@ import {
   FETCH_APPOINTMENT_TYPES_KEY,
   useAppointmentTypesQuery,
 } from '@/shared/api/querys/appointment-types-query';
+import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { TEXT } from '@/static/texts/i18n';
 import { UpdateAppointmentTypePayload } from '@/types/appointments/appointment-type';
 
@@ -26,8 +27,13 @@ export function useAppointmentTypesSettings() {
       {
         onSuccess: () => {
           toast.success(t(TEXT.SETTINGS.APPOINTMENT_TYPES.SAVED));
-          // Marcar un control desmarca el anterior: se vuelve a pedir la lista entera.
-          void queryClient.invalidateQueries({ queryKey: [FETCH_APPOINTMENT_TYPES_KEY] });
+          // Marcar un control desmarca el anterior; una duración nueva mueve el fin de las citas.
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_APPOINTMENT_TYPES_KEY],
+          });
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_APPOINTMENTS_KEY],
+          });
           setEditingUuid(null);
         },
         onError: (error: Error) => toast.error(error.message),

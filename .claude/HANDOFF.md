@@ -28,7 +28,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - La agenda va de 8:00 a 18:00 en líneas de media hora; la cita dura lo que su
   tipo y al moverla conserva su duración (D10). Al cambiar la duración de un tipo
   en Configuración, sus citas de hoy en adelante pasan a la nueva duración; las
-  pasadas quedan como fueron (2026-11-01, pendiente de hacer).
+  pasadas quedan como fueron (D37).
 - El primer contacto del paciente es el teléfono principal (D12).
 - Editar la historia clínica la actualiza y deja un PDF en Archivos con qué
   cambió y quién (D18).

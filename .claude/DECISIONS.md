@@ -723,3 +723,22 @@ para anotar llamadas o lo que haga falta.
 - El modal tiene el mismo ancho en las tres pestañas (el que necesita Mantenimiento) para que no salte al cambiar. Los mantenimientos van en una fila en pantallas anchas, 2x2 en tableta y apilados en celular.
 - No hay toasts de éxito al guardar un check o una nota: se confirma con "Guardado" junto al campo. El toast queda solo para errores.
 - El check y la nota se guardan con mutaciones separadas, para que guardar uno no pise el estado ni los avisos del otro. Cerrar el modal (Escape, fondo o "Listo") guarda la nota pendiente igual que al salir del campo; si falla con el modal ya cerrado, el toast cita el texto de la nota.
+
+## D37 · La duración de un tipo alcanza a sus citas futuras (2026-11-01)
+
+**Decisión:** al cambiar la duración de un tipo de cita en Configuración, sus citas de hoy en adelante
+(hoy en hora de Costa Rica) pasan a fin = inicio + nueva duración; el inicio no cambia. Lo hace el API
+en el mismo `PATCH /appointment-types/:uuid`, dentro de la transacción del tipo
+(`appointment-type.storage.ts`), filtrando por tipo y tenant. El front invalida la consulta de citas al
+guardar para que la agenda se vea al día.
+
+**No se tocan:** las citas pasadas; las "sin hora" (08:00 UTC en punto, que la agenda pinta con la
+duración del tipo); las cerradas (CANCELLED, COMPLETED, EXPIRED), porque reescribir su `updatedAt` haría
+reaparecer las COMPLETED que el front oculta como reemplazadas al reagendar; y nada si la duración nueva
+es igual a la anterior o se limpia (`null`).
+
+**Sin cambio a propósito:** `schedule-next-appointment` sigue guardando 30 min fijos: crea citas sin
+hora y la agenda no usa ese fin.
+
+**Por qué:** cada cita guarda su `endTime` y la agenda lo respeta (D10), así que cambiar solo el tipo no
+se veía en las citas ya agendadas.
