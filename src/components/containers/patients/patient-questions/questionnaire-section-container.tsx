@@ -51,6 +51,10 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
     isSaving,
     getAuthor,
     getCorrection,
+    getPreview,
+    revealsLatest,
+    handleSaved,
+    handleRevealed,
     handleSavingChange,
     handleStartCreate,
     handleCloseCreate,
@@ -126,6 +130,7 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
           template={template}
           entry={editingEntry}
           onClose={editingEntry ? handleCloseEdit : handleCloseCreate}
+          onSaved={handleSaved}
           onSavingChange={handleSavingChange}
           onDirtyChange={handleDirtyChange}
         />
@@ -137,6 +142,9 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
           historyLabel={template.name}
           getAuthor={getAuthor}
           getCorrection={getCorrection}
+          getPreview={getPreview}
+          revealsLatest={revealsLatest}
+          onRevealed={handleRevealed}
           renderLatestAction={(entry) =>
             entry.canEdit ? (
               <Button

@@ -811,3 +811,7 @@ Cada Mantenimiento 1 a 4 tiene un estado (`UNMARKED`, `ATTENDED`, `MISSED`) y un
 ## D41 · Un dato vacío no muestra nada (2026-11-01)
 
 Un campo sin valor no muestra "Sin registrar" ni `—`: queda en blanco. `EMPTY_VALUE = ''` en `formatters.ts`, y los formateadores devuelven vacío. Una etiqueta sin valor muestra la etiqueta y el valor en blanco; una celda o un renglón sin nada que mostrar (por ejemplo el detalle de la bitácora) queda vacío o no se dibuja. Se conserva "vacío" en la bitácora para un campo que se vacía ("X: valor → vacío"), porque ahí es un cambio. Reemplaza lo que decía la tabla de RULES §1.
+
+## D42 · Preguntas: guardar lleva a "Último registro" y las filas del historial se distinguen (2026-11-01)
+
+Tras guardar (corrección o registro nuevo) la vista vuelve al inicio de "Último registro", para ver "Corregido por X". En el 409 solo se muestra la línea roja del API (sin toast ni ayuda gris). La ayuda "Lo puedes corregir hoy; después queda fijo." es la misma al crear y al editar. Las filas cerradas del historial traen la primera respuesta con valor en una línea recortada y la etiqueta "Corregido" si aplica; la fecha corta ("1 nov, 22:01") solo va en la tarjeta compacta.

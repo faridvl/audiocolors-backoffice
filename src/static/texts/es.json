@@ -187,9 +187,9 @@
     "entrySave": "Guardar registro",
     "entrySaved": "Registro guardado",
     "entryHint": "Lo puedes corregir hoy; después queda fijo.",
-    "entryEditHint": "Solo se corrige el mismo día en que se llenó.",
     "entryStaleHint": "Lo que escribiste sigue aquí. Puedes guardarlo como un registro nuevo.",
-    "entrySaveAsNew": "Guardar como nuevo registro",
+    "entrySaveAsNew": "Guardar como nuevo",
+    "entryCorrectedTag": "Corregido",
     "entriesLoading": "Cargando registros...",
     "entriesLoadError": "No se pudieron cargar los registros",
     "entryEmptyError": "Responde al menos una pregunta para guardar el registro.",
@@ -401,8 +401,10 @@
       "toasts": {
         "confirmed": "Cita de {{name}} confirmada a las {{hour}}",
         "moved": "Cita de {{name}} movida a las {{hour}}",
+        "movedNoName": "Cita movida a las {{hour}}",
         "timeError": "La cita de {{name}} quedó confirmada sin hora. Arrástrala de nuevo a un horario.",
-        "returned": "{{name}} volvió a por confirmar"
+        "returned": "{{name}} volvió a por confirmar",
+        "returnedNoName": "La cita volvió a por confirmar"
       },
       "returnHere": "Suéltala aquí para dejarla por confirmar",
       "selection": {

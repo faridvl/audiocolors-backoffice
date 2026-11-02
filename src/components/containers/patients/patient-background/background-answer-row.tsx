@@ -36,6 +36,7 @@ export const BackgroundAnswerRow: React.FC<BackgroundAnswerRowProps> = ({
         <Typography
           variant={isEmphasized ? TypographyVariant.BODY_SEMIBOLD : TypographyVariant.BODY}
           className={tailwind(
+            'min-w-0 [overflow-wrap:anywhere]',
             answer === false && 'text-ink-700',
             (answer === null || isMuted) && 'text-ink-600',
           )}
@@ -68,7 +69,7 @@ export const BackgroundAnswerRow: React.FC<BackgroundAnswerRowProps> = ({
         )}
       </div>
       {isYes && detail && (
-        <Typography variant={TypographyVariant.HELPER} className="mt-0.5 text-ink-600">
+        <Typography variant={TypographyVariant.HELPER} className="mt-0.5 text-ink-600 [overflow-wrap:anywhere]">
           {detailLabel
             ? t(TEXT.QUESTIONS.ANSWER_WITH_DETAIL, {
                 label: shortDetailLabel(detailLabel),

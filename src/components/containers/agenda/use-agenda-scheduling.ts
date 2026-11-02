@@ -140,8 +140,11 @@ export function useAgendaScheduling() {
           resolveAppointmentDuration(appointment, appointmentTypes),
         ),
       });
+      const hour = formatMinuteOfDay(startMinute);
       toast.success(
-        t(TEXT.AGENDA.BOARD.TOASTS.MOVED, { name, hour: formatMinuteOfDay(startMinute) }),
+        name
+          ? t(TEXT.AGENDA.BOARD.TOASTS.MOVED, { name, hour })
+          : t(TEXT.AGENDA.BOARD.TOASTS.MOVED_NO_NAME, { hour }),
       );
     });
   };
@@ -160,7 +163,11 @@ export function useAgendaScheduling() {
         appointmentUuid: appointment.id,
         status: AppointmentStatus.CANCELLED,
       });
-      toast.success(t(TEXT.AGENDA.BOARD.TOASTS.RETURNED, { name }));
+      toast.success(
+        name
+          ? t(TEXT.AGENDA.BOARD.TOASTS.RETURNED, { name })
+          : t(TEXT.AGENDA.BOARD.TOASTS.RETURNED_NO_NAME),
+      );
     });
   };
 

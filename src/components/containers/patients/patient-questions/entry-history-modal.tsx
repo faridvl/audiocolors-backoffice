@@ -5,6 +5,7 @@ import {
   AccordionHeadingLevel,
   AccordionVariant,
 } from '@/components/common/accordion/accordion';
+import { Badge } from '@/components/common/badge/badge';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { SheetDialog } from '@/components/containers/agenda/sheet-dialog';
 import { formatDateTime } from '@/shared/utils/formatters';
@@ -25,6 +26,7 @@ export const EntryHistoryModal = <T extends DatedEntry>({
   entries,
   getAuthor,
   getCorrection,
+  getPreview,
   renderEntry,
   onClose,
 }: EntryHistoryModalProps<T>) => {
@@ -41,6 +43,22 @@ export const EntryHistoryModal = <T extends DatedEntry>({
       <div className="mt-4 flex flex-col gap-2">
         {entries.map((entry) => {
           const correction = getCorrection?.(entry);
+          const preview = getPreview?.(entry);
+          const closedPreview =
+            preview || correction ? (
+              <span className="mt-1 flex min-w-0 items-center gap-2">
+                {preview && (
+                  <Typography
+                    variant={TypographyVariant.HELPER}
+                    as="span"
+                    className="block min-w-0 flex-1 truncate text-ink-600"
+                  >
+                    {preview}
+                  </Typography>
+                )}
+                {correction && <Badge>{t(TEXT.QUESTIONS.ENTRY_CORRECTED_TAG)}</Badge>}
+              </span>
+            ) : undefined;
           return (
             <Accordion
               key={entry.uuid}
@@ -51,6 +69,7 @@ export const EntryHistoryModal = <T extends DatedEntry>({
               isExpanded={expandedUuids.includes(entry.uuid)}
               onToggle={() => toggle(entry.uuid)}
               isLazy
+              closedPreview={closedPreview}
             >
               {correction && (
                 <Typography variant={TypographyVariant.HELPER}>{correction}</Typography>

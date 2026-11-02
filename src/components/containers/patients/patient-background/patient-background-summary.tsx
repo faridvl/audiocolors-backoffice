@@ -24,7 +24,7 @@ const TextAnswer: React.FC<{ label: string; value: string; isMuted: boolean }> =
       <Typography
         variant={TypographyVariant.BODY}
         className={tailwind(
-          value ? 'whitespace-pre-wrap' : 'text-ink-400',
+          value ? 'whitespace-pre-wrap [overflow-wrap:anywhere]' : 'text-ink-400',
           value && (isMuted ? 'text-ink-600' : 'text-ink-800'),
         )}
       >

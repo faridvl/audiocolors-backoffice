@@ -17,6 +17,8 @@ interface QuestionnaireEntryFormProps {
   /** Con un registro, el mismo formulario lo corrige, precargado con sus respuestas. */
   entry?: QuestionnaireEntry;
   onClose: () => void;
+  /** Se llama al guardar bien, antes de cerrar. */
+  onSaved?: () => void;
   /** Avisa si está guardando, para que la sección no se pueda cerrar a mitad del guardado. */
   onSavingChange: (isSaving: boolean) => void;
   onDirtyChange: (isDirty: boolean) => void;
@@ -39,6 +41,7 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
   template,
   entry,
   onClose,
+  onSaved,
   onSavingChange,
   onDirtyChange,
 }) => {
@@ -58,6 +61,7 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
     template,
     entry,
     onDone: onClose,
+    onSaved,
   });
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
 
@@ -96,12 +100,14 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
           )}
 
           <div className="flex flex-col gap-3 border-t border-ink-100 pt-4 xl:flex-row xl:items-center xl:justify-end">
-            <Typography
-              variant={TypographyVariant.HELPER}
-              className="min-w-0 xl:flex-1 xl:text-right"
-            >
-              {t(isEditing ? TEXT.QUESTIONS.ENTRY_EDIT_HINT : TEXT.QUESTIONS.ENTRY_HINT)}
-            </Typography>
+            {!staleMessage && (
+              <Typography
+                variant={TypographyVariant.HELPER}
+                className="min-w-0 xl:flex-1 xl:text-right"
+              >
+                {t(TEXT.QUESTIONS.ENTRY_HINT)}
+              </Typography>
+            )}
             <div className="flex items-center justify-end gap-3">
               <Button
                 type="button"

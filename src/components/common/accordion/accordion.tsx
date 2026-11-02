@@ -48,6 +48,8 @@ interface AccordionProps {
   isLazy?: boolean;
   /** Al abrirlo, lleva la cabecera a la vista (abrir uno cierra otro y la página se mueve). */
   scrollsIntoViewOnExpand?: boolean;
+  /** Línea extra bajo el subtítulo mientras está cerrado (un adelanto del contenido). */
+  closedPreview?: React.ReactNode;
   /** Acción a la derecha de la cabecera (menú, botón); queda fuera del botón que abre y cierra. */
   action?: React.ReactNode;
   /** En el celular la acción va debajo del título y a todo el ancho; desde `sm`, a la derecha. */
@@ -71,6 +73,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   isToggleDisabled = false,
   isLazy = false,
   scrollsIntoViewOnExpand = false,
+  closedPreview,
   action,
   stacksActionOnMobile = false,
   className,
@@ -123,7 +126,7 @@ export const Accordion: React.FC<AccordionProps> = ({
               }`}
               aria-hidden
             />
-            <span className="block min-w-0">
+            <span className="block min-w-0 flex-1">
               <Typography
                 variant={TypographyVariant.SUBTITLE}
                 as="span"
@@ -146,6 +149,7 @@ export const Accordion: React.FC<AccordionProps> = ({
                   {subtitle}
                 </Typography>
               )}
+              {!isExpanded && closedPreview}
             </span>
           </button>
         </Heading>

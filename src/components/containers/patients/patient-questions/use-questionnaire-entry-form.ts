@@ -24,6 +24,8 @@ interface UseQuestionnaireEntryFormOptions {
   /** Con un registro, el formulario lo corrige en vez de crear uno nuevo. */
   entry?: QuestionnaireEntry;
   onDone: () => void;
+  /** Se llama al guardar bien, antes de `onDone`. */
+  onSaved?: () => void;
 }
 
 export function useQuestionnaireEntryForm({
@@ -31,6 +33,7 @@ export function useQuestionnaireEntryForm({
   template,
   entry,
   onDone,
+  onSaved,
 }: UseQuestionnaireEntryFormOptions) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -80,17 +83,20 @@ export function useQuestionnaireEntryForm({
       refreshEntries();
       void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
       releaseSaving();
+      onSaved?.();
       onDone();
     };
     const handleError = (error: Error) => {
-      toast.error(error.message);
+      const isStale = isUpdating && error instanceof ApiError && error.status === HttpStatus.CONFLICT;
+      // En el conflicto el mensaje ya queda a la vista en el formulario: el aviso sería repetirlo.
+      if (!isStale) toast.error(error.message);
       if (error instanceof ApiError) {
         // Si las preguntas cambiaron mientras se llenaba, se vuelve a pedir la plantilla vigente.
         if (error.status === HttpStatus.BAD_REQUEST) {
           void queryClient.invalidateQueries({ queryKey: [FETCH_QUESTIONNAIRE_TEMPLATES_KEY] });
         }
         // Ya no se corrige (cambió el día): se queda lo escrito para guardarlo como registro nuevo.
-        if (isUpdating && error.status === HttpStatus.CONFLICT) {
+        if (isStale) {
           refreshEntries();
           setStaleMessage(error.message);
           releaseSaving();
