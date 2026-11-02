@@ -54,6 +54,10 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: ClipboardList,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.QUESTIONNAIRE_CORRECTED]: {
+      icon: ClipboardList,
+      tone: ActionTone.NEUTRAL,
+    },
     [PatientActivityAction.APPOINTMENT_CONFIRMED]: { icon: CalendarCheck, tone: ActionTone.ACCENT },
     [PatientActivityAction.APPOINTMENT_TENTATIVE]: {
       icon: CalendarClock,
@@ -387,6 +391,11 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
     case PatientActivityAction.QUESTIONNAIRE_FILLED:
       return detail.templateName
         ? context.t(TEXT.ACTIVITY.DETAIL.QUESTIONNAIRE_FILLED, { name: detail.templateName })
+        : '—';
+
+    case PatientActivityAction.QUESTIONNAIRE_CORRECTED:
+      return detail.templateName
+        ? context.t(TEXT.ACTIVITY.DETAIL.QUESTIONNAIRE_CORRECTED, { name: detail.templateName })
         : '—';
 
     case PatientActivityAction.CONTACT_ATTEMPTS_CHANGED:

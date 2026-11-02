@@ -8,11 +8,14 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { PatientBackgroundFields } from '@/components/containers/patients/patient-background/patient-background-fields';
 import { TEXT } from '@/static/texts/i18n';
 import { ClinicalTemplate } from '@/types/clinical-templates/clinical-template';
+import { QuestionnaireEntry } from '@/types/questionnaires/questionnaire-entry';
 import { useQuestionnaireEntryForm } from './use-questionnaire-entry-form';
 
 interface QuestionnaireEntryFormProps {
   patientUuid: string;
   template: ClinicalTemplate;
+  /** Con un registro, el mismo formulario lo corrige, precargado con sus respuestas. */
+  entry?: QuestionnaireEntry;
   onClose: () => void;
   /** Avisa si está guardando, para que la sección no se pueda cerrar a mitad del guardado. */
   onSavingChange: (isSaving: boolean) => void;
@@ -30,19 +33,21 @@ const EmptyErrorResetter: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   return null;
 };
 
-/** Un registro nuevo de una sección propia: las preguntas actuales, sin responder. */
+/** Un registro de una sección propia: nuevo (preguntas de hoy, sin responder) o la corrección de uno. */
 export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
   patientUuid,
   template,
+  entry,
   onClose,
   onSavingChange,
   onDirtyChange,
 }) => {
   const { t } = useTranslation();
-  const { initialValues, isPending, isEmpty, clearEmptyError, handleSubmit } =
+  const { initialValues, fields, isEditing, isPending, isEmpty, clearEmptyError, handleSubmit } =
     useQuestionnaireEntryForm({
       patientUuid,
       template,
+      entry,
       onDone: onClose,
     });
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
@@ -59,7 +64,7 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
           <FormDirtyReporter onDirtyChange={onDirtyChange} />
           <EmptyErrorResetter onReset={clearEmptyError} />
           <PatientBackgroundFields
-            fields={template.fields}
+            fields={fields}
             showsHistoryTitle={false}
             hasCardBorder={false}
           />
@@ -77,7 +82,7 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
               variant={TypographyVariant.HELPER}
               className="min-w-0 xl:flex-1 xl:text-right"
             >
-              {t(TEXT.QUESTIONS.ENTRY_HINT)}
+              {t(isEditing ? TEXT.QUESTIONS.ENTRY_EDIT_HINT : TEXT.QUESTIONS.ENTRY_HINT)}
             </Typography>
             <div className="flex items-center justify-end gap-3">
               <Button
@@ -96,7 +101,7 @@ export const QuestionnaireEntryForm: React.FC<QuestionnaireEntryFormProps> = ({
                 disabled={isPending}
                 className="shrink-0 whitespace-nowrap"
               >
-                {t(TEXT.QUESTIONS.ENTRY_SAVE)}
+                {t(isEditing ? TEXT.QUESTIONS.ENTRY_EDIT_SAVE : TEXT.QUESTIONS.ENTRY_SAVE)}
               </Button>
             </div>
           </div>

@@ -30,6 +30,19 @@ export function formatDateTime(isoDate?: string): string {
   });
 }
 
+/** Solo la hora local: "14:32". Devuelve '—' si no es valida. */
+export function formatTime(isoDate?: string | null): string {
+  if (!isoDate) return '—';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '—';
+
+  return parsed.toLocaleTimeString('es-CR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
 /**
  * Fecha de calendario sin hora (nacimiento): el API la guarda a medianoche UTC, así que se
  * muestra en UTC para que no retroceda un día en Costa Rica.
@@ -99,7 +112,12 @@ export function buildMonthOption(monthKey: string): {
 } {
   const label = formatMonthLabel(monthKey);
   const [year] = monthKey.split('-');
-  return { value: monthKey, label, shortLabel: label.replace(` ${year}`, ''), group: year };
+  return {
+    value: monthKey,
+    label,
+    shortLabel: label.replace(` ${year}`, ''),
+    group: year,
+  };
 }
 
 /** Edad en anios cumplidos a partir de la fecha de nacimiento. */

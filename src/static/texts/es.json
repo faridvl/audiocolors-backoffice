@@ -181,10 +181,14 @@
     "entryMeta": "{{date}} · {{author}}",
     "entryShowOlder_one": "Ver anteriores ({{count}})",
     "entryShowOlder_other": "Ver anteriores ({{count}})",
-    "entryHideOlder": "Ocultar anteriores",
+    "entryEdit": "Editar",
+    "entryEditSave": "Guardar cambios",
+    "entryCorrected": "Corregido por {{author}} · {{time}}",
+    "entryCorrectedSaved": "Registro corregido",
     "entrySave": "Guardar registro",
     "entrySaved": "Registro guardado",
-    "entryHint": "Una vez guardado, el registro no se puede editar.",
+    "entryHint": "Lo puedes corregir hoy; después queda fijo.",
+    "entryEditHint": "Solo se corrige el mismo día en que se llenó.",
     "entriesLoading": "Cargando registros...",
     "entriesLoadError": "No se pudieron cargar los registros",
     "entryEmptyError": "Responde al menos una pregunta para guardar el registro.",
@@ -517,7 +521,8 @@
       "CONTACT_ATTEMPTS_CHANGED": "Intentos de contacto",
       "MAINTENANCE_CHECK_CHANGED": "Mantenimiento",
       "MAINTENANCE_NOTE_CHANGED": "Nota de mantenimiento",
-      "QUESTIONNAIRE_FILLED": "Preguntas llenadas"
+      "QUESTIONNAIRE_FILLED": "Preguntas llenadas",
+      "QUESTIONNAIRE_CORRECTED": "Preguntas corregidas"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -567,6 +572,7 @@
       "maintenanceNote": "Mantenimiento {{number}}: {{excerpt}}",
       "maintenanceNoteRemoved": "Mantenimiento {{number}}: nota borrada",
       "questionnaireFilled": "Llenó «{{name}}»",
+      "questionnaireCorrected": "Corrigió «{{name}}»",
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",

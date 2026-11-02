@@ -10,9 +10,19 @@ export interface QuestionnaireEntry {
   createdAt: string;
   createdByUuid: string;
   createdByName?: string | null;
+  /** Cuándo se corrigió; null si nunca. */
+  updatedAt?: string | null;
+  updatedByUuid?: string | null;
+  updatedByName?: string | null;
+  /** Lo calcula el API (mismo día en hora de Costa Rica): el front no recalcula la fecha. */
+  canEdit: boolean;
 }
 
 export interface CreateQuestionnaireEntryPayload {
   templateUuid: string;
+  answers: Record<string, ClinicalAnswer>;
+}
+
+export interface UpdateQuestionnaireEntryPayload {
   answers: Record<string, ClinicalAnswer>;
 }

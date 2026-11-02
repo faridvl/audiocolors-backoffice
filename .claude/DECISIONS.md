@@ -770,3 +770,23 @@ historia clínica, y que lo ya registrado no cambie si después editan las pregu
 - En el expediente solo salen secciones con al menos una pregunta. Sin registros quedan como sin llenar; con el formulario con cambios, como borrador.
 - "Nuevo registro" abre el formulario con las preguntas de hoy (Sí/No sin marcar), reutilizando los campos de la historia; al guardar se invalida la consulta, se cierra el formulario y el nuevo queda arriba.
 - La lista de registros con fecha y autor (`EntryHistoryList`) es genérica para reutilizarla en las otoscopías.
+
+**Actualización (2026-11-01) · corrección de registros:** un registro se corrige solo el mismo día
+calendario (`America/Costa_Rica`) en que se creó; después queda fijo (el de las 23:50 ya no se corrige
+a las 00:05). `PATCH /patients/:patientUuid/questionnaire-entries/:entryUuid` con `{ answers }`, mismos
+permisos que el POST; si el registro no es del paciente o de la clínica responde 404, y fuera del día
+409 con "Este registro ya no se puede corregir: solo se corrige el mismo día en que se llenó."
+Corrige cualquier rol clínico, no solo el autor, y queda anotado quién (`updatedAt`, `updatedByUuid`;
+`createdAt` y `createdByUuid` no cambian). Las respuestas se validan contra las preguntas guardadas en
+el propio registro (`templateSnapshot`), con las mismas reglas del POST (al menos una con contenido,
+tipos y topes). El GET trae además `updatedAt`, `updatedByName` y `canEdit`; el front usa `canEdit` y
+no recalcula la fecha. La bitácora registra `QUESTIONNAIRE_CORRECTED`, sin copiar las respuestas.
+
+**Actualización (2026-11-01) · front de corrección e historial en modal:**
+
+- El último registro muestra "Editar" solo si `canEdit` es true. Abre el mismo formulario con las respuestas cargadas, usando las preguntas guardadas en el registro (`templateSnapshot`), y guarda con PATCH. Cancelar con cambios pide confirmación, igual que "Nuevo registro". Al guardar se recargan los registros y la bitácora.
+- Si el registro se corrigió, bajo la fecha dice "Corregido por Ana · 14:32" (hora de Costa Rica con `formatTime`).
+- 409 (ya no se puede corregir) y 404 (registro no encontrado) muestran el mensaje, cierran la edición y recargan los registros; 400 igual que en el POST.
+- "Ver anteriores (n)" ya no despliega nada en la tarjeta: abre un modal (`SheetDialog` de agenda, hoja inferior en móvil) con una fecha colapsable por registro anterior. El último registro NO sale en el modal: ya está a la vista en la tarjeta y el contador `n` cuenta solo los anteriores.
+- `EntryHistoryList` sigue genérico: recibe `renderEntry`, `getAuthor`, `getCorrection` y `renderLatestAction`, para reutilizarlo en otoscopías.
+- La bitácora muestra `QUESTIONNAIRE_CORRECTED` como "Preguntas corregidas" con detalle "Corrigió «nombre»".

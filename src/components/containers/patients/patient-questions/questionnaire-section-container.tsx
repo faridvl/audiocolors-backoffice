@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { AlertTriangle, Loader2, Plus } from 'lucide-react';
+import { AlertTriangle, Loader2, Pencil, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   Accordion,
@@ -47,12 +47,16 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
   const { t } = useTranslation();
   const {
     isCreating,
+    editingEntry,
     isSaving,
     getAuthor,
+    getCorrection,
     handleSavingChange,
     handleStartCreate,
     handleCloseCreate,
-  } = useQuestionnaireSection(onExpand);
+    handleStartEdit,
+    handleCloseEdit,
+  } = useQuestionnaireSection(entries, onExpand);
   const handleDirtyChange = useCallback(
     (isDirty: boolean) => onDirtyChange(template.uuid, isDirty),
     [onDirtyChange, template.uuid],
@@ -60,6 +64,7 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
 
   const isReady = !isLoading && !isError;
   const hasEntries = entries.length > 0;
+  const isFormOpen = isCreating || !!editingEntry;
   const newEntryButton = (
     <Button
       variant={ButtonVariant.SECONDARY}
@@ -82,7 +87,7 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
       onToggle={onToggle}
       scrollsIntoViewOnExpand
       stacksActionOnMobile
-      action={isReady && hasEntries && !isCreating ? newEntryButton : undefined}
+      action={isReady && hasEntries && !isFormOpen ? newEntryButton : undefined}
     >
       {isLoading && (
         <div className="flex items-center justify-center gap-2 py-6">
@@ -105,7 +110,7 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
         </div>
       )}
 
-      {isReady && !hasEntries && !isCreating && (
+      {isReady && !hasEntries && !isFormOpen && (
         <div className="flex flex-col items-start gap-3">
           <Typography variant={TypographyVariant.HELPER}>
             {t(TEXT.QUESTIONS.ENTRY_EMPTY)}
@@ -114,20 +119,36 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
         </div>
       )}
 
-      {isReady && isCreating && (
+      {isReady && isFormOpen && (
         <QuestionnaireEntryForm
+          key={editingEntry?.uuid ?? 'new'}
           patientUuid={patientUuid}
           template={template}
-          onClose={handleCloseCreate}
+          entry={editingEntry}
+          onClose={editingEntry ? handleCloseEdit : handleCloseCreate}
           onSavingChange={handleSavingChange}
           onDirtyChange={handleDirtyChange}
         />
       )}
 
-      {isReady && hasEntries && !isCreating && (
+      {isReady && hasEntries && !isFormOpen && (
         <EntryHistoryList
           entries={entries}
+          historyLabel={template.name}
           getAuthor={getAuthor}
+          getCorrection={getCorrection}
+          renderLatestAction={(entry) =>
+            entry.canEdit ? (
+              <Button
+                variant={ButtonVariant.GHOST}
+                onClick={() => handleStartEdit(entry)}
+                icon={<Pencil className="h-4 w-4" aria-hidden />}
+                className="shrink-0"
+              >
+                {t(TEXT.QUESTIONS.ENTRY_EDIT)}
+              </Button>
+            ) : null
+          }
           renderEntry={(entry, { isMuted }) => (
             <PatientBackgroundSummary
               fields={entry.templateSnapshot.fields}
