@@ -117,7 +117,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   `patient_questionnaire_entries` aplicada solo en Docker local), front `4f50e80` + `1b4f72f` + el de la etiqueta.
   Pasó cuestionador, revisor-ux y qa (API y pantalla). Sin probar: STAFF (no hay usuario de prueba) y editar
   la historia clínica ya llenada. Para el usuario: ¿un registro se corrige el mismo día, como las otoscopías?
-  ¿Se borran o archivan secciones con registros (hoy 409)? ¿STAFF puede leer las plantillas (hoy sí, solo preguntas)?
+  ¿Se borran o archivan secciones con registros (hoy 409)? STAFF sigue pudiendo leer las plantillas
+  (solo preguntas): el usuario lo deja así hasta el desarrollo de seguridad y roles (2026-11-01).
 - Nombres de roles (2026-10-30, no hacerlo todavía): hoy OWNER, ADMIN, DOCTOR y STAFF. El usuario
   los quiere más claros (Administrador, Profesional, Recepción, Secretario o Empleado) y busca un
   estándar global de nombres. Propuesta a revisar: código fijo en inglés (`PRACTITIONER` viene de
