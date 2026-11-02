@@ -26,7 +26,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - "Control" es el tipo de cita marcado como control en Configuración, no un
   nombre (D22).
 - La agenda va de 8:00 a 18:00 en líneas de media hora; la cita dura lo que su
-  tipo y al moverla conserva su duración (D10).
+  tipo y al moverla conserva su duración (D10). Al cambiar la duración de un tipo
+  en Configuración, sus citas de hoy en adelante pasan a la nueva duración; las
+  pasadas quedan como fueron (2026-11-01, pendiente de hacer).
 - El primer contacto del paciente es el teléfono principal (D12).
 - Editar la historia clínica la actualiza y deja un PDF en Archivos con qué
   cambió y quién (D18).
@@ -80,11 +82,10 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   8. Audífonos en laboratorio (modal "Indicadores del paciente" → pestaña
      Laboratorio, hoy un switch que se guarda al tocarlo): al marcarlo, pedir la
      fecha de envío (un solo día).
-  9. **Pendiente de definir:** al desmarcarlo queda la fecha de entrega y un
-     historial corto de envíos/entregas, con nota opcional. Hoy la clínica lo anota
-     a mano en Control de evolución ("Se hace entrega de audífonos..."); la idea es
-     sacarlo de ahí. Duda: esa nota, ¿es la misma del control de evolución o solo
-     vive en este historial?
+  9. Al desmarcarlo queda la fecha de entrega y un historial corto de
+     envíos/entregas, con nota opcional. Hoy la clínica lo anota a mano en Control
+     de evolución ("Se hace entrega de audífonos..."). La nota es la misma del
+     control de evolución (2026-11-01): falta definir el diseño antes de construirlo.
   10. Pre-registro rápido desde "Agendar cita" cuando la búsqueda da "Ningún
       paciente coincide": nombre, teléfono, cédula y sede; el expediente se
       completa cuando llega a la cita.
