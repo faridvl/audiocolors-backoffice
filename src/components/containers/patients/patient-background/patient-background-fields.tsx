@@ -24,7 +24,9 @@ export const PatientBackgroundFields: React.FC<{
   fields: ClinicalField[];
   /** Con `false` va sin el título "Antecedentes" (otras secciones de Preguntas). */
   showsHistoryTitle?: boolean;
-}> = ({ fields, showsHistoryTitle = true }) => {
+  /** Con `false` las tarjetas de preguntas van sin borde (el formulario ya está dentro de una caja). */
+  hasCardBorder?: boolean;
+}> = ({ fields, showsHistoryTitle = true, hasCardBorder = true }) => {
   const { t } = useTranslation();
   const { values, setFieldValue } = useFormikContext<ClinicalHistoryFormValues>();
   const groups = groupFields(fields);
@@ -57,7 +59,7 @@ export const PatientBackgroundFields: React.FC<{
           </div>
           <div className={CLINICAL_SECTIONS_COLUMNS}>
             {booleanGroups.map((group) => (
-              <ClinicalSectionCard key={group.key} title={group.title}>
+              <ClinicalSectionCard key={group.key} title={group.title} isBordered={hasCardBorder}>
                 {group.booleans.map((field) => {
                   const answer = values.checks[field.id] ?? null;
                   return (

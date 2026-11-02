@@ -10,6 +10,7 @@ const NETWORK_ERROR_MESSAGE =
 const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
 export enum HttpStatus {
+  BAD_REQUEST = 400,
   FORBIDDEN = 403,
   NOT_FOUND = 404,
   CONFLICT = 409,

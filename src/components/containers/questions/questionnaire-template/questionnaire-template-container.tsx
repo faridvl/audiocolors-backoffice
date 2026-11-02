@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Form, Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { ConfirmDialog } from '@/components/common/confirm-dialog/confirm-dialog';
 import { FormDirtyReporter } from '@/components/common/form/form-dirty-reporter';
 import { inputBaseClasses } from '@/components/common/input/input';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
@@ -45,6 +46,17 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
     [onDirtyChange, sectionKey],
   );
   const nameId = `questionnaire-name-${sectionKey}`;
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
+
+  // El borrador recién nombrado puede quedar fuera de pantalla en el celular: se lleva a la vista.
+  useEffect(() => {
+    if (template) return;
+    const input = nameInputRef.current;
+    if (!input) return;
+    input.focus();
+    input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [template]);
 
   return (
     <Formik<QuestionnaireTemplateFormValues>
@@ -57,11 +69,20 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
         <Form className="flex w-full flex-col gap-4">
           <FormDirtyReporter onDirtyChange={handleDirtyChange} />
 
-          <label htmlFor={nameId} className="flex flex-col gap-1.5">
-            <Typography variant={TypographyVariant.BODY}>
-              {t(TEXT.QUESTIONS.SECTION_NAME)}
-            </Typography>
+          <label htmlFor={nameId} className="flex scroll-mb-24 scroll-mt-4 flex-col gap-1.5">
+            <span className="flex items-baseline justify-between gap-2">
+              <Typography variant={TypographyVariant.BODY}>
+                {t(TEXT.QUESTIONS.SECTION_NAME)}
+              </Typography>
+              <Typography variant={TypographyVariant.HELPER}>
+                {t(TEXT.QUESTIONS.NAME_COUNTER, {
+                  count: values.name.length,
+                  max: QUESTIONNAIRE_NAME_MAX_LENGTH,
+                })}
+              </Typography>
+            </span>
             <input
+              ref={nameInputRef}
               id={nameId}
               name="name"
               value={values.name}
@@ -90,7 +111,7 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
           {/* Fija abajo: con muchas preguntas, guardar no obliga a bajar hasta el final. */}
           <div className="sticky bottom-0 z-10 flex flex-col gap-2 border-t border-ink-100 bg-white py-3">
             {!template && (
-              <Typography variant={TypographyVariant.HELPER}>
+              <Typography variant={TypographyVariant.HELPER} className="hidden sm:block">
                 {t(TEXT.QUESTIONS.SECTION_NEW_HINT)}
               </Typography>
             )}
@@ -99,7 +120,11 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
                 <Button
                   type="button"
                   variant={ButtonVariant.SECONDARY}
-                  onClick={onCancel}
+                  onClick={() =>
+                    values.name.trim() || values.questions.length > 0
+                      ? setIsConfirmingCancel(true)
+                      : onCancel()
+                  }
                   disabled={isPending}
                 >
                   {t(TEXT.GENERAL.BUTTONS.CANCEL)}
@@ -115,6 +140,17 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
               </Button>
             </div>
           </div>
+
+          {isConfirmingCancel && (
+            <ConfirmDialog
+              title={t(TEXT.GENERAL.DISCARD.TITLE)}
+              message={t(TEXT.GENERAL.DISCARD.MESSAGE)}
+              confirmLabel={t(TEXT.GENERAL.DISCARD.CONFIRM)}
+              cancelLabel={t(TEXT.GENERAL.DISCARD.KEEP_EDITING)}
+              onConfirm={() => onCancel?.()}
+              onCancel={() => setIsConfirmingCancel(false)}
+            />
+          )}
         </Form>
       )}
     </Formik>

@@ -24,6 +24,8 @@ interface QuestionnaireSectionContainerProps extends QuestionSectionControls {
   entries: QuestionnaireEntry[];
   isLoading: boolean;
   isError: boolean;
+  /** Estado de la sección bajo el título: "Sin registros" o cuántos y cuándo fue el último. */
+  statusText?: string;
   onRetry: () => void;
   onDirtyChange: (sectionKey: string, isDirty: boolean) => void;
 }
@@ -35,6 +37,7 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
   entries,
   isLoading,
   isError,
+  statusText,
   onRetry,
   isExpanded,
   onToggle,
@@ -62,7 +65,7 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
       variant={ButtonVariant.SECONDARY}
       onClick={handleStartCreate}
       icon={<Plus className="h-4 w-4 text-ink-500" aria-hidden />}
-      className="shrink-0 whitespace-nowrap"
+      className="w-full shrink-0 whitespace-nowrap sm:w-auto"
     >
       {t(TEXT.QUESTIONS.ENTRY_NEW)}
     </Button>
@@ -72,11 +75,13 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
     <Accordion
       variant={AccordionVariant.NESTED}
       title={template.name}
+      subtitle={statusText}
       isExpanded={isExpanded}
       isToggleDisabled={isSaving}
       headingLevel={AccordionHeadingLevel.H3}
       onToggle={onToggle}
       scrollsIntoViewOnExpand
+      stacksActionOnMobile
       action={isReady && hasEntries && !isCreating ? newEntryButton : undefined}
     >
       {isLoading && (
@@ -123,11 +128,12 @@ export const QuestionnaireSectionContainer: React.FC<QuestionnaireSectionContain
         <EntryHistoryList
           entries={entries}
           getAuthor={getAuthor}
-          renderEntry={(entry) => (
+          renderEntry={(entry, { isMuted }) => (
             <PatientBackgroundSummary
               fields={entry.templateSnapshot.fields}
               answers={entry.answers}
               showsHistoryTitle={false}
+              isMuted={isMuted}
             />
           )}
         />

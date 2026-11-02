@@ -11,7 +11,7 @@ import { tailwind } from '@/utils/tailwind-utils';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientActivityAction } from '@/types/patient-activity/patient-activity';
 import {
-  ACTION_STYLES,
+  getActionStyle,
   ActivityRow,
   formatActivityDetail,
   formatDayGroup,
@@ -57,7 +57,7 @@ const ActionPill: React.FC<{ action: PatientActivityAction; label: string }> = (
   action,
   label,
 }) => {
-  const { icon: Icon, tone } = ACTION_STYLES[action];
+  const { icon: Icon, tone } = getActionStyle(action);
   return (
     <span
       className={tailwind(

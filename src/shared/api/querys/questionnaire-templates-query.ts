@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ApiError, ApiServiceClient, HttpStatus } from '@/shared/api/api-service-client';
+import { isForbiddenError } from '@/shared/api/querys/patient-background-query';
 import { env } from '@/shared/api/config';
 import {
   ClinicalTemplate,
@@ -18,9 +19,8 @@ export function useQuestionnaireTemplatesQuery() {
       ),
     staleTime: 1000 * 60 * 5,
     retry: (failureCount, error) =>
-      !(
-        error instanceof ApiError &&
-        (error.status === HttpStatus.FORBIDDEN || error.status === HttpStatus.NOT_FOUND)
-      ) && failureCount < 3,
+      !isForbiddenError(error) &&
+      !(error instanceof ApiError && error.status === HttpStatus.NOT_FOUND) &&
+      failureCount < 3,
   });
 }

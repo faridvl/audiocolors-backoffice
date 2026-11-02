@@ -31,6 +31,8 @@ export enum PatientActivityAction {
   CLINICAL_HISTORY_CREATED = 'CLINICAL_HISTORY_CREATED',
   CLINICAL_HISTORY_UPDATED = 'CLINICAL_HISTORY_UPDATED',
   PHYSICAL_EXAM_UPDATED = 'PHYSICAL_EXAM_UPDATED',
+  /** Se llenó una sección propia de Preguntas; el detalle trae solo el nombre, nunca las respuestas. */
+  QUESTIONNAIRE_FILLED = 'QUESTIONNAIRE_FILLED',
 }
 
 export const APPOINTMENT_ACTIONS = [
@@ -81,6 +83,8 @@ export interface PatientActivityDetail {
   /** CONTACT_ATTEMPTS_CHANGED (registros viejos): intentos de contacto ahora y antes. */
   count?: number;
   previousCount?: number;
+  /** QUESTIONNAIRE_FILLED: la sección que se llenó. */
+  templateName?: string;
 }
 
 export interface PatientActivity {

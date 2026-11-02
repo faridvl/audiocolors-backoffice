@@ -50,6 +50,10 @@ enum ActionTone {
  */
 export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; tone: ActionTone }> =
   {
+    [PatientActivityAction.QUESTIONNAIRE_FILLED]: {
+      icon: ClipboardList,
+      tone: ActionTone.NEUTRAL,
+    },
     [PatientActivityAction.APPOINTMENT_CONFIRMED]: { icon: CalendarCheck, tone: ActionTone.ACCENT },
     [PatientActivityAction.APPOINTMENT_TENTATIVE]: {
       icon: CalendarClock,
@@ -112,8 +116,20 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     },
   };
 
+/** Una acción que el API agregue antes que este front no debe tumbar la página. */
+const FALLBACK_ACTION_STYLE = { icon: ClipboardList, tone: ActionTone.NEUTRAL };
+
+export function getActionStyle(action: PatientActivityAction): {
+  icon: LucideIcon;
+  tone: ActionTone;
+} {
+  return ACTION_STYLES[action] ?? FALLBACK_ACTION_STYLE;
+}
+
 export function getActionLabel(t: TFunction, action: PatientActivityAction): string {
-  return t(`${TEXT.ACTIVITY.ACTION_PREFIX}.${action}`);
+  return t(`${TEXT.ACTIVITY.ACTION_PREFIX}.${action}`, {
+    defaultValue: t(TEXT.ACTIVITY.UNKNOWN_ACTION),
+  });
 }
 
 /** Cuántos campos cambiados se listan antes de resumir con "+N más". */
@@ -367,6 +383,11 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
           : TEXT.ACTIVITY.DETAIL.MAINTENANCE_NOTE_REMOVED,
         { number: detail.number, excerpt: detail.excerpt },
       );
+
+    case PatientActivityAction.QUESTIONNAIRE_FILLED:
+      return detail.templateName
+        ? context.t(TEXT.ACTIVITY.DETAIL.QUESTIONNAIRE_FILLED, { name: detail.templateName })
+        : '—';
 
     case PatientActivityAction.CONTACT_ATTEMPTS_CHANGED:
       return context.t(TEXT.ACTIVITY.DETAIL.CONTACT_ATTEMPTS, {

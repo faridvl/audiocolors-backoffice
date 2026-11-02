@@ -50,6 +50,8 @@ interface AccordionProps {
   scrollsIntoViewOnExpand?: boolean;
   /** Acción a la derecha de la cabecera (menú, botón); queda fuera del botón que abre y cierra. */
   action?: React.ReactNode;
+  /** En el celular la acción va debajo del título y a todo el ancho; desde `sm`, a la derecha. */
+  stacksActionOnMobile?: boolean;
   className?: string;
   children: React.ReactNode;
 }
@@ -70,6 +72,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   isLazy = false,
   scrollsIntoViewOnExpand = false,
   action,
+  stacksActionOnMobile = false,
   className,
   children,
 }) => {
@@ -98,7 +101,12 @@ export const Accordion: React.FC<AccordionProps> = ({
       ref={sectionRef}
       className={tailwind('flex flex-col gap-4', VARIANT_STYLES[variant], className)}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div
+        className={tailwind(
+          'flex justify-between gap-3',
+          stacksActionOnMobile ? 'flex-col sm:flex-row sm:items-start' : 'items-start',
+        )}
+      >
         <Heading className="min-w-0 flex-1">
           <button
             id={buttonId}

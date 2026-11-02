@@ -14,6 +14,12 @@ export const TEXT = {
     YES: 'common.yes',
     NO: 'common.no',
     UNSAVED_CHANGES: 'common.unsavedChanges',
+    DISCARD: {
+      TITLE: 'common.discard.title',
+      MESSAGE: 'common.discard.message',
+      CONFIRM: 'common.discard.confirm',
+      KEEP_EDITING: 'common.discard.keepEditing',
+    },
     UNANSWERED: 'common.unanswered',
     PAGINATION: {
       SHOWING: 'common.pagination.showing',
@@ -120,6 +126,13 @@ export const TEXT = {
     ENTRY_HINT: 'questions.entryHint',
     ENTRIES_LOADING: 'questions.entriesLoading',
     ENTRIES_LOAD_ERROR: 'questions.entriesLoadError',
+    ENTRY_EMPTY_ERROR: 'questions.entryEmptyError',
+    ENTRIES_PREVIOUS: 'questions.entriesPrevious',
+    SECTION_STATUS_NONE: 'questions.sectionStatusNone',
+    SECTION_STATUS_SUMMARY: 'questions.sectionStatusSummary',
+    ANSWER_WITH_DETAIL: 'questions.answerWithDetail',
+    NEW_SECTION_DISABLED_HINT: 'questions.newSectionDisabledHint',
+    NAME_COUNTER: 'questions.nameCounter',
   },
   CLINICAL_TEMPLATE: {
     TEMPLATE_NAME: 'clinicalTemplate.templateName',
@@ -353,6 +366,7 @@ export const TEXT = {
     TITLE: 'activity.title',
     COUNT: 'activity.count',
     UNKNOWN_ACTOR: 'activity.unknownActor',
+    UNKNOWN_ACTION: 'activity.unknownAction',
     SUMMARY: {
       TODAY: 'activity.summary.today',
       TODAY_EMPTY: 'activity.summary.todayEmpty',
@@ -424,6 +438,7 @@ export const TEXT = {
       MAINTENANCE_UNDONE: 'activity.detail.maintenanceUndone',
       MAINTENANCE_NOTE: 'activity.detail.maintenanceNote',
       MAINTENANCE_NOTE_REMOVED: 'activity.detail.maintenanceNoteRemoved',
+      QUESTIONNAIRE_FILLED: 'activity.detail.questionnaireFilled',
     },
   },
   DOCUMENTS: {

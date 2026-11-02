@@ -13,15 +13,22 @@ import {
 } from './clinical-history-styles';
 import { ClinicalSectionCard } from './clinical-section-card';
 
-const TextAnswer: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+const TextAnswer: React.FC<{ label: string; value: string; isMuted: boolean }> = ({
+  label,
+  value,
+  isMuted,
+}) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-0.5 rounded-lg bg-ink-50 px-3 py-2">
+    <div className="flex flex-col gap-0.5 py-2">
       <Typography variant={TypographyVariant.HELPER}>{label}</Typography>
       <Typography
         variant={TypographyVariant.BODY}
-        className={value ? 'whitespace-pre-wrap text-ink-800' : 'text-ink-400'}
+        className={tailwind(
+          value ? 'whitespace-pre-wrap' : 'text-ink-400',
+          value && (isMuted ? 'text-ink-600' : 'text-ink-800'),
+        )}
       >
         {value || t(TEXT.GENERAL.NOT_REGISTERED)}
       </Typography>
@@ -37,6 +44,8 @@ interface PatientBackgroundSummaryProps {
   authorship?: string[];
   /** Con `false` las preguntas Sí/No van sin el título "Antecedentes" (otras secciones de Preguntas). */
   showsHistoryTitle?: boolean;
+  /** Registros anteriores: las respuestas se leen más apagadas que las del último. */
+  isMuted?: boolean;
 }
 
 /** La hoja ya llena, con la misma grilla que el formulario: todas las preguntas a la vista. */
@@ -45,6 +54,7 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
   answers,
   authorship = [],
   showsHistoryTitle = true,
+  isMuted = false,
 }) => {
   const { t } = useTranslation();
   const groups = groupFields(fields);
@@ -69,6 +79,8 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
                     label={field.label}
                     answer={yesNoOf(answers[field.id])}
                     detail={detailOf(answers[field.id]) || null}
+                    detailLabel={field.detailLabel}
+                    isMuted={isMuted}
                   />
                 ))}
               </ClinicalSectionCard>
@@ -84,7 +96,12 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
           )}
           <div className={CLINICAL_TEXTS_GRID}>
             {group.texts.map((field) => (
-              <TextAnswer key={field.id} label={field.label} value={textOf(answers[field.id])} />
+              <TextAnswer
+                key={field.id}
+                label={field.label}
+                value={textOf(answers[field.id])}
+                isMuted={isMuted}
+              />
             ))}
           </div>
         </section>

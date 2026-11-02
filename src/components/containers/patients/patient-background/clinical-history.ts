@@ -228,6 +228,18 @@ export function buildAnswers(
   return answers;
 }
 
+/** La pregunta del detalle en corto para leerla como etiqueta: "¿Cuáles molestias?" pasa a "Cuáles molestias". */
+export function shortDetailLabel(detailLabel: string): string {
+  return detailLabel.replace(/^[¿\s]+/, '').replace(/[?:\s]+$/, '');
+}
+
+/** Un Sí/No marcado cuenta como respuesta; un texto o un dato en blanco, no. */
+export function hasAnswerContent(answers: Record<string, ClinicalAnswer>): boolean {
+  return Object.values(answers).some((answer) =>
+    typeof answer === 'string' ? answer.length > 0 : true,
+  );
+}
+
 /**
  * Lo que se manda al API: las respuestas con la copia de las preguntas, y las
  * columnas fijas de las preguntas estándar para que se sigan leyendo igual.

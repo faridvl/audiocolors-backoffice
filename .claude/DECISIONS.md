@@ -751,8 +751,11 @@ sección debajo de "Historia clínica"; "Nueva sección" pide el nombre (obligat
 sección queda como borrador local hasta guardar con al menos una pregunta (POST); las existentes se
 editan con PATCH. No se borran. En el expediente cada sección se llena varias veces: cada registro
 guarda fecha, autor y una copia de las preguntas que tenía (`templateSnapshot`), se muestra el último y
-"Ver anteriores" despliega el resto; los registros no se editan ni se borran. La historia clínica no
-cambia (se llena una vez).
+"Ver anteriores" despliega el resto; los registros no se editan ni se borran. El último lleva "Último registro" y
+"Ver anteriores (n)" muestra el resto, atenuados, bajo "Registros anteriores"; cada sección muestra
+"Sin registros" o "N registros · último 12 mar". Un registro sin respuestas no se guarda, y si el API
+rechaza por preguntas que cambiaron se muestra su mensaje y se recargan las plantillas. La historia
+clínica no cambia (se llena una vez).
 
 **Migración de datos:** no hay; las secciones y los registros son nuevos.
 

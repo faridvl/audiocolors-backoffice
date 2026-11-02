@@ -16,7 +16,8 @@ interface EntryHistoryListProps<T extends DatedEntry> {
   /** Del más nuevo al más viejo. */
   entries: T[];
   getAuthor: (entry: T) => string;
-  renderEntry: (entry: T) => React.ReactNode;
+  /** `isMuted` en los registros anteriores: se leen más apagados que el último. */
+  renderEntry: (entry: T, options: { isMuted: boolean }) => React.ReactNode;
 }
 
 const EntryBlock = <T extends DatedEntry>({
@@ -24,14 +25,16 @@ const EntryBlock = <T extends DatedEntry>({
   title,
   getAuthor,
   renderEntry,
+  isMuted = false,
 }: {
   entry: T;
   title?: string;
+  isMuted?: boolean;
 } & Pick<EntryHistoryListProps<T>, 'getAuthor' | 'renderEntry'>) => {
   const { t } = useTranslation();
 
   return (
-    <article className="flex flex-col gap-3">
+    <article className="flex w-full flex-col gap-3">
       <div className="flex flex-col gap-0.5">
         {title && <Typography variant={TypographyVariant.SUBTITLE}>{title}</Typography>}
         <Typography variant={TypographyVariant.HELPER}>
@@ -41,7 +44,7 @@ const EntryBlock = <T extends DatedEntry>({
           })}
         </Typography>
       </div>
-      {renderEntry(entry)}
+      {renderEntry(entry, { isMuted })}
     </article>
   );
 };
@@ -87,12 +90,23 @@ export const EntryHistoryList = <T extends DatedEntry>({
               : t(TEXT.QUESTIONS.ENTRY_SHOW_OLDER, { count: older.length })}
           </Button>
 
-          {showsOlder &&
-            older.map((entry) => (
-              <div key={entry.uuid} className="border-t border-ink-100 pt-5">
-                <EntryBlock entry={entry} getAuthor={getAuthor} renderEntry={renderEntry} />
-              </div>
-            ))}
+          {showsOlder && (
+            <div className="flex flex-col gap-5">
+              <Typography variant={TypographyVariant.SUBTITLE}>
+                {t(TEXT.QUESTIONS.ENTRIES_PREVIOUS)}
+              </Typography>
+              {older.map((entry) => (
+                <div key={entry.uuid} className="border-t border-ink-100 pt-5">
+                  <EntryBlock
+                    entry={entry}
+                    getAuthor={getAuthor}
+                    renderEntry={renderEntry}
+                    isMuted
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

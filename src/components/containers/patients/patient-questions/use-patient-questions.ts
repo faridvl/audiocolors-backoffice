@@ -13,6 +13,7 @@ import {
 } from '@/shared/api/querys/patient-background-query';
 import { useQuestionnaireEntriesQuery } from '@/shared/api/querys/questionnaire-entries-query';
 import { useQuestionnaireTemplatesQuery } from '@/shared/api/querys/questionnaire-templates-query';
+import { formatShortDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { QuestionnaireEntry } from '@/types/questionnaires/questionnaire-entry';
 import { QuestionnaireSectionContainer } from './questionnaire-section-container';
@@ -79,6 +80,14 @@ export function usePatientQuestions(patientUuid: string) {
         let state = QuestionSectionState.COMPLETE;
         if (dirtyByKey[template.uuid]) state = QuestionSectionState.DRAFT;
         else if (hasLoaded && entries.length === 0) state = QuestionSectionState.UNFILLED;
+        const statusText = hasLoaded
+          ? entries.length === 0
+            ? t(TEXT.QUESTIONS.SECTION_STATUS_NONE)
+            : t(TEXT.QUESTIONS.SECTION_STATUS_SUMMARY, {
+                count: entries.length,
+                date: formatShortDate(entries[0].createdAt),
+              })
+          : undefined;
         sections.push({
           key: template.uuid,
           title: template.name,
@@ -90,6 +99,7 @@ export function usePatientQuestions(patientUuid: string) {
               entries,
               isLoading: entriesQuery.isLoading,
               isError: entriesQuery.isError,
+              statusText,
               onRetry: () => void entriesQuery.refetch(),
               onDirtyChange: handleDirtyChange,
               ...controls,

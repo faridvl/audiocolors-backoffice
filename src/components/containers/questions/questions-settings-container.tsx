@@ -31,7 +31,7 @@ export const QuestionsSettingsContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-end">
+      <div className="flex flex-col items-end gap-1.5">
         <Button
           variant={ButtonVariant.SECONDARY}
           icon={<Plus className="h-4 w-4" aria-hidden />}
@@ -40,6 +40,11 @@ export const QuestionsSettingsContainer: React.FC = () => {
         >
           {t(TEXT.QUESTIONS.NEW_SECTION)}
         </Button>
+        {!canAddSection && (
+          <Typography variant={TypographyVariant.HELPER} className="text-right">
+            {t(TEXT.QUESTIONS.NEW_SECTION_DISABLED_HINT)}
+          </Typography>
+        )}
       </div>
 
       {sections.map((section) => (
@@ -64,7 +69,9 @@ export const QuestionsSettingsContainer: React.FC = () => {
       {isLoadingTemplates && (
         <div className="flex items-center justify-center gap-2 py-6">
           <Loader2 className="h-5 w-5 animate-spin text-brand" aria-hidden />
-          <Typography variant={TypographyVariant.BODY}>{t(TEXT.QUESTIONS.SECTIONS_LOADING)}</Typography>
+          <Typography variant={TypographyVariant.BODY}>
+            {t(TEXT.QUESTIONS.SECTIONS_LOADING)}
+          </Typography>
         </div>
       )}
 
@@ -81,7 +88,10 @@ export const QuestionsSettingsContainer: React.FC = () => {
       )}
 
       {isNameModalOpen && (
-        <NewQuestionnaireSectionModal onConfirm={handleConfirmName} onClose={handleCloseNameModal} />
+        <NewQuestionnaireSectionModal
+          onConfirm={handleConfirmName}
+          onClose={handleCloseNameModal}
+        />
       )}
     </div>
   );
