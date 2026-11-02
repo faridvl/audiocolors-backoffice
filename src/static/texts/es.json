@@ -513,6 +513,7 @@
       "APPOINTMENT_COMPLETED": "Cita atendida",
       "STATUS_CHANGED": "Estado cambiado",
       "HEARING_AIDS_LAB_CHANGED": "Audífonos en laboratorio",
+      "HEARING_AIDS_DELIVERED": "Audífonos entregados",
       "WARRANTY_CHANGED": "Garantía",
       "VIDEO_CANDIDATE_CHANGED": "Candidato a video",
       "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
@@ -563,7 +564,9 @@
       },
       "labShipment": {
         "sent": "Audífonos enviados al laboratorio el {{date}}",
-        "dateChanged": "Fecha de envío cambiada: {{before}} → {{after}}"
+        "dateChanged": "Fecha de envío cambiada: {{before}} → {{after}}",
+        "delivered": "Registró la entrega de audífonos del laboratorio ({{date}})",
+        "deliveredWithNote": "Registró la entrega de audífonos del laboratorio ({{date}}) con nota"
       },
       "maintenance": {
         "UNMARKED": "Mantenimiento {{number}}: sin marcar",
@@ -731,7 +734,28 @@
         "shippedOn": "Enviados el {{date}}",
         "changeDate": "Cambiar fecha",
         "dateUpdated": "Fecha de envío actualizada",
-        "sinceValue": "En laboratorio desde el {{date}}"
+        "sinceValue": "En laboratorio desde el {{date}}",
+        "delivery": {
+          "title": "Entrega de audífonos",
+          "dateLabel": "Fecha de entrega",
+          "noteLabel": "Nota (opcional)",
+          "noteHelp": "Si escribes una nota, también queda en Control de evolución.",
+          "save": "Guardar entrega",
+          "toast": "Entrega registrada"
+        },
+        "history": {
+          "title": "Historial de envíos",
+          "loading": "Cargando el historial de envíos…",
+          "empty": "Todavía no hay envíos registrados.",
+          "error": "No se pudo cargar el historial de envíos.",
+          "sentAndDelivered": "Enviado {{sent}} · Entregado {{delivered}}",
+          "inLab": "En laboratorio desde {{date}}",
+          "deliveredBy": "Entrega registrada por {{name}}",
+          "showAll": "Ver todos ({{count}})",
+          "showLess": "Ver menos",
+          "noteMore": "Ver más",
+          "noteLess": "Ver menos"
+        }
       },
       "warrantyDocument": {
         "label": "Archivo de la garantía",

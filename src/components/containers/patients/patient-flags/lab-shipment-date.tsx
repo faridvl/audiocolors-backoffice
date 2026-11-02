@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
-import { inputBaseClasses } from '@/components/common/input/input';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
-import { tailwind } from '@/utils/tailwind-utils';
+import { LabDateField } from './lab-date-field';
 
 interface LabShipmentDateProps {
   /** "YYYY-MM-DD" elegido en el campo. */
@@ -32,27 +30,13 @@ export const LabShipmentDate: React.FC<LabShipmentDateProps> = ({
 
   return (
     <div className="flex flex-col gap-3 pb-3">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="lab-shipment-date">
-          <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
-            {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.DATE_LABEL)}
-          </Typography>
-        </label>
-        <input
-          id="lab-shipment-date"
-          type="date"
-          max={maxDate}
-          value={date}
-          onChange={(event) => onDateChange(event.target.value)}
-          // Safari de iOS dibuja el input de fecha con su propio estilo; sin apariencia nativa
-          // queda alineado con el resto de campos.
-          className={tailwind(
-            inputBaseClasses,
-            'block h-[46px] min-w-0 appearance-none text-left',
-            '[&::-webkit-date-and-time-value]:text-left',
-          )}
-        />
-      </div>
+      <LabDateField
+        id="lab-shipment-date"
+        label={t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.DATE_LABEL)}
+        value={date}
+        max={maxDate}
+        onChange={onDateChange}
+      />
       <div className="flex gap-2">
         <Button
           variant={ButtonVariant.SECONDARY}

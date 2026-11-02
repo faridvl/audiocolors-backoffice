@@ -1,3 +1,5 @@
+import { fromDayKey } from '@/shared/utils/dates';
+
 /** Lo que se muestra cuando un dato no existe (un nombre o una sede que no llegó). */
 export const EMPTY_VALUE = '';
 
@@ -12,6 +14,12 @@ export function formatDate(isoDate?: string): string {
     month: 'short',
     year: 'numeric',
   });
+}
+
+/** Formatea un día "YYYY-MM-DD" como "12 mar 2026", leído como día local (no UTC). */
+export function formatDayKeyWithYear(dayKey?: string): string {
+  if (!dayKey) return '';
+  return formatDate(fromDayKey(dayKey).toISOString());
 }
 
 /** Formatea una fecha ISO con su hora local: "12 mar 2026, 16:42". Devuelve vacío si no es valida. */

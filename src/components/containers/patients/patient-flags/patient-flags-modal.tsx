@@ -8,7 +8,9 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PatientFlag } from '@/types/patients/patient';
+import { LabDeliveryForm } from './lab-delivery-form';
 import { LabShipmentDate } from './lab-shipment-date';
+import { LabShipmentHistory } from './lab-shipment-history';
 import { PatientMaintenanceList } from './patient-maintenance-list';
 import { PatientFlagSection, usePatientFlags } from './use-patient-flags';
 import { WarrantyDocumentSelect } from './warranty-document-select';
@@ -33,6 +35,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
     activeFlags,
     isWarrantySection,
     isMaintenanceSection,
+    isLabSection,
     labShipment,
     handleToggle,
     handleSectionChange,
@@ -110,20 +113,31 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
                         onCancel={labShipment.handleCancel}
                       />
                     )}
-                    {isLab && labShipment.isLabOn && !labShipment.isEditing && (
-                      <Button
-                        variant={ButtonVariant.GHOST}
-                        onClick={labShipment.handleStartDateChange}
-                        className="mb-2 min-h-[36px] px-2 py-1 text-brand-700"
-                      >
-                        {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.CHANGE_DATE)}
-                      </Button>
+                    {isLab && labShipment.isDelivering && (
+                      <LabDeliveryForm
+                        patient={patient}
+                        onDelivered={labShipment.handleDelivered}
+                        onCancel={labShipment.handleDeliveryCancel}
+                      />
                     )}
+                    {isLab &&
+                      labShipment.isLabOn &&
+                      !labShipment.isEditing &&
+                      !labShipment.isDelivering && (
+                        <Button
+                          variant={ButtonVariant.GHOST}
+                          onClick={labShipment.handleStartDateChange}
+                          className="mb-2 min-h-[36px] px-2 py-1 text-brand-700"
+                        >
+                          {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.CHANGE_DATE)}
+                        </Button>
+                      )}
                   </div>
                 );
               })}
             </div>
           )}
+          {isLabSection && <LabShipmentHistory patientUuid={patient.uuid} />}
           {isWarrantySection && (
             <div className="mt-4">
               <WarrantyDocumentSelect patient={patient} />
@@ -131,8 +145,8 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
           )}
         </div>
 
-        {/* Mientras se edita la fecha, "Listo" se leería como guardarla y la descartaría. */}
-        {!labShipment.isEditing && (
+        {/* Con un formulario abierto, "Listo" se leería como guardarlo y lo descartaría. */}
+        {!labShipment.isEditing && !labShipment.isDelivering && (
           <div className="flex shrink-0 justify-end px-6 pb-6 pt-3">
             <Button
               variant={ButtonVariant.SECONDARY}

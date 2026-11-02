@@ -20,6 +20,7 @@ export enum PatientActivityAction {
   APPOINTMENT_COMPLETED = 'APPOINTMENT_COMPLETED',
   STATUS_CHANGED = 'STATUS_CHANGED',
   HEARING_AIDS_LAB_CHANGED = 'HEARING_AIDS_LAB_CHANGED',
+  HEARING_AIDS_DELIVERED = 'HEARING_AIDS_DELIVERED',
   WARRANTY_CHANGED = 'WARRANTY_CHANGED',
   VIDEO_CANDIDATE_CHANGED = 'VIDEO_CANDIDATE_CHANGED',
   WARRANTY_EXPIRED_CHANGED = 'WARRANTY_EXPIRED_CHANGED',
@@ -77,6 +78,8 @@ export interface PatientActivityDetail {
   isOn?: boolean;
   /** Audífonos en laboratorio: día de envío (`date`) y el anterior si se corrigió (`previousDate`). */
   previousDate?: string;
+  /** HEARING_AIDS_DELIVERED: true si la entrega trajo nota (el texto no se guarda en la bitácora). */
+  hasNote?: boolean;
   /** Mantenimientos: cuál es (1 a 4). */
   number?: number;
   /** MAINTENANCE_CHECK_CHANGED: true al marcarlo, false al desmarcarlo. */

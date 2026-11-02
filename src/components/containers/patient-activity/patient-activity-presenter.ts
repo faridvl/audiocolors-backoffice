@@ -80,6 +80,7 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     [PatientActivityAction.DOCUMENT_DELETED]: { icon: FileX, tone: ActionTone.DANGER },
     [PatientActivityAction.STATUS_CHANGED]: { icon: UserCog, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.HEARING_AIDS_LAB_CHANGED]: { icon: Ear, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.HEARING_AIDS_DELIVERED]: { icon: Ear, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.WARRANTY_CHANGED]: { icon: ShieldCheck, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.VIDEO_CANDIDATE_CHANGED]: { icon: Video, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.WARRANTY_EXPIRED_CHANGED]: {
@@ -359,6 +360,14 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       }
       return context.t(
         `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
+      );
+
+    case PatientActivityAction.HEARING_AIDS_DELIVERED:
+      return context.t(
+        detail.hasNote
+          ? TEXT.ACTIVITY.DETAIL.LAB_DELIVERED_WITH_NOTE
+          : TEXT.ACTIVITY.DETAIL.LAB_DELIVERED,
+        { date: formatDayKey(detail.date) },
       );
 
     case PatientActivityAction.WARRANTY_CHANGED:

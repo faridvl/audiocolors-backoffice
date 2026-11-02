@@ -6,6 +6,7 @@ import { useUpdatePatientFlagMutation } from '@/shared/api/mutations/patients/up
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import { FETCH_PATIENT_LAB_SHIPMENTS_KEY } from '@/shared/api/querys/patient-lab-shipments-query';
 import { toDayKey } from '@/shared/utils/dates';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
@@ -49,6 +50,8 @@ export function usePatientFlags(
   // Fecha de envío en edición (null = el campo está cerrado): al prender los audífonos no se
   // guarda hasta confirmarla.
   const [shipmentDate, setShipmentDate] = useState<string | null>(null);
+  // Formulario de entrega abierto: apagar el switch no guarda hasta confirmarlo.
+  const [isDelivering, setIsDelivering] = useState(false);
   const today = toDayKey(new Date());
   const isLabOn = Boolean(patient.hearingAidsInLabSince);
 
@@ -79,17 +82,20 @@ export function usePatientFlags(
   const handleToggle = (flag: PatientFlag, isOn: boolean) => {
     if (flag === PatientFlag.HEARING_AIDS_IN_LAB) {
       if (isOn) {
+        setIsDelivering(false);
         setShipmentDate(today);
         return;
       }
       setShipmentDate(null);
-      // Cancelar al prender: el indicador nunca llegó a guardarse.
-      if (!isLabOn) return;
+      // Con el indicador guardado, apagarlo es entregar; si no, era cancelar al prender.
+      if (isLabOn) setIsDelivering(true);
+      return;
     }
     saveFlag(flag, isOn);
   };
 
   const handleStartDateChange = () => {
+    setIsDelivering(false);
     setShipmentDate(
       patient.hearingAidsInLabSince ? toDayKey(new Date(patient.hearingAidsInLabSince)) : today,
     );
@@ -99,6 +105,7 @@ export function usePatientFlags(
   const handleSectionChange = (section: PatientFlagSection) => {
     setActiveSection(section);
     setShipmentDate(null);
+    setIsDelivering(false);
   };
 
   const handleSaveShipmentDate = () => {
@@ -118,6 +125,9 @@ export function usePatientFlags(
           );
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENTS_KEY] });
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_PATIENT_LAB_SHIPMENTS_KEY, patient.uuid],
+          });
           const prefix = isOn
             ? TEXT.PATIENTS.FLAGS.TOAST_ON_PREFIX
             : TEXT.PATIENTS.FLAGS.TOAST_OFF_PREFIX;
@@ -150,7 +160,11 @@ export function usePatientFlags(
       handleStartDateChange,
       handleSave: handleSaveShipmentDate,
       handleCancel: () => setShipmentDate(null),
+      isDelivering,
+      handleDeliveryCancel: () => setIsDelivering(false),
+      handleDelivered: () => setIsDelivering(false),
     },
+    isLabSection: activeSection === PatientFlagSection.LAB,
     isWarrantySection: activeSection === PatientFlagSection.WARRANTY,
     isMaintenanceSection: activeSection === PatientFlagSection.MAINTENANCE,
     handleSectionChange,
