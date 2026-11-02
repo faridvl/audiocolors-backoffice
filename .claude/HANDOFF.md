@@ -70,7 +70,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Rama `feature/preguntas-y-mantenimientos` en el front y en el API (worktree
   `E:\Proyectos\node\api-historia`), un commit por etapa; lo hecho hasta el punto 4 ya está en `develop` de los dos repos (2026-10-30), sin pasar a `main`. Se prueba
   contra el API local (`docs/AMBIENTE-LOCAL.md`). Orden: 3, 11, 1, 7, 8, 10, 4,
-  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34), 6 (D35) y 2 (D38, secciones propias de Preguntas), con la rama subida en los dos repos (2026-11-01), sin merge a `develop`. Corrección del punto 5 (check y nota por mantenimiento, D36; reemplaza D33 y D34) hecha y commiteada en local: front `865dd34` + `34cf16a`, API `672ea01` + `d101e85`, subida a la rama en los dos repos (2026-11-01), sin merge a `develop`; pasó cuestionador, revisor-ux y qa en el navegador. Sin probar: otra clínica (no hay segunda en local) y eventos viejos en la bitácora. Conocido: dos PUT idénticos en el mismo milisegundo dejan dos eventos en la bitácora (el API compara sin transacción); la base queda bien. Pendiente del usuario: si la bitácora muestra el texto de la nota de mantenimiento o solo que cambió. Para el desarrollo futuro de roles y permisos (no preguntar antes): solo el profesional médico agrega notas (2026-11-01). Después, el punto 2 y las otoscopías. Al publicar: primero la migración del API,
+  5, 6, 2 y después una etapa extra: historial de otoscopías. Hechos: 3 (D26), 11 (D28), 1 (D29), 7 (D30), 8 (D31), 10 (D32), 4 (D33), 5 (D34), 6 (D35) y 2 (D38, secciones propias de Preguntas), con la rama subida en los dos repos (2026-11-01), sin merge a `develop`. Corrección del punto 5 (check y nota por mantenimiento, D36; reemplaza D33 y D34) hecha y commiteada en local: front `865dd34` + `34cf16a`, API `672ea01` + `d101e85`, subida a la rama en los dos repos (2026-11-01), sin merge a `develop`; pasó cuestionador, revisor-ux y qa en el navegador. Sin probar: otra clínica (no hay segunda en local) y eventos viejos en la bitácora. Conocido: dos PUT idénticos en el mismo milisegundo dejan dos eventos en la bitácora (el API compara sin transacción); la base queda bien. La bitácora solo dice que cambió la nota de un mantenimiento, sin copiar el texto (usuario, 2026-11-01; falta hacerlo). Para el desarrollo futuro de roles y permisos (no preguntar antes): solo el profesional médico agrega notas (2026-11-01). Después, el punto 2 y las otoscopías. Al publicar: primero la migración del API,
   después el API y al final el front; tras desplegar, contar pacientes con `branchUuid` sin fila en `PatientBranch` y repetir el backfill, y revisar sedes de otra clínica en una copia de producción. Cada punto:
   1. Historia clínica pasa a vivir dentro de un acordeón general "Preguntas"
      (nombre provisional), en Configuración y en el detalle del paciente.
@@ -118,6 +118,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## Preguntas abiertas
 
+- Dato vacío: decidido, un campo sin valor no muestra nada (ni "Sin registrar" ni `—`) (usuario, 2026-11-01; falta hacerlo y pasarlo a DECISIONS).
+
 - Pacientes viejos con `isActive = false` y `status = ACTIVE` (D-2026-10-04): se dejan como están,
   sin archivar ni reactivar; no es prioridad (usuario, 2026-11-01).
 
@@ -135,8 +137,6 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   también 8 dígitos) escrito sin + se guarda como de Costa Rica (D30).
 
 
-- Dato vacío: la skill pide "Sin registrar" y el código usa `—` (`EMPTY_VALUE`) en
-  la agenda y vistas compactas. ¿Cuál se queda? (RULES.md §1)
 - Leídas y limpiadas de Notificaciones se guardan por navegador: ¿hace falta
   sincronizarlas entre dispositivos, guardándolas en el API? (D23)
 - Logo definitivo en SVG desde Illustrator (P1-1) y limpiar el paciente inactivo
