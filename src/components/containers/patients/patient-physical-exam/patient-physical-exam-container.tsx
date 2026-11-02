@@ -13,7 +13,7 @@ interface PatientPhysicalExamContainerProps {
   patientUuid: string;
 }
 
-/** Exploración física (otoscopía): historial por paciente, entre la ficha y la historia clínica. */
+/** Exploración física (otoscopia): historial por paciente, entre la ficha y la historia clínica. */
 export const PatientPhysicalExamContainer: React.FC<PatientPhysicalExamContainerProps> = ({
   patientUuid,
 }) => {

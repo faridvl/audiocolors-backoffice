@@ -69,21 +69,6 @@ export function formatShortDate(isoDate?: string): string {
   return parsed.toLocaleDateString('es-CR', { day: 'numeric', month: 'short' });
 }
 
-/** Fecha corta con hora para líneas compactas: "1 nov, 22:01". Devuelve vacío si no es valida. */
-export function formatShortDateTime(isoDate?: string): string {
-  if (!isoDate) return '';
-  const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '';
-
-  return parsed.toLocaleString('es-CR', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-}
-
 const MONTH_LABELS = [
   'enero',
   'febrero',

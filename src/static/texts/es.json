@@ -36,6 +36,7 @@
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
     "no": "No",
+    "notRecorded": "Sin registrar",
     "unanswered": "Sin responder",
     "unsavedChanges": "Tienes cambios sin guardar. ¿Descartarlos?"
   },
@@ -813,14 +814,14 @@
       }
     },
     "physicalExam": {
-      "loading": "Cargando otoscopías...",
-      "loadError": "No se pudo cargar el historial de otoscopías",
-      "new": "Nueva otoscopía",
-      "empty": "Todavía no hay otoscopías registradas.",
-      "save": "Guardar otoscopía",
-      "saved": "Otoscopía guardada",
-      "correctedSaved": "Otoscopía corregida",
-      "emptyError": "Escribe lo observado en al menos un oído para guardar la otoscopía.",
+      "loading": "Cargando otoscopias...",
+      "loadError": "No se pudo cargar el historial de otoscopias",
+      "new": "Nueva otoscopia",
+      "empty": "Todavía no hay otoscopias registradas.",
+      "save": "Guardar otoscopia",
+      "saved": "Otoscopia guardada",
+      "correctedSaved": "Otoscopia corregida",
+      "emptyError": "Escribe lo observado en al menos un oído para guardar la otoscopia.",
       "previewRight": "OD: {{detail}}",
       "previewLeft": "OI: {{detail}}"
     },

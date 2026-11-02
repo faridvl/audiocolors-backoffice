@@ -1,13 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import { ApiError, HttpStatus } from '@/shared/api/api-service-client';
 import { useCreateOtoscopyEntryMutation } from '@/shared/api/mutations/otoscopy/create-otoscopy-entry-mutation';
 import { useUpdateOtoscopyEntryMutation } from '@/shared/api/mutations/otoscopy/update-otoscopy-entry-mutation';
-import { FETCH_OTOSCOPY_ENTRIES_KEY } from '@/shared/api/querys/otoscopy-entries-query';
-import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
-import { TEXT } from '@/static/texts/i18n';
 import { OtoscopyEntry } from '@/types/patients/otoscopy-entry';
 
 export interface OtoscopyFormValues {
@@ -32,8 +26,6 @@ export function useOtoscopyEntryForm({
   onDone,
   onSaved,
 }: UseOtoscopyEntryFormOptions) {
-  const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const { executeCreateEntry, isPending: isCreatePending } = useCreateOtoscopyEntryMutation();
   const { executeUpdateEntry, isPending: isUpdatePending } = useUpdateOtoscopyEntryMutation();
   const [isSaving, setIsSaving] = useState(false);
@@ -70,45 +62,28 @@ export function useOtoscopyEntryForm({
     }
     savingRef.current = true;
     setIsSaving(true);
-    const refreshEntries = () =>
-      void queryClient.invalidateQueries({ queryKey: [FETCH_OTOSCOPY_ENTRIES_KEY, patientUuid] });
     const isUpdating = !!entry && !asNew;
+    // Los avisos y el refresco los hace la mutation; aquí solo lo propio del formulario.
     const handleSuccess = () => {
-      toast.success(
-        t(
-          isUpdating
-            ? TEXT.PATIENTS.PHYSICAL_EXAM.CORRECTED_SAVED
-            : TEXT.PATIENTS.PHYSICAL_EXAM.SAVED,
-        ),
-      );
-      refreshEntries();
-      void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
       releaseSaving();
       onSaved?.();
       onDone();
     };
     const handleError = (error: Error) => {
-      const isStale =
-        isUpdating && error instanceof ApiError && error.status === HttpStatus.CONFLICT;
-      // En el conflicto el mensaje ya queda a la vista en el formulario: el aviso sería repetirlo.
-      if (!isStale) toast.error(error.message);
-      if (error instanceof ApiError) {
-        // Ya no se corrige (cambió el día): se queda lo escrito para guardarlo como registro nuevo.
-        if (isStale) {
-          refreshEntries();
-          setStaleMessage(error.message);
-          releaseSaving();
-          return;
-        }
-        // El registro ya no existe: se cierra y se muestra como quedó.
-        if (isUpdating && error.status === HttpStatus.NOT_FOUND) {
-          refreshEntries();
-          releaseSaving();
-          onDone();
-          return;
-        }
-      }
       releaseSaving();
+      if (!(error instanceof ApiError)) return;
+      // Ya no se corrige (cambió el día): se queda lo escrito para guardarlo como registro nuevo.
+      if (isUpdating && error.status === HttpStatus.CONFLICT) {
+        setStaleMessage(error.message);
+        return;
+      }
+      // El registro ya no existe, o el usuario perdió el acceso: no hay nada que seguir editando.
+      if (
+        (isUpdating && error.status === HttpStatus.NOT_FOUND) ||
+        error.status === HttpStatus.FORBIDDEN
+      ) {
+        onDone();
+      }
     };
 
     if (entry && !asNew) {

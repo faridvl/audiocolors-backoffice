@@ -31,15 +31,15 @@ export function usePatientPhysicalExam(patientUuid: string) {
         })
       : undefined;
 
-  // Primer oído con texto, en una línea, para distinguir las filas cerradas del historial.
+  // Los dos oídos en una línea, para distinguir las filas cerradas del historial.
   const getPreview = (entry: OtoscopyEntry) => {
-    if (entry.otoscopyRight?.trim()) {
-      return t(TEXT.PATIENTS.PHYSICAL_EXAM.PREVIEW_RIGHT, { detail: entry.otoscopyRight.trim() });
-    }
-    if (entry.otoscopyLeft?.trim()) {
-      return t(TEXT.PATIENTS.PHYSICAL_EXAM.PREVIEW_LEFT, { detail: entry.otoscopyLeft.trim() });
-    }
-    return undefined;
+    const right = entry.otoscopyRight?.trim();
+    const left = entry.otoscopyLeft?.trim();
+    const parts = [
+      right && t(TEXT.PATIENTS.PHYSICAL_EXAM.PREVIEW_RIGHT, { detail: right }),
+      left && t(TEXT.PATIENTS.PHYSICAL_EXAM.PREVIEW_LEFT, { detail: left }),
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : undefined;
   };
 
   return {

@@ -8,7 +8,7 @@ export const FETCH_OTOSCOPY_ENTRIES_KEY = 'fetchOtoscopyEntries';
 
 const MAX_RETRIES = 3;
 
-/** Historial de otoscopías del paciente, de la más nueva a la más vieja. */
+/** Historial de otoscopias del paciente, de la más nueva a la más vieja. */
 export function useOtoscopyEntriesQuery(patientUuid: string) {
   return useQuery({
     queryKey: [FETCH_OTOSCOPY_ENTRIES_KEY, patientUuid],

@@ -12,6 +12,7 @@ export const TEXT = {
     CHARACTER_COUNT: 'common.characterCount',
     YES: 'common.yes',
     NO: 'common.no',
+    NOT_RECORDED: 'common.notRecorded',
     UNSAVED_CHANGES: 'common.unsavedChanges',
     DISCARD: {
       TITLE: 'common.discard.title',

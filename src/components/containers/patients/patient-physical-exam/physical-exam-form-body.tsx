@@ -22,9 +22,9 @@ interface PhysicalExamFormBodyProps {
   isEditing: boolean;
   isPending: boolean;
   isEmpty: boolean;
-  /** Mensaje del API cuando la otoscopía ya no se puede corregir. */
+  /** Mensaje del API cuando la otoscopia ya no se puede corregir. */
   staleMessage: string | null;
-  /** Se llama al cambiar un texto, para borrar el aviso de otoscopía vacía. */
+  /** Se llama al cambiar un texto, para borrar el aviso de otoscopia vacía. */
   onChange: () => void;
   onSaveAsNew: (values: OtoscopyFormValues) => void;
   onCancel: () => void;

@@ -15,7 +15,7 @@ interface PatientPhysicalExamFormProps {
   onSavingChange: (isSaving: boolean) => void;
 }
 
-/** OD y OI en dos cuadros de texto: una otoscopía nueva o la corrección de una de hoy. */
+/** OD y OI en dos cuadros de texto: una otoscopia nueva o la corrección de una de hoy. */
 export const PatientPhysicalExamForm: React.FC<PatientPhysicalExamFormProps> = ({
   patientUuid,
   entry,

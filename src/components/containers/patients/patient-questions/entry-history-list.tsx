@@ -3,7 +3,7 @@ import { History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { formatShortDateTime } from '@/shared/utils/formatters';
+import { formatDateTime } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { EntryHistoryModal } from './entry-history-modal';
 import { DatedEntry, EntryRenderer } from './entry-history-types';
@@ -63,7 +63,7 @@ export const EntryHistoryList = <T extends DatedEntry>({
             </Typography>
             <Typography variant={TypographyVariant.HELPER}>
               {t(TEXT.QUESTIONS.ENTRY_META, {
-                date: formatShortDateTime(latest.createdAt),
+                date: formatDateTime(latest.createdAt),
                 author: getAuthor(latest),
               })}
             </Typography>
