@@ -157,7 +157,7 @@ export const PatientActivityContainer: React.FC = () => {
         header: t(TEXT.ACTIVITY.COLUMNS.ACTOR),
         width: '15%',
         render: (row) => (
-          <span className="italic">{row.activity.actorName ?? t(TEXT.ACTIVITY.UNKNOWN_ACTOR)}</span>
+          <span className="italic">{row.activity.actorName}</span>
         ),
       },
     ],

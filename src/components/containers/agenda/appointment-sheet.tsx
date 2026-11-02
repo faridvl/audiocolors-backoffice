@@ -108,9 +108,7 @@ export const AppointmentSheet: React.FC<{ agenda: AgendaState; appointment: Appo
         },
         {
           label: t(TEXT.AGENDA.SHEET.SCHEDULED_BY),
-          value:
-            agenda.resolveSchedulerName(appointment.userUUID) ??
-            t(TEXT.AGENDA.SHEET.SCHEDULED_BY_UNKNOWN),
+          value: agenda.resolveSchedulerName(appointment.userUUID) ?? EMPTY_VALUE,
         },
       ]}
       primaryAction={primary ? toSheetAction(primary) : undefined}

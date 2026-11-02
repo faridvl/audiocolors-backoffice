@@ -39,37 +39,35 @@ export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
 export const MAINTENANCE_NUMBERS = [1, 2, 3, 4] as const;
 export type MaintenanceNumber = (typeof MAINTENANCE_NUMBERS)[number];
 
-/** Largo máximo de la nota de un mantenimiento (el API la rechaza si lo pasa). */
+/** Largo máximo de una nota de mantenimiento (el API la rechaza si lo pasa). */
 export const MAINTENANCE_NOTE_MAX_LENGTH = 500;
 
-type MaintenanceDoneField =
-  'maintenance1Done' | 'maintenance2Done' | 'maintenance3Done' | 'maintenance4Done';
-type MaintenanceNoteField =
-  'maintenance1Note' | 'maintenance2Note' | 'maintenance3Note' | 'maintenance4Note';
-
-export const MAINTENANCE_DONE_FIELDS: Record<MaintenanceNumber, MaintenanceDoneField> = {
-  1: 'maintenance1Done',
-  2: 'maintenance2Done',
-  3: 'maintenance3Done',
-  4: 'maintenance4Done',
-};
-
-export const MAINTENANCE_NOTE_FIELDS: Record<MaintenanceNumber, MaintenanceNoteField> = {
-  1: 'maintenance1Note',
-  2: 'maintenance2Note',
-  3: 'maintenance3Note',
-  4: 'maintenance4Note',
-};
-
-export function isMaintenanceDone(patient: Patient, maintenanceNumber: MaintenanceNumber): boolean {
-  return patient[MAINTENANCE_DONE_FIELDS[maintenanceNumber]] === true;
+/** Cómo quedó un mantenimiento; el API siempre devuelve uno de los tres. */
+export enum MaintenanceStatus {
+  UNMARKED = 'UNMARKED',
+  ATTENDED = 'ATTENDED',
+  MISSED = 'MISSED',
 }
 
-export function getMaintenanceNote(
+type MaintenanceStatusField =
+  | 'maintenance1Status'
+  | 'maintenance2Status'
+  | 'maintenance3Status'
+  | 'maintenance4Status';
+
+export const MAINTENANCE_STATUS_FIELDS: Record<MaintenanceNumber, MaintenanceStatusField> = {
+  1: 'maintenance1Status',
+  2: 'maintenance2Status',
+  3: 'maintenance3Status',
+  4: 'maintenance4Status',
+};
+
+/** Si el campo falta (API viejo o expediente sin cargar), cuenta como sin marcar. */
+export function getMaintenanceStatus(
   patient: Patient,
   maintenanceNumber: MaintenanceNumber,
-): string | null {
-  return patient[MAINTENANCE_NOTE_FIELDS[maintenanceNumber]] ?? null;
+): MaintenanceStatus {
+  return patient[MAINTENANCE_STATUS_FIELDS[maintenanceNumber]] ?? MaintenanceStatus.UNMARKED;
 }
 
 export interface Patient {
@@ -82,15 +80,11 @@ export interface Patient {
   hearingAidsInLabSince?: string | null;
   warrantyActiveSince?: string | null;
   videoCandidateSince?: string | null;
-  /** Mantenimientos 1 a 4: hecho o no, y su nota opcional; si faltan (API viejo) cuentan como no hecho y sin nota. */
-  maintenance1Done?: boolean;
-  maintenance2Done?: boolean;
-  maintenance3Done?: boolean;
-  maintenance4Done?: boolean;
-  maintenance1Note?: string | null;
-  maintenance2Note?: string | null;
-  maintenance3Note?: string | null;
-  maintenance4Note?: string | null;
+  /** Estado de los mantenimientos 1 a 4 (sus notas se piden aparte, ver `PatientMaintenance`). */
+  maintenance1Status?: MaintenanceStatus;
+  maintenance2Status?: MaintenanceStatus;
+  maintenance3Status?: MaintenanceStatus;
+  maintenance4Status?: MaintenanceStatus;
   warrantyExpiredSince?: string | null;
   renewPrescriptionSince?: string | null;
   /** Documento (categoría WARRANTY) elegido como el de la garantía. */

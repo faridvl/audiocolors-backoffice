@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { EMPTY_VALUE } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
 import { PatientListPreset, PatientListSelection } from './patient-list-selection';
 import { usePatientSummary } from './use-patient-summary';
@@ -37,7 +38,7 @@ export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
           >
             <Typography variant={TypographyVariant.HELPER}>{card.label}</Typography>
             <Typography variant={TypographyVariant.HEADER} as="p">
-              {card.count ?? '—'}
+              {card.count ?? EMPTY_VALUE}
             </Typography>
           </button>
         );

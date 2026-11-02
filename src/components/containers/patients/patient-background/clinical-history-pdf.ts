@@ -120,9 +120,7 @@ export async function buildClinicalHistoryPdf(input: ClinicalHistoryPdfInput): P
     group.texts.forEach((field) => {
       const text = values.texts[field.id]?.trim();
       write(field.label, FontSize.NOTE, { muted: true });
-      write(text || t(TEXT.GENERAL.NOT_REGISTERED), FontSize.BODY, {
-        muted: !text,
-      });
+      if (text) write(text, FontSize.BODY);
       y += 1;
     });
   });

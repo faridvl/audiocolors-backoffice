@@ -27,7 +27,7 @@ No aplicar el estándar global a ciegas. Aquí:
 | Debounce de búsqueda 400 ms | **300 ms** (`use-patient-activity.ts`, `use-patient-picker.ts`) |
 | Teléfonos con `PhoneField`, `+506 8888-7777`, solo dígitos con código de país | `PhoneField` propio (`components/common/phone-field`), sin selector de país: `XXXX-XXXX` para Costa Rica y, si lo escrito empieza con `+`, número de otro país sin máscara (8 a 15 dígitos, máximo 20 caracteres). Costa Rica se guarda igual que siempre: `patient.phone` como `+506 XXXX-XXXX` y los contactos como `XXXX-XXXX`; un `+506` con 8 dígitos también es Costa Rica. Los extranjeros se guardan compactos, `+` y solo dígitos (`+13055551234`), en paciente y contacto (D30). Un dato viejo que no se toca no se valida. Todo en `shared/utils/phone.ts` (también `tel:`, WhatsApp y la comparación). Zynka solo asume `+506` en los de Costa Rica: no cambiar el formato de esos |
 | Fechas: DB en UTC, negocio en `America/Costa_Rica`, `timeZone` al formatear | Hora local del navegador (`src/shared/utils/dates.ts`, `CLINIC_LOCALE = 'es-CR'`), sin `timeZone` al formatear; solo la bitácora manda el `timeZone` del navegador al API |
-| Dato vacío: "Sin registrar" | `EMPTY_VALUE = '—'` (`src/shared/utils/formatters.ts`) en la agenda y otras vistas compactas; "Sin registrar" solo en `FormViewSection`. Pendiente de decisión del usuario |
+| Dato vacío: "Sin registrar" | Un dato vacío no muestra nada: `EMPTY_VALUE = ''` (`src/shared/utils/formatters.ts`), sin "Sin registrar" ni `—` (D41). Una etiqueta sin valor muestra la etiqueta y el valor en blanco |
 
 ---
 
@@ -93,11 +93,9 @@ cuatro estados de lista, donde solo el vacío ofrece "crear". Aquí los resuelve
 
 Ver skill `estandares-frontend` (i18n y Colores y UI): todo texto visible sale de
 i18n con tildes y ñ, orden de búsqueda de keys (`TEXT.GENERAL` primero), plurales,
-`Typography` para tamaño y peso, "Sin registrar" en datos vacíos, y escribir
+`Typography` para tamaño y peso, y escribir
 texto con Write o Python UTF-8, no heredocs. En este repo:
 
-- **"Sin registrar" en gris (`ink`):** un hueco sin marca se confunde con un error
-  de carga.
 - `i18next` + `react-i18next`, inicializado por *side-effect import* en `_app.tsx`
   (`import '@/shared/i18n/i18n';`), sin `I18nextProvider`. Hay un único idioma
   (`src/static/texts/es.json`, con `TEXT` en `src/static/texts/i18n.ts`); no existe

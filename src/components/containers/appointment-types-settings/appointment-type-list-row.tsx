@@ -38,7 +38,7 @@ export const AppointmentTypeListRow: React.FC<AppointmentTypeListRowProps> = ({
         <Typography variant={TypographyVariant.BODY} inline className="shrink-0 text-ink-500">
           {appointmentType.duration
             ? t(TEXT.SETTINGS.APPOINTMENT_TYPES.MINUTES_SHORT, { count: appointmentType.duration })
-            : t(TEXT.GENERAL.NOT_REGISTERED)}
+            : ''}
         </Typography>
         <ChevronRight className="h-4 w-4 shrink-0 text-ink-400" aria-hidden />
       </Button>

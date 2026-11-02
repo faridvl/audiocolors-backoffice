@@ -18,8 +18,6 @@ const TextAnswer: React.FC<{ label: string; value: string; isMuted: boolean }> =
   value,
   isMuted,
 }) => {
-  const { t } = useTranslation();
-
   return (
     <div className="flex flex-col gap-0.5 py-2">
       <Typography variant={TypographyVariant.HELPER}>{label}</Typography>
@@ -30,7 +28,7 @@ const TextAnswer: React.FC<{ label: string; value: string; isMuted: boolean }> =
           value && (isMuted ? 'text-ink-600' : 'text-ink-800'),
         )}
       >
-        {value || t(TEXT.GENERAL.NOT_REGISTERED)}
+        {value}
       </Typography>
     </div>
   );

@@ -1,11 +1,11 @@
 /** Lo que se muestra cuando un dato no existe (un nombre o una sede que no llegó). */
-export const EMPTY_VALUE = '—';
+export const EMPTY_VALUE = '';
 
-/** Formatea una fecha ISO como "12 mar 2026". Devuelve '—' si no es valida. */
+/** Formatea una fecha ISO como "12 mar 2026". Devuelve vacío si no es valida. */
 export function formatDate(isoDate?: string): string {
-  if (!isoDate) return '—';
+  if (!isoDate) return '';
   const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '—';
+  if (Number.isNaN(parsed.getTime())) return '';
 
   return parsed.toLocaleDateString('es-CR', {
     day: '2-digit',
@@ -14,11 +14,11 @@ export function formatDate(isoDate?: string): string {
   });
 }
 
-/** Formatea una fecha ISO con su hora local: "12 mar 2026, 16:42". Devuelve '—' si no es valida. */
+/** Formatea una fecha ISO con su hora local: "12 mar 2026, 16:42". Devuelve vacío si no es valida. */
 export function formatDateTime(isoDate?: string): string {
-  if (!isoDate) return '—';
+  if (!isoDate) return '';
   const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '—';
+  if (Number.isNaN(parsed.getTime())) return '';
 
   return parsed.toLocaleString('es-CR', {
     day: '2-digit',
@@ -30,11 +30,11 @@ export function formatDateTime(isoDate?: string): string {
   });
 }
 
-/** Solo la hora local: "14:32". Devuelve '—' si no es valida. */
+/** Solo la hora local: "14:32". Devuelve vacío si no es valida. */
 export function formatTime(isoDate?: string | null): string {
-  if (!isoDate) return '—';
+  if (!isoDate) return '';
   const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '—';
+  if (Number.isNaN(parsed.getTime())) return '';
 
   return parsed.toLocaleTimeString('es-CR', {
     hour: '2-digit',
@@ -48,9 +48,9 @@ export function formatTime(isoDate?: string | null): string {
  * muestra en UTC para que no retroceda un día en Costa Rica.
  */
 export function formatCalendarDate(isoDate?: string | null): string {
-  if (!isoDate) return '—';
+  if (!isoDate) return '';
   const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '—';
+  if (Number.isNaN(parsed.getTime())) return '';
 
   return parsed.toLocaleDateString('es-CR', {
     day: '2-digit',
@@ -60,11 +60,11 @@ export function formatCalendarDate(isoDate?: string | null): string {
   });
 }
 
-/** Formatea una fecha ISO como "12 mar", sin año. Devuelve '—' si no es valida. */
+/** Formatea una fecha ISO como "12 mar", sin año. Devuelve vacío si no es valida. */
 export function formatShortDate(isoDate?: string): string {
-  if (!isoDate) return '—';
+  if (!isoDate) return '';
   const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '—';
+  if (Number.isNaN(parsed.getTime())) return '';
 
   return parsed.toLocaleDateString('es-CR', { day: 'numeric', month: 'short' });
 }
@@ -84,7 +84,7 @@ const MONTH_LABELS = [
   'diciembre',
 ];
 
-/** "2026-11" -> "Noviembre 2026". Devuelve '—' si el mes no es valido. */
+/** "2026-11" -> "Noviembre 2026". Devuelve vacío si el mes no es valido. */
 /** Mes abreviado y con mayúscula para cuadrículas ("Ene", "Feb"…); `monthIndex` de 0 a 11. */
 export function formatShortMonth(monthIndex: number): string {
   const label = MONTH_LABELS[monthIndex] ?? '';
@@ -92,10 +92,10 @@ export function formatShortMonth(monthIndex: number): string {
 }
 
 export function formatMonthLabel(monthKey?: string | null): string {
-  if (!monthKey) return '—';
+  if (!monthKey) return '';
   const [year, month] = monthKey.split('-');
   const label = MONTH_LABELS[Number(month) - 1];
-  if (!label || !year) return '—';
+  if (!label || !year) return '';
 
   return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
 }
@@ -137,5 +137,5 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function getFullName(firstName?: string, lastName?: string): string {
-  return [firstName, lastName].filter(Boolean).join(' ').trim() || '—';
+  return [firstName, lastName].filter(Boolean).join(' ').trim() || '';
 }

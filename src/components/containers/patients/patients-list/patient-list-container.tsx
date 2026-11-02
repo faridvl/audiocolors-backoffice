@@ -63,7 +63,7 @@ function buildColumns(branches: Branch[] | undefined, t: TFunction): TableColumn
       key: 'phone',
       header: 'Teléfono',
       width: '16%',
-      render: (patient) => (patient.phone ? formatPhoneForDisplay(patient.phone) : '—'),
+      render: (patient) => (patient.phone ? formatPhoneForDisplay(patient.phone) : EMPTY_VALUE),
     },
     {
       key: 'branch',
@@ -121,7 +121,7 @@ function buildColumns(branches: Branch[] | undefined, t: TFunction): TableColumn
           );
         }
 
-        return '—';
+        return EMPTY_VALUE;
       },
     },
     {

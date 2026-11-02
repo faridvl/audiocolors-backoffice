@@ -28,6 +28,7 @@ export enum PatientActivityAction {
   CONTACT_ATTEMPTS_CHANGED = 'CONTACT_ATTEMPTS_CHANGED',
   MAINTENANCE_CHECK_CHANGED = 'MAINTENANCE_CHECK_CHANGED',
   MAINTENANCE_NOTE_CHANGED = 'MAINTENANCE_NOTE_CHANGED',
+  MAINTENANCE_NOTE_ADDED = 'MAINTENANCE_NOTE_ADDED',
   CLINICAL_HISTORY_CREATED = 'CLINICAL_HISTORY_CREATED',
   CLINICAL_HISTORY_UPDATED = 'CLINICAL_HISTORY_UPDATED',
   PHYSICAL_EXAM_UPDATED = 'PHYSICAL_EXAM_UPDATED',
@@ -53,7 +54,7 @@ export interface PatientFieldChange {
 /**
  * `detail` llega como JSON libre según la acción (ver ENDPOINTS.md del API).
  * Todas las claves son opcionales aquí: se lee lo que haya y lo que falte
- * se muestra como "—".
+ * queda en blanco.
  */
 export interface PatientActivityDetail {
   changes?: PatientFieldChange[];
@@ -80,7 +81,7 @@ export interface PatientActivityDetail {
   number?: number;
   /** MAINTENANCE_CHECK_CHANGED: true al marcarlo, false al desmarcarlo. */
   done?: boolean;
-  /** MAINTENANCE_CHANGED (registros viejos): cómo quedó, null = sin marcar. */
+  /** MAINTENANCE_CHANGED: cómo quedó, null = sin marcar. */
   status?: string | null;
   /** CONTACT_ATTEMPTS_CHANGED (registros viejos): intentos de contacto ahora y antes. */
   count?: number;

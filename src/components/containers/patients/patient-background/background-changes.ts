@@ -1,5 +1,4 @@
 import type { TFunction } from 'i18next';
-import { TEXT } from '@/static/texts/i18n';
 import {
   ClinicalAnswer,
   ClinicalField,
@@ -26,7 +25,7 @@ export function buildBackgroundChanges(
   original: Record<string, ClinicalAnswer>,
   values: ClinicalHistoryFormValues,
 ): BackgroundChange[] {
-  const empty = t(TEXT.GENERAL.NOT_REGISTERED);
+  const empty = '';
   const changes: BackgroundChange[] = [];
 
   fields.forEach(({ id, label, fieldType, detailLabel }) => {

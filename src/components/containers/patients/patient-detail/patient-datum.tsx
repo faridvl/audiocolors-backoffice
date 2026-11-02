@@ -1,7 +1,5 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
 
 interface PatientDatumProps {
@@ -12,9 +10,8 @@ interface PatientDatumProps {
   className?: string;
 }
 
-/** Dato del expediente con su etiqueta encima; vacío dice "Sin registrar". */
+/** Dato del expediente con su etiqueta encima; vacío no muestra nada. */
 export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, children, className }) => {
-  const { t } = useTranslation();
   // Un arreglo vacío es truthy: sin esto dejaría un `dd` sin contenido.
   const hasChildren = React.Children.toArray(children).length > 0;
 
@@ -31,7 +28,7 @@ export const PatientDatum: React.FC<PatientDatumProps> = ({ label, value, childr
           as="dd"
           className={tailwind(value ? 'break-words' : 'whitespace-nowrap text-ink-400')}
         >
-          {value || t(TEXT.GENERAL.NOT_REGISTERED)}
+          {value}
         </Typography>
       )}
     </div>

@@ -81,7 +81,7 @@ export const PatientFlagPills: React.FC<{
   );
 };
 
-/** Celda de la lista: el valor con su color; apagado, "—" o su texto ("Sin garantía"). */
+/** Celda de la lista: el valor con su color; apagado, vacío o su texto ("Sin garantía"). */
 export const PatientFlagValue: React.FC<{ patient: Patient; flag: PatientFlag }> = ({
   patient,
   flag,
