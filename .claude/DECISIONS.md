@@ -790,3 +790,9 @@ no recalcula la fecha. La bitácora registra `QUESTIONNAIRE_CORRECTED`, sin copi
 - "Ver anteriores (n)" ya no despliega nada en la tarjeta: abre un modal (`SheetDialog` de agenda, hoja inferior en móvil) con una fecha colapsable por registro anterior. El último registro NO sale en el modal: ya está a la vista en la tarjeta y el contador `n` cuenta solo los anteriores.
 - `EntryHistoryList` sigue genérico: recibe `renderEntry`, `getAuthor`, `getCorrection` y `renderLatestAction`, para reutilizarlo en otoscopías.
 - La bitácora muestra `QUESTIONNAIRE_CORRECTED` como "Preguntas corregidas" con detalle "Corrigió «nombre»".
+
+## D39 · El día de una cita es el de Costa Rica, no el UTC (2026-11-01)
+
+`GET /appointments?date=YYYY-MM-DD` filtra de las 06:00 UTC del día (incluida) a las 06:00 UTC del siguiente (excluida), es decir, de 00:00 a 24:00 en Costa Rica (UTC-6, sin horario de verano). Antes iba de 00:00 a 23:59:59.999 UTC y una cita desde las 18:00 de Costa Rica salía en el día siguiente. Lo mismo para `GET /maintenances/upcoming?month=`, que ahora toma el mes de la clínica. Las citas "sin hora" se siguen guardando a las 08:00 UTC (02:00 de Costa Rica del mismo día), así que caen en su día. El rango sale de `clinicDayRange` / `clinicMonthRange` en `clinic-day.util.ts` del API.
+
+**Pendiente en el front:** la agenda agrupa y ubica por hora con la zona del navegador (`toDayKey`, `toSlotHour`, `toMinuteOfDay`); es correcta solo con el navegador en hora de Costa Rica.

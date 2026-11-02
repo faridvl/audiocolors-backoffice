@@ -135,8 +135,6 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   también 8 dígitos) escrito sin + se guarda como de Costa Rica (D30).
 
 
-- Si una cita empieza a las 18:00 o después, en UTC ya es el día siguiente: el
-  API tendría que filtrar por día local (D10). La línea de tiempo llega a las 18:00.
 - Dato vacío: la skill pide "Sin registrar" y el código usa `—` (`EMPTY_VALUE`) en
   la agenda y vistas compactas. ¿Cuál se queda? (RULES.md §1)
 - Leídas y limpiadas de Notificaciones se guardan por navegador: ¿hace falta
