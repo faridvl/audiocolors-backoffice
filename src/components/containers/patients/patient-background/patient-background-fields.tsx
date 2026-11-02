@@ -20,7 +20,11 @@ import {
 import { ClinicalSectionCard } from './clinical-section-card';
 
 /** La hoja de la historia clínica armada con las preguntas de la clínica. Va dentro de un Formik. */
-export const PatientBackgroundFields: React.FC<{ fields: ClinicalField[] }> = ({ fields }) => {
+export const PatientBackgroundFields: React.FC<{
+  fields: ClinicalField[];
+  /** Con `false` va sin el título "Antecedentes" (otras secciones de Preguntas). */
+  showsHistoryTitle?: boolean;
+}> = ({ fields, showsHistoryTitle = true }) => {
   const { t } = useTranslation();
   const { values, setFieldValue } = useFormikContext<ClinicalHistoryFormValues>();
   const groups = groupFields(fields);
@@ -35,10 +39,12 @@ export const PatientBackgroundFields: React.FC<{ fields: ClinicalField[] }> = ({
       {booleanGroups.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <Typography variant={TypographyVariant.SUBTITLE}>
-              {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
-            </Typography>
-            <div role="status">
+            {showsHistoryTitle && (
+              <Typography variant={TypographyVariant.SUBTITLE}>
+                {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
+              </Typography>
+            )}
+            <div role="status" className="ml-auto">
               <Typography variant={TypographyVariant.HELPER} className="text-ink-600">
                 {missingCount > 0
                   ? t(TEXT.PATIENTS.BACKGROUND.PROGRESS_MISSING, {

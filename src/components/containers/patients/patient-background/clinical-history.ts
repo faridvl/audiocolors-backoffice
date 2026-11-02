@@ -206,17 +206,11 @@ export interface LegacyOtoscopy {
 
 const toNullableText = (value: string | undefined) => value?.trim() || null;
 
-/**
- * Lo que se manda al API: las respuestas con la copia de las preguntas, y las
- * columnas fijas de las preguntas estándar para que se sigan leyendo igual.
- */
-export function buildPayload(
+/** Las respuestas del formulario por id de pregunta, en la forma que espera el API. */
+export function buildAnswers(
   fields: ClinicalField[],
   values: ClinicalHistoryFormValues,
-  notes: string | null,
-  removed?: RemovedQuestions,
-  legacyOtoscopy?: LegacyOtoscopy,
-): SavePatientBackgroundPayload {
+): Record<string, ClinicalAnswer> {
   const answers: Record<string, ClinicalAnswer> = {};
   fields.forEach(({ id, fieldType, detailLabel }) => {
     if (fieldType !== ClinicalFieldType.BOOLEAN) {
@@ -231,6 +225,21 @@ export function buildPayload(
       ? { value, detail: value ? toNullableText(values.details[id]) : null }
       : value;
   });
+  return answers;
+}
+
+/**
+ * Lo que se manda al API: las respuestas con la copia de las preguntas, y las
+ * columnas fijas de las preguntas estándar para que se sigan leyendo igual.
+ */
+export function buildPayload(
+  fields: ClinicalField[],
+  values: ClinicalHistoryFormValues,
+  notes: string | null,
+  removed?: RemovedQuestions,
+  legacyOtoscopy?: LegacyOtoscopy,
+): SavePatientBackgroundPayload {
+  const answers = buildAnswers(fields, values);
 
   // El API reemplaza todo: sin esto, la respuesta de una pregunta ya quitada se perdería.
   if (removed) Object.assign(answers, removed.answers);

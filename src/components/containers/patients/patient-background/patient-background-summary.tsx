@@ -33,14 +33,18 @@ interface PatientBackgroundSummaryProps {
   /** Las preguntas tal como estaban al llenarla. */
   fields: ClinicalField[];
   answers: Record<string, ClinicalAnswer>;
-  authorship: string[];
+  /** Líneas de autoría al pie; sin ellas no se pinta el pie. */
+  authorship?: string[];
+  /** Con `false` las preguntas Sí/No van sin el título "Antecedentes" (otras secciones de Preguntas). */
+  showsHistoryTitle?: boolean;
 }
 
 /** La hoja ya llena, con la misma grilla que el formulario: todas las preguntas a la vista. */
 export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> = ({
   fields,
   answers,
-  authorship,
+  authorship = [],
+  showsHistoryTitle = true,
 }) => {
   const { t } = useTranslation();
   const groups = groupFields(fields);
@@ -51,9 +55,11 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
     <div className={tailwind('flex flex-col gap-5', CLINICAL_SHEET_WIDTH)}>
       {booleanGroups.length > 0 && (
         <section className="flex flex-col gap-2">
-          <Typography variant={TypographyVariant.SUBTITLE}>
-            {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
-          </Typography>
+          {showsHistoryTitle && (
+            <Typography variant={TypographyVariant.SUBTITLE}>
+              {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
+            </Typography>
+          )}
           <div className={CLINICAL_SECTIONS_COLUMNS}>
             {booleanGroups.map((group) => (
               <ClinicalSectionCard key={group.key} title={group.title}>
@@ -84,13 +90,15 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
         </section>
       ))}
 
-      <div className="flex flex-col border-t border-ink-100 pt-3">
-        {authorship.map((line) => (
-          <Typography key={line} variant={TypographyVariant.HELPER}>
-            {line}
-          </Typography>
-        ))}
-      </div>
+      {authorship.length > 0 && (
+        <div className="flex flex-col border-t border-ink-100 pt-3">
+          {authorship.map((line) => (
+            <Typography key={line} variant={TypographyVariant.HELPER}>
+              {line}
+            </Typography>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

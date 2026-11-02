@@ -14,6 +14,22 @@ export function formatDate(isoDate?: string): string {
   });
 }
 
+/** Formatea una fecha ISO con su hora local: "12 mar 2026, 16:42". Devuelve '—' si no es valida. */
+export function formatDateTime(isoDate?: string): string {
+  if (!isoDate) return '—';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '—';
+
+  return parsed.toLocaleString('es-CR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
 /**
  * Fecha de calendario sin hora (nacimiento): el API la guarda a medianoche UTC, así que se
  * muestra en UTC para que no retroceda un día en Costa Rica.

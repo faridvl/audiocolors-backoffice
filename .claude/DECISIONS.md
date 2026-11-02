@@ -742,3 +742,28 @@ hora y la agenda no usa ese fin.
 
 **Por qué:** cada cita guarda su `endTime` y la agenda lo respeta (D10), así que cambiar solo el tipo no
 se veía en las citas ya agendadas.
+
+## D38 · Secciones propias de Preguntas (2026-11-01)
+
+**Decisión:** la clínica crea secciones propias dentro de "Preguntas" (plantillas `ClinicalTemplate`
+con `speciality: 'QUESTIONNAIRE'`). Se crean y editan en Configuración > Preguntas, un acordeón por
+sección debajo de "Historia clínica"; "Nueva sección" pide el nombre (obligatorio, máx. 60) y la
+sección queda como borrador local hasta guardar con al menos una pregunta (POST); las existentes se
+editan con PATCH. No se borran. En el expediente cada sección se llena varias veces: cada registro
+guarda fecha, autor y una copia de las preguntas que tenía (`templateSnapshot`), se muestra el último y
+"Ver anteriores" despliega el resto; los registros no se editan ni se borran. La historia clínica no
+cambia (se llena una vez).
+
+**Migración de datos:** no hay; las secciones y los registros son nuevos.
+
+**Sin validar a propósito:** el front no limita cuántas secciones ni cuántos registros hay.
+
+**Por qué:** la clínica necesita seguimientos que se repiten (cada visita un registro) sin tocar la
+historia clínica, y que lo ya registrado no cambie si después editan las preguntas.
+
+**Diseño:**
+
+- Permisos: Configuración usa `EDIT_CLINICAL_TEMPLATE`; el expediente `VIEW_CLINICAL_RECORD`. STAFF no ve nada (el API responde 403 y el bloque se omite).
+- En el expediente solo salen secciones con al menos una pregunta. Sin registros quedan como sin llenar; con el formulario con cambios, como borrador.
+- "Nuevo registro" abre el formulario con las preguntas de hoy (Sí/No sin marcar), reutilizando los campos de la historia; al guardar se invalida la consulta, se cierra el formulario y el nuevo queda arriba.
+- La lista de registros con fecha y autor (`EntryHistoryList`) es genérica para reutilizarla en las otoscopías.
