@@ -138,7 +138,10 @@ export function resolveAppointmentActions(
   if (timing === DayTiming.FUTURE) return { primary: null, secondary: contactActions };
 
   if (appointment.status === AppointmentStatus.WAITING) {
-    return { primary: AppointmentAction.MARK_DONE, secondary: [AppointmentAction.UNDO_ARRIVED] };
+    return {
+      primary: AppointmentAction.MARK_DONE,
+      secondary: [AppointmentAction.UNDO_ARRIVED],
+    };
   }
 
   const section = resolveSection(appointment, timing);
@@ -154,9 +157,10 @@ export function resolveAppointmentActions(
 }
 
 /**
- * Horarios de la vista de escritorio, en hora de la clínica: uno por hora, de
- * 8:00 a 17:00. El tope es de negocio (el horario de atención de la clínica);
- * el API filtra las citas por el día de Costa Rica, así que no lo condiciona.
+ * Horarios para crear o mover citas, en hora de la clínica: uno por hora, de
+ * 8:00 a 17:00. Es el horario de atención de la clínica. No limita lo que se
+ * muestra: la línea de tiempo del día se amplía para citas fuera de este rango
+ * (ver `resolveTimelineRange`).
  */
 export enum SlotHour {
   FIRST = 8,
@@ -200,15 +204,32 @@ export function buildSlotHours(): number[] {
 }
 
 /**
- * Horario de una cita, o null si no tiene uno. Las citas confirmadas desde el
+ * Hora (0 a 23) de una cita, o null si no tiene una. Las citas confirmadas desde el
  * modal (solo día) quedan a las 08:00 UTC, que en la clínica son las 2:00:
- * fuera de los horarios, así que se leen como "sin hora".
+ * se leen como "sin hora". Cualquier otra cita tiene hora real, aunque caiga
+ * fuera del horario de atención.
  */
 export function resolveSlotHour(appointment: Appointment): number | null {
-  return toSlotHour(appointment.schedule.startTime);
+  return isDayOnlyAppointment(appointment)
+    ? null
+    : new Date(appointment.schedule.startTime).getHours();
 }
 
-/** Horario de una fecha ISO, o null si cae fuera de los horarios. */
+/** Hora UTC en que el API guarda una cita confirmada solo con día. */
+const DAY_ONLY_UTC_HOUR = 8;
+
+/** Si la cita se confirmó solo con el día: su inicio es exactamente las 08:00:00.000 UTC. */
+export function isDayOnlyAppointment(appointment: Appointment): boolean {
+  const start = new Date(appointment.schedule.startTime);
+  return (
+    start.getUTCHours() === DAY_ONLY_UTC_HOUR &&
+    start.getUTCMinutes() === 0 &&
+    start.getUTCSeconds() === 0 &&
+    start.getUTCMilliseconds() === 0
+  );
+}
+
+/** Horario ofrecido para agendar de una fecha ISO, o null si cae fuera del horario de atención. */
 export function toSlotHour(isoDate: string): number | null {
   const hour = new Date(isoDate).getHours();
   return hour >= SlotHour.FIRST && hour <= SlotHour.LAST ? hour : null;
@@ -227,9 +248,35 @@ export function buildSlotTimes(
   };
 }
 
-/** La línea de tiempo del día va de la primera hora al final de la última. */
-export const TIMELINE_START_MINUTE = SlotHour.FIRST * MINUTES_IN_HOUR;
-export const TIMELINE_END_MINUTE = (SlotHour.LAST + 1) * MINUTES_IN_HOUR;
+const MINUTES_IN_DAY = 24 * MINUTES_IN_HOUR;
+
+/** Tramo del día que dibuja la línea de tiempo, en minutos del día. */
+export interface TimelineRange {
+  startMinute: number;
+  endMinute: number;
+}
+
+/** Como mínimo la línea de tiempo va del horario de atención: de la primera hora al final de la última. */
+export const DEFAULT_TIMELINE_RANGE: TimelineRange = {
+  startMinute: SlotHour.FIRST * MINUTES_IN_HOUR,
+  endMinute: (SlotHour.LAST + 1) * MINUTES_IN_HOUR,
+};
+
+/**
+ * Tramo del día: el horario de atención, ampliado a horas completas para que
+ * entren la cita más temprana y la más tardía (una de 18:30 a 19:00 lleva el fin
+ * a las 19:00; una de las 7:15, el inicio a las 7:00).
+ */
+export function resolveTimelineRange(
+  spans: { startMinute: number; endMinute: number }[],
+): TimelineRange {
+  const earliest = Math.min(DEFAULT_TIMELINE_RANGE.startMinute, ...spans.map((s) => s.startMinute));
+  const latest = Math.max(DEFAULT_TIMELINE_RANGE.endMinute, ...spans.map((s) => s.endMinute));
+  return {
+    startMinute: Math.floor(earliest / MINUTES_IN_HOUR) * MINUTES_IN_HOUR,
+    endMinute: Math.min(MINUTES_IN_DAY, Math.ceil(latest / MINUTES_IN_HOUR) * MINUTES_IN_HOUR),
+  };
+}
 /** Soltar o tocar la línea de tiempo cae en la media hora más cercana. */
 export const TIMELINE_STEP_MINUTES = 30;
 
@@ -242,12 +289,12 @@ export function resolveStartMinute(appointment: Appointment): number | null {
 
 /**
  * Minuto (relativo al inicio de la línea de tiempo) → media hora donde cae,
- * sin salirse del día: la última empieza media hora antes del cierre.
+ * sin salirse del tramo: la última empieza media hora antes del cierre.
  */
-export function snapToTimelineStep(offsetMinutes: number): number {
+export function snapToTimelineStep(offsetMinutes: number, range: TimelineRange): number {
   const step = Math.floor(offsetMinutes / TIMELINE_STEP_MINUTES) * TIMELINE_STEP_MINUTES;
-  const lastStart = TIMELINE_END_MINUTE - TIMELINE_STEP_MINUTES;
-  return Math.min(lastStart, Math.max(TIMELINE_START_MINUTE, TIMELINE_START_MINUTE + step));
+  const lastStart = range.endMinute - TIMELINE_STEP_MINUTES;
+  return Math.min(lastStart, Math.max(range.startMinute, range.startMinute + step));
 }
 
 export interface TimelineBlock {
@@ -275,7 +322,11 @@ export function buildTimelineBlocks(
       const savedEnd = toMinuteOfDay(appointment.schedule.endTime);
       const endMinute =
         savedEnd > startMinute ? savedEnd : startMinute + fallbackDuration(appointment);
-      return { appointment, startMinute, endMinute: Math.min(endMinute, TIMELINE_END_MINUTE) };
+      return {
+        appointment,
+        startMinute,
+        endMinute: Math.min(endMinute, MINUTES_IN_DAY),
+      };
     })
     .filter((block): block is Omit<TimelineBlock, 'lane' | 'laneCount'> => block !== null)
     .sort(

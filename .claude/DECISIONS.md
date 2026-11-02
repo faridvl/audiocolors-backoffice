@@ -815,3 +815,11 @@ Un campo sin valor no muestra "Sin registrar" ni `—`: queda en blanco. `EMPTY_
 ## D42 · Preguntas: guardar lleva a "Último registro" y las filas del historial se distinguen (2026-11-01)
 
 Tras guardar (corrección o registro nuevo) la vista vuelve al inicio de "Último registro", para ver "Corregido por X". En el 409 solo se muestra la línea roja del API (sin toast ni ayuda gris). La ayuda "Lo puedes corregir hoy; después queda fijo." es la misma al crear y al editar. Las filas cerradas del historial traen la primera respuesta con valor en una línea recortada y la etiqueta "Corregido" si aplica; la fecha corta ("1 nov, 22:01") solo va en la tarjeta compacta.
+
+## D43 · La agenda de escritorio muestra las citas fuera de 8:00 a 18:00 (2026-11-01)
+
+"Sin hora asignada" es solo para las citas confirmadas con el día y sin hora: las que guardan su inicio a las 08:00:00.000 UTC exactas (2:00 en Costa Rica). Toda otra cita tiene hora real, aunque sea de las 7:00 o de las 18:30 (creada por Zynka o por el API); antes salía como "sin hora" por caer fuera de 8 a 18. `resolveSlotHour` ya no recorta por rango y la regla vive en `isDayOnlyAppointment`.
+
+La línea de tiempo del día en escritorio va como mínimo de 8:00 a 18:00 y se amplía a horas completas para que entren la cita más temprana y la más tardía (`resolveTimelineRange`): una de 18:30 a 19:00 lleva el fin a las 19:00, una de las 7:15 lleva el inicio a las 7:00. Si todo cae entre 8 y 18, queda igual que antes. La línea de "ahora", la sombra al pasar o arrastrar y el redondeo a la media hora (`snapToTimelineStep`) usan el tramo del día, así que soltar en la parte ampliada es posible.
+
+**No cambia:** las horas que ofrece el modal de agendar y la lista de "poner hora" (`buildSlotHours`, `toSlotHour`) siguen de 8:00 a 17:00, el horario de atención de la clínica; una próxima cita fuera de ese horario queda sin hora preseleccionada. Los textos de `docs/novedades` ("de 8:00 a 17:00") describen esas listas y no se tocan.

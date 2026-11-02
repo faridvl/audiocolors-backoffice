@@ -8,7 +8,9 @@ import {
   DayTiming,
   resolveAppointmentDuration,
   resolveSlotHour,
+  resolveTimelineRange,
   resolveTypeDuration,
+  TIMELINE_STEP_MINUTES,
 } from '../agenda-presenter';
 import {
   deferFromDragEvent,
@@ -74,14 +76,31 @@ export function useAgendaBoard(agenda: AgendaState) {
     [selectedAppointments, savingIds],
   );
 
+  // Los que se están guardando también cuentan: si no, el tramo se encogería y el aviso quedaría fuera.
+  const timelineRange = useMemo(
+    () =>
+      resolveTimelineRange([
+        ...blocks,
+        ...savingOnDay.map((item) => ({
+          startMinute: item.startMinute,
+          endMinute: item.startMinute + TIMELINE_STEP_MINUTES,
+        })),
+      ]),
+    [blocks, savingOnDay],
+  );
+
   const returningItems = savingItems.filter((item) => item.startMinute === null);
 
   const selectedPending = pendingPatients.find((patient) => patient.uuid === selectedPendingUuid);
 
   const findPayloadTarget = (payload: AgendaDragPayload) =>
     payload.kind === AgendaDragKind.PENDING
-      ? { patient: pendingPatients.find((patient) => patient.uuid === payload.id) }
-      : { appointment: selectedAppointments.find((appointment) => appointment.id === payload.id) };
+      ? {
+          patient: pendingPatients.find((patient) => patient.uuid === payload.id),
+        }
+      : {
+          appointment: selectedAppointments.find((appointment) => appointment.id === payload.id),
+        };
 
   /** Cuánto dura lo que se arrastra: la sombra de soltar tiene ese largo. */
   const draggingDuration = (() => {
@@ -170,6 +189,7 @@ export function useAgendaBoard(agenda: AgendaState) {
     isDragging: dragging !== null,
     isDraggingAppointment: dragging?.kind === AgendaDragKind.APPOINTMENT,
     blocks,
+    timelineRange,
     savingOnDay,
     draggingDuration,
     unscheduledAppointments,
