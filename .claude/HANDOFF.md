@@ -113,6 +113,11 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## Preguntas abiertas
 
+- Punto 2 (secciones propias, D38), commits locales sin push: API `8ff5065` + `83c83e7` (migración
+  `patient_questionnaire_entries` aplicada solo en Docker local), front `4f50e80` + `1b4f72f` + el de la etiqueta.
+  Pasó cuestionador, revisor-ux y qa (API y pantalla). Sin probar: STAFF (no hay usuario de prueba) y editar
+  la historia clínica ya llenada. Para el usuario: ¿un registro se corrige el mismo día, como las otoscopías?
+  ¿Se borran o archivan secciones con registros (hoy 409)? ¿STAFF puede leer las plantillas (hoy sí, solo preguntas)?
 - Nombres de roles (2026-10-30, no hacerlo todavía): hoy OWNER, ADMIN, DOCTOR y STAFF. El usuario
   los quiere más claros (Administrador, Profesional, Recepción, Secretario o Empleado) y busca un
   estándar global de nombres. Propuesta a revisar: código fijo en inglés (`PRACTITIONER` viene de
