@@ -1,90 +1,67 @@
-import { useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
-import { useSavePatientPhysicalExamMutation } from '@/shared/api/mutations/patients/save-patient-physical-exam-mutation';
-import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import { useOtoscopyEntriesQuery } from '@/shared/api/querys/otoscopy-entries-query';
 import { isForbiddenError } from '@/shared/api/querys/patient-background-query';
-import {
-  FETCH_PATIENT_PHYSICAL_EXAM_KEY,
-  usePatientPhysicalExamQuery,
-} from '@/shared/api/querys/patient-physical-exam-query';
-import { formatDate } from '@/shared/utils/formatters';
+import { formatTime } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
-
-export interface PhysicalExamFormValues {
-  otoscopyRight: string;
-  otoscopyLeft: string;
-}
-
-const toNullableText = (value: string) => value.trim() || null;
+import { OtoscopyEntry } from '@/types/patients/otoscopy-entry';
 
 export function usePatientPhysicalExam(patientUuid: string) {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
   const resolveAuthorLabel = useResolveAuthorLabel();
-  const {
-    data: exam,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = usePatientPhysicalExamQuery(patientUuid);
-  const { executeSavePatientPhysicalExam, isPending } = useSavePatientPhysicalExamMutation();
-  const [isEditing, setIsEditing] = useState(false);
+  const { data, isLoading, isError, error, refetch } = useOtoscopyEntriesQuery(patientUuid);
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingEntryUuid, setEditingEntryUuid] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [revealsLatest, setRevealsLatest] = useState(false);
 
-  const initialValues = useMemo<PhysicalExamFormValues>(
-    () => ({
-      otoscopyRight: exam?.otoscopyRight ?? '',
-      otoscopyLeft: exam?.otoscopyLeft ?? '',
-    }),
-    [exam],
-  );
+  const entries = data ?? [];
+  // Si el registro desaparece de la lista, la edición se da por cerrada.
+  const editingEntry = entries.find((entry) => entry.uuid === editingEntryUuid);
 
-  const authorship = exam
-    ? t(TEXT.PATIENTS.PHYSICAL_EXAM.UPDATED_BY, {
-        author: resolveAuthorLabel(exam.updatedByUuid ?? exam.createdByUuid ?? ''),
-        date: formatDate(exam.updatedAt),
-      })
-    : null;
+  const getAuthor = (entry: OtoscopyEntry) =>
+    resolveAuthorLabel(entry.createdByUuid ?? '', entry.createdByName);
 
-  const handleSubmit = (values: PhysicalExamFormValues) => {
-    executeSavePatientPhysicalExam(
-      {
-        patientUuid,
-        exam: {
-          otoscopyRight: toNullableText(values.otoscopyRight),
-          otoscopyLeft: toNullableText(values.otoscopyLeft),
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success(t(TEXT.PATIENTS.PHYSICAL_EXAM.SAVED));
-          void queryClient.invalidateQueries({
-            queryKey: [FETCH_PATIENT_PHYSICAL_EXAM_KEY, patientUuid],
-          });
-          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
-          setIsEditing(false);
-        },
-        onError: (saveError: Error) => toast.error(saveError.message),
-      },
-    );
+  const getCorrection = (entry: OtoscopyEntry) =>
+    entry.updatedAt
+      ? t(TEXT.QUESTIONS.ENTRY_CORRECTED, {
+          author: resolveAuthorLabel(entry.updatedByUuid ?? '', entry.updatedByName),
+          time: formatTime(entry.updatedAt),
+        })
+      : undefined;
+
+  // Primer oído con texto, en una línea, para distinguir las filas cerradas del historial.
+  const getPreview = (entry: OtoscopyEntry) => {
+    if (entry.otoscopyRight?.trim()) {
+      return t(TEXT.PATIENTS.PHYSICAL_EXAM.PREVIEW_RIGHT, { detail: entry.otoscopyRight.trim() });
+    }
+    if (entry.otoscopyLeft?.trim()) {
+      return t(TEXT.PATIENTS.PHYSICAL_EXAM.PREVIEW_LEFT, { detail: entry.otoscopyLeft.trim() });
+    }
+    return undefined;
   };
 
   return {
-    exam: exam ?? null,
+    entries,
     // STAFF no tiene acceso a lo clínico: la tarjeta no se muestra.
     isHidden: isForbiddenError(error),
     isLoading,
     isError,
     refetch: () => void refetch(),
-    authorship,
-    initialValues,
-    isEditing,
-    isPending,
-    handleStartEdit: () => setIsEditing(true),
-    handleCancelEdit: () => setIsEditing(false),
-    handleSubmit,
+    isCreating,
+    editingEntry,
+    isSaving,
+    revealsLatest,
+    getAuthor,
+    getCorrection,
+    getPreview,
+    handleSaved: useCallback(() => setRevealsLatest(true), []),
+    handleRevealed: useCallback(() => setRevealsLatest(false), []),
+    handleSavingChange: setIsSaving,
+    handleStartCreate: () => setIsCreating(true),
+    handleCloseCreate: useCallback(() => setIsCreating(false), []),
+    handleStartEdit: (entry: OtoscopyEntry) => setEditingEntryUuid(entry.uuid),
+    handleCloseEdit: useCallback(() => setEditingEntryUuid(null), []),
   };
 }

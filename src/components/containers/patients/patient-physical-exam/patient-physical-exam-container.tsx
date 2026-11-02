@@ -1,8 +1,9 @@
 import React from 'react';
-import { AlertTriangle, Loader2, Pencil } from 'lucide-react';
+import { AlertTriangle, Loader2, Pencil, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { EntryHistoryList } from '@/components/containers/patients/patient-questions/entry-history-list';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientPhysicalExamForm } from './patient-physical-exam-form';
 import { PhysicalExamAnswer } from './physical-exam-answer';
@@ -12,30 +13,48 @@ interface PatientPhysicalExamContainerProps {
   patientUuid: string;
 }
 
-/** Exploración física (otoscopia): siempre abierta, entre la ficha del paciente y la historia clínica. */
+/** Exploración física (otoscopía): historial por paciente, entre la ficha y la historia clínica. */
 export const PatientPhysicalExamContainer: React.FC<PatientPhysicalExamContainerProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
   const {
-    exam,
+    entries,
     isHidden,
     isLoading,
     isError,
     refetch,
-    authorship,
-    initialValues,
-    isEditing,
-    isPending,
+    isCreating,
+    editingEntry,
+    isSaving,
+    revealsLatest,
+    getAuthor,
+    getCorrection,
+    getPreview,
+    handleSaved,
+    handleRevealed,
+    handleSavingChange,
+    handleStartCreate,
+    handleCloseCreate,
     handleStartEdit,
-    handleCancelEdit,
-    handleSubmit,
+    handleCloseEdit,
   } = usePatientPhysicalExam(patientUuid);
 
   if (isHidden) return null;
 
   const isReady = !isLoading && !isError;
-  const isEmpty = !exam?.otoscopyRight && !exam?.otoscopyLeft;
+  const hasEntries = entries.length > 0;
+  const isFormOpen = isCreating || !!editingEntry;
+  const newEntryButton = (
+    <Button
+      variant={ButtonVariant.SECONDARY}
+      onClick={handleStartCreate}
+      icon={<Plus className="h-4 w-4 text-ink-500" aria-hidden />}
+      className="w-full shrink-0 whitespace-nowrap sm:w-auto"
+    >
+      {t(TEXT.PATIENTS.PHYSICAL_EXAM.NEW)}
+    </Button>
+  );
 
   return (
     <section className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
@@ -43,16 +62,7 @@ export const PatientPhysicalExamContainer: React.FC<PatientPhysicalExamContainer
         <Typography variant={TypographyVariant.SUBTITLE}>
           {t(TEXT.PATIENTS.BACKGROUND.OTOSCOPY_TITLE)}
         </Typography>
-        {isReady && !isEditing && (
-          <Button
-            variant={ButtonVariant.SECONDARY}
-            onClick={handleStartEdit}
-            icon={<Pencil className="h-4 w-4 text-ink-500" aria-hidden />}
-            className="w-full shrink-0 whitespace-nowrap sm:w-auto"
-          >
-            {t(isEmpty ? TEXT.PATIENTS.PHYSICAL_EXAM.REGISTER : TEXT.PATIENTS.PHYSICAL_EXAM.EDIT)}
-          </Button>
-        )}
+        {isReady && hasEntries && !isFormOpen && newEntryButton}
       </div>
 
       {isLoading && (
@@ -76,39 +86,61 @@ export const PatientPhysicalExamContainer: React.FC<PatientPhysicalExamContainer
         </div>
       )}
 
-      {isReady && isEditing && (
+      {isReady && !hasEntries && !isFormOpen && (
+        <div className="flex flex-col items-start gap-3">
+          <Typography variant={TypographyVariant.HELPER}>
+            {t(TEXT.PATIENTS.PHYSICAL_EXAM.EMPTY)}
+          </Typography>
+          {newEntryButton}
+        </div>
+      )}
+
+      {isReady && isFormOpen && (
         <PatientPhysicalExamForm
-          initialValues={initialValues}
-          isPending={isPending}
-          onSubmit={handleSubmit}
-          onCancel={handleCancelEdit}
+          key={editingEntry?.uuid ?? 'new'}
+          patientUuid={patientUuid}
+          entry={editingEntry}
+          onClose={editingEntry ? handleCloseEdit : handleCloseCreate}
+          onSaved={handleSaved}
+          onSavingChange={handleSavingChange}
         />
       )}
 
-      {isReady && !isEditing && isEmpty && (
-        <Typography variant={TypographyVariant.BODY} className="text-ink-500">
-          {t(TEXT.PATIENTS.PHYSICAL_EXAM.EMPTY)}
-        </Typography>
-      )}
-
-      {isReady && !isEditing && !isEmpty && (
-        <>
-          <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
-            <PhysicalExamAnswer
-              label={t(TEXT.PATIENTS.BACKGROUND.RIGHT_EAR)}
-              value={exam?.otoscopyRight ?? null}
-            />
-            <PhysicalExamAnswer
-              label={t(TEXT.PATIENTS.BACKGROUND.LEFT_EAR)}
-              value={exam?.otoscopyLeft ?? null}
-            />
-          </div>
-          {authorship && (
-            <Typography variant={TypographyVariant.HELPER} className="border-t border-ink-100 pt-3">
-              {authorship}
-            </Typography>
+      {isReady && hasEntries && !isFormOpen && (
+        <EntryHistoryList
+          entries={entries}
+          historyLabel={t(TEXT.PATIENTS.BACKGROUND.OTOSCOPY_TITLE)}
+          getAuthor={getAuthor}
+          getCorrection={getCorrection}
+          getPreview={getPreview}
+          revealsLatest={revealsLatest}
+          onRevealed={handleRevealed}
+          renderLatestAction={(entry) =>
+            entry.canEdit ? (
+              <Button
+                variant={ButtonVariant.GHOST}
+                onClick={() => handleStartEdit(entry)}
+                disabled={isSaving}
+                icon={<Pencil className="h-4 w-4" aria-hidden />}
+                className="shrink-0"
+              >
+                {t(TEXT.QUESTIONS.ENTRY_EDIT)}
+              </Button>
+            ) : null
+          }
+          renderEntry={(entry) => (
+            <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-2">
+              <PhysicalExamAnswer
+                label={t(TEXT.PATIENTS.BACKGROUND.RIGHT_EAR)}
+                value={entry.otoscopyRight}
+              />
+              <PhysicalExamAnswer
+                label={t(TEXT.PATIENTS.BACKGROUND.LEFT_EAR)}
+                value={entry.otoscopyLeft}
+              />
+            </div>
           )}
-        </>
+        />
       )}
     </section>
   );

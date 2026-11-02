@@ -823,3 +823,14 @@ Tras guardar (corrección o registro nuevo) la vista vuelve al inicio de "Últim
 La línea de tiempo del día en escritorio va como mínimo de 8:00 a 18:00 y se amplía a horas completas para que entren la cita más temprana y la más tardía (`resolveTimelineRange`): una de 18:30 a 19:00 lleva el fin a las 19:00, una de las 7:15 lleva el inicio a las 7:00. Si todo cae entre 8 y 18, queda igual que antes. La línea de "ahora", la sombra al pasar o arrastrar y el redondeo a la media hora (`snapToTimelineStep`) usan el tramo del día, así que soltar en la parte ampliada es posible.
 
 **No cambia:** las horas que ofrece el modal de agendar y la lista de "poner hora" (`buildSlotHours`, `toSlotHour`) siguen de 8:00 a 17:00, el horario de atención de la clínica; una próxima cita fuera de ese horario queda sin hora preseleccionada. Los textos de `docs/novedades` ("de 8:00 a 17:00") describen esas listas y no se tocan.
+
+
+## D44 · La otoscopía pasa a ser un historial por paciente (2026-11-02)
+
+La otoscopía única de la exploración física (`PatientPhysicalExam`) se convierte en un historial, igual que Preguntas: cada "nueva" crea un registro y nunca pisa el anterior; solo se corrige el mismo día de creación en hora de Costa Rica, y la versión anterior queda guardada (D38, D39). Tabla nueva `PatientOtoscopyEntry` con OD, OI, autor, creación y corrección, más `PatientOtoscopyEntryRevision`.
+
+**Backfill:** la migración copia la otoscopía única de cada paciente como su primer registro del historial, solo si algún oído tiene texto (los vacíos o solo espacios no generan registro). Fecha del registro = última modificación de la exploración (no se inventa una fecha de hoy) y autor = quien la modificó por última vez, o quien la creó si no hay otro; puede quedar sin autor. En la base de pruebas, 5 de 6 exploraciones tenían texto y dieron 5 registros.
+
+**Pendiente:** las columnas `otoscopyRight`/`otoscopyLeft` de `PatientPhysicalExam` y las rutas `physical-exam` no se borran todavía ni se mantienen en paralelo (no hay doble escritura): se eliminan en una migración posterior, cuando el front ya lea solo el historial.
+
+**Front:** la tarjeta "Exploración física" usa el historial de Preguntas (`EntryHistoryList`) y sus textos de corrección; "Editar" solo aparece si el API manda `canEdit`. El autor que viene sin dato se muestra como en Preguntas ("el equipo médico"). Si el API responde 409 al corregir, se avisa y se ofrece guardar como registro nuevo. El front ya no lee ni escribe las rutas `physical-exam`.

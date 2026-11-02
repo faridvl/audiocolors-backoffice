@@ -813,13 +813,16 @@
       }
     },
     "physicalExam": {
-      "loading": "Cargando exploración física...",
-      "loadError": "No se pudo cargar la exploración física",
-      "register": "Registrar otoscopía",
-      "empty": "Sin otoscopía registrada",
-      "edit": "Editar",
-      "saved": "Exploración física guardada",
-      "updatedBy": "Actualizada por {{author}} el {{date}}"
+      "loading": "Cargando otoscopías...",
+      "loadError": "No se pudo cargar el historial de otoscopías",
+      "new": "Nueva otoscopía",
+      "empty": "Todavía no hay otoscopías registradas.",
+      "save": "Guardar otoscopía",
+      "saved": "Otoscopía guardada",
+      "correctedSaved": "Otoscopía corregida",
+      "emptyError": "Escribe lo observado en al menos un oído para guardar la otoscopía.",
+      "previewRight": "OD: {{detail}}",
+      "previewLeft": "OI: {{detail}}"
     },
     "background": {
       "title": "Historia clínica",

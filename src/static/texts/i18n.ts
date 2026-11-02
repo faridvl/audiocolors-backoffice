@@ -591,11 +591,14 @@ export const TEXT = {
     PHYSICAL_EXAM: {
       LOADING: 'patients.physicalExam.loading',
       LOAD_ERROR: 'patients.physicalExam.loadError',
-      REGISTER: 'patients.physicalExam.register',
+      NEW: 'patients.physicalExam.new',
       EMPTY: 'patients.physicalExam.empty',
-      EDIT: 'patients.physicalExam.edit',
+      SAVE: 'patients.physicalExam.save',
       SAVED: 'patients.physicalExam.saved',
-      UPDATED_BY: 'patients.physicalExam.updatedBy',
+      CORRECTED_SAVED: 'patients.physicalExam.correctedSaved',
+      EMPTY_ERROR: 'patients.physicalExam.emptyError',
+      PREVIEW_RIGHT: 'patients.physicalExam.previewRight',
+      PREVIEW_LEFT: 'patients.physicalExam.previewLeft',
     },
     BACKGROUND: {
       TITLE: 'patients.background.title',
