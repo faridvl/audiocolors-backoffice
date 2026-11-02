@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Ear } from 'lucide-react';
+import { Ear, X } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Switch } from '@/components/common/switch/switch';
 import { Tabs } from '@/components/common/tabs/tabs';
@@ -37,10 +37,12 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
     isMaintenanceSection,
     isLabSection,
     labShipment,
+    isCloseBlocked,
     handleToggle,
     handleSectionChange,
   } = usePatientFlags(patient, initialSection);
-  useEscapeKey(onClose);
+  // Esc y el clic en el fondo se ignoran con una entrega a medias; la X y "Listo" sí cierran.
+  useEscapeKey(onClose, !isCloseBlocked);
 
   return (
     <div
@@ -48,7 +50,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
       aria-modal="true"
       aria-label={t(TEXT.PATIENTS.FLAGS.TITLE)}
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
-      onClick={onClose}
+      onClick={isCloseBlocked ? undefined : onClose}
     >
       <div
         className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white sm:max-w-4xl"
@@ -58,7 +60,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10">
             <Ear className="h-5 w-5 text-brand-700" aria-hidden />
           </span>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <Typography variant={TypographyVariant.ACCENT}>
               {t(TEXT.PATIENTS.FLAGS.TITLE)}
             </Typography>
@@ -66,6 +68,14 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
               {t(TEXT.PATIENTS.FLAGS.DESCRIPTION)}
             </Typography>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t(TEXT.PATIENTS.FLAGS.CLOSE)}
+            className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink-500 hover:bg-ink-50 hover:text-ink-700"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-6 pb-2">
@@ -118,6 +128,7 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
                         patient={patient}
                         onDelivered={labShipment.handleDelivered}
                         onCancel={labShipment.handleDeliveryCancel}
+                        onGuardChange={labShipment.handleDeliveryGuardChange}
                       />
                     )}
                     {isLab &&

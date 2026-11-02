@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { usePatientLabShipmentsQuery } from '@/shared/api/querys/patient-lab-shipments-query';
 
 /** Envíos que se ven sin expandir; con más, aparece "Ver todos". */
-const COLLAPSED_SHIPMENTS = 3;
+export const COLLAPSED_SHIPMENTS = 3;
 
 /** Historial de envíos al laboratorio: los 3 más recientes hasta que se expande. */
 export function useLabShipmentHistory(patientUuid: string) {

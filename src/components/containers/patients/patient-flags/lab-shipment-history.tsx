@@ -7,7 +7,7 @@ import { formatDayKeyWithYear } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientLabShipment } from '@/types/patients/patient-lab-shipment';
 import { LabShipmentNote } from './lab-shipment-note';
-import { useLabShipmentHistory } from './use-lab-shipment-history';
+import { COLLAPSED_SHIPMENTS, useLabShipmentHistory } from './use-lab-shipment-history';
 
 const HISTORY = TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.HISTORY;
 
@@ -18,14 +18,20 @@ const ShipmentRow: React.FC<{ shipment: PatientLabShipment }> = ({ shipment }) =
 
   return (
     <li className="flex min-w-0 flex-col gap-1 rounded-lg bg-ink-50 px-3 py-2">
-      <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-        {shipment.deliveredAt
-          ? t(HISTORY.SENT_AND_DELIVERED, {
-              sent,
-              delivered: formatDayKeyWithYear(shipment.deliveredAt),
-            })
-          : t(HISTORY.IN_LAB, { date: sent })}
-      </Typography>
+      {shipment.deliveredAt ? (
+        <>
+          <Typography variant={TypographyVariant.BODY_BOLD}>
+            {t(HISTORY.DELIVERED, { date: formatDayKeyWithYear(shipment.deliveredAt) })}
+          </Typography>
+          <Typography variant={TypographyVariant.HELPER}>
+            {t(HISTORY.SENT, { date: sent })}
+          </Typography>
+        </>
+      ) : (
+        <Typography variant={TypographyVariant.BODY_BOLD}>
+          {t(HISTORY.IN_LAB, { date: sent })}
+        </Typography>
+      )}
       {shipment.note && <LabShipmentNote text={shipment.note} />}
       {shipment.deliveredByName && (
         <Typography variant={TypographyVariant.HELPER}>
@@ -68,7 +74,11 @@ export const LabShipmentHistory: React.FC<{ patientUuid: string }> = ({ patientU
           </Button>
         </div>
       )}
-      {isEmpty && <Typography variant={TypographyVariant.HELPER}>{t(HISTORY.EMPTY)}</Typography>}
+      {isEmpty && (
+        <Typography variant={TypographyVariant.HELPER} className="text-ink-600">
+          {t(HISTORY.EMPTY)}
+        </Typography>
+      )}
       {shipments.length > 0 && (
         <ul className="flex flex-col gap-2">
           {shipments.map((shipment) => (
@@ -81,9 +91,11 @@ export const LabShipmentHistory: React.FC<{ patientUuid: string }> = ({ patientU
           variant={ButtonVariant.GHOST}
           onClick={handleToggle}
           aria-expanded={isExpanded}
-          className="min-h-[44px] w-fit px-2 text-brand-700 hover:underline"
+          className="min-h-[44px] w-fit px-0 text-brand-700 hover:underline"
         >
-          {isExpanded ? t(HISTORY.SHOW_LESS) : t(HISTORY.SHOW_ALL, { count: total })}
+          {isExpanded
+            ? t(HISTORY.SHOW_LESS, { count: COLLAPSED_SHIPMENTS })
+            : t(HISTORY.SHOW_ALL, { count: total })}
         </Button>
       )}
     </section>

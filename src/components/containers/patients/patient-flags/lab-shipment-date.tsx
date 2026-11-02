@@ -47,7 +47,7 @@ export const LabShipmentDate: React.FC<LabShipmentDateProps> = ({
           {t(TEXT.GENERAL.BUTTONS.CANCEL)}
         </Button>
         <Button onClick={onSave} isLoading={isSaving} disabled={isSaveDisabled} className="flex-1">
-          {t(TEXT.GENERAL.BUTTONS.SAVE)}
+          {t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.SAVE)}
         </Button>
       </div>
     </div>

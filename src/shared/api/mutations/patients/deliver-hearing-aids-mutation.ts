@@ -1,6 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import {
+  handleLabConflict,
+  isLabConflict,
+} from '@/shared/api/mutations/patients/handle-lab-conflict';
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
@@ -21,7 +25,7 @@ interface DeliverHearingAidsVariables {
 
 /**
  * Entrega los audífonos que estaban en el laboratorio. Con nota, el API también la deja en
- * Control de evolución: por eso se refrescan las notas. Los errores los muestra el formulario.
+ * Control de evolución: por eso se refrescan las notas. Los errores los muestra el formulario, salvo el 409 (pestaña vieja), que sale como aviso.
  */
 export function useDeliverHearingAidsMutation() {
   const { t } = useTranslation();
@@ -52,6 +56,9 @@ export function useDeliverHearingAidsMutation() {
         queryKey: [FETCH_PATIENT_NOTES_KEY, patientUuid],
       });
       toast.success(t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.DELIVERY.TOAST));
+    },
+    onError: (error, { patientUuid }) => {
+      if (isLabConflict(error)) handleLabConflict(queryClient, patientUuid, error);
     },
   });
 

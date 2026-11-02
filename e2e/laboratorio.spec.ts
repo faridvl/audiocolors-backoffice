@@ -18,6 +18,7 @@ const VIEWPORTS = [375, 1024, 1440];
 const VIEWPORT_HEIGHT = 900;
 const DEFAULT_VIEWPORT = { width: 1280, height: 720 };
 const HTTP_BAD_REQUEST = 400;
+const HTTP_CONFLICT = 409;
 const HTTP_ERROR_MIN = 400;
 const FETCH_RESOURCE_ERROR = "Failed to load resource";
 const CLINIC_TIME_ZONE = "America/Costa_Rica";
@@ -31,6 +32,10 @@ const SWITCH_NAME = /Audífonos en laboratorio/;
 const DELIVERY_TITLE = "Entrega de audífonos";
 const SAVE_DELIVERY = "Guardar entrega";
 const HISTORY_TITLE = "Historial de envíos";
+const SAVE_SHIPMENT = "Guardar envío";
+const ALREADY_DELIVERED_TOAST =
+  "Este envío ya fue entregado. Recarga la página.";
+const SHOW_LAST_THREE = "Mostrar solo los últimos 3";
 
 test.use({ storageState: SESSION_FILE });
 test.describe.configure({ mode: "serial" });
@@ -178,10 +183,11 @@ test("1. prender con fecha guarda el envío y lo muestra en el historial", async
   await labSwitch(page).click();
   await page.locator("#lab-shipment-date").fill(clinicDay(-SENT_DAYS_AGO));
   const put = page.waitForResponse(isFlagsPut);
-  await dialog(page)
-    .getByRole("button", { name: "Guardar", exact: true })
-    .click();
-  expect((await put).status()).toBe(200);
+  await dialog(page).getByRole("button", { name: SAVE_SHIPMENT }).click();
+  const response = await put;
+  expect(response.status()).toBe(200);
+  // Abrir un envío no manda shipmentUuid: solo la corrección de fecha lo manda.
+  expect(response.request().postDataJSON()).not.toHaveProperty("shipmentUuid");
 
   await expect(labSwitch(page)).toBeChecked();
   await expect(history(page).getByText(/^En laboratorio desde /)).toBeVisible();
@@ -223,8 +229,14 @@ test("3. una fecha anterior al envío muestra el error del API y deja abierto el
   await dialog(page).getByRole("button", { name: SAVE_DELIVERY }).click();
   expect((await put).status()).toBe(HTTP_BAD_REQUEST);
 
-  const error = dialog(page).locator("[aria-live='polite']");
-  await expect(error).not.toBeEmpty();
+  await expect(page.locator("#lab-delivery-date")).toHaveAttribute(
+    "aria-invalid",
+    "true",
+  );
+  await expect(page.locator("#lab-delivery-date-error")).not.toBeEmpty();
+  await expect(
+    dialog(page).getByText("Al guardar, los audífonos salen del laboratorio."),
+  ).toBeVisible();
   await expect(dialog(page).getByText(DELIVERY_TITLE)).toBeVisible();
   await expect(
     dialog(page).getByRole("button", { name: SAVE_DELIVERY }),
@@ -256,7 +268,8 @@ test("4. entregar con nota: doble clic da un solo PUT, queda en el historial y e
   expect(puts).toHaveLength(1);
 
   const row = history(page).locator("li").first();
-  await expect(row).toContainText(/Enviado .* · Entregado /);
+  await expect(row).toContainText(/Entregado /);
+  await expect(row).toContainText(/Enviado /);
   await expect(row).toContainText(note);
   await expect(row).toContainText(/Entrega registrada por \S+/);
   await shootAt(page, "historial-entregado", dialog);
@@ -303,6 +316,9 @@ test("5. historial con varios envíos: 3 visibles, Ver todos y nota larga con Ve
     .getByRole("button", { name: `Ver todos (${total})` })
     .click();
   await expect(history(page).locator("li")).toHaveCount(total);
+  await expect(
+    history(page).getByRole("button", { name: SHOW_LAST_THREE }),
+  ).toBeVisible();
   await shootAt(page, "historial-completo", dialog);
 });
 
@@ -316,4 +332,57 @@ test("6. la bitácora registra la entrega", async ({ page }) => {
   await expect(
     page.getByText(/Registró la entrega de audífonos del laboratorio/).first(),
   ).toBeVisible();
+});
+
+test("7. pestaña vieja: corregir la fecha de un envío ya entregado avisa y cierra el formulario", async ({
+  page,
+}) => {
+  expectedStatuses = [HTTP_CONFLICT];
+  await setFlag({ hearingAidsInLab: true, hearingAidsInLabDate: clinicDay() });
+  await openFlags(page);
+  await expect(history(page).getByText(/^En laboratorio desde /)).toBeVisible();
+
+  // Otra pestaña entrega los audífonos mientras esta sigue mostrando el envío abierto.
+  await setFlag({ hearingAidsInLab: false, deliveredAt: clinicDay() });
+
+  await dialog(page).getByRole("button", { name: "Cambiar fecha" }).click();
+  await page.locator("#lab-shipment-date").fill(clinicDay(-1));
+  const put = page.waitForResponse(isFlagsPut);
+  await dialog(page).getByRole("button", { name: SAVE_SHIPMENT }).click();
+  const response = await put;
+  expect(response.status()).toBe(HTTP_CONFLICT);
+  expect(response.request().postDataJSON()).toHaveProperty("shipmentUuid");
+
+  await expect(page.getByText(ALREADY_DELIVERED_TOAST)).toBeVisible();
+  await expect(page.locator("#lab-shipment-date")).toBeHidden();
+  await expect(labSwitch(page)).not.toBeChecked();
+  await expect(history(page).getByText(/^En laboratorio desde /)).toBeHidden();
+  await shootAt(page, "envio-ya-entregado", dialog);
+});
+
+test("8. Escape y el clic en el fondo no cierran con una nota escrita; la X sí", async ({
+  page,
+}) => {
+  await setFlag({ hearingAidsInLab: true, hearingAidsInLabDate: clinicDay() });
+  await openFlags(page);
+  await labSwitch(page).click();
+  await page.locator("#lab-delivery-note").fill(text("Nota sin guardar"));
+
+  await page.keyboard.press("Escape");
+  await expect(dialog(page)).toBeVisible();
+  await dialog(page).click({ position: { x: 2, y: 2 } });
+  await expect(dialog(page)).toBeVisible();
+  await shootAt(page, "nota-escrita", dialog);
+
+  await page.locator("#lab-delivery-note").fill("");
+  await expect(async () => {
+    await page.keyboard.press("Escape");
+    await expect(dialog(page)).toBeHidden({ timeout: 500 });
+  }).toPass();
+
+  await openFlags(page);
+  await labSwitch(page).click();
+  await page.locator("#lab-delivery-note").fill(text("Nota que se descarta"));
+  await dialog(page).getByRole("button", { name: "Cerrar" }).click();
+  await expect(dialog(page)).toBeHidden();
 });

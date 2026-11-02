@@ -13,6 +13,8 @@ interface LabDateFieldProps {
   /** Último día que se puede elegir (hoy). */
   max: string;
   disabled?: boolean;
+  /** Error del campo: se muestra debajo y marca el campo como inválido. */
+  errorMessage?: string | null;
   onChange: (date: string) => void;
 }
 
@@ -24,6 +26,7 @@ export const LabDateField: React.FC<LabDateFieldProps> = ({
   min,
   max,
   disabled,
+  errorMessage,
   onChange,
 }) => (
   <div className="flex flex-col gap-1.5">
@@ -39,6 +42,8 @@ export const LabDateField: React.FC<LabDateFieldProps> = ({
       max={max}
       value={value}
       disabled={disabled}
+      aria-invalid={Boolean(errorMessage)}
+      aria-describedby={errorMessage ? `${id}-error` : undefined}
       onChange={(event) => onChange(event.target.value)}
       // Safari de iOS dibuja el input de fecha con su propio estilo; sin apariencia nativa
       // queda alineado con el resto de campos.
@@ -48,5 +53,12 @@ export const LabDateField: React.FC<LabDateFieldProps> = ({
         '[&::-webkit-date-and-time-value]:text-left',
       )}
     />
+    <div aria-live="polite">
+      {errorMessage && (
+        <Typography id={`${id}-error`} variant={TypographyVariant.ERROR}>
+          {errorMessage}
+        </Typography>
+      )}
+    </div>
   </div>
 );

@@ -657,6 +657,7 @@
       "title": "Indicadores del paciente",
       "description": "Se guarda al tocar cada opción.",
       "done": "Listo",
+      "close": "Cerrar",
       "sections": {
         "lab": "Laboratorio",
         "warranty": "Garantía",
@@ -735,11 +736,13 @@
         "changeDate": "Cambiar fecha",
         "dateUpdated": "Fecha de envío actualizada",
         "sinceValue": "En laboratorio desde el {{date}}",
+        "save": "Guardar envío",
         "delivery": {
           "title": "Entrega de audífonos",
           "dateLabel": "Fecha de entrega",
           "noteLabel": "Nota (opcional)",
           "noteHelp": "Si escribes una nota, también queda en Control de evolución.",
+          "hint": "Al guardar, los audífonos salen del laboratorio.",
           "save": "Guardar entrega",
           "toast": "Entrega registrada"
         },
@@ -748,11 +751,12 @@
           "loading": "Cargando el historial de envíos…",
           "empty": "Todavía no hay envíos registrados.",
           "error": "No se pudo cargar el historial de envíos.",
-          "sentAndDelivered": "Enviado {{sent}} · Entregado {{delivered}}",
+          "sent": "Enviado {{date}}",
+          "delivered": "Entregado {{date}}",
           "inLab": "En laboratorio desde {{date}}",
           "deliveredBy": "Entrega registrada por {{name}}",
           "showAll": "Ver todos ({{count}})",
-          "showLess": "Ver menos",
+          "showLess": "Mostrar solo los últimos {{count}}",
           "noteMore": "Ver más",
           "noteLess": "Ver menos"
         }

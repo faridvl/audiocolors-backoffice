@@ -520,6 +520,7 @@ export const TEXT = {
       TITLE: 'patients.flags.title',
       DESCRIPTION: 'patients.flags.description',
       DONE: 'patients.flags.done',
+      CLOSE: 'patients.flags.close',
       /** `${SECTION_PREFIX}.${PatientFlagSection}` */
       SECTION_PREFIX: 'patients.flags.sections',
       /** Prefijos: `${LABEL_PREFIX}.${PatientFlag}`. */
@@ -535,11 +536,13 @@ export const TEXT = {
         CHANGE_DATE: 'patients.flags.labShipment.changeDate',
         DATE_UPDATED: 'patients.flags.labShipment.dateUpdated',
         SINCE_VALUE: 'patients.flags.labShipment.sinceValue',
+        SAVE: 'patients.flags.labShipment.save',
         DELIVERY: {
           TITLE: 'patients.flags.labShipment.delivery.title',
           DATE_LABEL: 'patients.flags.labShipment.delivery.dateLabel',
           NOTE_LABEL: 'patients.flags.labShipment.delivery.noteLabel',
           NOTE_HELP: 'patients.flags.labShipment.delivery.noteHelp',
+          HINT: 'patients.flags.labShipment.delivery.hint',
           SAVE: 'patients.flags.labShipment.delivery.save',
           TOAST: 'patients.flags.labShipment.delivery.toast',
         },
@@ -548,7 +551,8 @@ export const TEXT = {
           LOADING: 'patients.flags.labShipment.history.loading',
           EMPTY: 'patients.flags.labShipment.history.empty',
           ERROR: 'patients.flags.labShipment.history.error',
-          SENT_AND_DELIVERED: 'patients.flags.labShipment.history.sentAndDelivered',
+          SENT: 'patients.flags.labShipment.history.sent',
+          DELIVERED: 'patients.flags.labShipment.history.delivered',
           IN_LAB: 'patients.flags.labShipment.history.inLab',
           DELIVERED_BY: 'patients.flags.labShipment.history.deliveredBy',
           SHOW_ALL: 'patients.flags.labShipment.history.showAll',
