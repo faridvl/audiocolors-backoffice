@@ -665,25 +665,20 @@
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
-        "rowTitleShort": "Mant. {{number}}",
-        "options": {
-          "ATTENDED": "Asistido",
-          "MISSED": "Perdido"
-        },
         "toasts": {
           "UNMARKED": "Mantenimiento {{number}} sin marcar",
-          "ATTENDED": "Mantenimiento {{number}} marcado como asistido",
-          "MISSED": "Mantenimiento {{number}} marcado como perdido"
+          "ATTENDED": "Mantenimiento {{number}} marcado como asistido"
         },
         "pillLabels": {
           "ATTENDED": "Mantenimiento {{number}}: asistido",
           "MISSED": "Mantenimiento {{number}}: perdido"
         },
         "pill": "Mant. {{number}}",
-        "notesToggleEmpty": "Agregar nota al mantenimiento {{number}}",
-        "notesToggleUnknown": "Notas del mantenimiento {{number}}",
-        "notesToggleCount_one": "Notas del mantenimiento {{number}}, {{count}} nota",
-        "notesToggleCount_other": "Notas del mantenimiento {{number}}, {{count}} notas",
+        "notesToggleLabel": "{{action}} · {{title}}",
+        "notesToggleEmpty": "Agregar nota",
+        "notesToggleUnknown": "Notas",
+        "notesToggleCount_one": "{{count}} nota",
+        "notesToggleCount_other": "{{count}} notas",
         "notePlaceholder": "Escribe una nota",
         "save": "Guardar",
         "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",

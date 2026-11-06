@@ -563,14 +563,12 @@ export const TEXT = {
       },
       MAINTENANCE: {
         ROW_TITLE: 'patients.flags.maintenance.rowTitle',
-        /** Título abreviado, solo en pantallas angostas. */
-        ROW_TITLE_SHORT: 'patients.flags.maintenance.rowTitleShort',
         /** Prefijos: `${PREFIX}.${MaintenanceStatus}`. */
-        OPTION_PREFIX: 'patients.flags.maintenance.options',
         TOAST_PREFIX: 'patients.flags.maintenance.toasts',
         PILL_LABEL_PREFIX: 'patients.flags.maintenance.pillLabels',
         PILL: 'patients.flags.maintenance.pill',
         NOTES_TOGGLE_EMPTY: 'patients.flags.maintenance.notesToggleEmpty',
+        NOTES_TOGGLE_LABEL: 'patients.flags.maintenance.notesToggleLabel',
         NOTES_TOGGLE_UNKNOWN: 'patients.flags.maintenance.notesToggleUnknown',
         /** Plural: `_one` / `_other`. */
         NOTES_TOGGLE_COUNT: 'patients.flags.maintenance.notesToggleCount',

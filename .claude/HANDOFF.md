@@ -39,7 +39,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   paciente", pestaña Mantenimiento: una fila por Mantenimiento 1 a 4 con tres estados
   (sin marcar, asistido, perdido) y un historial de notas con autor y fecha que no se
   edita ni se borra (D40). Se marcan a mano, no se calculan. Ya no hay contador de
-  intentos: lo de "se llamó" va en una nota. Rediseño compacto (rama `feature/mantenimiento-compacto`): una línea por mantenimiento con dos chips (Asistido, Perdido; tocar el elegido lo desmarca), botón de notas con ícono y panel plano; Enter guarda la nota.
+  intentos: lo de "se llamó" va en una nota. Desde D46 la pantalla ya no muestra "Perdido": cada mantenimiento es una casilla (marcada = asistido) con un texto "Agregar nota" / "N notas" que abre las notas debajo (rama `feature/mantenimiento-compacto`); el API y las píldoras no cambian; Enter guarda la nota.
 - Sedes (2026-10-28): un paciente tiene una o más sedes; en los filtros de la
   lista y la agenda aparece en todas, y cada cita se agenda en una de sus sedes.
   Los pacientes actuales conservan la sede que tienen.

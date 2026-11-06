@@ -16,7 +16,7 @@ export const MaintenanceNoteHistory: React.FC<{ notes: MaintenanceNote[] }> = ({
 
   return (
     <div className="flex min-w-0 flex-col">
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-2 pb-1 pt-1">
         {visibleNotes.map((note) => (
           <li key={note.uuid} className="flex min-w-0 flex-col gap-0.5">
             <Typography

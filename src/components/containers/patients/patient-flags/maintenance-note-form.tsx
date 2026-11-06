@@ -1,8 +1,6 @@
 import React from 'react';
-import { SendHorizontal } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
-import { inputBaseClasses } from '@/components/common/input/input';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 import { MAINTENANCE_NOTE_MAX_LENGTH, MaintenanceNumber } from '@/types/patients/patient';
@@ -12,7 +10,7 @@ import { useMaintenanceNoteForm } from './use-maintenance-note-form';
 /** Desde cuántos caracteres aparece el contador. */
 const NOTE_COUNTER_THRESHOLD = 400;
 
-/** Una línea para escribir con Guardar al lado; cada nota guardada queda en el historial. */
+/** Una línea para escribir, sin marco, con Guardar al lado; cada nota guardada queda en el historial. */
 export const MaintenanceNoteForm: React.FC<{
   patientUuid: string;
   maintenanceNumber: MaintenanceNumber;
@@ -25,7 +23,7 @@ export const MaintenanceNoteForm: React.FC<{
 
   return (
     <div className="flex min-w-0 flex-col">
-      <div className="flex items-end gap-1">
+      <div className="flex items-center gap-1 border-t border-ink-100">
         <textarea
           id={`maintenance-note-${maintenanceNumber}`}
           ref={fieldRef}
@@ -39,9 +37,8 @@ export const MaintenanceNoteForm: React.FC<{
           readOnly={isSaving}
           aria-invalid={hasError}
           className={tailwind(
-            inputBaseClasses,
-            'min-w-0 flex-1 resize-none',
-            hasError && 'border-danger focus:border-danger focus:ring-danger/20',
+            'min-w-0 flex-1 resize-none border-0 bg-transparent px-0 py-2.5 text-base text-ink-800 placeholder:text-ink-400 focus:outline-none focus:ring-0',
+            hasError && 'text-danger-700',
           )}
         />
         <Button
@@ -49,10 +46,9 @@ export const MaintenanceNoteForm: React.FC<{
           onClick={handleSave}
           isLoading={isSaving}
           disabled={!canSave}
-          aria-label={t(TEXT.PATIENTS.FLAGS.MAINTENANCE.SAVE)}
-          className="min-w-[44px] shrink-0 px-2 text-brand-700"
+          className="shrink-0 px-2 text-brand-700"
         >
-          <SendHorizontal className="h-5 w-5" aria-hidden="true" />
+          {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.SAVE)}
         </Button>
       </div>
       <div aria-live="polite">

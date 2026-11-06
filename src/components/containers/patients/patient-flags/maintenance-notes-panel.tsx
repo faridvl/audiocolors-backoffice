@@ -19,7 +19,7 @@ interface MaintenanceNotesPanelProps {
   onRetry: () => void;
 }
 
-/** Panel que se abre bajo la fila: historial de notas y el campo para agregar una. */
+/** Bajo la fila, con sangría a la altura del título: notas como texto y una línea para agregar otra. */
 export const MaintenanceNotesPanel: React.FC<MaintenanceNotesPanelProps> = ({
   id,
   patientUuid,
@@ -33,7 +33,7 @@ export const MaintenanceNotesPanel: React.FC<MaintenanceNotesPanelProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div id={id} className="flex min-w-0 flex-col gap-1 pb-1 pl-3 sm:pl-4">
+    <div id={id} className="flex min-w-0 flex-col pl-8">
       {isLoading ? (
         <Typography variant={TypographyVariant.HELPER}>
           {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_LOADING)}
