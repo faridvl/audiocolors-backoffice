@@ -1,16 +1,17 @@
 import { MaintenanceStatus } from '@/types/patients/patient';
 
-/** Opción elegida en el selector de cada mantenimiento. */
-export const MAINTENANCE_SELECTED_STYLES: Record<MaintenanceStatus, string> = {
-  [MaintenanceStatus.UNMARKED]:
-    'bg-ink-100 font-bold text-ink-900 shadow-sm ring-1 ring-inset ring-ink-300',
-  [MaintenanceStatus.ATTENDED]: 'bg-brand text-white shadow-sm',
-  [MaintenanceStatus.MISSED]: 'bg-danger-700 text-white shadow-sm',
+/** Estados que se eligen con un chip; "sin marcar" es no tener ninguno elegido. */
+export type MaintenanceChipStatus = MaintenanceStatus.ATTENDED | MaintenanceStatus.MISSED;
+
+/** Chip elegido de cada mantenimiento. */
+export const MAINTENANCE_CHIP_SELECTED_STYLES: Record<MaintenanceChipStatus, string> = {
+  [MaintenanceStatus.ATTENDED]: 'border-brand bg-brand text-white',
+  [MaintenanceStatus.MISSED]: 'border-danger-700 bg-danger-700 text-white',
 };
 
-/** Opción sin elegir: el hover solo existe en dispositivos que lo soportan (en celular se queda pegado). */
-export const MAINTENANCE_UNSELECTED_STYLES =
-  'text-ink-500 [@media(hover:hover)]:hover:text-ink-800';
+/** Chip sin elegir: el hover solo existe en dispositivos que lo soportan (en celular se queda pegado). */
+export const MAINTENANCE_CHIP_UNSELECTED_STYLES =
+  'border-ink-300 bg-white text-ink-600 [@media(hover:hover)]:group-hover:bg-ink-50';
 
 /** Botón de notas de la fila: sin hover pegajoso en celular. */
 export const MAINTENANCE_NOTES_BUTTON_STYLES =

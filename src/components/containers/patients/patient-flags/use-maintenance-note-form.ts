@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
 import { useCreateMaintenanceNoteMutation } from "@/shared/api/mutations/patients/create-maintenance-note-mutation";
 import {
   MAINTENANCE_NOTE_MAX_LENGTH,
@@ -55,6 +55,13 @@ export function useMaintenanceNoteForm(
     );
   };
 
+  // Enter guarda y Shift+Enter hace salto de línea; no se corta una composición (IME).
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) return;
+    event.preventDefault();
+    handleSave();
+  };
+
   return {
     draft,
     fieldRef,
@@ -62,6 +69,7 @@ export function useMaintenanceNoteForm(
     isSaving: isPending,
     canSave: text.length > 0,
     handleChange,
+    handleKeyDown,
     handleSave,
   };
 }

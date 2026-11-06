@@ -1,25 +1,17 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { SegmentedOption } from '@/components/common/segmented-control/segmented-control';
-import { TEXT } from '@/static/texts/i18n';
 import { MaintenanceStatus, Patient } from '@/types/patients/patient';
-import {
-  MAINTENANCE_SELECTED_STYLES,
-  MAINTENANCE_UNSELECTED_STYLES,
-} from './patient-maintenance-styles';
+import { MaintenanceChipStatus } from './patient-maintenance-styles';
 import { PatientMaintenanceRow } from './patient-maintenance-row';
 import { useMaintenanceOpenRow } from './use-maintenance-open-row';
 import { usePatientMaintenance } from './use-patient-maintenance';
 
-const MAINTENANCE_STATUSES = [
-  MaintenanceStatus.UNMARKED,
+const MAINTENANCE_CHIP_STATUSES: MaintenanceChipStatus[] = [
   MaintenanceStatus.ATTENDED,
   MaintenanceStatus.MISSED,
 ];
 
 /** Una línea por mantenimiento (1 a 4): el estado se guarda al tocar y las notas se abren debajo. */
 export const PatientMaintenanceList: React.FC<{ patient: Patient }> = ({ patient }) => {
-  const { t } = useTranslation();
   const {
     rows,
     handleStatusChange,
@@ -31,13 +23,6 @@ export const PatientMaintenanceList: React.FC<{ patient: Patient }> = ({ patient
   } = usePatientMaintenance(patient);
   const { openNumber, registerRow, handleToggle } = useMaintenanceOpenRow();
 
-  const options: SegmentedOption<MaintenanceStatus>[] = MAINTENANCE_STATUSES.map((status) => ({
-    value: status,
-    label: t(`${TEXT.PATIENTS.FLAGS.MAINTENANCE.OPTION_PREFIX}.${status}`),
-    selectedClassName: MAINTENANCE_SELECTED_STYLES[status],
-    unselectedClassName: MAINTENANCE_UNSELECTED_STYLES,
-  }));
-
   return (
     <div className="flex flex-col divide-y divide-ink-100">
       {rows.map((row) => (
@@ -45,7 +30,7 @@ export const PatientMaintenanceList: React.FC<{ patient: Patient }> = ({ patient
           key={row.maintenanceNumber}
           row={row}
           patientUuid={patient.uuid}
-          options={options}
+          chipStatuses={MAINTENANCE_CHIP_STATUSES}
           isSaving={isSaving}
           isLoadingNotes={isLoadingNotes}
           isFetchingNotes={isFetchingNotes}

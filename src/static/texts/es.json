@@ -665,9 +665,8 @@
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
-        "hint": "Las notas no se pueden editar.",
+        "rowTitleShort": "Mant. {{number}}",
         "options": {
-          "UNMARKED": "Sin marcar",
           "ATTENDED": "Asistido",
           "MISSED": "Perdido"
         },
@@ -681,10 +680,10 @@
           "MISSED": "Mantenimiento {{number}}: perdido"
         },
         "pill": "Mant. {{number}}",
-        "notesButtonEmpty": "Agregar nota",
-        "notesButtonUnknown": "Notas",
-        "notesButtonCount_one": "{{count}} nota",
-        "notesButtonCount_other": "{{count}} notas",
+        "notesToggleEmpty": "Agregar nota al mantenimiento {{number}}",
+        "notesToggleUnknown": "Notas del mantenimiento {{number}}",
+        "notesToggleCount_one": "Notas del mantenimiento {{number}}, {{count}} nota",
+        "notesToggleCount_other": "Notas del mantenimiento {{number}}, {{count}} notas",
         "notePlaceholder": "Escribe una nota",
         "save": "Guardar",
         "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",

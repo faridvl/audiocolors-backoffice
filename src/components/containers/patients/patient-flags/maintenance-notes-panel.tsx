@@ -33,15 +33,7 @@ export const MaintenanceNotesPanel: React.FC<MaintenanceNotesPanelProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div
-      id={id}
-      className="mb-2 flex min-w-0 flex-col gap-2 rounded-r-lg border-l-2 border-brand bg-ink-50 py-3 pl-3 pr-3"
-    >
-      {notes.length > 0 && (
-        <Typography variant={TypographyVariant.HELPER}>
-          {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.HINT)}
-        </Typography>
-      )}
+    <div id={id} className="flex min-w-0 flex-col gap-1 pb-1 pl-3 sm:pl-4">
       {isLoading ? (
         <Typography variant={TypographyVariant.HELPER}>
           {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_LOADING)}

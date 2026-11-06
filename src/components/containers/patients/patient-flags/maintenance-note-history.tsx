@@ -15,13 +15,10 @@ export const MaintenanceNoteHistory: React.FC<{ notes: MaintenanceNote[] }> = ({
   if (notes.length === 0) return null;
 
   return (
-    <div className="flex min-w-0 flex-col gap-2">
+    <div className="flex min-w-0 flex-col">
       <ul className="flex flex-col gap-2">
         {visibleNotes.map((note) => (
-          <li
-            key={note.uuid}
-            className="flex min-w-0 flex-col gap-0.5 rounded-lg bg-white px-3 py-2"
-          >
+          <li key={note.uuid} className="flex min-w-0 flex-col gap-0.5">
             <Typography
               variant={TypographyVariant.BODY}
               className="whitespace-pre-wrap break-words"
@@ -44,7 +41,7 @@ export const MaintenanceNoteHistory: React.FC<{ notes: MaintenanceNote[] }> = ({
           variant={ButtonVariant.GHOST}
           onClick={handleToggle}
           aria-expanded={isExpanded}
-          className="min-h-[44px] w-fit px-2 text-brand-700 hover:underline"
+          className="-ml-2 w-fit px-2 text-brand-700 hover:underline"
         >
           {isExpanded
             ? t(TEXT.PATIENTS.FLAGS.MAINTENANCE.SHOW_LESS)

@@ -1,24 +1,23 @@
 import React from 'react';
-import { ChevronDown, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
-import {
-  SegmentedControl,
-  SegmentedControlSize,
-  SegmentedOption,
-} from '@/components/common/segmented-control/segmented-control';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 import { MaintenanceStatus } from '@/types/patients/patient';
 import { tailwind } from '@/utils/tailwind-utils';
 import { MaintenanceNotesPanel } from './maintenance-notes-panel';
-import { MAINTENANCE_NOTES_BUTTON_STYLES } from './patient-maintenance-styles';
+import { MaintenanceStatusChip } from './maintenance-status-chip';
+import {
+  MAINTENANCE_NOTES_BUTTON_STYLES,
+  MaintenanceChipStatus,
+} from './patient-maintenance-styles';
 import { MaintenanceRow } from './use-patient-maintenance';
 
 interface PatientMaintenanceRowProps {
   row: MaintenanceRow;
   patientUuid: string;
-  options: SegmentedOption<MaintenanceStatus>[];
+  chipStatuses: MaintenanceChipStatus[];
   isSaving: boolean;
   isLoadingNotes: boolean;
   isFetchingNotes: boolean;
@@ -30,11 +29,11 @@ interface PatientMaintenanceRowProps {
   onRetryNotes: () => void;
 }
 
-/** Una línea por mantenimiento: título, estado y botón de notas; el panel de notas se abre debajo. */
+/** Una línea por mantenimiento: título, chips de estado e ícono de notas; el panel se abre debajo. */
 export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   row,
   patientUuid,
-  options,
+  chipStatuses,
   isSaving,
   isLoadingNotes,
   isFetchingNotes,
@@ -46,68 +45,64 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   onRetryNotes,
 }) => {
   const { t } = useTranslation();
-  const title = t(TEXT.PATIENTS.FLAGS.MAINTENANCE.ROW_TITLE, {
-    number: row.maintenanceNumber,
-  });
+  const values = { number: row.maintenanceNumber };
+  const title = t(TEXT.PATIENTS.FLAGS.MAINTENANCE.ROW_TITLE, values);
   const panelId = `maintenance-notes-${row.maintenanceNumber}`;
   const noteCount = row.notes.length;
 
-  const renderNotesLabel = () => {
-    if (isLoadingNotes) {
-      return (
-        <>
-          <span aria-hidden="true" className="h-3 w-16 animate-pulse rounded bg-ink-200" />
-          <span className="sr-only">{t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_LOADING)}</span>
-        </>
-      );
-    }
-    if (hasNotesError) {
-      return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_BUTTON_UNKNOWN);
-    }
+  const notesLabel = () => {
+    if (hasNotesError) return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_UNKNOWN, values);
     if (noteCount > 0) {
-      return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_BUTTON_COUNT, {
-        count: noteCount,
-      });
+      return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_COUNT, { ...values, count: noteCount });
     }
-    return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_BUTTON_EMPTY);
+    return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_EMPTY, values);
   };
 
   return (
     <div ref={rowRef} className="min-w-0">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 py-2 sm:grid-cols-[minmax(0,1fr)_13.5rem_9.5rem]">
-        <Typography variant={TypographyVariant.BODY} className="min-w-0 font-semibold text-ink-800">
-          {title}
-        </Typography>
-        <SegmentedControl
-          options={options}
-          value={row.status}
-          onChange={onStatusChange}
-          ariaLabel={title}
-          size={SegmentedControlSize.COMPACT}
-          isDisabled={isSaving}
-          isFullWidth
-          className="col-span-2 row-start-2 sm:col-span-1 sm:col-start-2 sm:row-start-1 [&>button]:min-h-[44px] sm:[&>button]:min-h-[36px] sm:[&>button]:flex-auto sm:[&>button]:px-1.5"
-        />
-        <Button
-          variant={ButtonVariant.GHOST}
-          onClick={onToggleNotes}
-          disabled={isLoadingNotes}
-          aria-expanded={isOpen}
-          aria-controls={panelId}
-          icon={<MessageSquare className="h-4 w-4" aria-hidden="true" />}
-          className={tailwind(
-            'col-start-2 row-start-1 min-h-[44px] min-w-[9.5rem] sm:col-start-3 justify-start px-2.5 py-1.5 text-brand-700 sm:min-h-[36px]',
-            MAINTENANCE_NOTES_BUTTON_STYLES,
-          )}
+      <div className="flex items-center justify-between gap-2 py-0.5">
+        <Typography
+          variant={TypographyVariant.BODY}
+          className="min-w-0 truncate font-semibold text-ink-800"
         >
-          <span className="flex min-w-0 flex-1 items-center gap-2 text-left">
-            {renderNotesLabel()}
+          <span className="sm:hidden">
+            {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.ROW_TITLE_SHORT, values)}
           </span>
-          <ChevronDown
-            aria-hidden="true"
-            className={tailwind('h-4 w-4 shrink-0 transition-transform', isOpen && 'rotate-180')}
-          />
-        </Button>
+          <span className="hidden sm:inline">{title}</span>
+        </Typography>
+        <div role="group" aria-label={title} className="flex shrink-0 items-center gap-1.5">
+          {chipStatuses.map((status) => (
+            <MaintenanceStatusChip
+              key={status}
+              status={status}
+              label={t(`${TEXT.PATIENTS.FLAGS.MAINTENANCE.OPTION_PREFIX}.${status}`)}
+              isSelected={row.status === status}
+              isDisabled={isSaving}
+              onToggle={() =>
+                onStatusChange(row.status === status ? MaintenanceStatus.UNMARKED : status)
+              }
+            />
+          ))}
+          <Button
+            variant={ButtonVariant.GHOST}
+            onClick={onToggleNotes}
+            disabled={isLoadingNotes}
+            aria-expanded={isOpen}
+            aria-controls={panelId}
+            aria-label={notesLabel()}
+            className={tailwind(
+              'min-w-[44px] gap-1 px-2 py-1.5 text-brand-700',
+              MAINTENANCE_NOTES_BUTTON_STYLES,
+            )}
+          >
+            <MessageSquare className="h-5 w-5" aria-hidden="true" />
+            {isLoadingNotes ? (
+              <span aria-hidden="true" className="h-3 w-3 animate-pulse rounded bg-ink-200" />
+            ) : (
+              noteCount > 0 && <span aria-hidden="true">{noteCount}</span>
+            )}
+          </Button>
+        </div>
       </div>
       {isOpen && (
         <MaintenanceNotesPanel
