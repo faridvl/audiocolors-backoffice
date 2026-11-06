@@ -655,7 +655,7 @@
     "flags": {
       "menu": "Indicadores",
       "title": "Indicadores del paciente",
-      "description": "Se guarda al tocar cada opción.",
+      "description": "Se guarda al tocar.",
       "done": "Listo",
       "close": "Cerrar",
       "sections": {
@@ -665,7 +665,7 @@
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
-        "hint": "Las notas quedan en el historial y no se pueden editar.",
+        "hint": "Las notas no se pueden editar.",
         "options": {
           "UNMARKED": "Sin marcar",
           "ATTENDED": "Asistido",
@@ -681,16 +681,19 @@
           "MISSED": "Mantenimiento {{number}}: perdido"
         },
         "pill": "Mant. {{number}}",
-        "notesButton": "Nota",
-        "notesButtonCount": "Notas · {{count}}",
-        "noteLabel": "Nota",
+        "notesButtonEmpty": "Agregar nota",
+        "notesButtonUnknown": "Notas",
+        "notesButtonCount_one": "{{count}} nota",
+        "notesButtonCount_other": "{{count}} notas",
+        "notePlaceholder": "Escribe una nota",
         "save": "Guardar",
         "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",
         "noteMeta": "{{date}} · {{author}}",
         "showAll": "Ver todas ({{count}})",
         "showLess": "Ver menos",
         "notesLoading": "Cargando notas…",
-        "notesError": "No se pudieron cargar las notas."
+        "notesError": "No se pudieron cargar las notas.",
+        "notesRetry": "Reintentar"
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",

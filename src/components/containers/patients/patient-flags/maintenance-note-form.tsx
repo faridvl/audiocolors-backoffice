@@ -1,18 +1,15 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/common/button/button";
-import { inputBaseClasses } from "@/components/common/input/input";
-import {
-  Typography,
-  TypographyVariant,
-} from "@/components/common/typography/typography";
-import { TEXT } from "@/static/texts/i18n";
-import {
-  MAINTENANCE_NOTE_MAX_LENGTH,
-  MaintenanceNumber,
-} from "@/types/patients/patient";
-import { tailwind } from "@/utils/tailwind-utils";
-import { useMaintenanceNoteForm } from "./use-maintenance-note-form";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/common/button/button';
+import { inputBaseClasses } from '@/components/common/input/input';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { TEXT } from '@/static/texts/i18n';
+import { MAINTENANCE_NOTE_MAX_LENGTH, MaintenanceNumber } from '@/types/patients/patient';
+import { tailwind } from '@/utils/tailwind-utils';
+import { useMaintenanceNoteForm } from './use-maintenance-note-form';
+
+/** Filas iniciales del campo; crece con el texto. */
+const NOTE_FIELD_ROWS = 2;
 
 /** Campo con contador y Guardar; cada nota guardada queda en el historial. */
 export const MaintenanceNoteForm: React.FC<{
@@ -20,37 +17,28 @@ export const MaintenanceNoteForm: React.FC<{
   maintenanceNumber: MaintenanceNumber;
 }> = ({ patientUuid, maintenanceNumber }) => {
   const { t } = useTranslation();
-  const {
-    draft,
-    fieldRef,
-    hasError,
-    isSaving,
-    canSave,
-    handleChange,
-    handleSave,
-  } = useMaintenanceNoteForm(patientUuid, maintenanceNumber);
+  const { draft, fieldRef, hasError, isSaving, canSave, handleChange, handleSave } =
+    useMaintenanceNoteForm(patientUuid, maintenanceNumber);
   const fieldId = `maintenance-note-${maintenanceNumber}`;
+  const placeholder = t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTE_PLACEHOLDER);
 
   return (
     <div className="flex min-w-0 flex-col gap-1">
-      <label htmlFor={fieldId}>
-        <Typography variant={TypographyVariant.HELPER} as="span">
-          {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTE_LABEL)}
-        </Typography>
-      </label>
       <textarea
         id={fieldId}
         ref={fieldRef}
         value={draft}
         onChange={(event) => handleChange(event.target.value)}
         maxLength={MAINTENANCE_NOTE_MAX_LENGTH}
-        rows={3}
+        rows={NOTE_FIELD_ROWS}
+        placeholder={placeholder}
+        aria-label={placeholder}
         disabled={isSaving}
         aria-invalid={hasError}
         className={tailwind(
           inputBaseClasses,
-          "resize-none",
-          hasError && "border-danger focus:border-danger focus:ring-danger/20",
+          'resize-none',
+          hasError && 'border-danger focus:border-danger focus:ring-danger/20',
         )}
       />
       <div className="flex items-start justify-between gap-2">

@@ -21,7 +21,13 @@ export interface MaintenanceRow {
  */
 export function usePatientMaintenance(patient: Patient) {
   const { executeUpdatePatientMaintenance, isPending } = useUpdatePatientMaintenanceMutation();
-  const { data: maintenances, isLoading, isError } = usePatientMaintenancesQuery(patient.uuid);
+  const {
+    data: maintenances,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = usePatientMaintenancesQuery(patient.uuid);
 
   const rows: MaintenanceRow[] = MAINTENANCE_NUMBERS.map((maintenanceNumber) => ({
     maintenanceNumber,
@@ -31,14 +37,22 @@ export function usePatientMaintenance(patient: Patient) {
 
   const handleStatusChange = (maintenanceNumber: MaintenanceNumber, status: MaintenanceStatus) => {
     if (isPending || status === getMaintenanceStatus(patient, maintenanceNumber)) return;
-    executeUpdatePatientMaintenance({ patientUuid: patient.uuid, maintenanceNumber, status });
+    executeUpdatePatientMaintenance({
+      patientUuid: patient.uuid,
+      maintenanceNumber,
+      status,
+    });
   };
 
   return {
     rows,
     handleStatusChange,
+    handleRetryNotes: () => {
+      void refetch();
+    },
     isSaving: isPending,
     isLoadingNotes: isLoading,
+    isFetchingNotes: isFetching,
     hasNotesError: isError,
   };
 }

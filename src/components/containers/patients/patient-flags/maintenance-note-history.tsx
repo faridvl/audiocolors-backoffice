@@ -20,7 +20,7 @@ export const MaintenanceNoteHistory: React.FC<{ notes: MaintenanceNote[] }> = ({
         {visibleNotes.map((note) => (
           <li
             key={note.uuid}
-            className="flex min-w-0 flex-col gap-0.5 rounded-lg bg-ink-50 px-3 py-2"
+            className="flex min-w-0 flex-col gap-0.5 rounded-lg bg-white px-3 py-2"
           >
             <Typography
               variant={TypographyVariant.BODY}
