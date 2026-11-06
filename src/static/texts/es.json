@@ -681,10 +681,10 @@
           "MISSED": "Mantenimiento {{number}}: perdido"
         },
         "pill": "Mant. {{number}}",
-        "addNote": "Agregar nota",
+        "notesButton": "Nota",
+        "notesButtonCount": "Notas · {{count}}",
         "noteLabel": "Nota",
         "save": "Guardar",
-        "cancel": "Cancelar",
         "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",
         "noteMeta": "{{date}} · {{author}}",
         "showAll": "Ver todas ({{count}})",

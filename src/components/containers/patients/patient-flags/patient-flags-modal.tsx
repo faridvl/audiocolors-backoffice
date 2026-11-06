@@ -1,19 +1,22 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Ear, X } from 'lucide-react';
-import { Button, ButtonVariant } from '@/components/common/button/button';
-import { Switch } from '@/components/common/switch/switch';
-import { Tabs } from '@/components/common/tabs/tabs';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { useEscapeKey } from '@/hooks/use-escape-key';
-import { TEXT } from '@/static/texts/i18n';
-import { Patient, PatientFlag } from '@/types/patients/patient';
-import { LabDeliveryForm } from './lab-delivery-form';
-import { LabShipmentDate } from './lab-shipment-date';
-import { LabShipmentHistory } from './lab-shipment-history';
-import { PatientMaintenanceList } from './patient-maintenance-list';
-import { PatientFlagSection, usePatientFlags } from './use-patient-flags';
-import { WarrantyDocumentSelect } from './warranty-document-select';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Ear, X } from "lucide-react";
+import { Button, ButtonVariant } from "@/components/common/button/button";
+import { Switch } from "@/components/common/switch/switch";
+import { Tabs } from "@/components/common/tabs/tabs";
+import {
+  Typography,
+  TypographyVariant,
+} from "@/components/common/typography/typography";
+import { useEscapeKey } from "@/hooks/use-escape-key";
+import { TEXT } from "@/static/texts/i18n";
+import { Patient, PatientFlag } from "@/types/patients/patient";
+import { LabDeliveryForm } from "./lab-delivery-form";
+import { LabShipmentDate } from "./lab-shipment-date";
+import { LabShipmentHistory } from "./lab-shipment-history";
+import { PatientMaintenanceList } from "./patient-maintenance-list";
+import { PatientFlagSection, usePatientFlags } from "./use-patient-flags";
+import { WarrantyDocumentSelect } from "./warranty-document-select";
 
 interface PatientFlagsModalProps {
   patient: Patient;
@@ -90,14 +93,9 @@ export const PatientFlagsModal: React.FC<PatientFlagsModalProps> = ({
             className="mt-1"
           />
           {isMaintenanceSection ? (
-            <>
-              <Typography variant={TypographyVariant.BODY} className="mt-3 text-ink-500">
-                {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.HINT)}
-              </Typography>
-              <div className="mt-3">
-                <PatientMaintenanceList patient={patient} />
-              </div>
-            </>
+            <div className="mt-1">
+              <PatientMaintenanceList patient={patient} />
+            </div>
           ) : (
             <div className="mt-3 flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-200 px-3">
               {activeFlags.map((item) => {
