@@ -1,7 +1,11 @@
 import { MaintenanceStatus } from '@/types/patients/patient';
 
-/** Texto de notas de la fila: el hover solo existe en dispositivos que lo soportan (en celular se queda pegado). */
-export const MAINTENANCE_NOTES_BUTTON_STYLES = '[@media(hover:hover)]:hover:text-ink-800';
+/** Botón de notas de la fila: el hover solo existe en dispositivos que lo soportan (en celular se queda pegado). */
+export const MAINTENANCE_NOTES_BUTTON_STYLES =
+  '[@media(hover:hover)]:hover:bg-brand-50 [@media(hover:hover)]:hover:text-brand-700';
+
+/** Chevron del botón de notas: gira al abrir la fila. */
+export const MAINTENANCE_NOTES_CHEVRON_STYLES = 'transition-transform';
 
 /** Píldora del expediente; sin marcar no se pinta. */
 export const MAINTENANCE_PILL_STYLES: Record<MaintenanceStatus, string> = {

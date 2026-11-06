@@ -1,10 +1,14 @@
+import { ChevronDown, MessageSquare } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { TEXT } from '@/static/texts/i18n';
 import { MaintenanceStatus } from '@/types/patients/patient';
 import { tailwind } from '@/utils/tailwind-utils';
 import { MaintenanceNotesPanel } from './maintenance-notes-panel';
-import { MAINTENANCE_NOTES_BUTTON_STYLES } from './patient-maintenance-styles';
+import {
+  MAINTENANCE_NOTES_BUTTON_STYLES,
+  MAINTENANCE_NOTES_CHEVRON_STYLES,
+} from './patient-maintenance-styles';
 import { MaintenanceRow } from './use-patient-maintenance';
 
 interface PatientMaintenanceRowProps {
@@ -87,8 +91,9 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
             title,
           })}
           className={tailwind(
-            'min-h-[44px] shrink-0 whitespace-nowrap rounded-lg px-2 text-sm text-ink-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand',
+            'flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-sm font-medium text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand',
             MAINTENANCE_NOTES_BUTTON_STYLES,
+            isOpen && 'bg-brand-50',
           )}
         >
           {isLoadingNotes ? (
@@ -97,7 +102,18 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
               className="inline-block h-3 w-12 animate-pulse rounded bg-ink-100"
             />
           ) : (
-            <span aria-hidden="true">{notesText()}</span>
+            <>
+              <MessageSquare aria-hidden="true" className="h-4 w-4 shrink-0" />
+              <span aria-hidden="true">{notesText()}</span>
+              <ChevronDown
+                aria-hidden="true"
+                className={tailwind(
+                  'h-4 w-4 shrink-0',
+                  MAINTENANCE_NOTES_CHEVRON_STYLES,
+                  isOpen && 'rotate-180',
+                )}
+              />
+            </>
           )}
         </button>
       </div>
