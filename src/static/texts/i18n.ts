@@ -519,6 +519,7 @@ export const TEXT = {
       BRANCHES_LABEL: 'patients.form.branchesLabel',
       BRANCHES_PLACEHOLDER: 'patients.form.branchesPlaceholder',
       BRANCHES_REQUIRED: 'patients.form.branchesRequired',
+      BRANCHES_HINT: 'patients.form.branchesHint',
     },
     SUMMARY: {
       TENTATIVE: 'patients.summary.tentative',

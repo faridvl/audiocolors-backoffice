@@ -918,3 +918,7 @@ Con el filtro de laboratorio activo aparece un selector de un solo día (`LabDat
 ## D54 · Tipos de cita: el nombre repetido se detecta sin mayúsculas, tildes ni espacios (2026-11-07)
 
 Completa D49: al agregar o editar un tipo de cita, "control " (con espacio al final) y "Contról" cuentan como repetidos de "Control". La comparación (`toComparableName`) quita tildes, mayúsculas y espacios en los extremos; el nombre se guarda como lo escribió el usuario, ya sin espacios en los extremos.
+
+## D55 · Teléfonos +1 con máscara `(305) 555-1234` (2026-11-07)
+
+Completa D50: con un país de código +1 (Estados Unidos, Canadá…) el campo enmascara mientras se escribe como `(XXX) XXX-XXXX`, y al mostrarlo sale `+1 (305) 555-1234`. Se sigue guardando compacto (`+1 3055551234`), así que no cambia nada en la base ni en el API. Con más de 10 dígitos queda sin máscara para que la validación avise. Los demás países siguen con los dígitos sin máscara al escribir y en bloques al mostrarlos.

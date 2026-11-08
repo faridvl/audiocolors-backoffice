@@ -9,7 +9,7 @@ export const MAINTENANCE_NOTES_CHEVRON_STYLES = "transition-transform";
 
 /** Botón de estado de la fila: inactivo neutro; activo azul (vino) o rojo (lo perdió). */
 export const MAINTENANCE_CHOICE_BASE_STYLES =
-  "flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait";
+  "flex min-h-[44px] shrink-0 items-center whitespace-nowrap gap-1.5 rounded-lg border px-3 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-wait";
 
 export const MAINTENANCE_CHOICE_ICON_STYLES = "h-4 w-4 shrink-0";
 

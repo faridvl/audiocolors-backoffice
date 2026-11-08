@@ -61,6 +61,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## En qué estamos
 
+- **Arreglos del 2026-11-07 (rama `fix/mantenimiento-botones`):** botones "Vino"/"Lo perdió" ya no se
+  aplastan; teléfonos +1 con máscara `(305) 555-1234` (D55); nota "Puedes elegir varias sedes" en la ficha
+  y en el registro rápido. Probado en pantalla contra la base local.
 - **Lote del 2026-11-07 (rama `feature/preguntas-acordeon`, PR a `develop`):** Preguntas pasa a
   "Formularios"; otoscopia siempre en modo crear con historial en Control de evolución (D47);
   Mantenimiento con "Vino"/"Lo perdió" (D48); agregar tipos de cita (D49); selector de país en

@@ -93,6 +93,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             name="branchUuids"
             label={t(TEXT.PATIENTS.FORM.BRANCHES_LABEL)}
             placeholder={t(TEXT.PATIENTS.FORM.BRANCHES_PLACEHOLDER)}
+            hint={t(TEXT.PATIENTS.FORM.BRANCHES_HINT)}
             options={(branches ?? []).map((branch) => ({
               value: branch.uuid,
               label: branch.name,

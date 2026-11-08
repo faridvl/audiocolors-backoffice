@@ -106,7 +106,6 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
                 }
                 className={tailwind(
                   MAINTENANCE_CHOICE_BASE_STYLES,
-  MAINTENANCE_CHOICE_ICON_STYLES,
                   isActive
                     ? MAINTENANCE_CHOICE_ACTIVE_STYLES[status]
                     : MAINTENANCE_CHOICE_INACTIVE_STYLES,
