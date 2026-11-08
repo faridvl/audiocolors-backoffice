@@ -22,8 +22,8 @@ export const inputBaseClasses =
   "focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 " +
   "disabled:cursor-not-allowed disabled:bg-ink-50";
 
-/** Etiqueta en mayúscula pequeña (NOMBRE, MENSAJE) para los formularios que la piden. */
-export const FIELD_LABEL_CLASSES = "text-xs font-semibold uppercase tracking-wide text-ink-600";
+/** Etiqueta sobria (Nombre, Texto del documento) para los formularios que la piden. */
+export const FIELD_LABEL_CLASSES = "text-sm font-medium text-ink-700";
 
 interface FormFieldProps {
   name: string;

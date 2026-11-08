@@ -1,4 +1,4 @@
-import { fromDayKey } from '@/shared/utils/dates';
+import { CLINIC_TIME_ZONE, fromDayKey } from '@/shared/utils/dates';
 
 /** Lo que se muestra cuando un dato no existe (un nombre o una sede que no llegó). */
 export const EMPTY_VALUE = '';
@@ -13,6 +13,20 @@ export function formatDate(isoDate?: string): string {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+  });
+}
+
+/** Formatea una fecha ISO en formato largo: "8 de noviembre de 2026". Devuelve vacío si no es válida. */
+export function formatLongDate(isoDate?: string): string {
+  if (!isoDate) return '';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleDateString('es-CR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: CLINIC_TIME_ZONE,
   });
 }
 

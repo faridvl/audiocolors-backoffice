@@ -192,7 +192,6 @@
     "loadError": "No se pudieron cargar las plantillas",
     "empty": "Aún no tienes plantillas. Crea una para armar documentos con los datos del paciente, como un consentimiento informado.",
     "new": "Nueva plantilla",
-    "edit": "Editar",
     "editLabel": "Editar {{name}}",
     "updatedAt": "Actualizada el {{date}}",
     "back": "Volver",
@@ -201,7 +200,7 @@
     "saved": "Plantilla guardada",
     "name": "Nombre",
     "namePlaceholder": "Ej. Consentimiento informado",
-    "content": "Mensaje",
+    "content": "Texto del documento",
     "contentPlaceholder": "Escribe el texto. Usa las variables de la lista para poner los datos del paciente.",
     "viewExample": "Ver ejemplo",
     "toolbar": {
@@ -215,8 +214,8 @@
     },
     "variables": {
       "title": "Variables",
-      "titleWithTotal": "Variables ({{total}})",
-      "intro": "Haz clic para insertarla en el texto",
+      "insertButton": "Insertar variable",
+      "intro": "Toca una variable para insertarla en el texto",
       "insert": "Insertar {{variable}}",
       "inUse": "En uso",
       "groups": {
@@ -283,8 +282,8 @@
     "errors": {
       "nameRequired": "Escribe el nombre de la plantilla.",
       "nameMax": "El nombre admite hasta {{max}} caracteres.",
-      "contentRequired": "Escribe el mensaje de la plantilla.",
-      "contentMax": "El mensaje admite hasta {{max}} caracteres.",
+      "contentRequired": "Escribe el texto del documento.",
+      "contentMax": "El texto admite hasta {{max}} caracteres.",
       "unknownVariable_one": "La variable {{names}} no existe. Usa solo las de la lista.",
       "unknownVariable_other": "Las variables {{names}} no existen. Usa solo las de la lista.",
       "duplicateName": "Ya existe una plantilla con ese nombre.",

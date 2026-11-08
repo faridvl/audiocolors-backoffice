@@ -130,7 +130,6 @@ export const TEXT = {
     LOAD_ERROR: 'documentTemplates.loadError',
     EMPTY: 'documentTemplates.empty',
     NEW: 'documentTemplates.new',
-    EDIT: 'documentTemplates.edit',
     EDIT_LABEL: 'documentTemplates.editLabel',
     UPDATED_AT: 'documentTemplates.updatedAt',
     BACK: 'documentTemplates.back',
@@ -153,7 +152,7 @@ export const TEXT = {
     },
     VARIABLES: {
       TITLE: 'documentTemplates.variables.title',
-      TITLE_WITH_TOTAL: 'documentTemplates.variables.titleWithTotal',
+      INSERT_BUTTON: 'documentTemplates.variables.insertButton',
       INTRO: 'documentTemplates.variables.intro',
       INSERT: 'documentTemplates.variables.insert',
       IN_USE: 'documentTemplates.variables.inUse',

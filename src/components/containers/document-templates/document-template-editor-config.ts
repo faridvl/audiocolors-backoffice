@@ -36,14 +36,12 @@ const PROSE_CLASSES = [
   '[&_ul]:m-0 [&_ul]:list-disc [&_ul]:pl-6',
   '[&_ol]:m-0 [&_ol]:list-decimal [&_ol]:pl-6',
   '[&_s]:line-through',
-  '[&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left [&_p.is-editor-empty:first-child]:before:h-0 [&_p.is-editor-empty:first-child]:before:text-ink-400 [&_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]',
+  '[&_p.is-editor-empty:first-child]:before:pointer-events-none [&_p.is-editor-empty:first-child]:before:float-left [&_p.is-editor-empty:first-child]:before:h-0 [&_p.is-editor-empty:first-child]:before:text-ink-500 [&_p.is-editor-empty:first-child]:before:content-[attr(data-placeholder)]',
 ].join(' ');
 
 /** La hoja: blanca, con sombra suave, márgenes amplios y una altura cómoda para escribir. */
 const SHEET_CLASSES =
-  'mx-auto min-h-[320px] w-full max-w-3xl rounded-sm bg-white px-5 py-6 shadow-md outline-none focus-visible:ring-2 focus-visible:ring-brand sm:min-h-[480px] sm:px-12 sm:py-10';
-
-export const SHEET_ERROR_CLASSES = 'ring-2 ring-danger focus-visible:ring-danger';
+  'mx-auto min-h-[320px] w-full max-w-3xl rounded-lg bg-white px-5 py-6 shadow-sm outline-none sm:min-h-[480px] sm:px-12 sm:py-10';
 
 export const CONTENT_ID = 'content';
 export const CONTENT_LABEL_ID = 'content-label';
@@ -58,8 +56,8 @@ export function buildEditorAttributes(hasError: boolean): Record<string, string>
     'aria-required': 'true',
     'aria-invalid': hasError ? 'true' : 'false',
     ...(hasError ? { 'aria-describedby': CONTENT_ERROR_ID } : {}),
-    class: tailwind(SHEET_CLASSES, PROSE_CLASSES, hasError && SHEET_ERROR_CLASSES),
+    class: tailwind(SHEET_CLASSES, PROSE_CLASSES),
   };
 }
 
-export const SHEET_BACKDROP_CLASSES = 'bg-ink-100 p-3 sm:p-6';
+export const SHEET_BACKDROP_CLASSES = 'bg-ink-50 px-3 pb-6 pt-3 sm:px-6';

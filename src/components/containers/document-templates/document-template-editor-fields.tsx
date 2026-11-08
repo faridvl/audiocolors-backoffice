@@ -64,7 +64,11 @@ export const DocumentTemplateEditorFields: React.FC<DocumentTemplateEditorFields
       />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem] xl:items-start">
-        <DocumentTemplateContentField editor={editor} />
+        <DocumentTemplateContentField
+          editor={editor}
+          usedVariables={usedVariables}
+          onInsertVariable={handleInsertVariable}
+        />
         <DocumentTemplateVariablesPanel
           usedVariables={usedVariables}
           onInsert={handleInsertVariable}
@@ -73,7 +77,7 @@ export const DocumentTemplateEditorFields: React.FC<DocumentTemplateEditorFields
 
       {/* Pegada al borde de abajo y opaca: en una pantalla baja el botón principal siempre se alcanza. */}
       <div
-        className="sticky bottom-0 z-10 grid grid-cols-3 gap-2 border-t border-ink-200 bg-white pt-3 sm:flex sm:justify-end"
+        className="sticky -bottom-5 z-10 -mx-4 -mb-5 grid grid-cols-3 gap-2 bg-white px-4 pt-3 shadow-sticky-bar sm:flex sm:justify-end md:-bottom-6 md:-mx-6 md:-mb-6 md:px-6"
         style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
       >
         <Button variant={ButtonVariant.SECONDARY} onClick={onCancel} disabled={isSaving}>

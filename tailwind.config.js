@@ -78,6 +78,10 @@ module.exports = {
       borderRadius: {
         card: '0.75rem',
       },
+      boxShadow: {
+        /** Sombra hacia arriba de una barra de acciones pegada al borde de abajo. */
+        'sticky-bar': '0 -4px 12px -6px rgb(0 0 0 / 0.12)',
+      },
       keyframes: {
         'fade-in': {
           '0%': { opacity: '0', transform: 'translateY(4px)' },
