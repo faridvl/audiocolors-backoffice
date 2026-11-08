@@ -325,6 +325,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             // El lugar de la barra queda reservado: al pasar de una página corta a una larga el contenido no se corre.
             '[scrollbar-gutter:stable]',
             'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-6',
+            // La barra de abajo tapa el borde de esta área: el scroll a un campo o botón la respeta.
+            'scroll-pb-[calc(5rem+env(safe-area-inset-bottom))] md:scroll-pb-6',
           )}
         >
           {children}

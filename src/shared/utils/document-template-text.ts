@@ -1,7 +1,7 @@
 import {
   DOCUMENT_TEMPLATE_VARIABLES,
   DocumentTemplateVariable,
-} from '@/types/document-templates/document-template';
+} from '../../types/document-templates/document-template';
 
 const VARIABLE_PATTERN = /\{\{([^{}]*)\}\}/g;
 

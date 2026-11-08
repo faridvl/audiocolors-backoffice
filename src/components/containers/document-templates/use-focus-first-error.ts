@@ -16,7 +16,9 @@ export function useFocusFirstError() {
     const firstField = FIELD_ORDER.find((name) => errors[name]);
     const element = firstField ? document.getElementById(firstField) : null;
     if (!element) return;
-    element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    // El mensaje queda bajo el campo: se centra él para que la barra fija no lo tape.
+    const scrollTarget = document.getElementById(`${firstField}-error`) ?? element;
+    scrollTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
     element.focus({ preventScroll: true });
   }, [errors, isSubmitting, submitCount]);
 }
