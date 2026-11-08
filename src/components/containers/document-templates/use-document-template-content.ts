@@ -1,77 +1,85 @@
-import { KeyboardEvent, useLayoutEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { useEditor } from '@tiptap/react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 import {
-  applyTextFormat,
-  continueList,
-  findUsedVariables,
-  insertAtSelection,
-  TextEdit,
-  TextFormat,
-  variableToken,
-} from '@/shared/utils/document-template-text';
-import { DocumentTemplateVariable } from '@/types/document-templates/document-template';
+  DocumentNode,
+  documentToMarkdown,
+  DocumentNodeType,
+  markdownToDocument,
+} from '@/shared/utils/document-template-document';
+import { findUsedVariables } from '@/shared/utils/document-template-text';
+import { TEXT } from '@/static/texts/i18n';
+import {
+  DOCUMENT_TEMPLATE_VARIABLES,
+  DocumentTemplateVariable,
+} from '@/types/document-templates/document-template';
+import { buildEditorAttributes, buildEditorExtensions } from './document-template-editor-config';
 import { DocumentTemplateFormValues } from './document-template-form';
 
-interface PendingSelection {
-  start: number;
-  end: number;
-}
+const CONTENT_FIELD = 'content';
 
-/** El área del mensaje: aplica el formato y las variables sobre lo que el cursor tiene seleccionado. */
+/** El editor del mensaje: guarda en Formik el markdown de lo que se escribe y pinta el que llega. */
 export function useDocumentTemplateContent() {
-  const { values, setFieldValue } = useFormikContext<DocumentTemplateFormValues>();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const pendingSelection = useRef<PendingSelection | null>(null);
+  const { t } = useTranslation();
+  const { values, errors, touched, setFieldValue, setFieldTouched } =
+    useFormikContext<DocumentTemplateFormValues>();
+  const hasError = Boolean(touched.content && errors.content);
+  // Último markdown que salió del editor: distingue un cambio propio de uno que llega de afuera.
+  const lastMarkdown = useRef(values.content);
 
-  // El valor cambia por Formik; la selección se devuelve al área una vez pintado el texto nuevo.
-  useLayoutEffect(() => {
-    const selection = pendingSelection.current;
-    const textarea = textareaRef.current;
-    if (!selection || !textarea) return;
-    pendingSelection.current = null;
-    textarea.focus();
-    textarea.setSelectionRange(selection.start, selection.end);
-  }, [values.content]);
+  const extensions = useMemo(
+    () =>
+      buildEditorExtensions({
+        placeholder: t(TEXT.DOCUMENT_TEMPLATES.CONTENT_PLACEHOLDER),
+        getVariableLabel: (name) =>
+          DOCUMENT_TEMPLATE_VARIABLES.includes(name as DocumentTemplateVariable)
+            ? t(`${TEXT.DOCUMENT_TEMPLATES.VARIABLES.ITEM_PREFIX}.${name}.label`)
+            : null,
+      }),
+    [t],
+  );
 
-  const readSelection = () => {
-    const textarea = textareaRef.current;
-    const end = values.content.length;
-    return {
-      start: textarea?.selectionStart ?? end,
-      end: textarea?.selectionEnd ?? end,
-    };
-  };
+  const editor = useEditor({
+    extensions,
+    content: markdownToDocument(values.content),
+    // Next renderiza primero en el servidor: el editor se crea ya en el navegador.
+    immediatelyRender: false,
+    editorProps: { attributes: buildEditorAttributes(hasError) },
+    onUpdate: ({ editor: current }) => {
+      const markdown = documentToMarkdown(current.getJSON() as DocumentNode);
+      lastMarkdown.current = markdown;
+      void setFieldValue(CONTENT_FIELD, markdown);
+    },
+    onBlur: () => {
+      void setFieldTouched(CONTENT_FIELD, true);
+    },
+  });
 
-  const applyEdit = (edit: TextEdit) => {
-    pendingSelection.current = { start: edit.selectionStart, end: edit.selectionEnd };
-    void setFieldValue('content', edit.value);
-  };
+  useEffect(() => {
+    editor?.setOptions({
+      editorProps: { attributes: buildEditorAttributes(hasError) },
+    });
+  }, [editor, hasError]);
 
-  const handleFormat = (format: TextFormat) => {
-    const { start, end } = readSelection();
-    applyEdit(applyTextFormat(values.content, start, end, format));
-  };
+  // Si el formulario cambia el mensaje por su cuenta (otra plantilla, reinicio), el editor lo sigue.
+  useEffect(() => {
+    if (!editor || values.content === lastMarkdown.current) return;
+    lastMarkdown.current = values.content;
+    editor.commands.setContent(markdownToDocument(values.content), false);
+  }, [editor, values.content]);
 
   const handleInsertVariable = (variable: DocumentTemplateVariable) => {
-    const { start, end } = readSelection();
-    applyEdit(insertAtSelection(values.content, start, end, variableToken(variable)));
-  };
-
-  // Enter en una línea de lista sigue la lista; el resto de Enter escribe el salto normal.
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
-    const { start, end } = readSelection();
-    const edit = continueList(values.content, start, end);
-    if (!edit) return;
-    event.preventDefault();
-    applyEdit(edit);
+    editor
+      ?.chain()
+      .focus()
+      .insertContent({ type: DocumentNodeType.VARIABLE, attrs: { name: variable } })
+      .run();
   };
 
   return {
-    textareaRef,
+    editor,
     usedVariables: findUsedVariables(values.content),
-    handleFormat,
     handleInsertVariable,
-    handleKeyDown,
   };
 }

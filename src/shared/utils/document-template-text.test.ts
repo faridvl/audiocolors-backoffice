@@ -1,56 +1,32 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { applyTextFormat, TextFormat } from './document-template-text';
+import {
+  fillVariables,
+  findUnknownVariables,
+  findUsedVariables,
+  variableToken,
+} from './document-template-text';
+import { DocumentTemplateVariable } from '../../types/document-templates/document-template';
 
-const TEXT_WITH_VARIABLE = 'Se hace constar que {{nombre_completo}} acepta.';
+const TEXT_WITH_VARIABLES = 'Se hace constar que {{nombre_completo}} nació el {{ fecha_nacimiento }}.';
 
-describe('applyTextFormat sin selección', () => {
-  it('negrita inserta cuatro asteriscos y deja el cursor en medio', () => {
-    const edit = applyTextFormat(TEXT_WITH_VARIABLE, 20, 20, TextFormat.BOLD);
-    assert.equal(edit.value, 'Se hace constar que ****{{nombre_completo}} acepta.');
-    assert.equal(edit.selectionStart, 22);
-    assert.equal(edit.selectionEnd, 22);
+describe('variables del texto', () => {
+  it('la etiqueta de una variable lleva dobles llaves', () => {
+    assert.equal(variableToken(DocumentTemplateVariable.FULL_NAME), '{{nombre_completo}}');
   });
 
-  it('negrita al final del texto no altera lo anterior', () => {
-    const edit = applyTextFormat('hola', 4, 4, TextFormat.BOLD);
-    assert.equal(edit.value, 'hola****');
-    assert.equal(edit.selectionStart, 6);
-    assert.equal(edit.selectionEnd, 6);
+  it('las variables en uso salen sin repetir y sin espacios', () => {
+    const used = findUsedVariables(`${TEXT_WITH_VARIABLES} {{nombre_completo}} {{no_existe}}`);
+    assert.deepEqual(Array.from(used), ['nombre_completo', 'fecha_nacimiento']);
   });
 
-  it('negrita en un texto vacío deja el cursor entre los pares', () => {
-    const edit = applyTextFormat('', 0, 0, TextFormat.BOLD);
-    assert.equal(edit.value, '****');
-    assert.equal(edit.selectionStart, 2);
-    assert.equal(edit.selectionEnd, 2);
+  it('una variable desconocida se reporta', () => {
+    assert.deepEqual(findUnknownVariables('{{nombre}} {{xyz}} {{}}'), ['xyz', '']);
+    assert.deepEqual(findUnknownVariables(TEXT_WITH_VARIABLES), []);
   });
 
-  it('cursiva y tachado dejan el cursor entre sus marcas', () => {
-    const italic = applyTextFormat('ab', 1, 1, TextFormat.ITALIC);
-    assert.equal(italic.value, 'a**b');
-    assert.equal(italic.selectionStart, 2);
-    assert.equal(italic.selectionEnd, 2);
-
-    const strike = applyTextFormat('ab', 1, 1, TextFormat.STRIKE);
-    assert.equal(strike.value, 'a~~~~b');
-    assert.equal(strike.selectionStart, 3);
-    assert.equal(strike.selectionEnd, 3);
-  });
-});
-
-describe('applyTextFormat con selección', () => {
-  it('negrita envuelve lo seleccionado y lo deja seleccionado', () => {
-    const edit = applyTextFormat('hola mundo', 0, 4, TextFormat.BOLD);
-    assert.equal(edit.value, '**hola** mundo');
-    assert.equal(edit.selectionStart, 2);
-    assert.equal(edit.selectionEnd, 6);
-  });
-
-  it('cursiva envuelve lo seleccionado', () => {
-    const edit = applyTextFormat('hola mundo', 5, 10, TextFormat.ITALIC);
-    assert.equal(edit.value, 'hola *mundo*');
-    assert.equal(edit.selectionStart, 6);
-    assert.equal(edit.selectionEnd, 11);
+  it('rellenar cambia las conocidas y deja las desconocidas', () => {
+    const filled = fillVariables('{{nombre}} {{ edad }} {{xyz}}', { nombre: 'María', edad: '41' });
+    assert.equal(filled, 'María 41 {{xyz}}');
   });
 });

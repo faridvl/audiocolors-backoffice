@@ -953,3 +953,13 @@ No se guarda PDF: el botón Imprimir arma `AudiometryPrintReport` con los datos 
 - Página 1: encabezado y paciente, los dos audiogramas con la columna de grados en medio, Weber debajo con sus flechas, logoaudiometría y la tabla Resumen (PTA, grado, umbral, discriminación, falladas, método y escala).
 - Página 2, siempre (`break-before-page`): Diagnóstico y Observaciones ("Sin registrar" si están vacíos) y la firma.
 - El informe no lleva la simbología ni la lista de palabras: son ayudas de captura, no resultado clínico.
+
+## D60 · Editor visual de plantillas con TipTap, guardando markdown (2026-11-08)
+
+El mensaje de la plantilla se escribe en un editor tipo Word (TipTap sobre ProseMirror) en lugar de un `<textarea>`. Lo guardado no cambia: sigue siendo markdown con `# título`, `**negrita**`, `*cursiva*`, `~~tachado~~`, listas `- ` y `1. ` y variables `{{clave}}`, así que el API y el PDF (`document-template-pdf.ts`) siguen igual.
+
+- La conversión markdown a documento y de vuelta es código propio (`document-template-document.ts`, con pruebas de ida y vuelta); su parser inline es el mismo que usa el PDF.
+- Las variables son etiquetas inline que no se editan, con su nombre en español; se borran de una vez y se guardan como `{{clave}}`. Una clave desconocida se pinta como etiqueta de error y la validación sigue impidiendo guardar. Escribir o pegar `{{clave}}` también crea la etiqueta.
+- Solo se admiten los formatos que el markdown puede expresar (negrita, cursiva, tachado, títulos, listas de una sola línea); pegar HTML se reduce a eso. Sin saltos de línea suaves ni listas anidadas.
+- Limitaciones conocidas: no hay escape de `*`, `~~` ni `{{` literales, y una lista numerada se renumera desde su primer número.
+- El editor se crea solo en el navegador (`immediatelyRender: false`) por el render del servidor de Next.

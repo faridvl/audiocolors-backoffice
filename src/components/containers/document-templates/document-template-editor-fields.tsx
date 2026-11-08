@@ -26,8 +26,7 @@ export const DocumentTemplateEditorFields: React.FC<DocumentTemplateEditorFields
 }) => {
   const { t } = useTranslation();
   const { values } = useFormikContext<DocumentTemplateFormValues>();
-  const { textareaRef, usedVariables, handleFormat, handleInsertVariable, handleKeyDown } =
-    useDocumentTemplateContent();
+  const { editor, usedVariables, handleInsertVariable } = useDocumentTemplateContent();
   useFocusFirstError();
   const [isExampleOpen, setIsExampleOpen] = useState(false);
 
@@ -54,9 +53,7 @@ export const DocumentTemplateEditorFields: React.FC<DocumentTemplateEditorFields
             />
           </div>
           <DocumentTemplateContentField
-            textareaRef={textareaRef}
-            onFormat={handleFormat}
-            onKeyDown={handleKeyDown}
+            editor={editor}
             onViewExample={() => setIsExampleOpen(true)}
           />
         </div>

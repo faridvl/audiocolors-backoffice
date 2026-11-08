@@ -143,7 +143,6 @@ export const TEXT = {
     CONTENT: 'documentTemplates.content',
     CONTENT_PLACEHOLDER: 'documentTemplates.contentPlaceholder',
     VIEW_EXAMPLE: 'documentTemplates.viewExample',
-    FORMAT_HELP: 'documentTemplates.formatHelp',
     TOOLBAR: {
       LABEL: 'documentTemplates.toolbar.label',
       BOLD: 'documentTemplates.toolbar.bold',
@@ -160,7 +159,7 @@ export const TEXT = {
       IN_USE: 'documentTemplates.variables.inUse',
       WITH_EXAMPLE: 'documentTemplates.variables.withExample',
       FOOTER: 'documentTemplates.variables.footer',
-      /** `${ITEM_PREFIX}.${DocumentTemplateVariable}.description` y `.example` */
+      /** `${ITEM_PREFIX}.${DocumentTemplateVariable}.label`, `.description` y `.example` */
       ITEM_PREFIX: 'documentTemplates.variables',
     },
     ERRORS: {

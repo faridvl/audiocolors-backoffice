@@ -83,9 +83,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 ## En qué estamos
 
 - **Plantillas de documento (2026-11-08, rama `feature/plantillas-documento`):** pantalla hecha
-  (lista, editor con barra de formato, panel de variables, "Ver ejemplo" en PDF). Depende de los
-  endpoints `/document-templates` del API, que se construyen aparte. Falta probarla en pantalla
-  contra ese API.
+  (lista, editor visual con barra de formato y hoja en blanco, panel de variables, "Ver ejemplo" en
+  PDF; D60). Probada en pantalla contra el API local (escribir con formato, variables como
+  etiquetas, guardar y reabrir). Pendiente: revisión de UX y qa.
 - **Audiometría (2026-11-08, en `develop` del front y del API):** acordeón completo (tonal,
   logoaudiometría, listas de palabras, Resumen, notas) que se guarda con historial por paciente; una
   guardada se ve solo lectura y se imprime como informe A4 reconstruido desde la BD (D59). Campo de

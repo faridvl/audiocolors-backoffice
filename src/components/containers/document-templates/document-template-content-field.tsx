@@ -1,72 +1,42 @@
 import React from 'react';
-import {
-  Bold,
-  Heading,
-  Italic,
-  List,
-  ListOrdered,
-  type LucideIcon,
-  Strikethrough,
-} from 'lucide-react';
+import { Editor, EditorContent } from '@tiptap/react';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { FIELD_LABEL_CLASSES, inputBaseClasses } from '@/components/common/input/input';
+import { FIELD_LABEL_CLASSES } from '@/components/common/input/input';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { TextFormat } from '@/shared/utils/document-template-text';
 import { TEXT } from '@/static/texts/i18n';
-import { DOCUMENT_TEMPLATE_CONTENT_MAX_LENGTH } from '@/types/document-templates/document-template';
 import { tailwind } from '@/utils/tailwind-utils';
-
-const CONTENT_ID = 'content';
-
-const TOOLBAR_ACTIONS: { format: TextFormat; icon: LucideIcon; labelKey: string }[] = [
-  { format: TextFormat.BOLD, icon: Bold, labelKey: TEXT.DOCUMENT_TEMPLATES.TOOLBAR.BOLD },
-  { format: TextFormat.ITALIC, icon: Italic, labelKey: TEXT.DOCUMENT_TEMPLATES.TOOLBAR.ITALIC },
-  {
-    format: TextFormat.STRIKE,
-    icon: Strikethrough,
-    labelKey: TEXT.DOCUMENT_TEMPLATES.TOOLBAR.STRIKE,
-  },
-  { format: TextFormat.HEADING, icon: Heading, labelKey: TEXT.DOCUMENT_TEMPLATES.TOOLBAR.HEADING },
-  {
-    format: TextFormat.BULLET_LIST,
-    icon: List,
-    labelKey: TEXT.DOCUMENT_TEMPLATES.TOOLBAR.BULLET_LIST,
-  },
-  {
-    format: TextFormat.NUMBERED_LIST,
-    icon: ListOrdered,
-    labelKey: TEXT.DOCUMENT_TEMPLATES.TOOLBAR.NUMBERED_LIST,
-  },
-];
+import {
+  CONTENT_ERROR_ID,
+  CONTENT_LABEL_ID,
+  SHEET_BACKDROP_CLASSES,
+} from './document-template-editor-config';
+import { TOOLBAR_ACTIONS } from './document-template-format-toolbar';
 
 interface DocumentTemplateContentFieldProps {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
-  onFormat: (format: TextFormat) => void;
-  onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  editor: Editor | null;
   onViewExample: () => void;
 }
 
-/** El mensaje: barra de formato arriba y un área de texto grande; "Ver ejemplo" arriba a la derecha. */
+/** El mensaje: barra de formato pegada a una hoja en blanco donde se escribe con el formato a la vista. */
 export const DocumentTemplateContentField: React.FC<DocumentTemplateContentFieldProps> = ({
-  textareaRef,
-  onFormat,
-  onKeyDown,
+  editor,
   onViewExample,
 }) => {
   const { t } = useTranslation();
-  const [field, { error, touched }] = useField<string>('content');
+  const [, { error, touched }] = useField<string>('content');
   const errorText = touched && error ? error : undefined;
 
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-2">
-        <label htmlFor={CONTENT_ID}>
+        {/* Un contenteditable no se enlaza con `label for`: el clic en el título enfoca el editor. */}
+        <div id={CONTENT_LABEL_ID} onClick={() => editor?.commands.focus()}>
           <Typography variant={TypographyVariant.BODY} className={FIELD_LABEL_CLASSES} inline>
             {t(TEXT.DOCUMENT_TEMPLATES.CONTENT)}
             <span className="ml-0.5 text-danger">*</span>
           </Typography>
-        </label>
+        </div>
         <button
           type="button"
           onClick={onViewExample}
@@ -78,43 +48,42 @@ export const DocumentTemplateContentField: React.FC<DocumentTemplateContentField
         </button>
       </div>
 
-      <div
-        role="toolbar"
-        aria-label={t(TEXT.DOCUMENT_TEMPLATES.TOOLBAR.LABEL)}
-        className="flex flex-wrap gap-1"
-      >
-        {TOOLBAR_ACTIONS.map(({ format, icon: Icon, labelKey }) => (
-          <button
-            key={format}
-            type="button"
-            title={t(labelKey)}
-            aria-label={t(labelKey)}
-            onClick={() => onFormat(format)}
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-ink-200 bg-white text-ink-700 transition-colors sm:h-10 sm:w-10 hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-          >
-            <Icon className="h-4 w-4" aria-hidden />
-          </button>
-        ))}
+      <div className="overflow-hidden rounded-lg border border-ink-200">
+        <div
+          role="toolbar"
+          aria-label={t(TEXT.DOCUMENT_TEMPLATES.TOOLBAR.LABEL)}
+          className="flex flex-wrap gap-1 border-b border-ink-200 bg-white p-1.5"
+        >
+          {TOOLBAR_ACTIONS.map(({ format, icon: Icon, labelKey, isActive, run }) => {
+            const isPressed = editor ? isActive(editor) : false;
+            return (
+              <button
+                key={format}
+                type="button"
+                title={t(labelKey)}
+                aria-label={t(labelKey)}
+                aria-pressed={isPressed}
+                disabled={!editor}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => editor && run(editor)}
+                className={tailwind(
+                  'flex h-11 w-11 items-center justify-center rounded-md text-ink-700 transition-colors disabled:opacity-50 sm:h-10 sm:w-10 hover:bg-ink-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand',
+                  isPressed && 'bg-brand-50 text-brand-700',
+                )}
+              >
+                <Icon className="h-4 w-4" aria-hidden />
+              </button>
+            );
+          })}
+        </div>
+
+        <div className={SHEET_BACKDROP_CLASSES}>
+          <EditorContent editor={editor} />
+        </div>
       </div>
 
-      <Typography variant={TypographyVariant.HELPER}>
-        {t(TEXT.DOCUMENT_TEMPLATES.FORMAT_HELP)}
-      </Typography>
-
-      <textarea
-        {...field}
-        id={CONTENT_ID}
-        ref={textareaRef}
-        onKeyDown={onKeyDown}
-        maxLength={DOCUMENT_TEMPLATE_CONTENT_MAX_LENGTH}
-        placeholder={t(TEXT.DOCUMENT_TEMPLATES.CONTENT_PLACEHOLDER)}
-        aria-invalid={errorText ? true : undefined}
-        aria-describedby={errorText ? `${CONTENT_ID}-error` : undefined}
-        className={tailwind(inputBaseClasses, 'min-h-[240px] resize-y sm:min-h-[340px]')}
-      />
-
       {errorText && (
-        <Typography variant={TypographyVariant.ERROR} id={`${CONTENT_ID}-error`}>
+        <Typography variant={TypographyVariant.ERROR} id={CONTENT_ERROR_ID}>
           {errorText}
         </Typography>
       )}

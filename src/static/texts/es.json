@@ -204,7 +204,6 @@
     "content": "Mensaje",
     "contentPlaceholder": "Escribe el texto. Usa las variables de la lista para poner los datos del paciente.",
     "viewExample": "Ver ejemplo",
-    "formatHelp": "El formato se ve en Ver ejemplo.",
     "toolbar": {
       "label": "Formato del texto",
       "bold": "Negrita",
@@ -222,58 +221,72 @@
       "withExample": "{{description}} — ej. {{example}}",
       "footer": "Solo puedes usar estas variables. El sistema no deja guardar si escribes una que no existe.",
       "nombre": {
+        "label": "Nombre",
         "description": "Solo el nombre del paciente",
         "example": "María"
       },
       "apellidos": {
+        "label": "Apellidos",
         "description": "Los apellidos del paciente",
         "example": "Rodríguez Mora"
       },
       "nombre_completo": {
+        "label": "Nombre completo",
         "description": "Nombre y apellidos del paciente",
         "example": "María Rodríguez Mora"
       },
       "tipo_documento": {
+        "label": "Tipo de documento",
         "description": "El tipo de documento de identidad",
         "example": "Cédula"
       },
       "documento": {
+        "label": "Documento",
         "description": "El número de documento",
         "example": "1-1234-5678"
       },
       "fecha_nacimiento": {
+        "label": "Fecha de nacimiento",
         "description": "La fecha de nacimiento",
         "example": "14/03/1985"
       },
       "edad": {
+        "label": "Edad",
         "description": "La edad en años",
         "example": "41 años"
       },
       "genero": {
+        "label": "Género",
         "description": "El género del paciente",
         "example": "Femenino"
       },
       "telefono": {
+        "label": "Teléfono",
         "description": "El teléfono principal",
         "example": "+506 8888-1234"
       },
       "correo": {
+        "label": "Correo",
         "description": "El correo electrónico",
         "example": "maria@ejemplo.com"
       },
       "direccion": {
+        "label": "Dirección",
         "description": "La dirección del paciente",
         "example": "Escazú, San José"
       },
       "sedes": {
+        "label": "Sedes",
         "description": "Las sedes donde se atiende el paciente",
         "example": "Sede Escazú"
       },
       "fecha_hoy": {
+        "label": "Fecha de hoy",
         "description": "La fecha del día en que se arma el documento",
         "example": "15 de noviembre de 2026"
       },
       "profesional": {
+        "label": "Profesional",
         "description": "El profesional que atiende",
         "example": "Dra. Ana Vargas"
       }
