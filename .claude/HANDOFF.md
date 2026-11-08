@@ -83,7 +83,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   con datos de ejemplo; cada página lleva el logo y el nombre de la clínica al pie. Usarlas desde el
   expediente con datos reales es otro desarrollo.
 
-- Imprimir resumen del paciente (2026-11-08, sin empezar): un solo botón en el expediente
+- Imprimir resumen del paciente (2026-11-08, hecho en la rama, ver En qué estamos): un solo botón en el expediente
   ("Generar resumen") abre un modal con tarjetas seleccionables: plantillas de documento (se elige
   cuáles, puede haber varias, llenas con los datos del paciente), historia clínica, otoscopía y
   audiometría (reusar el informe de D59). Genera un solo PDF con lo marcado. Siempre lleva la ficha
@@ -97,6 +97,19 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   se omite ese tramo.
 
 ## En qué estamos
+
+- **Resumen del paciente (2026-11-08, rama `feature/resumen-paciente`, local, sin push ni PR):**
+  botón "Generar resumen", modal por tarjetas y hoja de impresión (D64); nombre de archivo
+  "{Tipo} - {Clínica} - {Paciente} - {Cédula}" también en la audiometría suelta. Revisado
+  (cuestionador y revisor-ux), corregido y probado por qa contra el API local de la rama de
+  plantillas con un escenario real (paciente "Prueba Resumen Mora Quesada", 3 plantillas reales, en
+  la base Docker de pruebas `audiocolors-prueba-db`): PDF de 6 hojas, fecha de nacimiento correcta,
+  una sola firma, error por tarjeta, cerrar durante Generar no imprime. Sin probar: el `afterprint`
+  real del navegador, Safari/iPhone y un usuario STAFF. Al publicar: las plantillas del API van
+  antes que este front. Menores: el título de cada plantilla sale duplicado si la plantilla trae su
+  propio H1; `{{tipo_documento}}` sale vacío (el paciente no guarda el tipo). Visto de paso (ya
+  existía): en una audiometría guardada sin tipo de lista, Logoaudiometría muestra "Sin registrar"
+  (`speech-word-list-selectors.tsx`, rama `isReadOnly`), contra D41.
 
 - **Plantillas de documento (2026-11-08, en `develop` del front y del API; migración aplicada en la
   base de desarrollo):** pantalla hecha
