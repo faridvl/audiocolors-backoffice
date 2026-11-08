@@ -3,11 +3,17 @@ export const TEXT = {
     BUTTONS: {
       SAVE: 'common.buttons.save',
       CANCEL: 'common.buttons.cancel',
+      CLEAR: 'common.buttons.clear',
       LOADING: 'common.buttons.loading',
       RETRY: 'common.buttons.retry',
     },
     OPTIONAL: 'common.optional',
     PHONE_HINT: 'common.phoneHint',
+    PHONE_COUNTRY: {
+      LABEL: 'common.phoneCountry.label',
+      SEARCH: 'common.phoneCountry.search',
+      EMPTY: 'common.phoneCountry.empty',
+    },
     FORBIDDEN: 'common.forbidden',
     CHARACTER_COUNT: 'common.characterCount',
     YES: 'common.yes',
@@ -50,6 +56,8 @@ export const TEXT = {
     EMPTY_TITLE: 'notifications.emptyTitle',
     EMPTY_DESCRIPTION: 'notifications.emptyDescription',
     RELEASE_TITLE: 'notifications.releaseTitle',
+    STALE_PATIENT_TITLE: 'notifications.stalePatientTitle',
+    STALE_PATIENT_DETAIL: 'notifications.stalePatientDetail',
     /** `${KIND_PREFIX}.${ReleaseChangeKind}`: título de cada grupo. */
     KIND_PREFIX: 'notifications.kinds',
     /** `${COUNT_PREFIX}.${ReleaseChangeKind}` con `count`: resumen de la lista. */
@@ -93,6 +101,10 @@ export const TEXT = {
       MINUTES_SHORT: 'settings.appointmentTypes.minutesShort',
       MINUTES: 'settings.appointmentTypes.minutes',
       SAVED: 'settings.appointmentTypes.saved',
+      ADD: 'settings.appointmentTypes.add',
+      NEW_TITLE: 'settings.appointmentTypes.newTitle',
+      CREATED: 'settings.appointmentTypes.created',
+      DUPLICATE_NAME: 'settings.appointmentTypes.duplicateName',
     },
   },
   QUESTIONS: {
@@ -308,7 +320,6 @@ export const TEXT = {
           PHONE_REQUIRED: 'agenda.picker.create.errors.phoneRequired',
           PHONE_LOCAL: 'agenda.picker.create.errors.phoneLocal',
           PHONE_INTERNATIONAL: 'agenda.picker.create.errors.phoneInternational',
-          PHONE_COSTA_RICA_WITH_PLUS: 'agenda.picker.create.errors.phoneCostaRicaWithPlus',
         },
       },
     },
@@ -532,6 +543,8 @@ export const TEXT = {
       OFF_PREFIX: 'patients.flags.offValues',
       LAB_SHIPMENT: {
         DATE_LABEL: 'patients.flags.labShipment.dateLabel',
+        FILTER_DAY_LABEL: 'patients.flags.labShipment.filterDayLabel',
+        FILTER_DAY_CLEAR: 'patients.flags.labShipment.filterDayClear',
         SHIPPED_ON: 'patients.flags.labShipment.shippedOn',
         CHANGE_DATE: 'patients.flags.labShipment.changeDate',
         DATE_UPDATED: 'patients.flags.labShipment.dateUpdated',
@@ -563,6 +576,9 @@ export const TEXT = {
       },
       MAINTENANCE: {
         ROW_TITLE: 'patients.flags.maintenance.rowTitle',
+        CHOICE_ATTENDED: 'patients.flags.maintenance.choiceAttended',
+        CHOICE_MISSED: 'patients.flags.maintenance.choiceMissed',
+        CHOICE_LABEL: 'patients.flags.maintenance.choiceLabel',
         /** Prefijos: `${PREFIX}.${MaintenanceStatus}`. */
         TOAST_PREFIX: 'patients.flags.maintenance.toasts',
         PILL_LABEL_PREFIX: 'patients.flags.maintenance.pillLabels',
@@ -581,6 +597,11 @@ export const TEXT = {
         NOTES_LOADING: 'patients.flags.maintenance.notesLoading',
         NOTES_ERROR: 'patients.flags.maintenance.notesError',
         NOTES_RETRY: 'patients.flags.maintenance.notesRetry',
+      },
+      PRIORITY: {
+        MARK: 'patients.flags.priority.mark',
+        UNMARK: 'patients.flags.priority.unmark',
+        PATIENT_ACTION: 'patients.flags.priority.patientAction',
       },
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',
       TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
@@ -619,16 +640,9 @@ export const TEXT = {
       },
     },
     PHYSICAL_EXAM: {
-      LOADING: 'patients.physicalExam.loading',
-      LOAD_ERROR: 'patients.physicalExam.loadError',
-      NEW: 'patients.physicalExam.new',
-      EMPTY: 'patients.physicalExam.empty',
       SAVE: 'patients.physicalExam.save',
       SAVED: 'patients.physicalExam.saved',
-      CORRECTED_SAVED: 'patients.physicalExam.correctedSaved',
       EMPTY_ERROR: 'patients.physicalExam.emptyError',
-      PREVIEW_RIGHT: 'patients.physicalExam.previewRight',
-      PREVIEW_LEFT: 'patients.physicalExam.previewLeft',
     },
     BACKGROUND: {
       TITLE: 'patients.background.title',

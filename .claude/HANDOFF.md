@@ -52,16 +52,23 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Nada se borra: una sección con registros no se puede borrar (2026-11-01).
   La tarjeta de cada sección muestra solo el último registro; el historial se abre
   en un modal con la lista de fechas, cada una colapsable con sus respuestas (2026-11-01).
-- Otoscopías (2026-10-28): historial por paciente. Cada otoscopía es un registro
-  con fecha, autor, OD y OI; "Nueva otoscopía" crea uno nuevo y nunca pisa el
-  anterior. La tarjeta muestra la última con "Nueva otoscopía" y "Ver anteriores"
-  (de la más reciente a la más vieja). Un registro se corrige solo el mismo día en
-  que se creó; después queda fijo. No va ligado a una cita. La otoscopía que ya
-  tiene cada paciente pasa a ser su primer registro. Se ve y se usa igual que el
-  historial de las secciones propias de Preguntas. Solo roles clínicos.
+- Otoscopías (2026-10-28, ajustado 2026-11-07): historial por paciente. Cada
+  otoscopía es un registro con fecha, autor, OD y OI; guardar crea uno nuevo y
+  nunca pisa el anterior. La tarjeta de Exploración física siempre muestra el
+  formulario listo para una otoscopía nueva ("Guardar otoscopia", "Limpiar"); el
+  historial se ve solo en Control de evolución, donde el API deja una nota de
+  "Pruebas" al guardar (D47). No va ligado a una cita. Solo roles clínicos.
 
 ## En qué estamos
 
+- **Lote del 2026-11-07 (rama `feature/preguntas-acordeon`, PR a `develop`):** Preguntas pasa a
+  "Formularios"; otoscopia siempre en modo crear con historial en Control de evolución (D47);
+  Mantenimiento con "Vino"/"Lo perdió" (D48); agregar tipos de cita (D49); selector de país en
+  teléfonos (D50, D54); prioridad de paciente (D51); día de envío en el filtro de laboratorio (D52);
+  aviso de pacientes con 6 meses sin movimiento en Notificaciones (D53). API en su PR a `develop`
+  (migraciones de otoscopia y de prioridad). Probado en pantalla con Playwright contra la base local.
+  Sin probar en pantalla: el teléfono al recargar y en contactos (en la base quedó bien guardado), la
+  ficha a 375 px con el botón de prioridad y una nota de otoscopia sin autor (no había en local).
 - **v1.0.0 publicada el 2026-10-23** (back-office #24, API #16) con historia
   clínica, Configuración, agenda por horario, permisos por rol y bandeja de
   notificaciones/novedades por versión.
@@ -127,7 +134,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   los quiere más claros (Administrador, Profesional, Recepción, Secretario o Empleado) y busca un
   estándar global de nombres. Propuesta a revisar: código fijo en inglés (`PRACTITIONER` viene de
   FHIR) y el nombre visible desde `es.json`.
-- Teléfonos: ¿hace falta un selector de país? Hoy un número de Nicaragua (+505,
+- Teléfonos (histórico): ¿hace falta un selector de país? Hoy un número de Nicaragua (+505,
   también 8 dígitos) escrito sin + se guarda como de Costa Rica (D30).
 
 

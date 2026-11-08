@@ -1,21 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
 import { useField } from "formik";
 import { useTranslation } from "react-i18next";
 import { FormField } from "@/components/common/input/input";
+import { PhoneCountrySelect } from "@/components/common/phone-field/phone-country-select";
 import { TEXT } from "@/static/texts/i18n";
 import {
+  composePhoneValue,
+  detectPhoneCountry,
   formatPhoneInput,
-  shouldShowCountryPrefix,
+  switchPhoneCountry,
+  toNationalInput,
 } from "@/shared/utils/phone";
-
-/** Código que el sistema asume cuando el número no empieza con `+`. */
-const DEFAULT_COUNTRY_LABEL = "+506";
+import type { PhoneCountry } from "@/shared/utils/phone-countries";
 
 interface PhoneFieldProps {
   name: string;
   label: string;
   required?: boolean;
-  /** Reemplaza la ayuda por defecto (cómo escribir un número de otro país); '' la oculta. */
+  /** Reemplaza la ayuda por defecto (cómo elegir otro país); '' la oculta. */
   hint?: string;
   /** Deja la ayuda a la vista aunque haya error. */
   isHintAlwaysVisible?: boolean;
@@ -23,8 +25,9 @@ interface PhoneFieldProps {
 }
 
 /**
- * Teléfono de Formik: XXXX-XXXX para Costa Rica, con "+506" a la vista como adorno; con `+`
- * al inicio (o un número largo sin `+`, dato viejo), sin máscara y sin adorno.
+ * Teléfono de Formik con selector de país (Costa Rica por defecto). El valor guardado en el
+ * formulario es el mismo de siempre: `XXXX-XXXX` para Costa Rica y `+<código> <dígitos>` para
+ * otro país. Un dato viejo que no se reconoce se muestra tal cual, sin máscara.
  */
 export const PhoneField: React.FC<PhoneFieldProps> = ({
   name,
@@ -36,6 +39,15 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
 }) => {
   const { t } = useTranslation();
   const [{ value }, , { setValue }] = useField<string>(name);
+  // Recuerda el país elegido mientras el campo está vacío o el código es compartido (+1).
+  const [chosenCountry, setChosenCountry] = useState<PhoneCountry>();
+  const country = detectPhoneCountry(value, chosenCountry);
+
+  const handleSelectCountry = (next: PhoneCountry) => {
+    setChosenCountry(next);
+    const national = country ? toNationalInput(value, country) : "";
+    void setValue(switchPhoneCountry(next, national));
+  };
 
   return (
     <FormField
@@ -45,10 +57,17 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
       isHintAlwaysVisible={isHintAlwaysVisible}
       inputMode="tel"
       required={required}
-      startAdornment={
-        shouldShowCountryPrefix(value) ? DEFAULT_COUNTRY_LABEL : undefined
+      startControl={
+        <PhoneCountrySelect country={country} onSelect={handleSelectCountry} />
       }
-      onChange={(event) => void setValue(formatPhoneInput(event.target.value))}
+      displayValue={country ? toNationalInput(value, country) : value}
+      onChange={(event) =>
+        void setValue(
+          country
+            ? composePhoneValue(country, event.target.value)
+            : formatPhoneInput(event.target.value),
+        )
+      }
       className={className}
     />
   );

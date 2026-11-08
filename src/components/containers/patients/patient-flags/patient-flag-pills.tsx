@@ -11,6 +11,7 @@ const FLAG_TONES: Record<PatientFlag, string> = {
   [PatientFlag.VIDEO_CANDIDATE]: 'bg-brand-50 text-brand-700',
   [PatientFlag.WARRANTY_EXPIRED]: 'bg-danger/10 text-danger',
   [PatientFlag.RENEW_PRESCRIPTION]: 'bg-info/10 text-info',
+  [PatientFlag.PRIORITY]: 'bg-danger/10 text-danger',
 };
 
 const OFF_TONE = 'bg-ink-100 text-ink-500';

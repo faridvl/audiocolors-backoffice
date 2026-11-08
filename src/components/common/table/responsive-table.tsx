@@ -1,9 +1,12 @@
-import React from 'react';
-import { Inbox, AlertTriangle, Loader2, SearchX } from 'lucide-react';
-import { tailwind } from '@/utils/tailwind-utils';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { Button, ButtonVariant } from '@/components/common/button/button';
-import { topStripeStyle } from '@/shared/design/tokens';
+import React from "react";
+import { Inbox, AlertTriangle, Loader2, SearchX } from "lucide-react";
+import { tailwind } from "@/utils/tailwind-utils";
+import {
+  Typography,
+  TypographyVariant,
+} from "@/components/common/typography/typography";
+import { Button, ButtonVariant } from "@/components/common/button/button";
+import { topStripeStyle } from "@/shared/design/tokens";
 
 /**
  * Tabla responsive.
@@ -36,11 +39,11 @@ export interface TableColumn<T> {
 type RowAccentColor<T> = (row: T) => string | undefined;
 
 export enum TableState {
-  LOADING = 'LOADING',
-  ERROR = 'ERROR',
-  EMPTY = 'EMPTY',
-  NO_RESULTS = 'NO_RESULTS',
-  READY = 'READY',
+  LOADING = "LOADING",
+  ERROR = "ERROR",
+  EMPTY = "EMPTY",
+  NO_RESULTS = "NO_RESULTS",
+  READY = "READY",
 }
 
 interface ResponsiveTableProps<T> {
@@ -54,6 +57,8 @@ interface ResponsiveTableProps<T> {
   onRowClick?: (row: T) => void;
   onRetry?: () => void;
   rowActions?: (row: T) => React.ReactNode;
+  /** Espacio a la derecha del título de la tarjeta móvil, para que las acciones no lo tapen. */
+  cardTitleClassName?: string;
   /** Color de acento en el borde superior de la tarjeta movil (p.ej. por sede). */
   rowAccentColor?: RowAccentColor<T>;
   /**
@@ -79,7 +84,9 @@ const StateBlock: React.FC<{
   <div className="flex flex-col items-center justify-center gap-2 px-6 py-16 text-center">
     {icon}
     <Typography variant={TypographyVariant.ACCENT}>{title}</Typography>
-    {description && <Typography variant={TypographyVariant.BODY}>{description}</Typography>}
+    {description && (
+      <Typography variant={TypographyVariant.BODY}>{description}</Typography>
+    )}
     {action && <div className="mt-3">{action}</div>}
   </div>
 );
@@ -94,19 +101,21 @@ export function ResponsiveTable<T>({
   onRowClick,
   onRetry,
   rowActions,
+  cardTitleClassName = "pr-8",
   rowAccentColor,
   getRowGroup,
-  emptyTitle = 'Aún no hay registros',
+  emptyTitle = "Aún no hay registros",
   emptyDescription,
   emptyAction,
-  noResultsTitle = 'Sin resultados',
-  noResultsDescription = 'Prueba con otros términos o cambia los filtros.',
-  errorTitle = 'No se pudieron cargar los datos',
+  noResultsTitle = "Sin resultados",
+  noResultsDescription = "Prueba con otros términos o cambia los filtros.",
+  errorTitle = "No se pudieron cargar los datos",
 }: ResponsiveTableProps<T>) {
   const resolveState = (): TableState => {
     if (isLoading) return TableState.LOADING;
     if (isError) return TableState.ERROR;
-    if (!rows.length) return hasActiveFilters ? TableState.NO_RESULTS : TableState.EMPTY;
+    if (!rows.length)
+      return hasActiveFilters ? TableState.NO_RESULTS : TableState.EMPTY;
     return TableState.READY;
   };
 
@@ -116,7 +125,9 @@ export function ResponsiveTable<T>({
     const stateContent = {
       [TableState.LOADING]: (
         <StateBlock
-          icon={<Loader2 className="h-6 w-6 animate-spin text-brand" aria-hidden />}
+          icon={
+            <Loader2 className="h-6 w-6 animate-spin text-brand" aria-hidden />
+          }
           title="Cargando..."
         />
       ),
@@ -150,11 +161,16 @@ export function ResponsiveTable<T>({
       ),
     }[state];
 
-    return <div className="rounded-card border border-ink-200 bg-white">{stateContent}</div>;
+    return (
+      <div className="rounded-card border border-ink-200 bg-white">
+        {stateContent}
+      </div>
+    );
   }
 
   const cardColumns = columns.filter((column) => !column.hideOnCard);
-  const titleColumn = columns.find((column) => column.isCardTitle) ?? columns[0];
+  const titleColumn =
+    columns.find((column) => column.isCardTitle) ?? columns[0];
   const detailColumns = cardColumns.filter((column) => column !== titleColumn);
 
   /** Etiqueta del grupo si esta fila abre uno nuevo; null si sigue el anterior. */
@@ -174,16 +190,22 @@ export function ResponsiveTable<T>({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  style={column.width?.includes('%') ? { width: column.width } : undefined}
+                  style={
+                    column.width?.includes("%")
+                      ? { width: column.width }
+                      : undefined
+                  }
                   className={tailwind(
-                    'px-4 py-3 text-left text-sm font-bold uppercase tracking-wide text-ink-600',
-                    column.width?.startsWith('w-') && column.width,
+                    "px-4 py-3 text-left text-sm font-bold uppercase tracking-wide text-ink-600",
+                    column.width?.startsWith("w-") && column.width,
                   )}
                 >
                   {column.header}
                 </th>
               ))}
-              {rowActions && <th className="w-16 px-4 py-3" aria-label="Acciones" />}
+              {rowActions && (
+                <th className="w-16 px-4 py-3" aria-label="Acciones" />
+              )}
             </tr>
           </thead>
 
@@ -203,12 +225,15 @@ export function ResponsiveTable<T>({
                 <tr
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                   className={tailwind(
-                    'border-b border-ink-200 last:border-b-0 transition-colors',
-                    onRowClick && 'cursor-pointer hover:bg-ink-50',
+                    "border-b border-ink-200 last:border-b-0 transition-colors",
+                    onRowClick && "cursor-pointer hover:bg-ink-50",
                   )}
                 >
                   {columns.map((column) => (
-                    <td key={column.key} className="px-4 py-3 align-middle text-sm text-ink-700">
+                    <td
+                      key={column.key}
+                      className="px-4 py-3 align-middle text-sm text-ink-700"
+                    >
                       {column.render(row)}
                     </td>
                   ))}
@@ -258,13 +283,21 @@ export function ResponsiveTable<T>({
                 disabled={!onRowClick}
                 className="flex w-full flex-col gap-3 text-left disabled:cursor-default"
               >
-                <div className="pr-8">{titleColumn.render(row)}</div>
+                <div className={cardTitleClassName}>
+                  {titleColumn.render(row)}
+                </div>
 
                 <dl className="flex flex-col gap-1.5 border-t border-ink-100 pt-3">
                   {detailColumns.map((column) => (
-                    <div key={column.key} className="flex items-baseline justify-between gap-3">
+                    <div
+                      key={column.key}
+                      className="flex items-baseline justify-between gap-3"
+                    >
                       <dt className="shrink-0">
-                        <Typography variant={TypographyVariant.HELPER} className="font-bold">
+                        <Typography
+                          variant={TypographyVariant.HELPER}
+                          className="font-bold"
+                        >
                           {column.header}
                         </Typography>
                       </dt>

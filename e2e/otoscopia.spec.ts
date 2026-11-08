@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import {
   APIRequestContext,
@@ -15,14 +14,9 @@ const SESSION_COOKIE = "SESSION_ACCESS_TOKEN";
 const RECORDS_URL = "http://localhost:7071";
 const PATIENT_ROUTE = "/pacientes";
 const SCREENSHOT_DIR = "test-results/otoscopia";
-const DB_CONTAINER = "audiocolors-prueba-db";
-const DB_USER = "admin";
-const DB_NAME = "saas_medical_records";
-const AGED_DAYS = 3;
 const VIEWPORTS = [375, 1024, 1440];
 const VIEWPORT_HEIGHT = 900;
 const DEFAULT_VIEWPORT = { width: 1280, height: 720 };
-const HTTP_CONFLICT = 409;
 const HTTP_ERROR_MIN = 400;
 const FETCH_RESOURCE_ERROR = "Failed to load resource";
 
@@ -41,7 +35,6 @@ const text = (label: string) => `${label} ${stamp}`;
 
 const consoleErrors: string[] = [];
 const badResponses: string[] = [];
-let expectedStatuses: number[] = [];
 
 function readToken(): string {
   const state = JSON.parse(readFileSync(SESSION_FILE, "utf-8")) as {
@@ -53,34 +46,6 @@ function readToken(): string {
       "La sesión no trae SESSION_ACCESS_TOKEN: corre yarn e2e:login",
     );
   return decodeURIComponent(cookie.value);
-}
-
-async function createEntryViaApi(
-  otoscopyRight?: string,
-  otoscopyLeft?: string,
-): Promise<string> {
-  const response = await api.post(`/patients/${patientUuid}/otoscopy-entries`, {
-    data: { otoscopyRight, otoscopyLeft },
-  });
-  expect(response.status()).toBe(201);
-  return ((await response.json()) as { uuid: string }).uuid;
-}
-
-function ageEntryInDatabase(entryUuid: string) {
-  const sql = `UPDATE "PatientOtoscopyEntry" SET "createdAt" = now() - interval '${AGED_DAYS} days' WHERE uuid = '${entryUuid}'`;
-  execFileSync("docker", [
-    "exec",
-    DB_CONTAINER,
-    "psql",
-    "-U",
-    DB_USER,
-    "-d",
-    DB_NAME,
-    "-v",
-    "ON_ERROR_STOP=1",
-    "-c",
-    sql,
-  ]);
 }
 
 const card = (page: Page): Locator =>
@@ -123,15 +88,6 @@ async function shootAt(
   await page.setViewportSize(DEFAULT_VIEWPORT);
 }
 
-const openOlder = async (page: Page) => {
-  await card(page)
-    .getByRole("button", { name: /Ver anteriores \(\d+\)/ })
-    .click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  return dialog;
-};
-
 test.beforeAll(async () => {
   token = readToken();
   api = await playwrightRequest.newContext({
@@ -156,7 +112,6 @@ test.afterAll(async () => {
 test.beforeEach(async ({ page }) => {
   consoleErrors.length = 0;
   badResponses.length = 0;
-  expectedStatuses = [];
   page.on("console", (message) => {
     // El navegador repite cada 4xx/5xx como "Failed to load resource": ya lo cubre el guard de respuestas.
     if (
@@ -169,7 +124,7 @@ test.beforeEach(async ({ page }) => {
   page.on("pageerror", (error) => consoleErrors.push(error.message));
   page.on("response", (response) => {
     const status = response.status();
-    if (status >= HTTP_ERROR_MIN && !expectedStatuses.includes(status)) {
+    if (status >= HTTP_ERROR_MIN) {
       badResponses.push(
         `${status} ${response.request().method()} ${response.url()}`,
       );
@@ -182,11 +137,37 @@ test.afterEach(() => {
   expect(badResponses, "respuestas 4xx/5xx inesperadas").toEqual([]);
 });
 
-test("1. crea una otoscopia con OD y OI; el doble clic genera un solo POST", async ({
+const CLEAR_BUTTON = "Limpiar";
+
+test("1. la tarjeta siempre trae el formulario de otoscopia nueva", async ({
   page,
 }) => {
   await gotoPatient(page);
-  await page.getByRole("button", { name: "Nueva otoscopia" }).click();
+  const current = card(page);
+  await expect(current.locator("#otoscopyRight")).toBeVisible();
+  await expect(current.locator("#otoscopyLeft")).toBeVisible();
+  await expect(current.getByText("0/1000")).toHaveCount(2);
+  await expect(
+    current.getByRole("button", { name: SAVE_BUTTON }),
+  ).toBeDisabled();
+  await expect(current.getByRole("button", { name: CLEAR_BUTTON })).toHaveCount(
+    0,
+  );
+  await expect(current.getByText("Último registro")).toHaveCount(0);
+  await expect(
+    current.getByRole("button", { name: /Ver anteriores/ }),
+  ).toHaveCount(0);
+  await expect(
+    current.getByRole("button", { name: "Nueva otoscopia" }),
+  ).toHaveCount(0);
+  await expect(current.getByRole("button", { name: "Editar" })).toHaveCount(0);
+  await shootAt(page, "tarjeta-formulario", card);
+});
+
+test("2. guarda con OD y OI, el doble clic genera un solo POST y la tarjeta queda limpia", async ({
+  page,
+}) => {
+  await gotoPatient(page);
   await fillAndSave(page, text("OD uno"), text("OI uno"));
 
   const posts: string[] = [];
@@ -200,123 +181,61 @@ test("1. crea una otoscopia con OD y OI; el doble clic genera un solo POST", asy
   });
   await page.getByRole("button", { name: SAVE_BUTTON }).dblclick();
 
-  const latest = card(page).locator("article");
-  await expect(latest.getByText("Último registro")).toBeVisible();
-  await expect(latest.getByText(text("OD uno"))).toBeVisible();
-  await expect(latest.getByText(text("OI uno"))).toBeVisible();
-  // Fecha con año y autor: "dd mmm yyyy, hh:mm · Autor".
-  await expect(latest.getByText(/\b20\d{2}\b.* · \S+/)).toBeVisible();
+  await expect(page.getByText("Otoscopia guardada")).toBeVisible();
+  await expect(page.locator("#otoscopyRight")).toHaveValue("");
+  await expect(page.locator("#otoscopyLeft")).toHaveValue("");
+  await expect(
+    card(page).getByRole("button", { name: SAVE_BUTTON }),
+  ).toBeDisabled();
+  await expect(
+    card(page).getByRole("button", { name: CLEAR_BUTTON }),
+  ).toHaveCount(0);
   expect(posts).toHaveLength(1);
-  await shootAt(page, "tarjeta-con-datos", card);
 });
 
-test("2. segunda otoscopia: anteriores de la más reciente a la más vieja", async ({
+test("3. guarda con solo OD y deja la tarjeta lista para otra", async ({
   page,
 }) => {
   await gotoPatient(page);
-  await page.getByRole("button", { name: "Nueva otoscopia" }).click();
-  await fillAndSave(page, text("OD dos"), text("OI dos"));
-  await page.getByRole("button", { name: SAVE_BUTTON }).click();
-  await expect(
-    card(page).locator("article").getByText(text("OD dos")),
-  ).toBeVisible();
-
-  await createEntryViaApi(text("OD tres"), text("OI tres"));
-  await gotoPatient(page);
-  await expect(
-    card(page).locator("article").getByText(text("OD tres")),
-  ).toBeVisible();
-
-  const dialog = await openOlder(page);
-  const rows = dialog.locator("button[aria-expanded]");
-  await expect(rows).toHaveCount(2);
-  await expect(rows.nth(0)).toContainText(
-    `OD: ${text("OD dos")} · OI: ${text("OI dos")}`,
-  );
-  await expect(rows.nth(1)).toContainText(
-    `OD: ${text("OD uno")} · OI: ${text("OI uno")}`,
-  );
-  await shootAt(page, "modal-anteriores", (current) =>
-    current.getByRole("dialog"),
-  );
-});
-
-test('3. otoscopia solo con OD muestra "Sin registrar" en el OI', async ({
-  page,
-}) => {
-  await gotoPatient(page);
-  await page.getByRole("button", { name: "Nueva otoscopia" }).click();
   await fillAndSave(page, text("OD solo"), null);
-  await page.getByRole("button", { name: SAVE_BUTTON }).click();
-
-  const latest = card(page).locator("article");
-  await expect(latest.getByText(text("OD solo"))).toBeVisible();
-  await expect(latest.getByText("Sin registrar")).toBeVisible();
-
-  await createEntryViaApi(text("OD cuatro"), text("OI cuatro"));
-  await gotoPatient(page);
-  const dialog = await openOlder(page);
-  const soloRow = dialog
-    .locator("button[aria-expanded]")
-    .filter({ hasText: text("OD solo") });
-  await soloRow.click();
-  await expect(dialog.getByText("Sin registrar")).toBeVisible();
-});
-
-test('4. corrige la otoscopia del día: PATCH 200 y "Corregido por"', async ({
-  page,
-}) => {
-  await gotoPatient(page);
-  await card(page).getByRole("button", { name: "Editar" }).click();
-  await page.locator("#otoscopyRight").fill(text("OD corregido"));
-
-  const patch = page.waitForResponse(
-    (response) =>
-      response.request().method() === "PATCH" &&
-      response.url().includes("/otoscopy-entries/"),
-  );
-  await page.getByRole("button", { name: "Guardar cambios" }).click();
-  expect((await patch).status()).toBe(200);
-
-  const latest = card(page).locator("article");
-  await expect(latest.getByText(text("OD corregido"))).toBeVisible();
-  await expect(latest.getByText(/Corregido por/)).toBeVisible();
-});
-
-test("5. corregir un registro de otro día da 409, avisa y se guarda como nuevo", async ({
-  page,
-}) => {
-  expectedStatuses = [HTTP_CONFLICT];
-  const entryUuid = await createEntryViaApi(text("OD viejo"), text("OI viejo"));
-  await gotoPatient(page);
-  await expect(
-    card(page).locator("article").getByText(text("OD viejo")),
-  ).toBeVisible();
-  await card(page).getByRole("button", { name: "Editar" }).click();
-  await page.locator("#otoscopyRight").fill(text("OD tarde"));
-
-  // Con el formulario abierto, el registro "envejece": el API lo rechaza como de otro día.
-  ageEntryInDatabase(entryUuid);
-
-  const patch = page.waitForResponse(
-    (response) =>
-      response.request().method() === "PATCH" &&
-      response.url().includes("/otoscopy-entries/"),
-  );
-  await page.getByRole("button", { name: "Guardar cambios" }).click();
-  expect((await patch).status()).toBe(HTTP_CONFLICT);
-
-  await expect(
-    page.getByRole("alert").filter({ hasText: /no es de hoy/ }),
-  ).toBeVisible();
-  await expect(page.locator("#otoscopyRight")).toHaveValue(text("OD tarde"));
-
   const post = page.waitForResponse(isOtoscopyPost);
-  await page.getByRole("button", { name: "Guardar como nuevo" }).click();
+  await page.getByRole("button", { name: SAVE_BUTTON }).click();
   expect((await post).status()).toBe(201);
+
+  await expect(page.getByText("Otoscopia guardada")).toBeVisible();
+  await expect(page.locator("#otoscopyRight")).toHaveValue("");
+  await expect(page.locator("#otoscopyLeft")).toHaveValue("");
+});
+
+test('4. "Limpiar" solo aparece con texto y vacía los campos sin guardar', async ({
+  page,
+}) => {
+  await gotoPatient(page);
+  const clear = card(page).getByRole("button", { name: CLEAR_BUTTON });
+  await expect(clear).toHaveCount(0);
+
+  await fillAndSave(page, text("OD borrador"), text("OI borrador"));
+  await expect(clear).toBeVisible();
   await expect(
-    card(page).locator("article").getByText(text("OD tarde")),
-  ).toBeVisible();
+    card(page).getByRole("button", { name: SAVE_BUTTON }),
+  ).toBeEnabled();
+  await clear.click();
+
+  await expect(page.locator("#otoscopyRight")).toHaveValue("");
+  await expect(page.locator("#otoscopyLeft")).toHaveValue("");
+  await expect(clear).toHaveCount(0);
+  await expect(
+    card(page).getByRole("button", { name: SAVE_BUTTON }),
+  ).toBeDisabled();
+});
+
+test("5. la tarjeta ya no muestra la nota de corrección del mismo día", async ({
+  page,
+}) => {
+  await gotoPatient(page);
+  await expect(
+    card(page).getByText("Lo puedes corregir hoy; después queda fijo."),
+  ).toHaveCount(0);
 });
 
 test("6. API: PUT physical-exam aparece en otoscopy-entries", async () => {
@@ -332,29 +251,26 @@ test("6. API: PUT physical-exam aparece en otoscopy-entries", async () => {
   expect(entries.some((entry) => entry.otoscopyRight === marker)).toBe(true);
 });
 
-test("7. guardar y cerrar el acordeón de Preguntas: sale el aviso y la lista se refresca", async ({
+test("7. guardar y cerrar el acordeón de Formularios: sale el aviso y la tarjeta queda limpia", async ({
   page,
 }) => {
   await gotoPatient(page);
-  await page.getByRole("button", { name: "Nueva otoscopia" }).click();
   await fillAndSave(page, text("OD siete"), text("OI siete"));
   await page.getByRole("button", { name: SAVE_BUTTON }).click();
-  // Enseguida, sin esperar al guardado, se abre y cierra el acordeón de Preguntas.
-  const questions = page.getByRole("button", { name: /^Preguntas/ });
+  // Enseguida, sin esperar al guardado, se abre y cierra el acordeón de Formularios.
+  const questions = page.getByRole("button", { name: /^Formularios/ });
   await questions.click();
   await questions.click();
 
   await expect(page.getByText("Otoscopia guardada")).toBeVisible();
-  await expect(
-    card(page).locator("article").getByText(text("OD siete")),
-  ).toBeVisible();
+  await expect(page.locator("#otoscopyRight")).toHaveValue("");
 });
 
-test("8. la tarjeta de Preguntas carga sin errores y tiene captura", async ({
+test("8. la tarjeta de Formularios carga sin errores y tiene captura", async ({
   page,
 }) => {
   await gotoPatient(page);
-  const questions = page.getByRole("button", { name: /^Preguntas/ });
+  const questions = page.getByRole("button", { name: /^Formularios/ });
   await questions.click();
   await expect(questions).toHaveAttribute("aria-expanded", "true");
   await page.waitForLoadState("networkidle");

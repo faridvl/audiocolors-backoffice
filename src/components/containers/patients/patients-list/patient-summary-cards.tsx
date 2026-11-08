@@ -1,9 +1,15 @@
-import React from 'react';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { EMPTY_VALUE } from '@/shared/utils/formatters';
-import { tailwind } from '@/utils/tailwind-utils';
-import { PatientListPreset, PatientListSelection } from './patient-list-selection';
-import { usePatientSummary } from './use-patient-summary';
+import React from "react";
+import {
+  Typography,
+  TypographyVariant,
+} from "@/components/common/typography/typography";
+import { EMPTY_VALUE } from "@/shared/utils/formatters";
+import { tailwind } from "@/utils/tailwind-utils";
+import {
+  PatientListPreset,
+  PatientListSelection,
+} from "./patient-list-selection";
+import { usePatientSummary } from "./use-patient-summary";
 
 interface PatientSummaryCardsProps {
   selection: PatientListSelection;
@@ -30,13 +36,15 @@ export const PatientSummaryCards: React.FC<PatientSummaryCardsProps> = ({
             onClick={() => onTogglePreset(card.preset)}
             aria-pressed={isActive}
             className={tailwind(
-              'rounded-card border bg-white px-4 py-3 text-left transition-colors',
+              "rounded-card border bg-white px-4 py-3 text-left transition-colors",
               isActive
-                ? 'border-brand ring-2 ring-brand/20'
-                : 'border-ink-200 hover:border-ink-400',
+                ? "border-brand ring-2 ring-brand/20"
+                : "border-ink-200 hover:border-ink-400",
             )}
           >
-            <Typography variant={TypographyVariant.HELPER}>{card.label}</Typography>
+            <Typography variant={TypographyVariant.HELPER}>
+              {card.label}
+            </Typography>
             <Typography variant={TypographyVariant.HEADER} as="p">
               {card.count ?? EMPTY_VALUE}
             </Typography>

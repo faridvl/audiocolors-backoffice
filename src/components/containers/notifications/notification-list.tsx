@@ -1,17 +1,30 @@
 import React from 'react';
-import { BellOff, ChevronRight, Rocket } from 'lucide-react';
+import { BellOff, ChevronRight, Rocket, UserX } from 'lucide-react';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { formatDate } from '@/shared/utils/formatters';
-import { ReleaseChangeKind } from '@/static/releases';
+import { Release, ReleaseChangeKind } from '@/static/releases';
 import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
-import { AppNotification } from './use-notifications';
+import { AppNotification, NotificationKind } from './use-notifications';
 
 interface NotificationListProps {
   notifications: AppNotification[];
   isUnread: (id: string) => boolean;
   onSelect: (id: string) => void;
+}
+
+/** "3 novedades · 5 mejoras · 1 corrección": cuenta por grupo, sin repetir el detalle. */
+function summarizeRelease(release: Release, t: TFunction): string {
+  return Object.values(ReleaseChangeKind)
+    .map((kind) => ({
+      kind,
+      count: release.changes.filter((item) => item.kind === kind).length,
+    }))
+    .filter(({ count }) => count > 0)
+    .map(({ kind, count }) => t(`${TEXT.NOTIFICATIONS.COUNT_PREFIX}.${kind}`, { count }))
+    .join(' · ');
 }
 
 export const NotificationList: React.FC<NotificationListProps> = ({
@@ -37,16 +50,17 @@ export const NotificationList: React.FC<NotificationListProps> = ({
 
   return (
     <ul className="flex flex-col divide-y divide-ink-100">
-      {notifications.map(({ id, release }) => {
-        // "3 novedades · 5 mejoras · 1 corrección": cuenta por grupo, sin repetir el detalle.
-        const summary = Object.values(ReleaseChangeKind)
-          .map((kind) => ({
-            kind,
-            count: release.changes.filter((item) => item.kind === kind).length,
-          }))
-          .filter(({ count }) => count > 0)
-          .map(({ kind, count }) => t(`${TEXT.NOTIFICATIONS.COUNT_PREFIX}.${kind}`, { count }))
-          .join(' · ');
+      {notifications.map((notification) => {
+        const { id } = notification;
+        const isRelease = notification.kind === NotificationKind.RELEASE;
+        const title = isRelease
+          ? t(TEXT.NOTIFICATIONS.RELEASE_TITLE, { version: notification.release.version })
+          : t(TEXT.NOTIFICATIONS.STALE_PATIENT_TITLE, { name: notification.patient.fullName });
+        const detail = isRelease
+          ? summarizeRelease(notification.release, t)
+          : t(TEXT.NOTIFICATIONS.STALE_PATIENT_DETAIL, {
+              date: formatDate(notification.patient.lastMovementAt),
+            });
         const isNew = isUnread(id);
 
         return (
@@ -60,12 +74,16 @@ export const NotificationList: React.FC<NotificationListProps> = ({
               )}
             >
               <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700">
-                <Rocket className="h-4 w-4" aria-hidden />
+                {isRelease ? (
+                  <Rocket className="h-4 w-4" aria-hidden />
+                ) : (
+                  <UserX className="h-4 w-4" aria-hidden />
+                )}
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="flex items-center gap-2">
                   <Typography variant={TypographyVariant.BODY_SEMIBOLD} inline className="truncate">
-                    {t(TEXT.NOTIFICATIONS.RELEASE_TITLE, { version: release.version })}
+                    {title}
                   </Typography>
                   {isNew && (
                     <span
@@ -75,11 +93,13 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                   )}
                 </span>
                 <Typography variant={TypographyVariant.HELPER} inline>
-                  {summary}
+                  {detail}
                 </Typography>
-                <Typography variant={TypographyVariant.HELPER} inline className="text-ink-400">
-                  {formatDate(release.publishedAt)}
-                </Typography>
+                {isRelease && (
+                  <Typography variant={TypographyVariant.HELPER} inline className="text-ink-400">
+                    {formatDate(notification.publishedAt)}
+                  </Typography>
+                )}
               </span>
               <ChevronRight className="mt-2 h-4 w-4 shrink-0 text-ink-400" aria-hidden />
             </button>

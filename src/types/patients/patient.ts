@@ -87,6 +87,7 @@ export interface Patient {
   maintenance4Status?: MaintenanceStatus;
   warrantyExpiredSince?: string | null;
   renewPrescriptionSince?: string | null;
+  prioritySince?: string | null;
   /** Documento (categoría WARRANTY) elegido como el de la garantía. */
   warrantyDocumentUuid?: string | null;
   birthDate?: string | null;
@@ -174,6 +175,7 @@ export enum PatientFlag {
   VIDEO_CANDIDATE = 'isVideoCandidate',
   WARRANTY_EXPIRED = 'warrantyExpired',
   RENEW_PRESCRIPTION = 'renewPrescription',
+  PRIORITY = 'isPriority',
 }
 
 /** Campo del paciente que guarda desde cuándo está prendido cada indicador. */
@@ -184,10 +186,12 @@ export const PATIENT_FLAG_SINCE_FIELDS: Record<
   | 'videoCandidateSince'
   | 'warrantyExpiredSince'
   | 'renewPrescriptionSince'
+  | 'prioritySince'
 > = {
   [PatientFlag.HEARING_AIDS_IN_LAB]: 'hearingAidsInLabSince',
   [PatientFlag.ACTIVE_WARRANTY]: 'warrantyActiveSince',
   [PatientFlag.VIDEO_CANDIDATE]: 'videoCandidateSince',
   [PatientFlag.WARRANTY_EXPIRED]: 'warrantyExpiredSince',
   [PatientFlag.RENEW_PRESCRIPTION]: 'renewPrescriptionSince',
+  [PatientFlag.PRIORITY]: 'prioritySince',
 };

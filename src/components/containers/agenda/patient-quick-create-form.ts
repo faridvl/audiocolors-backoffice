@@ -21,7 +21,6 @@ export interface PatientQuickCreateValues {
 const PHONE_ERROR_KEYS: Record<PhoneError, string> = {
   [PhoneError.LOCAL_FORMAT]: ERRORS.PHONE_LOCAL,
   [PhoneError.INTERNATIONAL_FORMAT]: ERRORS.PHONE_INTERNATIONAL,
-  [PhoneError.COSTA_RICA_WITH_PLUS]: ERRORS.PHONE_COSTA_RICA_WITH_PLUS,
 };
 
 /**
