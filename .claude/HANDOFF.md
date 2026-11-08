@@ -85,7 +85,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## En qué estamos
 
-- **Plantillas de documento (2026-11-08, rama `feature/plantillas-documento`):** pantalla hecha
+- **Plantillas de documento (2026-11-08, en `develop` del front y del API; migración aplicada en la
+  base de desarrollo):** pantalla hecha
   (lista, editor visual con barra de formato y hoja en blanco, panel de variables, "Ver ejemplo" en
   PDF; D60). Probada en pantalla contra el API local (escribir con formato, variables como
   etiquetas, guardar y reabrir). Rediseño visual hecho (D61: sin "Cuándo se usa", panel compacto,
@@ -94,7 +95,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   rama). Qa contra el API local de la rama hecha: crear, editar, reabrir, vista previa, descargar,
   texto vacío, variable desconocida, nombre repetido y 375/768/1440 sin scroll horizontal. Corregido
   lo que encontró: `{{clave}}` escrita de un solo golpe (dictado, autocompletado) caía el editor (D63).
-  Sigue: decidir si se sube a `develop` (front y API). Menor: un párrafo que empieza con "1. " vuelve
+  Menor pendiente: un párrafo que empieza con "1. " vuelve
   como lista numerada al reabrir.
 - **Audiometría (2026-11-08, en `develop` del front y del API):** acordeón completo (tonal,
   logoaudiometría, listas de palabras, Resumen, notas) que se guarda con historial por paciente; una
