@@ -37,6 +37,7 @@
     "jspdf": "3.0.1",
     "lucide-react": "^0.564.0",
     "next": "^14.2.4",
+    "pdfjs-dist": "3.11.174",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^14.1.2",

@@ -89,7 +89,10 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   (lista, editor visual con barra de formato y hoja en blanco, panel de variables, "Ver ejemplo" en
   PDF; D60). Probada en pantalla contra el API local (escribir con formato, variables como
   etiquetas, guardar y reabrir). Rediseño visual hecho (D61: sin "Cuándo se usa", panel compacto,
-  encabezado en una línea) y probado a 375, 768 y 1440. Pendiente: qa.
+  encabezado en una línea) y probado a 375, 768 y 1440. Vista previa del PDF en la misma página
+  (D62), revisada y corregida en 375, 768 y 1440 con las plantillas simuladas (el API de dev no tiene la
+  rama). Pendiente: qa contra el API local de la rama; el encabezado fijo de la vista previa es blanco
+  sobre fondo gris claro (revisar si molesta).
 - **Audiometría (2026-11-08, en `develop` del front y del API):** acordeón completo (tonal,
   logoaudiometría, listas de palabras, Resumen, notas) que se guarda con historial por paciente; una
   guardada se ve solo lectura y se imprime como informe A4 reconstruido desde la BD (D59). Campo de

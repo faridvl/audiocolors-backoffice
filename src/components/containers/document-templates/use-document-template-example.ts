@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/hooks/use-session';
 import { buildDocumentTemplatePdf, loadDocumentLogo } from '@/shared/utils/document-template-pdf';
@@ -9,19 +9,18 @@ import { DOCUMENT_TEMPLATE_VARIABLES } from '@/types/document-templates/document
 /** Logo que se usa en el pie cuando la clínica no subió el suyo. */
 const FALLBACK_LOGO_URL = '/logo-audiocolors.png';
 
-/** Arma el PDF de ejemplo de `content` con datos inventados; la dirección del PDF se libera al cerrar. */
+/** Arma el PDF de ejemplo de `content` con datos inventados. */
 export function useDocumentTemplateExample(content: string) {
   const { t } = useTranslation();
   const { tenant } = useSession();
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [isError, setIsError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const clinicName = tenant?.businessName ?? '';
   const logoUrl = tenant?.logoUrl ?? FALLBACK_LOGO_URL;
 
   useEffect(() => {
     let isCancelled = false;
-    let createdUrl: string | null = null;
-
     const examples = Object.fromEntries(
       DOCUMENT_TEMPLATE_VARIABLES.map((variable) => [
         variable,
@@ -39,8 +38,7 @@ export function useDocumentTemplateExample(content: string) {
           pageLabel: (page, total) => t(TEXT.DOCUMENT_TEMPLATES.EXAMPLE.PAGE_OF, { page, total }),
         });
         if (isCancelled) return;
-        createdUrl = URL.createObjectURL(blob);
-        setPdfUrl(createdUrl);
+        setPdfBlob(blob);
       } catch {
         if (!isCancelled) setIsError(true);
       }
@@ -49,9 +47,14 @@ export function useDocumentTemplateExample(content: string) {
 
     return () => {
       isCancelled = true;
-      if (createdUrl) URL.revokeObjectURL(createdUrl);
     };
-  }, [content, clinicName, logoUrl, t]);
+  }, [content, clinicName, logoUrl, t, attempt]);
 
-  return { pdfUrl, isLoading: pdfUrl === null && !isError, isError };
+  const retry = useCallback(() => {
+    setPdfBlob(null);
+    setIsError(false);
+    setAttempt((current) => current + 1);
+  }, []);
+
+  return { pdfBlob, isLoading: pdfBlob === null && !isError, isError, retry };
 }

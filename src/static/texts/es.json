@@ -202,7 +202,7 @@
     "namePlaceholder": "Ej. Consentimiento informado",
     "content": "Texto del documento",
     "contentPlaceholder": "Escribe el texto. Usa las variables de la lista para poner los datos del paciente.",
-    "viewExample": "Ver ejemplo",
+    "viewExample": "Vista previa",
     "toolbar": {
       "label": "Formato del texto",
       "bold": "Negrita",
@@ -290,11 +290,12 @@
       "loadTemplate": "No se pudo abrir la plantilla"
     },
     "example": {
-      "title": "Ejemplo del documento",
-      "close": "Cerrar",
-      "loading": "Preparando el ejemplo...",
-      "error": "No se pudo preparar el ejemplo",
-      "frameTitle": "Vista previa del documento en PDF",
+      "backToEdit": "Volver a editar",
+      "unnamed": "Plantilla sin nombre",
+      "download": "Descargar PDF",
+      "loading": "Preparando la vista previa...",
+      "error": "No se pudo preparar la vista previa",
+      "pageAria": "Página {{page}} de {{total}}",
       "pageOf": "{{page}} de {{total}}"
     }
   },

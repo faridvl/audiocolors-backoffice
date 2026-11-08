@@ -971,3 +971,12 @@ El editor deja de pedir "Cuándo se usa": ya no está en el formulario, la valid
 - El panel de variables muestra solo el nombre de cada una como chip clicable, agrupadas en Paciente y Documento (`DOCUMENT_TEMPLATE_VARIABLE_GROUPS`), con un check si está en uso. Sin `{{}}`, descripciones ni ejemplos.
 - En 1440 es una columna fija de 16rem junto a la hoja; debajo de `xl` es un plegable "Variables (14)" sobre la hoja.
 - Los ejemplos de cada variable siguen en `es.json` porque los usa "Ver ejemplo".
+
+## D62 · Vista previa de plantillas en la misma página, con pdf.js (2026-11-08)
+
+"Vista previa" (antes "Ver ejemplo") ya no abre un modal con un iframe: cambia el editor a una vista en la misma página que dibuja cada hoja del PDF de ejemplo en canvas con `pdfjs-dist` 3.11, con "Volver a editar" (también Escape, sin perder lo escrito) y "Descargar PDF".
+
+- Cada intento de carga crea su propio worker: el worker de respaldo de pdf.js guarda la promesa fallida y "Reintentar" nunca se recuperaba.
+- Por debajo de 640 px la hoja mide 720 px y solo el contenedor de páginas se desplaza de lado; a 304 px el texto no se leía.
+- El encabezado con los botones queda fijo al bajar; en celular no muestra el nombre de la plantilla.
+- Sin nombre, el archivo se descarga como "Plantilla sin nombre.pdf".
