@@ -44,6 +44,7 @@ interface PatientSummaryProps {
   onEditMaintenance: () => void;
   onEditContacts: () => void;
   onEdit: () => void;
+  onGenerateSummary: () => void;
 }
 
 /**
@@ -59,6 +60,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
   onEditMaintenance,
   onEditContacts,
   onEdit,
+  onGenerateSummary,
 }) => {
   const { t } = useTranslation();
   const { data: branches } = useBranchesQuery();
@@ -147,7 +149,12 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         </dl>
       </div>
 
-      <PatientActions onEdit={onEdit} onChangeStatus={onChangeStatus} onEditFlags={onEditFlags} />
+      <PatientActions
+        onEdit={onEdit}
+        onChangeStatus={onChangeStatus}
+        onEditFlags={onEditFlags}
+        onGenerateSummary={onGenerateSummary}
+      />
     </section>
   );
 };

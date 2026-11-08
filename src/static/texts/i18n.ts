@@ -610,6 +610,11 @@ export const TEXT = {
       LOAD_ERROR: 'patients.clinicalSummary.loadError',
       RETRY: 'patients.clinicalSummary.retry',
       TEMPLATES_HINT: 'patients.clinicalSummary.templatesHint',
+      TEMPLATES_EMPTY: 'patients.clinicalSummary.templatesEmpty',
+      FILE_TYPE: {
+        SUMMARY: 'patients.clinicalSummary.fileType.summary',
+        AUDIOMETRY: 'patients.clinicalSummary.fileType.audiometry',
+      },
       SECTIONS: {
         TEMPLATES: 'patients.clinicalSummary.sections.templates',
         BACKGROUND: 'patients.clinicalSummary.sections.background',

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useCreateAudiometryEntryMutation } from '@/shared/api/mutations/audiometry/create-audiometry-entry-mutation';
 import {
   FETCH_AUDIOMETRY_ENTRY_KEY,
@@ -10,6 +11,9 @@ import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { calculateAge, formatDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useSession } from '@/hooks/use-session';
+import { printWithFileName } from '@/shared/utils/print-document';
+import { buildPrintFileName } from '@/shared/utils/print-file-name';
+import { TEXT } from '@/static/texts/i18n';
 import {
   AudiogramMarks,
   AudiometryNotes,
@@ -330,7 +334,16 @@ export function useAudiometryPoc(patientUuid: string) {
     patientAge: calculateAge(patient?.birthDate),
     patientBirthDate: patient?.birthDate ? formatDate(patient.birthDate) : '',
   };
-  const handlePrint = () => window.print();
+  const { t } = useTranslation();
+  const handlePrint = () =>
+    printWithFileName(
+      buildPrintFileName({
+        type: t(TEXT.PATIENTS.CLINICAL_SUMMARY.FILE_TYPE.AUDIOMETRY),
+        clinic: printReportHeader.clinicName,
+        patient: printReportHeader.patientName,
+        documentId: printReportHeader.patientDocumentId,
+      }),
+    );
 
   return {
     accordionRef,

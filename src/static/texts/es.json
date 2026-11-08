@@ -813,6 +813,11 @@
       "loadError": "No se pudieron cargar los datos del resumen.",
       "retry": "Reintentar",
       "templatesHint": "Marca las plantillas que quieras incluir.",
+      "templatesEmpty": "Todavía no hay plantillas de documento.",
+      "fileType": {
+        "summary": "Resumen clínico",
+        "audiometry": "Audiometría"
+      },
       "sections": {
         "templates": "Plantillas de documento",
         "background": "Historia clínica",

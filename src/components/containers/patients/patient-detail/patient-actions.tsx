@@ -1,5 +1,5 @@
 import React from 'react';
-import { Ear, Pencil, UserCog } from 'lucide-react';
+import { Ear, FileText, Pencil, UserCog } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { TEXT } from '@/static/texts/i18n';
@@ -8,6 +8,7 @@ interface PatientActionsProps {
   onEdit: () => void;
   onChangeStatus: () => void;
   onEditFlags: () => void;
+  onGenerateSummary: () => void;
 }
 
 /** Acciones del paciente en una columna a la derecha. En el celular solo íconos: con texto le quitan ancho a los datos. */
@@ -15,6 +16,7 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
   onEdit,
   onChangeStatus,
   onEditFlags,
+  onGenerateSummary,
 }) => {
   const { t } = useTranslation();
   const actions = [
@@ -25,6 +27,11 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
       onClick: onChangeStatus,
     },
     { label: t(TEXT.PATIENTS.FLAGS.MENU), icon: Ear, onClick: onEditFlags },
+    {
+      label: t(TEXT.PATIENTS.DETAIL.ACTIONS.GENERATE_SUMMARY),
+      icon: FileText,
+      onClick: onGenerateSummary,
+    },
   ];
 
   return (
