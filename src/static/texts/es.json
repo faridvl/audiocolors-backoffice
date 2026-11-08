@@ -154,6 +154,10 @@
       "QUESTIONS": {
         "title": "Formularios",
         "description": "Los formularios que la clínica llena con sus pacientes. Los cambios no afectan las respuestas ya guardadas."
+      },
+      "TEMPLATES": {
+        "title": "Plantillas",
+        "description": "Los documentos tipo de la clínica, con los datos del paciente ya puestos."
       }
     },
     "appointmentTypes": {
@@ -179,6 +183,118 @@
       "editTitle": "Editar tipo de cita",
       "editLabel": "Editar {{name}}",
       "minutesShort": "{{count}} min"
+    }
+  },
+  "documentTemplates": {
+    "pageTitle": "Plantillas · AudioColors Gestión Clínica",
+    "loading": "Cargando plantillas...",
+    "loadError": "No se pudieron cargar las plantillas",
+    "empty": "La clínica todavía no tiene plantillas.",
+    "new": "Nueva plantilla",
+    "edit": "Editar",
+    "editLabel": "Editar {{name}}",
+    "back": "Volver",
+    "newTitle": "Nueva plantilla",
+    "editTitle": "Editar plantilla",
+    "saved": "Plantilla guardada",
+    "name": "Nombre",
+    "namePlaceholder": "Ej. Consentimiento informado",
+    "description": "Cuándo se usa",
+    "descriptionPlaceholder": "Ej. Antes de la primera consulta",
+    "content": "Mensaje",
+    "contentPlaceholder": "Escribe el texto. Usa las variables de la derecha para poner los datos del paciente.",
+    "viewExample": "Ver ejemplo",
+    "toolbar": {
+      "label": "Formato del texto",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "strike": "Tachado",
+      "heading": "Título",
+      "bulletList": "Lista con viñetas",
+      "numberedList": "Lista numerada"
+    },
+    "variables": {
+      "title": "Variables disponibles",
+      "intro": "Cada variable se cambia por el dato del paciente cuando se arma el documento.",
+      "insert": "Insertar {{variable}}",
+      "inUse": "En uso",
+      "withExample": "{{description}} — ej. {{example}}",
+      "footer": "Solo puedes usar estas variables. El sistema no deja guardar si escribes una que no existe.",
+      "nombre": {
+        "description": "Solo el nombre del paciente",
+        "example": "María"
+      },
+      "apellidos": {
+        "description": "Los apellidos del paciente",
+        "example": "Rodríguez Mora"
+      },
+      "nombre_completo": {
+        "description": "Nombre y apellidos del paciente",
+        "example": "María Rodríguez Mora"
+      },
+      "tipo_documento": {
+        "description": "El tipo de documento de identidad",
+        "example": "Cédula"
+      },
+      "documento": {
+        "description": "El número de documento",
+        "example": "1-1234-5678"
+      },
+      "fecha_nacimiento": {
+        "description": "La fecha de nacimiento",
+        "example": "14/03/1985"
+      },
+      "edad": {
+        "description": "La edad en años",
+        "example": "41 años"
+      },
+      "genero": {
+        "description": "El género del paciente",
+        "example": "Femenino"
+      },
+      "telefono": {
+        "description": "El teléfono principal",
+        "example": "+506 8888-1234"
+      },
+      "correo": {
+        "description": "El correo electrónico",
+        "example": "maria@ejemplo.com"
+      },
+      "direccion": {
+        "description": "La dirección del paciente",
+        "example": "Escazú, San José"
+      },
+      "sedes": {
+        "description": "Las sedes donde se atiende el paciente",
+        "example": "Sede Escazú"
+      },
+      "fecha_hoy": {
+        "description": "La fecha del día en que se arma el documento",
+        "example": "15 de noviembre de 2026"
+      },
+      "profesional": {
+        "description": "El profesional que atiende",
+        "example": "Dra. Ana Vargas"
+      }
+    },
+    "errors": {
+      "nameRequired": "Escribe el nombre de la plantilla.",
+      "nameMax": "El nombre admite hasta {{max}} caracteres.",
+      "descriptionMax": "Este campo admite hasta {{max}} caracteres.",
+      "contentRequired": "Escribe el mensaje de la plantilla.",
+      "contentMax": "El mensaje admite hasta {{max}} caracteres.",
+      "unknownVariable_one": "La variable {{names}} no existe. Usa solo las de la lista.",
+      "unknownVariable_other": "Las variables {{names}} no existen. Usa solo las de la lista.",
+      "duplicateName": "Ya existe una plantilla con ese nombre.",
+      "loadTemplate": "No se pudo abrir la plantilla"
+    },
+    "example": {
+      "title": "Ejemplo del documento",
+      "close": "Cerrar",
+      "loading": "Preparando el ejemplo...",
+      "error": "No se pudo preparar el ejemplo",
+      "frameTitle": "Vista previa del documento en PDF",
+      "pageOf": "{{page}} de {{total}}"
     }
   },
   "questions": {

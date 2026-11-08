@@ -6,6 +6,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
+import { tailwind } from '@/utils/tailwind-utils';
 import { SettingsNav } from './settings-nav';
 import {
   sectionDescriptionKey,
@@ -33,7 +34,8 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const { sections } = useSettingsNavigation();
-  const permission = SETTINGS_SECTIONS.find((item) => item.section === section)?.permission;
+  const sectionItem = SETTINGS_SECTIONS.find((item) => item.section === section);
+  const permission = sectionItem?.permission;
 
   return (
     <AppLayout
@@ -46,7 +48,12 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
           <SettingsNav sections={sections} activeSection={section} />
         </aside>
         {/* Todas las secciones arrancan igual (misma línea, mismo ancho): cambiar de una a otra no salta. */}
-        <div className="flex w-full min-w-0 max-w-3xl flex-col gap-4">
+        <div
+          className={tailwind(
+            'flex w-full min-w-0 flex-col gap-4',
+            sectionItem?.isWide ? 'max-w-5xl' : 'max-w-3xl',
+          )}
+        >
           {showsDescription && (
             <Typography variant={TypographyVariant.BODY} className="text-ink-600">
               {t(sectionDescriptionKey(section))}

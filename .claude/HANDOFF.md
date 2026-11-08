@@ -72,8 +72,20 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   Diseño: modelo propio `PatientAudiometryEntry` en el API (por paciente, sin cita, payload JSON
   versionado y validado con Zod, append-only), no `Study`.
 
+- Plantillas de documento (2026-11-08): nueva sección Configuración → Plantillas. Se crean y se
+  editan varias (no se borran por ahora). La lista muestra solo tarjetas con el nombre; "Editar" abre
+  una vista dentro de la misma página (no otra ruta) con nombre, "Cuándo se usa", el texto con barra
+  de formato tipo Word y el panel de variables. Variables: solo datos personales del paciente (más
+  fecha de hoy y profesional); una variable desconocida no deja guardar. "Ver ejemplo" muestra el PDF
+  con datos de ejemplo; cada página lleva el logo y el nombre de la clínica al pie. Usarlas desde el
+  expediente con datos reales es otro desarrollo.
+
 ## En qué estamos
 
+- **Plantillas de documento (2026-11-08, rama `feature/plantillas-documento`):** pantalla hecha
+  (lista, editor con barra de formato, panel de variables, "Ver ejemplo" en PDF). Depende de los
+  endpoints `/document-templates` del API, que se construyen aparte. Falta probarla en pantalla
+  contra ese API.
 - **Audiometría (2026-11-08, en `develop` del front y del API):** acordeón completo (tonal,
   logoaudiometría, listas de palabras, Resumen, notas) que se guarda con historial por paciente; una
   guardada se ve solo lectura y se imprime como informe A4 reconstruido desde la BD (D59). Campo de

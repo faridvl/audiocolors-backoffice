@@ -15,6 +15,7 @@ export const routesPrivate = {
     index: '/configuracion',
     questions: '/configuracion/preguntas',
     appointmentTypes: '/configuracion/tipos-de-cita',
+    templates: '/configuracion/plantillas',
   },
 };
 
