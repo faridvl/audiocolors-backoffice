@@ -177,11 +177,6 @@ export function usePatientSummary(patient: Patient) {
   const toggleCard = (card: SummaryCard, isChecked: boolean) =>
     setChecked((current) => ({ ...current, [card]: isChecked }));
 
-  const toggleTemplate = (templateUuid: string, isChecked: boolean) =>
-    setTemplateUuids((current) =>
-      isChecked ? [...current, templateUuid] : current.filter((uuid) => uuid !== templateUuid),
-    );
-
   const isLoadingChosen =
     (checked[SummaryCard.TEMPLATES] && templateContentQueries.some((query) => query.isLoading)) ||
     (checked[SummaryCard.AUDIOMETRY] && audiometryQuery.isLoading);
@@ -223,7 +218,13 @@ export function usePatientSummary(patient: Patient) {
     const chosenTemplates = hasTemplatesChosen
       ? templateContentQueries.flatMap((query) =>
           query.data
-            ? [{ uuid: query.data.uuid, name: query.data.name, content: query.data.content }]
+            ? [
+                {
+                  uuid: query.data.uuid,
+                  name: query.data.name,
+                  content: query.data.content,
+                },
+              ]
             : [],
         )
       : [];
@@ -296,7 +297,7 @@ export function usePatientSummary(patient: Patient) {
     templates,
     templateUuids,
     toggleCard,
-    toggleTemplate,
+    changeTemplates: setTemplateUuids,
     isLoadingChosen,
     cancelGeneration,
     canGenerate,

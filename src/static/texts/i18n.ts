@@ -610,7 +610,11 @@ export const TEXT = {
       LOAD_ERROR: 'patients.clinicalSummary.loadError',
       CARD_LOAD_ERROR: 'patients.clinicalSummary.cardLoadError',
       RETRY: 'patients.clinicalSummary.retry',
-      TEMPLATES_HINT: 'patients.clinicalSummary.templatesHint',
+      TEMPLATES_PLACEHOLDER: 'patients.clinicalSummary.templatesPlaceholder',
+      TEMPLATES_SEARCH: 'patients.clinicalSummary.templatesSearch',
+      TEMPLATES_NO_RESULTS: 'patients.clinicalSummary.templatesNoResults',
+      TEMPLATES_SELECTED: 'patients.clinicalSummary.templatesSelected',
+      TEMPLATES_REMOVE: 'patients.clinicalSummary.templatesRemove',
       TEMPLATES_EMPTY: 'patients.clinicalSummary.templatesEmpty',
       FILE_TYPE: {
         SUMMARY: 'patients.clinicalSummary.fileType.summary',

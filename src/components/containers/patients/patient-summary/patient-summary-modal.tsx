@@ -2,7 +2,7 @@ import React from 'react';
 import { FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
-import { Checkbox } from '@/components/common/checkbox/checkbox';
+import { MultiSelect } from '@/components/common/multi-select/multi-select';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
@@ -72,19 +72,21 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
                 onChange={(isChecked) => summary.toggleCard(state.card, isChecked)}
               >
                 {state.card === SummaryCard.TEMPLATES && (
-                  <div className="mt-3 flex flex-col border-t border-ink-100 pb-1 pt-3">
-                    <Typography variant={TypographyVariant.HELPER} className="px-3 pb-1">
-                      {t(SUMMARY_TEXT.TEMPLATES_HINT)}
-                    </Typography>
-                    {summary.templates.map((template) => (
-                      <Checkbox
-                        key={template.uuid}
-                        label={template.name}
-                        isChecked={summary.templateUuids.includes(template.uuid)}
-                        onChange={(isChecked) => summary.toggleTemplate(template.uuid, isChecked)}
-                        className="min-h-[44px] w-full px-3"
-                      />
-                    ))}
+                  <div className="mt-3 border-t border-ink-100 pt-3">
+                    <MultiSelect
+                      options={summary.templates.map((template) => ({
+                        value: template.uuid,
+                        label: template.name,
+                      }))}
+                      selectedValues={summary.templateUuids}
+                      onChange={summary.changeTemplates}
+                      placeholder={t(SUMMARY_TEXT.TEMPLATES_PLACEHOLDER)}
+                      searchPlaceholder={t(SUMMARY_TEXT.TEMPLATES_SEARCH)}
+                      emptyText={t(SUMMARY_TEXT.TEMPLATES_NO_RESULTS)}
+                      ariaLabel={t(SUMMARY_TEXT.SECTIONS.TEMPLATES)}
+                      getSummaryLabel={(count) => t(SUMMARY_TEXT.TEMPLATES_SELECTED, { count })}
+                      getRemoveLabel={(label) => t(SUMMARY_TEXT.TEMPLATES_REMOVE, { label })}
+                    />
                   </div>
                 )}
               </SummaryOptionCard>
