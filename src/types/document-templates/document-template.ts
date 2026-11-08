@@ -20,14 +20,41 @@ export enum DocumentTemplateVariable {
 export const DOCUMENT_TEMPLATE_VARIABLES: DocumentTemplateVariable[] =
   Object.values(DocumentTemplateVariable);
 
+export enum DocumentTemplateVariableGroup {
+  PATIENT = 'patient',
+  DOCUMENT = 'document',
+}
+
+export const DOCUMENT_TEMPLATE_VARIABLE_GROUPS: Record<
+  DocumentTemplateVariableGroup,
+  DocumentTemplateVariable[]
+> = {
+  [DocumentTemplateVariableGroup.PATIENT]: [
+    DocumentTemplateVariable.NAME,
+    DocumentTemplateVariable.LAST_NAMES,
+    DocumentTemplateVariable.FULL_NAME,
+    DocumentTemplateVariable.DOCUMENT_TYPE,
+    DocumentTemplateVariable.DOCUMENT,
+    DocumentTemplateVariable.BIRTH_DATE,
+    DocumentTemplateVariable.AGE,
+    DocumentTemplateVariable.GENDER,
+    DocumentTemplateVariable.PHONE,
+    DocumentTemplateVariable.EMAIL,
+    DocumentTemplateVariable.ADDRESS,
+    DocumentTemplateVariable.BRANCHES,
+  ],
+  [DocumentTemplateVariableGroup.DOCUMENT]: [
+    DocumentTemplateVariable.TODAY,
+    DocumentTemplateVariable.PROFESSIONAL,
+  ],
+};
+
 export const DOCUMENT_TEMPLATE_NAME_MAX_LENGTH = 120;
-export const DOCUMENT_TEMPLATE_DESCRIPTION_MAX_LENGTH = 300;
 export const DOCUMENT_TEMPLATE_CONTENT_MAX_LENGTH = 20000;
 
 export interface DocumentTemplateSummary {
   uuid: string;
   name: string;
-  description: string | null;
   updatedAt: string;
 }
 
@@ -38,6 +65,5 @@ export interface DocumentTemplate extends DocumentTemplateSummary {
 
 export interface SaveDocumentTemplatePayload {
   name: string;
-  description?: string;
   content: string;
 }

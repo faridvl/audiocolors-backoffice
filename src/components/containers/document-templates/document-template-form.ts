@@ -4,7 +4,6 @@ import { findUnknownVariables } from '@/shared/utils/document-template-text';
 import { TEXT } from '@/static/texts/i18n';
 import {
   DOCUMENT_TEMPLATE_CONTENT_MAX_LENGTH,
-  DOCUMENT_TEMPLATE_DESCRIPTION_MAX_LENGTH,
   DOCUMENT_TEMPLATE_NAME_MAX_LENGTH,
   DocumentTemplate,
   SaveDocumentTemplatePayload,
@@ -12,13 +11,11 @@ import {
 
 export interface DocumentTemplateFormValues {
   name: string;
-  description: string;
   content: string;
 }
 
 export const EMPTY_DOCUMENT_TEMPLATE_VALUES: DocumentTemplateFormValues = {
   name: '',
-  description: '',
   content: '',
 };
 
@@ -26,16 +23,13 @@ export function toFormValues(template: DocumentTemplate | null): DocumentTemplat
   if (!template) return EMPTY_DOCUMENT_TEMPLATE_VALUES;
   return {
     name: template.name,
-    description: template.description ?? '',
     content: template.content,
   };
 }
 
 export function toPayload(values: DocumentTemplateFormValues): SaveDocumentTemplatePayload {
-  const description = values.description.trim();
   return {
     name: values.name.trim(),
-    ...(description ? { description } : {}),
     content: values.content,
   };
 }
@@ -49,12 +43,6 @@ export function buildDocumentTemplateSchema(t: TFunction) {
         DOCUMENT_TEMPLATE_NAME_MAX_LENGTH,
         t(TEXT.DOCUMENT_TEMPLATES.ERRORS.NAME_MAX, { max: DOCUMENT_TEMPLATE_NAME_MAX_LENGTH }),
       ),
-    description: Yup.string().max(
-      DOCUMENT_TEMPLATE_DESCRIPTION_MAX_LENGTH,
-      t(TEXT.DOCUMENT_TEMPLATES.ERRORS.DESCRIPTION_MAX, {
-        max: DOCUMENT_TEMPLATE_DESCRIPTION_MAX_LENGTH,
-      }),
-    ),
     content: Yup.string()
       .required(t(TEXT.DOCUMENT_TEMPLATES.ERRORS.CONTENT_REQUIRED))
       .max(

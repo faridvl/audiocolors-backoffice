@@ -3,7 +3,7 @@ import { useFormikContext } from 'formik';
 import { DocumentTemplateFormValues } from './document-template-form';
 
 /** Campos en el orden en que aparecen en pantalla; el id de cada uno es su nombre. */
-const FIELD_ORDER: (keyof DocumentTemplateFormValues)[] = ['name', 'description', 'content'];
+const FIELD_ORDER: (keyof DocumentTemplateFormValues)[] = ['name', 'content'];
 
 /** Al intentar guardar con errores, lleva la vista al primer campo con error y lo enfoca. */
 export function useFocusFirstError() {

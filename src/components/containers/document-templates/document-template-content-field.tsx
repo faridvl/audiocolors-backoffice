@@ -15,13 +15,11 @@ import { TOOLBAR_ACTIONS } from './document-template-format-toolbar';
 
 interface DocumentTemplateContentFieldProps {
   editor: Editor | null;
-  onViewExample: () => void;
 }
 
 /** El mensaje: barra de formato pegada a una hoja en blanco donde se escribe con el formato a la vista. */
 export const DocumentTemplateContentField: React.FC<DocumentTemplateContentFieldProps> = ({
   editor,
-  onViewExample,
 }) => {
   const { t } = useTranslation();
   const [, { error, touched }] = useField<string>('content');
@@ -37,15 +35,6 @@ export const DocumentTemplateContentField: React.FC<DocumentTemplateContentField
             <span className="ml-0.5 text-danger">*</span>
           </Typography>
         </div>
-        <button
-          type="button"
-          onClick={onViewExample}
-          className="flex min-h-[44px] items-center rounded-md px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
-        >
-          <Typography variant={TypographyVariant.LINK} inline>
-            {t(TEXT.DOCUMENT_TEMPLATES.VIEW_EXAMPLE)}
-          </Typography>
-        </button>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-ink-200">

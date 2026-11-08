@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { DocumentTemplateSummary } from '@/types/document-templates/document-template';
 
@@ -22,16 +23,18 @@ export const DocumentTemplateListItem: React.FC<DocumentTemplateListItemProps> =
         <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="truncate">
           {template.name}
         </Typography>
-        {template.description && (
-          <Typography variant={TypographyVariant.HELPER} className="line-clamp-2">
-            {template.description}
-          </Typography>
-        )}
+        <Typography variant={TypographyVariant.HELPER}>
+          {t(TEXT.DOCUMENT_TEMPLATES.UPDATED_AT, {
+            date: formatDate(template.updatedAt),
+          })}
+        </Typography>
       </div>
       <Button
         variant={ButtonVariant.SECONDARY}
         onClick={onEdit}
-        aria-label={t(TEXT.DOCUMENT_TEMPLATES.EDIT_LABEL, { name: template.name })}
+        aria-label={t(TEXT.DOCUMENT_TEMPLATES.EDIT_LABEL, {
+          name: template.name,
+        })}
         className="shrink-0"
       >
         {t(TEXT.DOCUMENT_TEMPLATES.EDIT)}

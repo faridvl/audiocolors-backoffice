@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FIELD_LABEL_CLASSES, FormField } from '@/components/common/input/input';
+import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
-import {
-  DOCUMENT_TEMPLATE_DESCRIPTION_MAX_LENGTH,
-  DOCUMENT_TEMPLATE_NAME_MAX_LENGTH,
-} from '@/types/document-templates/document-template';
+import { DOCUMENT_TEMPLATE_NAME_MAX_LENGTH } from '@/types/document-templates/document-template';
 import { DocumentTemplateContentField } from './document-template-content-field';
 import { DocumentTemplateExampleModal } from './document-template-example-modal';
 import { DocumentTemplateFormValues } from './document-template-form';
@@ -16,11 +15,13 @@ import { useDocumentTemplateContent } from './use-document-template-content';
 import { useFocusFirstError } from './use-focus-first-error';
 
 interface DocumentTemplateEditorFieldsProps {
+  title: string;
   isSaving: boolean;
   onCancel: () => void;
 }
 
 export const DocumentTemplateEditorFields: React.FC<DocumentTemplateEditorFieldsProps> = ({
+  title,
   isSaving,
   onCancel,
 }) => {
@@ -32,32 +33,38 @@ export const DocumentTemplateEditorFields: React.FC<DocumentTemplateEditorFields
 
   return (
     <>
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_19rem] xl:items-start">
-        <div className="flex flex-col gap-4 rounded-card border border-ink-200 bg-white p-4 sm:p-5">
-          <div className="grid gap-4 lg:grid-cols-2">
-            <FormField
-              name="name"
-              label={t(TEXT.DOCUMENT_TEMPLATES.NAME)}
-              labelClassName={FIELD_LABEL_CLASSES}
-              placeholder={t(TEXT.DOCUMENT_TEMPLATES.NAME_PLACEHOLDER)}
-              maxLength={DOCUMENT_TEMPLATE_NAME_MAX_LENGTH}
-              required
-            />
-            <FormField
-              name="description"
-              label={t(TEXT.DOCUMENT_TEMPLATES.DESCRIPTION)}
-              labelClassName={FIELD_LABEL_CLASSES}
-              placeholder={t(TEXT.DOCUMENT_TEMPLATES.DESCRIPTION_PLACEHOLDER)}
-              maxLength={DOCUMENT_TEMPLATE_DESCRIPTION_MAX_LENGTH}
-              optional
-            />
-          </div>
-          <DocumentTemplateContentField
-            editor={editor}
-            onViewExample={() => setIsExampleOpen(true)}
-          />
-        </div>
+      <div className="flex items-center gap-2">
+        <Button
+          variant={ButtonVariant.GHOST}
+          onClick={onCancel}
+          icon={<ArrowLeft className="h-4 w-4" aria-hidden />}
+          className="shrink-0 px-2 sm:px-4"
+        >
+          {t(TEXT.DOCUMENT_TEMPLATES.BACK)}
+        </Button>
+        <Typography variant={TypographyVariant.ACCENT} className="min-w-0 flex-1 truncate">
+          {title}
+        </Typography>
+        <Button
+          variant={ButtonVariant.SECONDARY}
+          onClick={() => setIsExampleOpen(true)}
+          className="shrink-0 px-3 sm:px-4"
+        >
+          {t(TEXT.DOCUMENT_TEMPLATES.VIEW_EXAMPLE)}
+        </Button>
+      </div>
 
+      <FormField
+        name="name"
+        label={t(TEXT.DOCUMENT_TEMPLATES.NAME)}
+        labelClassName={FIELD_LABEL_CLASSES}
+        placeholder={t(TEXT.DOCUMENT_TEMPLATES.NAME_PLACEHOLDER)}
+        maxLength={DOCUMENT_TEMPLATE_NAME_MAX_LENGTH}
+        required
+      />
+
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem] xl:items-start">
+        <DocumentTemplateContentField editor={editor} />
         <DocumentTemplateVariablesPanel
           usedVariables={usedVariables}
           onInsert={handleInsertVariable}

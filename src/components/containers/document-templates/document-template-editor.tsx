@@ -79,13 +79,11 @@ export const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
       enableReinitialize
     >
       <Form className="flex w-full flex-col gap-4" noValidate>
-        <div className="flex flex-wrap items-center gap-2">
-          {backButton}
-          <Typography variant={TypographyVariant.ACCENT}>
-            {t(isNew ? TEXT.DOCUMENT_TEMPLATES.NEW_TITLE : TEXT.DOCUMENT_TEMPLATES.EDIT_TITLE)}
-          </Typography>
-        </div>
-        <DocumentTemplateEditorFields isSaving={isSaving} onCancel={onBack} />
+        <DocumentTemplateEditorFields
+          title={t(isNew ? TEXT.DOCUMENT_TEMPLATES.NEW_TITLE : TEXT.DOCUMENT_TEMPLATES.EDIT_TITLE)}
+          isSaving={isSaving}
+          onCancel={onBack}
+        />
       </Form>
     </Formik>
   );

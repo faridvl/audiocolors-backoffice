@@ -963,3 +963,11 @@ El mensaje de la plantilla se escribe en un editor tipo Word (TipTap sobre Prose
 - Solo se admiten los formatos que el markdown puede expresar (negrita, cursiva, tachado, títulos, listas de una sola línea); pegar HTML se reduce a eso. Sin saltos de línea suaves ni listas anidadas.
 - Limitaciones conocidas: no hay escape de `*`, `~~` ni `{{` literales, y una lista numerada se renumera desde su primer número.
 - El editor se crea solo en el navegador (`immediatelyRender: false`) por el render del servidor de Next.
+
+## D61 · Plantillas sin "Cuándo se usa" y panel de variables compacto (2026-11-08)
+
+El editor deja de pedir "Cuándo se usa": ya no está en el formulario, la validación, el payload ni la lista (el API no se toca; una plantilla vieja con descripción simplemente no la muestra).
+
+- El panel de variables muestra solo el nombre de cada una como chip clicable, agrupadas en Paciente y Documento (`DOCUMENT_TEMPLATE_VARIABLE_GROUPS`), con un check si está en uso. Sin `{{}}`, descripciones ni ejemplos.
+- En 1440 es una columna fija de 16rem junto a la hoja; debajo de `xl` es un plegable "Variables (14)" sobre la hoja.
+- Los ejemplos de cada variable siguen en `es.json` porque los usa "Ver ejemplo".

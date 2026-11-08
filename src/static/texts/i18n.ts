@@ -132,14 +132,13 @@ export const TEXT = {
     NEW: 'documentTemplates.new',
     EDIT: 'documentTemplates.edit',
     EDIT_LABEL: 'documentTemplates.editLabel',
+    UPDATED_AT: 'documentTemplates.updatedAt',
     BACK: 'documentTemplates.back',
     NEW_TITLE: 'documentTemplates.newTitle',
     EDIT_TITLE: 'documentTemplates.editTitle',
     SAVED: 'documentTemplates.saved',
     NAME: 'documentTemplates.name',
     NAME_PLACEHOLDER: 'documentTemplates.namePlaceholder',
-    DESCRIPTION: 'documentTemplates.description',
-    DESCRIPTION_PLACEHOLDER: 'documentTemplates.descriptionPlaceholder',
     CONTENT: 'documentTemplates.content',
     CONTENT_PLACEHOLDER: 'documentTemplates.contentPlaceholder',
     VIEW_EXAMPLE: 'documentTemplates.viewExample',
@@ -154,18 +153,18 @@ export const TEXT = {
     },
     VARIABLES: {
       TITLE: 'documentTemplates.variables.title',
+      TITLE_WITH_TOTAL: 'documentTemplates.variables.titleWithTotal',
       INTRO: 'documentTemplates.variables.intro',
       INSERT: 'documentTemplates.variables.insert',
       IN_USE: 'documentTemplates.variables.inUse',
-      WITH_EXAMPLE: 'documentTemplates.variables.withExample',
-      FOOTER: 'documentTemplates.variables.footer',
-      /** `${ITEM_PREFIX}.${DocumentTemplateVariable}.label`, `.description` y `.example` */
+      /** `${GROUP_PREFIX}.${DocumentTemplateVariableGroup}` */
+      GROUP_PREFIX: 'documentTemplates.variables.groups',
+      /** `${ITEM_PREFIX}.${DocumentTemplateVariable}.label` y `.example` */
       ITEM_PREFIX: 'documentTemplates.variables',
     },
     ERRORS: {
       NAME_REQUIRED: 'documentTemplates.errors.nameRequired',
       NAME_MAX: 'documentTemplates.errors.nameMax',
-      DESCRIPTION_MAX: 'documentTemplates.errors.descriptionMax',
       CONTENT_REQUIRED: 'documentTemplates.errors.contentRequired',
       CONTENT_MAX: 'documentTemplates.errors.contentMax',
       UNKNOWN_VARIABLE: 'documentTemplates.errors.unknownVariable',
