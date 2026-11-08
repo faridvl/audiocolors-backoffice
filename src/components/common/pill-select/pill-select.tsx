@@ -14,6 +14,10 @@ export interface PillSelectOption {
   group?: string;
   /** Color de la barra a la izquierda del texto (p. ej. el de cada sede). */
   accentColor?: string;
+  /** Ícono a la izquierda del texto, en el botón y en la lista. */
+  icon?: React.ReactNode;
+  /** Con `icon`, deja el texto solo para lectores de pantalla. */
+  isLabelHidden?: boolean;
 }
 
 export enum PillSelectVariant {
@@ -47,6 +51,8 @@ interface PillSelectProps {
   placeholder?: string;
   /** En móvil (menos de `sm`) la lista se abre como hoja inferior, sin tapar el resto del formulario. */
   isSheetOnMobile?: boolean;
+  /** Sin interacción y con aspecto atenuado (p. ej. mientras falta un dato previo). */
+  isDisabled?: boolean;
   className?: string;
 }
 
@@ -74,16 +80,18 @@ export const PillSelect: React.FC<PillSelectProps> = ({
   variant = PillSelectVariant.PILL,
   placeholder,
   isSheetOnMobile = false,
+  isDisabled = false,
   className,
 }) => {
   const isSheet = useIsMobile() && isSheetOnMobile;
   const isMultiple = values !== undefined;
+  const selectedOption = isMultiple ? undefined : options.find((option) => option.value === value);
   const selectedLabel = isMultiple
     ? options
         .filter((option) => values.includes(option.value))
         .map((option) => option.label)
         .join(', ')
-    : options.find((option) => option.value === value)?.label;
+    : selectedOption?.label;
   const handleChange = (next: string | string[]) => {
     if (Array.isArray(next)) onValuesChange?.(next);
     else onChange?.(next);
@@ -94,6 +102,7 @@ export const PillSelect: React.FC<PillSelectProps> = ({
       value={isMultiple ? values : (value ?? '')}
       onChange={handleChange}
       multiple={isMultiple}
+      disabled={isDisabled}
     >
       {({ open }) => (
         <>
@@ -101,14 +110,23 @@ export const PillSelect: React.FC<PillSelectProps> = ({
             aria-label={ariaLabel}
             className={tailwind(
               'group relative flex w-full items-center border bg-white py-2.5 pr-11 text-left',
-              'transition-colors focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-brand',
+              'transition-colors data-[disabled]:cursor-not-allowed data-[disabled]:bg-ink-50 data-[disabled]:opacity-60 focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2 data-[focus]:outline-brand',
               BUTTON_VARIANT_STYLES[variant],
               isActive ? 'border-ink-800' : 'border-ink-200',
               className,
             )}
           >
+            {!buttonLabel && selectedOption?.icon && (
+              <span aria-hidden className="mr-2 flex shrink-0 items-center">
+                {selectedOption.icon}
+              </span>
+            )}
             <span
-              className={tailwind('truncate', !selectedLabel && !buttonLabel && 'text-ink-400')}
+              className={tailwind(
+                'truncate',
+                !selectedLabel && !buttonLabel && 'text-ink-400',
+                !buttonLabel && selectedOption?.isLabelHidden && 'sr-only',
+              )}
             >
               {buttonLabel ?? (selectedLabel || placeholder)}
             </span>
@@ -164,7 +182,14 @@ export const PillSelect: React.FC<PillSelectProps> = ({
                           className="h-4 w-1 shrink-0 rounded-full"
                         />
                       )}
-                      <span className="truncate">{option.shortLabel ?? option.label}</span>
+                      {option.icon && (
+                        <span aria-hidden className="flex shrink-0 items-center">
+                          {option.icon}
+                        </span>
+                      )}
+                      <span className={tailwind('truncate', option.isLabelHidden && 'sr-only')}>
+                        {option.shortLabel ?? option.label}
+                      </span>
                     </span>
                     <Check
                       className="invisible h-4 w-4 shrink-0 text-ink-900 group-data-[selected]:visible"

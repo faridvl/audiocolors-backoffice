@@ -1,7 +1,6 @@
 import React from 'react';
-import { inputBaseClasses } from '@/components/common/input/input';
+import { DateField } from '@/components/common/date-field/date-field';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { tailwind } from '@/utils/tailwind-utils';
 
 interface LabDateFieldProps {
   id: string;
@@ -35,30 +34,14 @@ export const LabDateField: React.FC<LabDateFieldProps> = ({
         {label}
       </Typography>
     </label>
-    <input
+    <DateField
       id={id}
-      type="date"
+      value={value}
       min={min}
       max={max}
-      value={value}
       disabled={disabled}
-      aria-invalid={Boolean(errorMessage)}
-      aria-describedby={errorMessage ? `${id}-error` : undefined}
-      onChange={(event) => onChange(event.target.value)}
-      // Safari de iOS dibuja el input de fecha con su propio estilo; sin apariencia nativa
-      // queda alineado con el resto de campos.
-      className={tailwind(
-        inputBaseClasses,
-        'block h-[46px] min-w-0 appearance-none text-left',
-        '[&::-webkit-date-and-time-value]:text-left',
-      )}
+      errorMessage={errorMessage}
+      onChange={onChange}
     />
-    <div aria-live="polite">
-      {errorMessage && (
-        <Typography id={`${id}-error`} variant={TypographyVariant.ERROR}>
-          {errorMessage}
-        </Typography>
-      )}
-    </div>
   </div>
 );

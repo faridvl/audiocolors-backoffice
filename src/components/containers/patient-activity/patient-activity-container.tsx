@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
 import { Pagination } from '@/components/common/table/pagination';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { DateField } from '@/components/common/date-field/date-field';
 import { inputBaseClasses } from '@/components/common/input/input';
 import { FilterBar, FilterBarField } from '@/components/common/filter-bar/filter-bar';
 import { getBranchStripeColor } from '@/shared/design/tokens';
@@ -21,13 +22,14 @@ import {
 import { ActivityScope, ALL_VALUE, usePatientActivity } from './use-patient-activity';
 import { BranchBadge } from '@/components/common/badge/branch-badge';
 
-const DateField: React.FC<{
+const ActivityDateField: React.FC<{
+  id: string;
   label: string;
   value: string;
   min?: string;
   max?: string;
   onChange: (value: string) => void;
-}> = ({ label, value, min, max, onChange }) => (
+}> = ({ id, label, value, min, max, onChange }) => (
   // Desde `sm` la etiqueta sube por encima de la fila: el campo queda a la altura del buscador.
   <label className="relative flex min-w-0 flex-col gap-1 sm:w-40">
     <Typography
@@ -37,19 +39,7 @@ const DateField: React.FC<{
     >
       {label}
     </Typography>
-    <input
-      type="date"
-      value={value}
-      min={min}
-      max={max}
-      onChange={(event) => onChange(event.target.value)}
-      // Safari de iOS dibuja el input de fecha más alto y centrado: sin apariencia nativa se alinea.
-      className={tailwind(
-        inputBaseClasses,
-        'block h-11 min-w-0 appearance-none text-left sm:h-[46px]',
-        '[&::-webkit-date-and-time-value]:text-left',
-      )}
-    />
+    <DateField id={id} value={value} min={min} max={max} onChange={onChange} />
   </label>
 );
 
@@ -156,9 +146,7 @@ export const PatientActivityContainer: React.FC = () => {
         key: 'actor',
         header: t(TEXT.ACTIVITY.COLUMNS.ACTOR),
         width: '15%',
-        render: (row) => (
-          <span className="italic">{row.activity.actorName}</span>
-        ),
+        render: (row) => <span className="italic">{row.activity.actorName}</span>,
       },
     ],
     [t, resolveBranchName],
@@ -232,13 +220,15 @@ export const PatientActivityContainer: React.FC = () => {
 
             {/* Desde/hasta: en el celular lado a lado, cada uno la mitad. */}
             <div className="grid grid-cols-2 gap-2 sm:flex">
-              <DateField
+              <ActivityDateField
+                id="activity-from-day"
                 label={t(TEXT.ACTIVITY.FILTERS.FROM_LABEL)}
                 value={fromDay}
                 max={toDay || todayKey}
                 onChange={handleFromDayChange}
               />
-              <DateField
+              <ActivityDateField
+                id="activity-to-day"
                 label={t(TEXT.ACTIVITY.FILTERS.TO_LABEL)}
                 value={toDay}
                 min={fromDay}

@@ -922,3 +922,34 @@ Completa D49: al agregar o editar un tipo de cita, "control " (con espacio al fi
 ## D55 · Teléfonos +1 con máscara `(305) 555-1234` (2026-11-07)
 
 Completa D50: con un país de código +1 (Estados Unidos, Canadá…) el campo enmascara mientras se escribe como `(XXX) XXX-XXXX`, y al mostrarlo sale `+1 (305) 555-1234`. Se sigue guardando compacto (`+1 3055551234`), así que no cambia nada en la base ni en el API. Con más de 10 dígitos queda sin máscara para que la validación avise. Los demás países siguen con los dígitos sin máscara al escribir y en bloques al mostrarlos.
+
+## D56 · Audiograma POC: BIAP solo con grados principales, sin subgrados; con PTA 5124 (2026-11-07)
+
+El selector de escala del Resumen ofrece ASHA (por defecto, PTA 512) y BIAP (recomendación 02/1, 1996). BIAP se usa solo con sus grados principales, sin subgrados, y con el PTA de 4 frecuencias (500, 1000, 2000 y 4000 Hz, redondeado a múltiplos de 5), con límites superiores inclusivos: Normal ≤20, Leve 21–40, Moderada 41–70, Severa 71–90, Profunda 91–119 y Cofosis ≥120. Como el gráfico llega a 120 dB, Cofosis se dibuja como una franja de 1 dB (119–120) al pie y su texto dice "120 dB o más". La escala elegida gobierna el grado de la tabla, el popover de info y las franjas y etiquetas de los audiogramas; la raya gruesa de 20 dB sigue fija.
+
+## D57 · Audiograma POC: "Palabras falladas" calcula la discriminación máxima (2026-11-07)
+
+El Resumen tiene la fila "Palabras falladas" (un campo por oído). Al escribirla se llena "Discriminación máxima (%)" de ese oído con (presentadas − falladas) ÷ presentadas × 100, redondeado al entero.
+
+- Presentadas por oído según el último tipo de lista elegido: monosílabos 25 (4 % por palabra) y bisílabos Tato 10 (`TATO_DISPLAYED_WORDS`, 10 % por palabra).
+- El último tipo elegido se conserva al cerrar el panel de palabras con la X; si nunca se eligió uno, se usan monosílabos.
+- Solo enteros de 0 al total. Vaciar el campo no cambia la discriminación, y editar la discriminación a mano no toca las falladas.
+- Al cambiar el tipo de lista se recalcula la discriminación de los oídos con falladas, siempre que sigan dentro del nuevo total.
+
+## D58 · Campo de fecha común `DateField`, en lugar de `<input type="date">` (2026-11-08)
+
+El input nativo se dibuja distinto en cada navegador (en Chrome en español se ve "dd ---- aaaa"). Los cinco lugares con `type="date"` pasan a `src/components/common/date-field/`: `DateField` (controlado, `value`/`onChange` con "YYYY-MM-DD" o vacío) y `FormDateField` (wrapper de Formik con el label y el error de `FormField`).
+
+- Se escribe como dd/mm/aaaa con máscara (solo dígitos, barras automáticas; borrar una barra borra el dígito anterior) o se elige en un calendario con botón de ícono dentro del campo.
+- Hacia afuera solo sale una fecha completa, real (31/02 no vale), de 1900 en adelante y dentro de `min`/`max`; si no, sale vacío. Así validaciones y API no cambian.
+- El error de lo que se escribe (fecha inválida, fuera de rango, incompleta al salir del campo) va primero; si no hay, se muestra el `errorMessage` de fuera.
+- Calendario con semana de lunes a domingo; el título abre meses y año, y el año abre páginas de 12 años. En móvil (`useIsMobile`) es una hoja inferior con fondo oscuro; en escritorio, un popover anclado al botón.
+- Todo en hora local (`fromDayKey`, `toDayKey`, `buildMonthGrid`); nunca `new Date('YYYY-MM-DD')`. Meses y días salen de Intl `es-CR`; los demás textos, de `TEXT.GENERAL.DATE_FIELD`.
+
+## D59 · Informe de audiometría impreso desde la BD (2026-11-08)
+
+No se guarda PDF: el botón Imprimir arma `AudiometryPrintReport` con los datos guardados y usa `window.print()` en A4.
+
+- Página 1: encabezado y paciente, los dos audiogramas con la columna de grados en medio, Weber debajo con sus flechas, logoaudiometría y la tabla Resumen (PTA, grado, umbral, discriminación, falladas, método y escala).
+- Página 2, siempre (`break-before-page`): Diagnóstico y Observaciones ("Sin registrar" si están vacíos) y la firma.
+- El informe no lleva la simbología ni la lista de palabras: son ayudas de captura, no resultado clínico.

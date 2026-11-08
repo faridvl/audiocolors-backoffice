@@ -13,3 +13,41 @@
     @apply bg-ink-50 text-ink-700 font-sans antialiased;
   }
 }
+
+/* Al imprimir solo sale el informe (data-print-report): el resto de la página se oculta y los
+   contenedores que lo envuelven pierden la altura fija y el scroll, que si no lo cortarían. */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body:has([data-print-report]) {
+    background: white;
+  }
+
+  body:has([data-print-report])
+    *:not(:has([data-print-report])):not([data-print-report]):not([data-print-report] *) {
+    display: none !important;
+  }
+
+  body:has([data-print-report]) *:has([data-print-report]) {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Sin esto el navegador quita los colores de fondo y los símbolos del audiograma salen en gris. */
+  [data-print-report],
+  [data-print-report] * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

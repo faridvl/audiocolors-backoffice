@@ -32,6 +32,23 @@
       "keepEditing": "Seguir editando"
     },
     "optional": "(Opcional)",
+    "dateField": {
+      "placeholder": "dd/mm/aaaa",
+      "openCalendar": "Abrir calendario",
+      "calendar": "Calendario",
+      "close": "Cerrar calendario",
+      "previousMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "previousYear": "Año anterior",
+      "nextYear": "Año siguiente",
+      "previousYears": "Años anteriores",
+      "nextYears": "Años siguientes",
+      "chooseMonthAndYear": "Elegir mes y año",
+      "chooseYear": "Elegir año",
+      "errorInvalid": "Escribe una fecha válida, como 15/03/2026.",
+      "errorBeforeMin": "La fecha no puede ser anterior al {{date}}.",
+      "errorAfterMax": "La fecha no puede ser posterior al {{date}}."
+    },
     "phoneHint": "¿Otro país? Elige su código en la lista.",
     "phoneCountry": {
       "label": "País del teléfono",
@@ -858,6 +875,153 @@
       "contacts": "Contactos",
       "patientContact": "Paciente",
       "editContacts": "Editar contactos",
+      "audiometry": {
+        "title": "Audiometría",
+        "save": "Guardar audiometría",
+        "saved": "Audiometría guardada",
+        "historyAria": "Historial de audiometrías",
+        "newEntry": "Audiometría nueva",
+        "newEntryButton": "Nueva audiometría",
+        "savedBanner": "Audiometría guardada. Registrada por {{author}} · {{date}}",
+        "readOnlyNotice": "Esta audiometría está guardada y es de solo lectura. Para registrar otra, usa Nueva audiometría.",
+        "saveHint": "Marca al menos un punto para guardar",
+        "entryAuthorDate": "Registrada por {{author}} · {{date}}",
+        "entryLoading": "Cargando la audiometría…",
+        "print": "Imprimir",
+        "report": {
+          "title": "Informe de audiometría",
+          "patient": "Paciente",
+          "documentId": "Identificación",
+          "age": "Edad",
+          "birthDate": "Fecha de nacimiento",
+          "date": "Fecha de la audiometría",
+          "professional": "Profesional",
+          "ptaMethod": "Método del PTA",
+          "gradeScale": "Escala del grado",
+          "failedOfPresented": "{{failed}} de {{presented}}",
+          "frequencyHz": "{{frequency}} Hz",
+          "signature": "Firma del profesional",
+          "printedOn": "Impreso el {{date}}"
+        },
+        "audiogramTitle": "Audiograma",
+        "audiogramAria": "Audiograma del {{ear}}",
+        "ears": {
+          "right": "Oído derecho",
+          "left": "Oído izquierdo"
+        },
+        "earsShort": {
+          "right": "OD",
+          "left": "OI"
+        },
+        "clearAudiogram": "Limpiar audiograma",
+        "clearSpeech": "Limpiar logoaudiometría",
+        "toolbarLabel": "Herramientas de marcado",
+        "masked": "Enmascarado",
+        "noResponse": "Sin respuesta",
+        "tools": {
+          "air": "Vía aérea",
+          "bone": "Vía ósea",
+          "ucl": "Umbral de molestia",
+          "mcl": "Nivel de confort",
+          "freeField": "Campo libre"
+        },
+        "grades": {
+          "normal": "Normal",
+          "slight": "Mínima",
+          "mild": "Leve",
+          "moderate": "Moderada",
+          "moderatelySevere": "Moderadamente severa",
+          "severe": "Severa",
+          "profound": "Profunda",
+          "totalLoss": "Cofosis"
+        },
+        "gradesShort": {
+          "moderatelySevere": "Mod. severa"
+        },
+        "legend": {
+          "title": "Simbología",
+          "air": "Vía aérea",
+          "airMasked": "Vía aérea enmascarada",
+          "bone": "Vía ósea",
+          "boneMasked": "Vía ósea enmascarada",
+          "ucl": "Umbral de molestia (UCL)",
+          "mcl": "Nivel de confort (MCL)",
+          "freeField": "Campo libre",
+          "noResponse": "Sin respuesta (flecha hacia abajo)"
+        },
+        "speech": {
+          "title": "Logoaudiometría",
+          "earLabel": "Oído de la logoaudiometría",
+          "aria": "Gráfico de logoaudiometría",
+          "normalCurve": "Curva normal"
+        },
+        "wordLists": {
+          "panelTitle": "{{type}} · Lista {{id}}",
+          "typePlaceholder": "Tipo de lista",
+          "listPlaceholder": "Lista",
+          "hideAria": "Ocultar lista de palabras",
+          "typeAria": "Tipo de lista de palabras",
+          "types": {
+            "bisyllable": "Bisílabos (Tato)",
+            "monosyllable": "Monosílabos (Rosenblüt y De Cruz)"
+          },
+          "typesShort": {
+            "bisyllable": "Bisílabos",
+            "monosyllable": "Monosílabos"
+          },
+          "column": "Columna {{number}}",
+          "selectAria": "Lista de palabras",
+          "option": "Lista {{id}}",
+          "note": "Solo de referencia para leerle las palabras al paciente. Los puntos se siguen marcando a mano en el gráfico."
+        },
+        "notes": {
+          "diagnosisTitle": "Diagnóstico",
+          "observationsTitle": "Observaciones"
+        },
+        "ptaTypes": {
+          "pta512": "PTA 512",
+          "pta5124": "PTA 4 frecuencias (5124)",
+          "pta124": "PTA alta frecuencia (124)",
+          "pta251": "PTA baja frecuencia (251)"
+        },
+        "summary": {
+          "title": "Resumen",
+          "metric": "Medida",
+          "pta": "PTA (dB)",
+          "ptaTypeAria": "Tipo de PTA",
+          "ptaInfoAria": "Ver las frecuencias de cada tipo de PTA",
+          "ptaInfoTitle": "Frecuencias que promedia cada PTA",
+          "ptaInfoItem": "{{name}}: {{frequencies}} Hz",
+          "ptaValue": "{{value}} dB",
+          "grade": "Grado de pérdida",
+          "gradeInfoAria": "Ver los rangos de cada grado de pérdida",
+          "gradeInfoTitle": "Grados de pérdida auditiva ({{scale}})",
+          "gradeInfoItem": "{{name}}: {{from}} a {{to}} dB",
+          "gradeInfoItemOpen": "{{name}}: {{from}} dB o más",
+          "gradeInfoSourceAsha": "Según ASHA (Clark, 1981), calculado con el PTA 512.",
+          "gradeInfoSourceBiap": "Según BIAP (recomendación 02/1), calculado con el PTA 4 frecuencias (5124).",
+          "gradeScaleAria": "Escala para clasificar el grado de pérdida",
+          "gradeScaleAsha": "ASHA",
+          "gradeScaleBiap": "BIAP",
+          "speechThreshold": "Umbral vocal (dB)",
+          "speechThresholdAria": "Umbral vocal, {{ear}}",
+          "maxDiscrimination": "Discriminación máxima (%)",
+          "maxDiscriminationAria": "Discriminación máxima, {{ear}}",
+          "failedWords": "Palabras falladas",
+          "failedWordsAria": "Palabras falladas, {{ear}}",
+          "failedWordsInfoAria": "Ver cómo se calcula la discriminación con las palabras falladas",
+          "failedWordsInfoItem": "{{name}}: {{count}} palabras por oído, cada una vale {{value}} %",
+          "weberTitle": "Prueba de Weber",
+          "weberFrequency": "Weber {{frequency}} Hz",
+          "weberAria": "Resultado de Weber a {{frequency}} Hz",
+          "empty": "—"
+        },
+        "weber": {
+          "center": "Centro",
+          "right": "Derecha",
+          "left": "Izquierda"
+        }
+      },
       "fields": {
         "documentId": "Cédula",
         "birthDate": "Nacimiento",

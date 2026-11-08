@@ -3,6 +3,7 @@ import { Form, useFormikContext } from 'formik';
 import { Save, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { FormDateField } from '@/components/common/date-field/form-date-field';
 import { FormField } from '@/components/common/input/input';
 import { FocusFirstError } from '@/components/common/form/focus-first-error';
 import { FormMultiSelectField } from '@/components/common/form/form-multi-select-field';
@@ -18,6 +19,7 @@ import {
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { TEXT } from '@/static/texts/i18n';
 import { getBranchStripeColor } from '@/shared/design/tokens';
+import { toDayKey } from '@/shared/utils/dates';
 import { DOCUMENT_MASKS, formatNationalId, PatientFormValues } from './patient-validation';
 
 interface PatientFormProps {
@@ -34,6 +36,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
   onCancel,
 }) => {
   const { t } = useTranslation();
+  const todayKey = toDayKey(new Date());
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
   const patientFullName = buildPatientFullName(values.firstName, values.lastName);
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
@@ -72,10 +75,10 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             required
           />
 
-          <FormField
+          <FormDateField
             name="birthDate"
             label="Fecha de nacimiento"
-            type="date"
+            max={todayKey}
             required={isBirthDateRequired}
             optional={!isBirthDateRequired}
           />

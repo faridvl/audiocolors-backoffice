@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { DateField } from '@/components/common/date-field/date-field';
 import { inputBaseClasses } from '@/components/common/input/input';
 import { useUpdatePatientStatusMutation } from '@/shared/api/mutations/patients/update-patient-status-mutation';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
@@ -151,14 +152,7 @@ export const ChangePatientStatusModal: React.FC<ChangePatientStatusModalProps> =
                   <span className="font-normal text-ink-400">(opcional)</span>
                 </Typography>
               </label>
-              <input
-                id="status-date"
-                type="date"
-                max={today}
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                className={inputBaseClasses}
-              />
+              <DateField id="status-date" max={today} value={date} onChange={setDate} />
             </div>
           )}
 

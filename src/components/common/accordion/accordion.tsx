@@ -54,6 +54,8 @@ interface AccordionProps {
   action?: React.ReactNode;
   /** En el celular la acción va debajo del título y a todo el ancho; desde `sm`, a la derecha. */
   stacksActionOnMobile?: boolean;
+  /** Debajo de `lg` la acción va en su propia fila y a todo el ancho; desde `lg`, a la derecha. */
+  stacksActionBelowLg?: boolean;
   className?: string;
   children: React.ReactNode;
 }
@@ -76,6 +78,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   closedPreview,
   action,
   stacksActionOnMobile = false,
+  stacksActionBelowLg = false,
   className,
   children,
 }) => {
@@ -107,7 +110,9 @@ export const Accordion: React.FC<AccordionProps> = ({
       <div
         className={tailwind(
           'flex justify-between gap-3',
-          stacksActionOnMobile ? 'flex-col sm:flex-row sm:items-start' : 'items-start',
+          stacksActionOnMobile && 'flex-col sm:flex-row sm:items-start',
+          stacksActionBelowLg && 'flex-col lg:flex-row lg:items-start',
+          !stacksActionOnMobile && !stacksActionBelowLg && 'items-start',
         )}
       >
         <Heading className="min-w-0 flex-1">
@@ -153,7 +158,7 @@ export const Accordion: React.FC<AccordionProps> = ({
             </span>
           </button>
         </Heading>
-        {action}
+        {stacksActionBelowLg ? <div className="w-full lg:w-auto">{action}</div> : action}
       </div>
 
       <div

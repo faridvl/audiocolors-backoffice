@@ -58,8 +58,30 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   formulario listo para una otoscopía nueva ("Guardar otoscopia", "Limpiar"); el
   historial se ve solo en Control de evolución, donde el API deja una nota de
   "Pruebas" al guardar (D47). No va ligado a una cita. Solo roles clínicos.
+- Audiometría guardada (2026-11-08): se guarda TODO lo del acordeón como datos para reconstruir el
+  gráfico, no solo un PDF: marcas tonales (aérea, ósea, molestia, confort, campo libre, enmascarado,
+  sin respuesta), puntos de logoaudiometría, listas y palabras falladas, el Resumen completo (PTA y su
+  método, ASHA/BIAP, umbral vocal, discriminación, falladas), Diagnóstico y Observaciones. NO se
+  guarda PDF: un botón Imprimir arma el PDF reconstruyéndolo desde la BD, como INFORME CLÍNICO
+  FORMAL: logo y datos de la clínica arriba, los mismos gráficos de la pantalla, Resumen/Weber/notas
+  en tablas y firma del profesional al pie (el pantallazo del acordeón se descartó por feo). Hay historial por paciente. Una audiometría guardada se abre con todo
+  cargado pero NO editable: sin la barra de herramientas ni los toggles de enmascarado/sin respuesta.
+  Para elegir una anterior: un selector en el encabezado del acordeón (donde hoy dice "Vista previa,
+  aún no se guarda") con las fechas de las audiometrías del paciente, sin ponerles nombre. Siempre se
+  ve el profesional que la hizo y la fecha.
+  Diseño: modelo propio `PatientAudiometryEntry` en el API (por paciente, sin cita, payload JSON
+  versionado y validado con Zod, append-only), no `Study`.
 
 ## En qué estamos
+
+- **Audiometría (2026-11-08, en `develop` del front y del API):** acordeón completo (tonal,
+  logoaudiometría, listas de palabras, Resumen, notas) que se guarda con historial por paciente; una
+  guardada se ve solo lectura y se imprime como informe A4 reconstruido desde la BD (D59). Campo de
+  fecha común `DateField` (D58). Probado con Playwright y qa (guardar, historial, solo lectura,
+  375/768/1440). Pendiente: en la lista del historial el API devuelve `createdByName` null (el detalle
+  sí trae el nombre); al guardar se ven a la vez el toast y dos franjas; otoscopia tiene el mismo hueco
+  de GET sobre pacientes borrados. Dudas de la audióloga sin responder: umbral vocal, PTA de 251,
+  orden de columnas del Resumen, símbolos en 125/8000, Rosenblüt y el PDF de Cárdenas.
 
 - **Arreglos del 2026-11-07 (rama `fix/mantenimiento-botones`):** botones "Vino"/"Lo perdió" ya no se
   aplastan; teléfonos +1 con máscara `(305) 555-1234` (D55); nota "Puedes elegir varias sedes" en la ficha

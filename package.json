@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test:phone": "tsc src/shared/utils/phone.test.ts --outDir node_modules/.cache/phone-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/phone-test/phone.test.js",
     "test:notifications": "tsc src/components/containers/notifications/build-notifications.test.ts --outDir node_modules/.cache/notifications-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/notifications-test/build-notifications.test.js",
+    "test:audiometry": "tsc src/components/containers/patients/patient-audiometry/audiometry-payload-mapper.test.ts --outDir node_modules/.cache/audiometry-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/audiometry-test/audiometry-payload-mapper.test.js",
     "e2e:login": "playwright test e2e/login.spec.ts",
     "release:bump": "node scripts/release.mjs bump",
     "release:check": "node scripts/release.mjs check --base origin/main"

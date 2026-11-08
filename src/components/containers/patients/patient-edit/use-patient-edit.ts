@@ -54,7 +54,7 @@ export function usePatientEdit(uuid: string) {
             lastName: patient.lastName ?? '',
             documentType: inferDocumentType(patient.documentId),
             documentId: patient.documentId ?? '',
-            // <input type="date"> exige exactamente YYYY-MM-DD.
+            // La API devuelve un ISO completo; el campo de fecha trabaja con YYYY-MM-DD.
             birthDate: patient.birthDate ? patient.birthDate.slice(0, 10) : '',
             gender: patient.gender ?? '',
             email: patient.email ?? '',

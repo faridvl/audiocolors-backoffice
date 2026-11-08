@@ -3,7 +3,7 @@ import { CalendarClock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { inputBaseClasses } from '@/components/common/input/input';
+import { DateField } from '@/components/common/date-field/date-field';
 import { MonthGrid } from '@/components/common/month-grid/month-grid';
 import { PillSelect, PillSelectVariant } from '@/components/common/pill-select/pill-select';
 import { formatMonthLabel } from '@/shared/utils/formatters';
@@ -202,21 +202,11 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
                     <span className="ml-0.5 text-danger">*</span>
                   </Typography>
                 </label>
-                <input
+                <DateField
                   id="appointment-date"
-                  type="date"
                   min={minDate}
                   value={date}
-                  onChange={(event) => handleDateChange(event.target.value)}
-                  // Safari de iOS dibuja el input de fecha con su propio estilo:
-                  // más alto que los demás, más ancho que el modal y centrado.
-                  // Sin apariencia nativa y con la misma altura fija que los
-                  // selectores del modal, quedan alineados.
-                  className={tailwind(
-                    inputBaseClasses,
-                    'block h-[46px] min-w-0 appearance-none text-left',
-                    '[&::-webkit-date-and-time-value]:text-left',
-                  )}
+                  onChange={handleDateChange}
                 />
               </div>
 
