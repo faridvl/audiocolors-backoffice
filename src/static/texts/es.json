@@ -658,7 +658,8 @@
     "form": {
       "branchesLabel": "Sedes",
       "branchesPlaceholder": "Elige una o más sedes",
-      "branchesRequired": "Elige al menos una sede"
+      "branchesRequired": "Elige al menos una sede",
+      "branchesHint": "Puedes elegir varias sedes"
     },
     "summary": {
       "tentative": "Citas tentativas este mes",

@@ -103,6 +103,7 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
               }))}
               isSheetOnMobile
               required={isBranchRequired}
+              hint={t(TEXT.PATIENTS.FORM.BRANCHES_HINT)}
               optional={!isBranchRequired}
             />
           </div>

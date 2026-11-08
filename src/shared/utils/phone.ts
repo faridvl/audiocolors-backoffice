@@ -50,6 +50,20 @@ const isInternational = (value: string) => cleanPhone(value).startsWith(INTERNAT
 const isCostaRicaWithCode = (digits: string) =>
   digits.length === COSTA_RICA_CODE.length + LOCAL_DIGITS && digits.startsWith(COSTA_RICA_CODE);
 
+const NORTH_AMERICA_CODE = '1';
+const AREA_CODE_DIGITS = 3;
+const EXCHANGE_DIGITS = 3;
+const TEN_DIGIT_NATIONAL = 10;
+
+/** +1 se escribe `(305) 555-1234` mientras se teclea; con más de 10 dígitos queda sin máscara. */
+function formatNorthAmericaDigits(digits: string): string {
+  if (digits.length <= AREA_CODE_DIGITS || digits.length > TEN_DIGIT_NATIONAL) return digits;
+  const area = digits.slice(0, AREA_CODE_DIGITS);
+  const exchange = digits.slice(AREA_CODE_DIGITS, AREA_CODE_DIGITS + EXCHANGE_DIGITS);
+  const line = digits.slice(AREA_CODE_DIGITS + EXCHANGE_DIGITS);
+  return line ? `(${area}) ${exchange}-${line}` : `(${area}) ${exchange}`;
+}
+
 function formatLocalDigits(digits: string): string {
   if (digits.length <= 4) return digits;
   return `${digits.slice(0, 4)}-${digits.slice(4)}`;
@@ -94,8 +108,9 @@ export function toNationalInput(value: string, country: PhoneCountry): string {
   const nationalDigits = cleaned.startsWith(INTERNATIONAL_PREFIX)
     ? digits.slice(country.dialCode.length)
     : digits;
-  return country.dialCode === DEFAULT_COUNTRY.dialCode
-    ? formatLocalDigits(nationalDigits)
+  if (country.dialCode === DEFAULT_COUNTRY.dialCode) return formatLocalDigits(nationalDigits);
+  return country.dialCode === NORTH_AMERICA_CODE
+    ? formatNorthAmericaDigits(nationalDigits)
     : nationalDigits;
 }
 
@@ -287,9 +302,6 @@ const NATIONAL_GROUPS: Record<number, number[]> = {
   11: [3, 4, 4],
   12: [4, 4, 4],
 };
-const NORTH_AMERICA_CODE = '1';
-const TEN_DIGIT_NATIONAL = 10;
-const TEN_DIGIT_GROUPS = [3, 3, 4];
 
 function splitInGroups(digits: string, sizes: number[]): string[] {
   let start = 0;
@@ -302,7 +314,7 @@ function splitInGroups(digits: string, sizes: number[]): string[] {
 
 /**
  * Cómo se muestra un teléfono guardado: Costa Rica `8888-7777`; otro país con el código
- * separado y el resto en bloques (`+1 305 555 1234`). Solo se ve así: se guarda compacto.
+ * separado y el resto en bloques (`+34 612 345 678`, `+1 (305) 555-1234`). Solo se ve así: se guarda compacto.
  */
 export function formatPhoneForDisplay(value: string): string {
   const normalized = normalizePhone(value);
@@ -314,10 +326,10 @@ export function formatPhoneForDisplay(value: string): string {
   const code = country.dialCode;
   const national = digits.slice(code.length);
 
-  let sizes = NATIONAL_GROUPS[national.length];
   if (code === NORTH_AMERICA_CODE && national.length === TEN_DIGIT_NATIONAL) {
-    sizes = TEN_DIGIT_GROUPS;
+    return `${INTERNATIONAL_PREFIX}${code} ${formatNorthAmericaDigits(national)}`;
   }
+  let sizes = NATIONAL_GROUPS[national.length];
   if (!sizes) {
     sizes =
       national.length <= NATIONAL_GROUP_SIZE

@@ -57,10 +57,20 @@ describe("otros países", () => {
     const value = composePhoneValue(unitedStates, "305 555 1234");
     assert.equal(value, "+1 3055551234");
     assert.equal(detectPhoneCountry(value)?.iso, "US");
-    assert.equal(toNationalInput(value, unitedStates), "3055551234");
+    assert.equal(toNationalInput(value, unitedStates), "(305) 555-1234");
     assert.equal(toPatientPhone(value), "+1 3055551234");
-    assert.equal(formatPhoneForDisplay(value), "+1 305 555 1234");
+    assert.equal(formatPhoneForDisplay(value), "+1 (305) 555-1234");
     assert.equal(validatePhone(value), null);
+  });
+
+  it("+1 se enmascara mientras se escribe y se guarda compacto", () => {
+    assert.ok(unitedStates);
+    assert.equal(toNationalInput("+1 305", unitedStates), "305");
+    assert.equal(toNationalInput("+1 3055", unitedStates), "(305) 5");
+    assert.equal(toNationalInput("+1 305555", unitedStates), "(305) 555");
+    assert.equal(toNationalInput("+1 3055551", unitedStates), "(305) 555-1");
+    assert.equal(toNationalInput("+1 30555512345", unitedStates), "30555512345");
+    assert.equal(composePhoneValue(unitedStates, "(305) 555-1234"), "+1 3055551234");
   });
 
   it("+34 guarda y recarga", () => {
@@ -97,7 +107,7 @@ describe("otros países", () => {
 
   it("un número pegado con + trae su propio país", () => {
     assert.ok(spain);
-    assert.equal(composePhoneValue(spain, "+1 305 555 1234"), "+1 3055551234");
+    assert.equal(composePhoneValue(spain, "+1 (305) 555-1234"), "+1 3055551234");
   });
 });
 
