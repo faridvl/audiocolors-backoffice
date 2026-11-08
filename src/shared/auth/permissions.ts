@@ -7,6 +7,10 @@ export enum Permission {
   VIEW_ACTIVITY = 'VIEW_ACTIVITY',
   EDIT_CLINICAL_TEMPLATE = 'EDIT_CLINICAL_TEMPLATE',
   EDIT_APPOINTMENT_TYPES = 'EDIT_APPOINTMENT_TYPES',
+  /** Ver los datos de contacto de la clínica en Configuración. */
+  VIEW_CLINIC = 'VIEW_CLINIC',
+  /** Cambiarlos: el API solo lo permite al dueño y a administración. */
+  EDIT_CLINIC = 'EDIT_CLINIC',
 }
 
 const ALL_PERMISSIONS = Object.values(Permission);
@@ -18,7 +22,7 @@ const ALL_PERMISSIONS = Object.values(Permission);
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [UserRole.OWNER]: ALL_PERMISSIONS,
   [UserRole.ADMIN]: ALL_PERMISSIONS,
-  [UserRole.DOCTOR]: ALL_PERMISSIONS,
+  [UserRole.DOCTOR]: ALL_PERMISSIONS.filter((permission) => permission !== Permission.EDIT_CLINIC),
   [UserRole.STAFF]: [],
 };
 

@@ -1,4 +1,4 @@
-import { CalendarClock, FileText, MessageSquareText, type LucideIcon } from 'lucide-react';
+import { Building2, CalendarClock, FileText, MessageSquareText, type LucideIcon } from 'lucide-react';
 import { Permission } from '@/shared/auth/permissions';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
@@ -7,6 +7,7 @@ export enum SettingsSection {
   APPOINTMENT_TYPES = 'APPOINTMENT_TYPES',
   QUESTIONS = 'QUESTIONS',
   TEMPLATES = 'TEMPLATES',
+  CLINIC = 'CLINIC',
 }
 
 export interface SettingsSectionItem {
@@ -39,6 +40,12 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
     icon: FileText,
     permission: Permission.EDIT_CLINICAL_TEMPLATE,
     isWide: true,
+  },
+  {
+    section: SettingsSection.CLINIC,
+    href: routesPrivate.settings.clinic,
+    icon: Building2,
+    permission: Permission.VIEW_CLINIC,
   },
 ];
 

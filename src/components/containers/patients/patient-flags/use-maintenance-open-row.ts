@@ -18,6 +18,9 @@ export function useMaintenanceOpenRow() {
       if (element) rowElements.current.set(maintenanceNumber, element);
       else rowElements.current.delete(maintenanceNumber);
     },
+    getRowElement: (maintenanceNumber: MaintenanceNumber) =>
+      rowElements.current.get(maintenanceNumber),
+    handleOpen: (maintenanceNumber: MaintenanceNumber) => setOpenNumber(maintenanceNumber),
     handleToggle: (maintenanceNumber: MaintenanceNumber) =>
       setOpenNumber((current) => (current === maintenanceNumber ? null : maintenanceNumber)),
   };

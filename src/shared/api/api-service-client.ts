@@ -21,15 +21,26 @@ export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    /** Errores 400 por campo, cuando el API los detalla. */
+    readonly details: ApiFieldError[] = [],
   ) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
+export interface ApiFieldError {
+  field: string;
+  message: string;
+}
+
 interface ApiErrorBody {
   message?: string | string[];
+  details?: ApiFieldError[];
 }
+
+const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
+  Array.isArray(body?.details) ? body.details : [];
 
 const handleSessionExpired = (): void => {
   CookiesManager.clearAll();
@@ -100,6 +111,7 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError(
       resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE),
       response.status,
+      resolveFieldErrors(data as ApiErrorBody | null),
     );
   }
 

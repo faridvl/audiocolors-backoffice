@@ -14,15 +14,24 @@ const NOTE_COUNTER_THRESHOLD = 400;
 export const MaintenanceNoteForm: React.FC<{
   patientUuid: string;
   maintenanceNumber: MaintenanceNumber;
-}> = ({ patientUuid, maintenanceNumber }) => {
+  /** La nota es el paso previo a marcar el mantenimiento como perdido. */
+  isMissedPending: boolean;
+  onMissedSaved: () => void;
+  onMissedCancel: () => void;
+}> = ({ patientUuid, maintenanceNumber, isMissedPending, onMissedSaved, onMissedCancel }) => {
   const { t } = useTranslation();
   const { draft, fieldRef, hasError, isSaving, canSave, handleChange, handleKeyDown, handleSave } =
-    useMaintenanceNoteForm(patientUuid, maintenanceNumber);
+    useMaintenanceNoteForm(patientUuid, maintenanceNumber, isMissedPending, onMissedSaved);
   const placeholder = t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTE_PLACEHOLDER);
   const showCounter = draft.length > NOTE_COUNTER_THRESHOLD;
 
   return (
     <div className="flex min-w-0 flex-col">
+      {isMissedPending && (
+        <Typography variant={TypographyVariant.HELPER} className="pt-2 text-danger-700">
+          {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.MISSED_HINT)}
+        </Typography>
+      )}
       <div className="flex items-center gap-1 border-t border-ink-100">
         <textarea
           id={`maintenance-note-${maintenanceNumber}`}
@@ -50,6 +59,16 @@ export const MaintenanceNoteForm: React.FC<{
         >
           {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.SAVE)}
         </Button>
+        {isMissedPending && (
+          <Button
+            variant={ButtonVariant.GHOST}
+            onClick={onMissedCancel}
+            disabled={isSaving}
+            className="shrink-0 px-2"
+          >
+            {t(TEXT.GENERAL.BUTTONS.CANCEL)}
+          </Button>
+        )}
       </div>
       <div aria-live="polite">
         {hasError && (

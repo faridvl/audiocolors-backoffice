@@ -17,6 +17,7 @@ interface PhoneCountrySelectProps {
   /** `null`: número que no se reconoce (dato viejo), sin país. */
   country: PhoneCountry | null;
   onSelect: (country: PhoneCountry) => void;
+  disabled?: boolean;
 }
 
 /**
@@ -26,6 +27,7 @@ interface PhoneCountrySelectProps {
 export const PhoneCountrySelect: React.FC<PhoneCountrySelectProps> = ({
   country,
   onSelect,
+  disabled = false,
 }) => {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
@@ -36,6 +38,7 @@ export const PhoneCountrySelect: React.FC<PhoneCountrySelectProps> = ({
       {({ close }) => (
         <>
           <PopoverButton
+            disabled={disabled}
             aria-label={t(TEXT.GENERAL.PHONE_COUNTRY.LABEL)}
             className="flex min-w-[6.5rem] items-center gap-1.5 rounded-l-lg border-r border-ink-200 pl-3 pr-2 text-base font-medium text-ink-600 focus:outline-none data-[focus]:outline data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-brand"
           >

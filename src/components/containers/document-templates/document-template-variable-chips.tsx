@@ -33,22 +33,22 @@ export const DocumentTemplateVariableChips: React.FC<DocumentTemplateVariableChi
           <Typography variant={TypographyVariant.HELPER} className="font-medium">
             {t(`${TEXT.DOCUMENT_TEMPLATES.VARIABLES.GROUP_PREFIX}.${group}`)}
           </Typography>
-          <ul className="flex flex-wrap gap-1.5">
+          <ul className="grid grid-cols-2 gap-1.5">
             {DOCUMENT_TEMPLATE_VARIABLE_GROUPS[group].map((variable) => {
               const label = t(variableLabelKey(variable));
               return (
-                <li key={variable}>
+                <li key={variable} className="min-w-0">
                   <button
                     type="button"
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => onInsert(variable)}
                     title={t(TEXT.DOCUMENT_TEMPLATES.VARIABLES.INSERT, { variable: label })}
-                    className="flex min-h-[44px] items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 text-sm text-ink-700 transition-colors hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:min-h-10 sm:px-2.5"
+                    className="flex min-h-[40px] w-full min-w-0 items-center justify-between gap-1 rounded-md border border-ink-200 bg-white px-2 text-xs text-ink-700 transition-colors hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:min-h-8"
                   >
-                    {label}
+                    <span className="truncate">{label}</span>
                     {usedVariables.has(variable) && (
                       <>
-                        <Check className="h-3.5 w-3.5 text-success" aria-hidden />
+                        <Check className="h-3 w-3 shrink-0 text-success" aria-hidden />
                         <span className="sr-only">
                           {t(TEXT.DOCUMENT_TEMPLATES.VARIABLES.IN_USE)}
                         </span>

@@ -2,7 +2,9 @@ import { formatCalendarDate, formatDateTime, formatLongDate } from '@/shared/uti
 import { AudiometryEntry } from '@/types/patients/audiometry-entry';
 import { DocumentTemplateVariable } from '@/types/document-templates/document-template';
 import { formatPhoneForDisplay } from '@/shared/utils/phone';
+import { OtoscopyEntry } from '@/types/patients/otoscopy-entry';
 import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
+import { Tenant } from '@/types/tenant/tenant';
 import { buildAudiometryReportData } from '../patient-audiometry/audiometry-report-data';
 import { payloadToState } from '../patient-audiometry/audiometry-payload-mapper';
 import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
@@ -15,6 +17,11 @@ interface TemplateValuesInput {
   /** Edad ya redactada ("41 años"); vacía si no hay fecha de nacimiento. */
   ageText: string;
   issuedAt: string;
+  /** Última otoscopía del paciente; sin ella, las variables salen vacías. */
+  latestOtoscopy: OtoscopyEntry | null;
+  /** Diagnóstico y observaciones de la última audiometría válida. */
+  latestAudiometryNotes: AudiometryEntry['payload']['notes'] | null;
+  clinic: Tenant | null;
 }
 
 /** Todas las variables de la plantilla con su valor real: ninguna debe quedar como `{{...}}`. */
@@ -24,6 +31,9 @@ export function buildTemplateValues({
   professionalName,
   ageText,
   issuedAt,
+  latestOtoscopy,
+  latestAudiometryNotes,
+  clinic,
 }: TemplateValuesInput): Record<DocumentTemplateVariable, string> {
   return {
     [DocumentTemplateVariable.NAME]: patient.firstName,
@@ -43,6 +53,14 @@ export function buildTemplateValues({
     [DocumentTemplateVariable.BRANCHES]: branchNames.join(', '),
     [DocumentTemplateVariable.TODAY]: formatLongDate(issuedAt),
     [DocumentTemplateVariable.PROFESSIONAL]: professionalName,
+    [DocumentTemplateVariable.OTOSCOPY_RIGHT]: latestOtoscopy?.otoscopyRight ?? '',
+    [DocumentTemplateVariable.OTOSCOPY_LEFT]: latestOtoscopy?.otoscopyLeft ?? '',
+    [DocumentTemplateVariable.DIAGNOSIS]: latestAudiometryNotes?.diagnosis ?? '',
+    [DocumentTemplateVariable.OBSERVATIONS]: latestAudiometryNotes?.observations ?? '',
+    [DocumentTemplateVariable.CLINIC_NAME]: clinic?.businessName ?? '',
+    [DocumentTemplateVariable.CLINIC_PHONE]: clinic?.phone ? formatPhoneForDisplay(clinic.phone) : '',
+    [DocumentTemplateVariable.CLINIC_EMAIL]: clinic?.email ?? '',
+    [DocumentTemplateVariable.CLINIC_ADDRESS]: clinic?.address ?? '',
   };
 }
 

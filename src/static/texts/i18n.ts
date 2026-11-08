@@ -99,6 +99,26 @@ export const TEXT = {
     NAV: 'settings.nav',
     /** `${SECTIONS_PREFIX}.${SettingsSection}.title` y `.description` */
     SECTIONS_PREFIX: 'settings.sections',
+    CLINIC: {
+      PAGE_TITLE: 'settings.clinic.pageTitle',
+      LOADING: 'settings.clinic.loading',
+      LOAD_ERROR: 'settings.clinic.loadError',
+      NAME: 'settings.clinic.name',
+      NAME_HINT: 'settings.clinic.nameHint',
+      PHONE: 'settings.clinic.phone',
+      EMAIL: 'settings.clinic.email',
+      EMAIL_PLACEHOLDER: 'settings.clinic.emailPlaceholder',
+      ADDRESS: 'settings.clinic.address',
+      ADDRESS_HINT: 'settings.clinic.addressHint',
+      READ_ONLY: 'settings.clinic.readOnly',
+      SAVED: 'settings.clinic.saved',
+      ERRORS: {
+        PHONE_LOCAL: 'settings.clinic.errors.phoneLocal',
+        PHONE_INTERNATIONAL: 'settings.clinic.errors.phoneInternational',
+        EMAIL_INVALID: 'settings.clinic.errors.emailInvalid',
+        ADDRESS_MAX: 'settings.clinic.errors.addressMax',
+      },
+    },
     APPOINTMENT_TYPES: {
       PAGE_TITLE: 'settings.appointmentTypes.pageTitle',
       LOADING: 'settings.appointmentTypes.loading',
@@ -715,6 +735,7 @@ export const TEXT = {
         /** Plural: `_one` / `_other`. */
         NOTES_TOGGLE_COUNT: 'patients.flags.maintenance.notesToggleCount',
         NOTE_PLACEHOLDER: 'patients.flags.maintenance.notePlaceholder',
+        MISSED_HINT: 'patients.flags.maintenance.missedHint',
         SAVE: 'patients.flags.maintenance.save',
         NOTE_ERROR: 'patients.flags.maintenance.noteError',
         NOTE_META: 'patients.flags.maintenance.noteMeta',

@@ -24,7 +24,10 @@ interface PatientMaintenanceRowProps {
   hasNotesError: boolean;
   isOpen: boolean;
   rowRef: (element: HTMLElement | null) => void;
+  isMissedPending: boolean;
   onStatusChange: (status: MaintenanceStatus) => void;
+  onMissedSaved: () => void;
+  onMissedCancel: () => void;
   onToggleNotes: () => void;
   onRetryNotes: () => void;
 }
@@ -44,8 +47,8 @@ const CHOICES = [
 ] as const;
 
 /**
- * Una línea por mantenimiento: título, "Vino" / "Lo perdió" y el acceso a las notas.
- * Tocar el botón activo vuelve a pendiente.
+ * Una línea por mantenimiento: título, "Recepción" / "Lo perdió" y el acceso a las notas.
+ * Tocar el botón activo vuelve a pendiente; "Lo perdió" se confirma con una nota.
  */
 export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   row,
@@ -56,7 +59,10 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   hasNotesError,
   isOpen,
   rowRef,
+  isMissedPending,
   onStatusChange,
+  onMissedSaved,
+  onMissedCancel,
   onToggleNotes,
   onRetryNotes,
 }) => {
@@ -165,6 +171,9 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
           patientUuid={patientUuid}
           maintenanceNumber={row.maintenanceNumber}
           notes={row.notes}
+          isMissedPending={isMissedPending}
+          onMissedSaved={onMissedSaved}
+          onMissedCancel={onMissedCancel}
           isLoading={isLoadingNotes}
           hasError={hasNotesError}
           isRetrying={isFetchingNotes}

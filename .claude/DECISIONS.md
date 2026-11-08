@@ -1019,3 +1019,11 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
   mismo y cerrar nunca imprime.
 - Al imprimir salen las hojas con las correcciones, sin barra, fondo gris ni resaltado. En celular
   las hojas se escalan al ancho con `zoom` (`--summary-zoom`).
+
+## 2026-11-08 Variables de plantilla, Clínica y Mantenimiento
+
+- Variables nuevas (grupos Paciente, Pruebas, Clínica, Documento): otoscopía = la última otoscopía del paciente; diagnóstico y observaciones = la última audiometría con `invalidatedAt` null, sin importar lo elegido en las tarjetas; clínica = `GET /tenants/current`. Dato faltante sale vacío. Las consultas extra solo se piden si hay plantillas elegidas y bloquean "generar" mientras cargan.
+- Configuración → Clínica usa dos permisos: `VIEW_CLINIC` (todos los que ven Configuración, salvo STAFF) y `EDIT_CLINIC` (solo OWNER y ADMIN). Quien solo ve, ve el formulario deshabilitado con un aviso.
+- `ApiError` lleva `details` (`{field,message}`) para mostrar los 400 del API junto al campo en Formik.
+- El teléfono de la clínica se guarda con `toPatientPhone` (Costa Rica con `+506 `); vacío se envía como cadena vacía y el API lo guarda como null.
+- "Lo perdió" exige nota: guardar graba la nota y, al terminar, marca el estado perdido; cancelar o tocar fuera no cambia el estado. "Vino" pasa a "Recepción" solo en el botón.

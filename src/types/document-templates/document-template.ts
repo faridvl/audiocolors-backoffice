@@ -12,6 +12,14 @@ export enum DocumentTemplateVariable {
   EMAIL = 'correo',
   ADDRESS = 'direccion',
   BRANCHES = 'sedes',
+  OTOSCOPY_RIGHT = 'otoscopia_od',
+  OTOSCOPY_LEFT = 'otoscopia_oi',
+  DIAGNOSIS = 'diagnostico',
+  OBSERVATIONS = 'observaciones',
+  CLINIC_NAME = 'clinica_nombre',
+  CLINIC_PHONE = 'clinica_telefono',
+  CLINIC_EMAIL = 'clinica_correo',
+  CLINIC_ADDRESS = 'clinica_direccion',
   TODAY = 'fecha_hoy',
   PROFESSIONAL = 'profesional',
 }
@@ -22,6 +30,8 @@ export const DOCUMENT_TEMPLATE_VARIABLES: DocumentTemplateVariable[] =
 
 export enum DocumentTemplateVariableGroup {
   PATIENT = 'patient',
+  TESTS = 'tests',
+  CLINIC = 'clinic',
   DOCUMENT = 'document',
 }
 
@@ -42,6 +52,18 @@ export const DOCUMENT_TEMPLATE_VARIABLE_GROUPS: Record<
     DocumentTemplateVariable.EMAIL,
     DocumentTemplateVariable.ADDRESS,
     DocumentTemplateVariable.BRANCHES,
+  ],
+  [DocumentTemplateVariableGroup.TESTS]: [
+    DocumentTemplateVariable.OTOSCOPY_RIGHT,
+    DocumentTemplateVariable.OTOSCOPY_LEFT,
+    DocumentTemplateVariable.DIAGNOSIS,
+    DocumentTemplateVariable.OBSERVATIONS,
+  ],
+  [DocumentTemplateVariableGroup.CLINIC]: [
+    DocumentTemplateVariable.CLINIC_NAME,
+    DocumentTemplateVariable.CLINIC_PHONE,
+    DocumentTemplateVariable.CLINIC_EMAIL,
+    DocumentTemplateVariable.CLINIC_ADDRESS,
   ],
   [DocumentTemplateVariableGroup.DOCUMENT]: [
     DocumentTemplateVariable.TODAY,

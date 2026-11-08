@@ -17,6 +17,7 @@ interface PhoneFieldProps {
   name: string;
   label: string;
   required?: boolean;
+  disabled?: boolean;
   /** Reemplaza la ayuda por defecto (cómo elegir otro país); '' la oculta. */
   hint?: string;
   /** Deja la ayuda a la vista aunque haya error. */
@@ -33,6 +34,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
   name,
   label,
   required = false,
+  disabled = false,
   hint,
   isHintAlwaysVisible,
   className,
@@ -57,8 +59,13 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
       isHintAlwaysVisible={isHintAlwaysVisible}
       inputMode="tel"
       required={required}
+      disabled={disabled}
       startControl={
-        <PhoneCountrySelect country={country} onSelect={handleSelectCountry} />
+        <PhoneCountrySelect
+          country={country}
+          onSelect={handleSelectCountry}
+          disabled={disabled}
+        />
       }
       displayValue={country ? toNationalInput(value, country) : value}
       onChange={(event) =>

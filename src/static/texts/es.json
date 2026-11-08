@@ -158,6 +158,30 @@
       "TEMPLATES": {
         "title": "Plantillas",
         "description": "Los documentos tipo de la clínica, con los datos del paciente ya puestos."
+      },
+      "CLINIC": {
+        "title": "Clínica",
+        "description": "Los datos de contacto de la clínica. Salen en los documentos que generas."
+      }
+    },
+    "clinic": {
+      "pageTitle": "Clínica · AudioColors Gestión Clínica",
+      "loading": "Cargando datos de la clínica...",
+      "loadError": "No se pudieron cargar los datos de la clínica",
+      "name": "Nombre",
+      "nameHint": "El nombre no se cambia desde aquí.",
+      "phone": "Teléfono",
+      "email": "Correo",
+      "emailPlaceholder": "correo@clinica.com",
+      "address": "Dirección",
+      "addressHint": "Como quieres que aparezca en los documentos.",
+      "readOnly": "Solo el dueño y administración pueden cambiar estos datos.",
+      "saved": "Datos de la clínica guardados",
+      "errors": {
+        "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
+        "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
+        "emailInvalid": "Correo inválido",
+        "addressMax": "Máximo 300 caracteres"
       }
     },
     "appointmentTypes": {
@@ -220,6 +244,8 @@
       "inUse": "En uso",
       "groups": {
         "patient": "Paciente",
+        "tests": "Pruebas",
+        "clinic": "Clínica",
         "document": "Documento"
       },
       "nombre": {
@@ -269,6 +295,38 @@
       "sedes": {
         "label": "Sedes",
         "example": "Sede Escazú"
+      },
+      "otoscopia_od": {
+        "label": "Otoscopía OD",
+        "example": "Conducto auditivo libre, membrana timpánica íntegra."
+      },
+      "otoscopia_oi": {
+        "label": "Otoscopía OI",
+        "example": "Leve acumulación de cerumen, membrana timpánica íntegra."
+      },
+      "diagnostico": {
+        "label": "Diagnóstico",
+        "example": "Hipoacusia neurosensorial bilateral leve a moderada."
+      },
+      "observaciones": {
+        "label": "Observaciones",
+        "example": "Se recomienda control en seis meses."
+      },
+      "clinica_nombre": {
+        "label": "Nombre",
+        "example": "Clínica Auditiva Los Ángeles"
+      },
+      "clinica_telefono": {
+        "label": "Teléfono",
+        "example": "+506 2222-3344"
+      },
+      "clinica_correo": {
+        "label": "Correo",
+        "example": "info@clinicaauditiva.example"
+      },
+      "clinica_direccion": {
+        "label": "Dirección",
+        "example": "Sabana Norte, 200 m al oeste de la Contraloría, San José"
       },
       "fecha_hoy": {
         "label": "Fecha de hoy",
@@ -871,7 +929,7 @@
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
-        "choiceAttended": "Vino",
+        "choiceAttended": "Recepción",
         "choiceMissed": "Lo perdió",
         "choiceLabel": "Mantenimiento {{number}}: {{choice}}",
         "toasts": {
@@ -890,6 +948,7 @@
         "notesToggleCount_one": "{{count}} nota",
         "notesToggleCount_other": "{{count}} notas",
         "notePlaceholder": "Escribe una nota",
+        "missedHint": "Escribe una nota para marcarlo como perdido",
         "save": "Guardar",
         "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",
         "noteMeta": "{{date}} · {{author}}",

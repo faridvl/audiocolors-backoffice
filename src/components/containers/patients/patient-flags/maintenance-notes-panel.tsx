@@ -13,6 +13,9 @@ interface MaintenanceNotesPanelProps {
   patientUuid: string;
   maintenanceNumber: MaintenanceNumber;
   notes: MaintenanceNote[];
+  isMissedPending: boolean;
+  onMissedSaved: () => void;
+  onMissedCancel: () => void;
   isLoading: boolean;
   hasError: boolean;
   isRetrying: boolean;
@@ -25,6 +28,9 @@ export const MaintenanceNotesPanel: React.FC<MaintenanceNotesPanelProps> = ({
   patientUuid,
   maintenanceNumber,
   notes,
+  isMissedPending,
+  onMissedSaved,
+  onMissedCancel,
   isLoading,
   hasError,
   isRetrying,
@@ -55,7 +61,13 @@ export const MaintenanceNotesPanel: React.FC<MaintenanceNotesPanelProps> = ({
       ) : (
         <MaintenanceNoteHistory notes={notes} />
       )}
-      <MaintenanceNoteForm patientUuid={patientUuid} maintenanceNumber={maintenanceNumber} />
+      <MaintenanceNoteForm
+        patientUuid={patientUuid}
+        maintenanceNumber={maintenanceNumber}
+        isMissedPending={isMissedPending}
+        onMissedSaved={onMissedSaved}
+        onMissedCancel={onMissedCancel}
+      />
     </div>
   );
 };

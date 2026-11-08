@@ -1,4 +1,4 @@
-import { KeyboardEvent, useLayoutEffect, useRef, useState } from "react";
+import { KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useCreateMaintenanceNoteMutation } from "@/shared/api/mutations/patients/create-maintenance-note-mutation";
 import {
   MAINTENANCE_NOTE_MAX_LENGTH,
@@ -15,6 +15,8 @@ const NOTE_MAX_ROWS = 8;
 export function useMaintenanceNoteForm(
   patientUuid: string,
   maintenanceNumber: MaintenanceNumber,
+  isMissedPending = false,
+  onMissedSaved?: () => void,
 ) {
   const { executeCreateMaintenanceNote, isPending } =
     useCreateMaintenanceNoteMutation();
@@ -37,6 +39,11 @@ export function useMaintenanceNoteForm(
     element.style.height = `${Math.min(element.scrollHeight + borders, maxHeight)}px`;
   }, [draft]);
 
+  // Al marcar "Lo perdió" el cursor queda listo para escribir la nota.
+  useEffect(() => {
+    if (isMissedPending) fieldRef.current?.focus();
+  }, [isMissedPending]);
+
   const handleChange = (value: string) => {
     setDraft(value.slice(0, MAINTENANCE_NOTE_MAX_LENGTH));
     setHasError(false);
@@ -49,7 +56,10 @@ export function useMaintenanceNoteForm(
     executeCreateMaintenanceNote(
       { patientUuid, maintenanceNumber, text },
       {
-        onSuccess: () => setDraft(""),
+        onSuccess: () => {
+          setDraft("");
+          if (isMissedPending) onMissedSaved?.();
+        },
         onError: () => setHasError(true),
       },
     );
