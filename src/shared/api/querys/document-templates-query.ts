@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQueries, useQuery } from '@tanstack/react-query';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import {
@@ -8,6 +8,7 @@ import {
 
 export const FETCH_DOCUMENT_TEMPLATES_KEY = 'fetchDocumentTemplates';
 export const FETCH_DOCUMENT_TEMPLATE_KEY = 'fetchDocumentTemplate';
+const SUMMARY_CONTENT_KEY_SUFFIX = 'summary';
 
 export function useDocumentTemplatesQuery() {
   return useQuery({
@@ -31,5 +32,24 @@ export function useDocumentTemplateQuery(templateUuid: string | null) {
     // El editor parte de una copia: que no se vuelva a pedir mientras se escribe.
     staleTime: Infinity,
     gcTime: 0,
+  });
+}
+
+/**
+ * El contenido de varias plantillas a la vez (el resumen del paciente); sin uuids no consulta.
+ * Clave propia y sin caché: cada vez que se abre el resumen trae el texto vigente, aunque el editor
+ * haya guardado cambios o tenga su copia en memoria.
+ */
+export function useDocumentTemplatesContentQueries(templateUuids: string[]) {
+  return useQueries({
+    queries: templateUuids.map((templateUuid) => ({
+      queryKey: [FETCH_DOCUMENT_TEMPLATE_KEY, templateUuid, SUMMARY_CONTENT_KEY_SUFFIX],
+      queryFn: () =>
+        ApiServiceClient(env.API.MEDICAL_RECORDS_URL).get<DocumentTemplate>(
+          `/document-templates/${templateUuid}`,
+        ),
+      staleTime: 0,
+      gcTime: 0,
+    })),
   });
 }

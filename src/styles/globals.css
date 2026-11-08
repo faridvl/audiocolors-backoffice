@@ -22,16 +22,18 @@
     margin: 12mm;
   }
 
-  body:has([data-print-report]) {
+  /* Informe suelto de audiometría. Con el resumen montado manda el resumen (reglas de abajo),
+     aunque el informe de la audiometría también esté en la página. */
+  body:has([data-print-report]):not(:has([data-print-summary])) {
     background: white;
   }
 
-  body:has([data-print-report])
+  body:has([data-print-report]):not(:has([data-print-summary]))
     *:not(:has([data-print-report])):not([data-print-report]):not([data-print-report] *) {
     display: none !important;
   }
 
-  body:has([data-print-report]) *:has([data-print-report]) {
+  body:has([data-print-report]):not(:has([data-print-summary])) *:has([data-print-report]) {
     display: block !important;
     position: static !important;
     height: auto !important;
@@ -47,6 +49,35 @@
   /* Sin esto el navegador quita los colores de fondo y los símbolos del audiograma salen en gris. */
   [data-print-report],
   [data-print-report] * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Resumen del paciente: lo único que sale al imprimir. */
+  body:has([data-print-summary]) {
+    background: white;
+  }
+
+  body:has([data-print-summary])
+    *:not(:has([data-print-summary])):not([data-print-summary]):not([data-print-summary] *) {
+    display: none !important;
+  }
+
+  body:has([data-print-summary]) *:has([data-print-summary]) {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  [data-print-summary],
+  [data-print-summary] * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

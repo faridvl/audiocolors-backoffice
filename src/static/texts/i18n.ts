@@ -600,6 +600,40 @@ export const TEXT = {
       CONTROLS: 'patients.summary.controls',
       HEARING_AIDS: 'patients.summary.hearingAids',
     },
+    CLINICAL_SUMMARY: {
+      TITLE: 'patients.clinicalSummary.title',
+      DESCRIPTION: 'patients.clinicalSummary.description',
+      CLOSE: 'patients.clinicalSummary.close',
+      GENERATE: 'patients.clinicalSummary.generate',
+      NO_RECORDS: 'patients.clinicalSummary.noRecords',
+      NO_ANSWERS: 'patients.clinicalSummary.noAnswers',
+      LOAD_ERROR: 'patients.clinicalSummary.loadError',
+      CARD_LOAD_ERROR: 'patients.clinicalSummary.cardLoadError',
+      RETRY: 'patients.clinicalSummary.retry',
+      TEMPLATES_PLACEHOLDER: 'patients.clinicalSummary.templatesPlaceholder',
+      TEMPLATES_SEARCH: 'patients.clinicalSummary.templatesSearch',
+      TEMPLATES_NO_RESULTS: 'patients.clinicalSummary.templatesNoResults',
+      TEMPLATES_SELECTED: 'patients.clinicalSummary.templatesSelected',
+      TEMPLATES_REMOVE: 'patients.clinicalSummary.templatesRemove',
+      TEMPLATES_EMPTY: 'patients.clinicalSummary.templatesEmpty',
+      FILE_TYPE: {
+        SUMMARY: 'patients.clinicalSummary.fileType.summary',
+        AUDIOMETRY: 'patients.clinicalSummary.fileType.audiometry',
+      },
+      SECTIONS: {
+        TEMPLATES: 'patients.clinicalSummary.sections.templates',
+        BACKGROUND: 'patients.clinicalSummary.sections.background',
+        OTOSCOPY: 'patients.clinicalSummary.sections.otoscopy',
+        AUDIOMETRY: 'patients.clinicalSummary.sections.audiometry',
+      },
+      DOCUMENT: {
+        TITLE: 'patients.clinicalSummary.document.title',
+        PHONE: 'patients.clinicalSummary.document.phone',
+        ISSUED: 'patients.clinicalSummary.document.issued',
+        BRANCH: 'patients.clinicalSummary.document.branch',
+        AUTHORSHIP: 'patients.clinicalSummary.document.authorship',
+      },
+    },
     FLAGS: {
       MENU: 'patients.flags.menu',
       TITLE: 'patients.flags.title',
@@ -858,6 +892,7 @@ export const TEXT = {
       ACTIONS: {
         EDIT: 'patients.detail.actions.edit',
         CHANGE_STATUS: 'patients.detail.actions.changeStatus',
+        GENERATE_SUMMARY: 'patients.detail.actions.generateSummary',
       },
     },
     PHYSICAL_EXAM: {

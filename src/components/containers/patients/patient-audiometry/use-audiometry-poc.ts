@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useCreateAudiometryEntryMutation } from '@/shared/api/mutations/audiometry/create-audiometry-entry-mutation';
 import {
   FETCH_AUDIOMETRY_ENTRY_KEY,
@@ -7,9 +8,12 @@ import {
   useAudiometryEntryQuery,
 } from '@/shared/api/querys/patient-audiometry-entries-query';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
-import { calculateAge, formatDate, formatDateTime } from '@/shared/utils/formatters';
+import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useSession } from '@/hooks/use-session';
+import { printWithFileName } from '@/shared/utils/print-document';
+import { buildPrintFileName } from '@/shared/utils/print-file-name';
+import { TEXT } from '@/static/texts/i18n';
 import {
   AudiogramMarks,
   AudiometryNotes,
@@ -39,7 +43,7 @@ import {
   calculateDiscriminationPercent,
 } from './audiometry-constants';
 import { WordListType } from './speech-word-lists';
-import { EarSummary, buildEarSummary } from './audiometry-calculations';
+import { buildEarSummaries, presentedWordsOf } from './audiometry-report-data';
 import {
   AudiometryFormState,
   hasAudiometryData,
@@ -124,8 +128,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const [lastWordListType, setLastWordListType] = useState<WordListType | null>(null);
   const [notes, setNotes] = useState<AudiometryNotes>(buildEmptyAudiometryNotes);
 
-  const presentedWords =
-    PRESENTED_WORDS_BY_LIST_TYPE[lastWordListType ?? DEFAULT_PRESENTED_WORDS_TYPE];
+  const presentedWords = presentedWordsOf(lastWordListType);
 
   const canMask = MASKABLE_TOOLS.includes(activeTool);
 
@@ -268,10 +271,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const handleToggleNoResponse = () => setHasNoResponse((current) => !current);
 
   const summaries = useMemo(
-    () =>
-      Object.fromEntries(
-        EARS.map((ear) => [ear, buildEarSummary(marks, ear, ptaType, gradingScale)]),
-      ) as Record<Ear, EarSummary>,
+    () => buildEarSummaries(marks, ptaType, gradingScale),
     [marks, ptaType, gradingScale],
   );
 
@@ -332,9 +332,18 @@ export function useAudiometryPoc(patientUuid: string) {
     patientName: patient ? `${patient.firstName} ${patient.lastName}`.trim() : '',
     patientDocumentId: patient?.documentId ?? '',
     patientAge: calculateAge(patient?.birthDate),
-    patientBirthDate: patient?.birthDate ? formatDate(patient.birthDate) : '',
+    patientBirthDate: formatCalendarDate(patient?.birthDate),
   };
-  const handlePrint = () => window.print();
+  const { t } = useTranslation();
+  const handlePrint = () =>
+    printWithFileName(
+      buildPrintFileName({
+        type: t(TEXT.PATIENTS.CLINICAL_SUMMARY.FILE_TYPE.AUDIOMETRY),
+        clinic: printReportHeader.clinicName,
+        patient: printReportHeader.patientName,
+        documentId: printReportHeader.patientDocumentId,
+      }),
+    );
 
   return {
     accordionRef,

@@ -988,3 +988,18 @@ La regla de entrada de TipTap (`nodeInputRule`) calcula mal la posición cuando 
 - Cubre por igual teclear, pegar y dictar; reemplaza también la regla de pegado.
 - Una `{{clave}}` partida entre dos formatos distintos (mitad en negrita) queda como texto.
 - Deshacer quita la etiqueta junto con la última tecla, no por separado.
+
+## D64 · Resumen del paciente como hoja de impresión, no con jsPDF (2026-11-08)
+
+"Generar resumen" en el expediente abre un modal con tarjetas: plantillas de documento (se marcan
+cuáles), historia clínica, última otoscopía y última audiometría. "Generar" arma una vista de
+impresión en HTML y abre el diálogo del navegador (Guardar como PDF), igual que el informe de
+audiometría (D59).
+
+- Se eligió HTML + `window.print()` y no jsPDF: así se reusan tal cual los gráficos SVG del informe
+  de audiometría; con jsPDF habría que pasarlos a imagen.
+- Siempre lleva arriba el logo y la ficha del paciente, y al final una sola firma: línea para firmar
+  a mano y el nombre del usuario con sesión (`fullName`). El título ("Msc.") sale de ese nombre; no
+  hay campo aparte.
+- La tarjeta de plantillas la ve todo el que ve al paciente; historia clínica, otoscopía y
+  audiometría solo con el permiso clínico (RULES §7). Sin registros, la tarjeta sale deshabilitada.

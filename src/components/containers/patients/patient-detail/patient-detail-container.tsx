@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
@@ -20,6 +20,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { EditContactsModal } from '@/components/containers/patients/patient-contacts/edit-contacts-modal';
 import { PatientSummary } from './patient-summary';
+import { PatientSummaryModal } from '@/components/containers/patients/patient-summary/patient-summary-modal';
 
 interface PatientDetailContainerProps {
   uuid: string;
@@ -32,9 +33,15 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   // Pestaña con la que abre el modal de indicadores; null = cerrado.
   const [flagsSection, setFlagsSection] = useState<PatientFlagSection | null>(null);
   const [isEditingContacts, setIsEditingContacts] = useState(false);
+
+  // El resumen es de un paciente: al pasar a otro se cierra para no imprimir los datos del anterior.
+  useEffect(() => {
+    setIsGeneratingSummary(false);
+  }, [uuid]);
 
   if (isLoading) {
     return (
@@ -69,6 +76,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         onEditMaintenance={() => setFlagsSection(PatientFlagSection.MAINTENANCE)}
         onEditContacts={() => setIsEditingContacts(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
+        onGenerateSummary={() => setIsGeneratingSummary(true)}
       />
 
       {/* El empleado ve los datos generales y los archivos, nada clínico. */}
@@ -91,6 +99,10 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
           currentDate={patient.statusDate}
           onClose={() => setIsChangingStatus(false)}
         />
+      )}
+
+      {isGeneratingSummary && (
+        <PatientSummaryModal patient={patient} onClose={() => setIsGeneratingSummary(false)} />
       )}
 
       {isEditingContacts && (

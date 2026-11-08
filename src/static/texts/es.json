@@ -182,7 +182,7 @@
       "controlRemove": "Al guardar no quedará ningún control y la tarjeta \"Controles este mes\" dejará de verse.",
       "editTitle": "Editar tipo de cita",
       "editLabel": "Editar {{name}}",
-    "updatedAt": "Actualizada el {{date}}",
+      "updatedAt": "Actualizada el {{date}}",
       "minutesShort": "{{count}} min"
     }
   },
@@ -762,7 +762,7 @@
       "noResultsDescription": "Prueba con otro nombre o cambia el filtro.",
       "registeredBy": "Registrado por:",
       "editLabel": "Editar {{name}}",
-    "updatedAt": "Actualizada el {{date}}",
+      "updatedAt": "Actualizada el {{date}}",
       "deleteLabel": "Eliminar {{name}}"
     },
     "preview": {
@@ -802,6 +802,42 @@
       "confirmed": "Citas confirmadas este mes",
       "controls": "Controles este mes",
       "hearingAids": "Audífonos en laboratorio"
+    },
+    "clinicalSummary": {
+      "title": "Generar resumen",
+      "description": "Elige qué va en el resumen. Al generarlo se abre la ventana de impresión.",
+      "close": "Cerrar",
+      "generate": "Generar resumen",
+      "noRecords": "Sin registros",
+      "noAnswers": "Sin respuestas",
+      "loadError": "No se pudieron cargar los datos del resumen.",
+      "cardLoadError": "No se pudo cargar",
+      "retry": "Reintentar",
+      "templatesPlaceholder": "Elige las plantillas",
+      "templatesSearch": "Buscar plantilla",
+      "templatesNoResults": "No hay plantillas con ese nombre.",
+      "templatesSelected_one": "{{count}} plantilla",
+      "templatesSelected_other": "{{count}} plantillas",
+      "templatesRemove": "Quitar {{label}}",
+      "templatesEmpty": "Todavía no hay plantillas de documento.",
+      "fileType": {
+        "summary": "Resumen clínico",
+        "audiometry": "Audiometría"
+      },
+      "sections": {
+        "templates": "Plantillas de documento",
+        "background": "Historia clínica",
+        "otoscopy": "Última otoscopía",
+        "audiometry": "Última audiometría"
+      },
+      "document": {
+        "title": "Resumen del expediente",
+        "phone": "Teléfono",
+        "issued": "Emitido",
+        "branch_one": "Sede",
+        "branch_other": "Sedes",
+        "authorship": "{{author}}, {{date}}"
+      }
     },
     "flags": {
       "menu": "Indicadores",
@@ -1149,7 +1185,8 @@
       },
       "actions": {
         "edit": "Modificar paciente",
-        "changeStatus": "Cambiar estado"
+        "changeStatus": "Cambiar estado",
+        "generateSummary": "Generar resumen"
       }
     },
     "physicalExam": {
