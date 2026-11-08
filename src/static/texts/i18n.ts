@@ -600,6 +600,29 @@ export const TEXT = {
       CONTROLS: 'patients.summary.controls',
       HEARING_AIDS: 'patients.summary.hearingAids',
     },
+    CLINICAL_SUMMARY: {
+      TITLE: 'patients.clinicalSummary.title',
+      DESCRIPTION: 'patients.clinicalSummary.description',
+      CLOSE: 'patients.clinicalSummary.close',
+      GENERATE: 'patients.clinicalSummary.generate',
+      NO_RECORDS: 'patients.clinicalSummary.noRecords',
+      LOADING: 'patients.clinicalSummary.loading',
+      LOAD_ERROR: 'patients.clinicalSummary.loadError',
+      RETRY: 'patients.clinicalSummary.retry',
+      TEMPLATES_HINT: 'patients.clinicalSummary.templatesHint',
+      SECTIONS: {
+        TEMPLATES: 'patients.clinicalSummary.sections.templates',
+        BACKGROUND: 'patients.clinicalSummary.sections.background',
+        OTOSCOPY: 'patients.clinicalSummary.sections.otoscopy',
+        AUDIOMETRY: 'patients.clinicalSummary.sections.audiometry',
+      },
+      DOCUMENT: {
+        TITLE: 'patients.clinicalSummary.document.title',
+        PHONE: 'patients.clinicalSummary.document.phone',
+        ISSUED: 'patients.clinicalSummary.document.issued',
+        AUTHORSHIP: 'patients.clinicalSummary.document.authorship',
+      },
+    },
     FLAGS: {
       MENU: 'patients.flags.menu',
       TITLE: 'patients.flags.title',
@@ -858,6 +881,7 @@ export const TEXT = {
       ACTIONS: {
         EDIT: 'patients.detail.actions.edit',
         CHANGE_STATUS: 'patients.detail.actions.changeStatus',
+        GENERATE_SUMMARY: 'patients.detail.actions.generateSummary',
       },
     },
     PHYSICAL_EXAM: {

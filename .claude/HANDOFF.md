@@ -83,6 +83,15 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   con datos de ejemplo; cada página lleva el logo y el nombre de la clínica al pie. Usarlas desde el
   expediente con datos reales es otro desarrollo.
 
+- Imprimir resumen del paciente (2026-11-08, sin empezar): un solo botón en el expediente
+  ("Generar resumen") abre un modal con tarjetas seleccionables: plantillas de documento (se elige
+  cuáles, puede haber varias, llenas con los datos del paciente), historia clínica, otoscopía y
+  audiometría (reusar el informe de D59). Genera un solo PDF con lo marcado. Siempre lleva la ficha
+  técnica (datos del paciente), el logo de la clínica y la firma del profesional.
+  De otoscopía y audiometría va solo la última, sin selector. La firma es una sola, al final: la
+  línea para firmar a mano y debajo el nombre del profesional con sesión iniciada (con su título,
+  p. ej. "Msc. …"); no hay firma digital ni imagen.
+
 ## En qué estamos
 
 - **Plantillas de documento (2026-11-08, en `develop` del front y del API; migración aplicada en la

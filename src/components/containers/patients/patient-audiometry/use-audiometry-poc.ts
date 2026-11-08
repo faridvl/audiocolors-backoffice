@@ -39,7 +39,7 @@ import {
   calculateDiscriminationPercent,
 } from './audiometry-constants';
 import { WordListType } from './speech-word-lists';
-import { EarSummary, buildEarSummary } from './audiometry-calculations';
+import { buildEarSummaries, presentedWordsOf } from './audiometry-report-data';
 import {
   AudiometryFormState,
   hasAudiometryData,
@@ -124,8 +124,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const [lastWordListType, setLastWordListType] = useState<WordListType | null>(null);
   const [notes, setNotes] = useState<AudiometryNotes>(buildEmptyAudiometryNotes);
 
-  const presentedWords =
-    PRESENTED_WORDS_BY_LIST_TYPE[lastWordListType ?? DEFAULT_PRESENTED_WORDS_TYPE];
+  const presentedWords = presentedWordsOf(lastWordListType);
 
   const canMask = MASKABLE_TOOLS.includes(activeTool);
 
@@ -268,10 +267,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const handleToggleNoResponse = () => setHasNoResponse((current) => !current);
 
   const summaries = useMemo(
-    () =>
-      Object.fromEntries(
-        EARS.map((ear) => [ear, buildEarSummary(marks, ear, ptaType, gradingScale)]),
-      ) as Record<Ear, EarSummary>,
+    () => buildEarSummaries(marks, ptaType, gradingScale),
     [marks, ptaType, gradingScale],
   );
 

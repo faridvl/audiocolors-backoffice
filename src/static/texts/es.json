@@ -803,6 +803,29 @@
       "controls": "Controles este mes",
       "hearingAids": "Audífonos en laboratorio"
     },
+    "clinicalSummary": {
+      "title": "Generar resumen",
+      "description": "Elige qué va en el resumen. Al generarlo se abre la ventana de impresión.",
+      "close": "Cerrar",
+      "generate": "Generar",
+      "noRecords": "Sin registros",
+      "loading": "Cargando datos…",
+      "loadError": "No se pudieron cargar los datos del resumen.",
+      "retry": "Reintentar",
+      "templatesHint": "Marca las plantillas que quieras incluir.",
+      "sections": {
+        "templates": "Plantillas de documento",
+        "background": "Historia clínica",
+        "otoscopy": "Última otoscopía",
+        "audiometry": "Última audiometría"
+      },
+      "document": {
+        "title": "Resumen del expediente",
+        "phone": "Teléfono",
+        "issued": "Emitido",
+        "authorship": "{{author}}, {{date}}"
+      }
+    },
     "flags": {
       "menu": "Indicadores",
       "title": "Indicadores del paciente",
@@ -1149,7 +1172,8 @@
       },
       "actions": {
         "edit": "Modificar paciente",
-        "changeStatus": "Cambiar estado"
+        "changeStatus": "Cambiar estado",
+        "generateSummary": "Generar resumen"
       }
     },
     "physicalExam": {

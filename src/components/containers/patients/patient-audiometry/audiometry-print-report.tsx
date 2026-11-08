@@ -69,6 +69,11 @@ interface AudiometryPrintReportProps {
   failedWords: FailedWordsValues;
   presentedWords: number;
   notes: AudiometryNotes;
+  /**
+   * Dentro del resumen del paciente: sin logo, ficha ni firma propios (el resumen los pone una
+   * sola vez) y sin salto de hoja forzado.
+   */
+  isEmbedded?: boolean;
 }
 
 /** Solo se ve al imprimir: informe clínico de la audiometría guardada, hecho para una hoja A4. */
@@ -86,6 +91,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   failedWords,
   presentedWords,
   notes,
+  isEmbedded = false,
 }) => {
   const { t } = useTranslation();
   const empty = t(SUMMARY_TEXT.EMPTY);
@@ -97,6 +103,10 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     { label: t(REPORT_TEXT.DOCUMENT_ID), value: header.patientDocumentId },
     { label: t(REPORT_TEXT.AGE), value: ageText },
     { label: t(REPORT_TEXT.BIRTH_DATE), value: header.patientBirthDate },
+    { label: t(REPORT_TEXT.DATE), value: entryDate },
+    { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
+  ].filter((field) => field.value !== '');
+  const embeddedFields = [
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
   ].filter((field) => field.value !== '');
@@ -163,33 +173,50 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
 
   return (
     <article
-      data-print-report
+      {...(isEmbedded ? { 'data-print-summary-section': '' } : { 'data-print-report': '' })}
       className="hidden flex-col gap-2 bg-white text-xs leading-snug text-ink-700 print:flex"
     >
-      <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
-        <div className="flex flex-col gap-1">
-          {header.clinicLogoUrl ? (
-            // Logo de la clínica en un host remoto que next/image no tiene configurado.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={header.clinicLogoUrl} alt={header.clinicName} className="h-10 w-auto" />
-          ) : (
-            <BrandLogo height={40} />
-          )}
-          {header.clinicName && (
-            <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
-          )}
-        </div>
-        <h1 className="text-right text-xl font-semibold text-ink-900">{t(REPORT_TEXT.TITLE)}</h1>
-      </header>
-
-      <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
-        {patientFields.map((field) => (
-          <div key={field.label} className="min-w-0">
-            <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
-            <dd className="font-medium text-ink-800">{field.value}</dd>
+      {isEmbedded && (
+        <header className="flex flex-col gap-1 border-b border-ink-300 pb-1">
+          <h2 className="text-base font-semibold text-ink-900">{t(REPORT_TEXT.TITLE)}</h2>
+          <dl className="flex flex-wrap gap-x-4 gap-y-0.5">
+            {embeddedFields.map((field) => (
+              <div key={field.label} className="flex gap-1">
+                <dt className="text-ink-500">{field.label}:</dt>
+                <dd className="font-medium text-ink-800">{field.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </header>
+      )}
+      {!isEmbedded && (
+        <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
+          <div className="flex flex-col gap-1">
+            {header.clinicLogoUrl ? (
+              // Logo de la clínica en un host remoto que next/image no tiene configurado.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={header.clinicLogoUrl} alt={header.clinicName} className="h-10 w-auto" />
+            ) : (
+              <BrandLogo height={40} />
+            )}
+            {header.clinicName && (
+              <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
+            )}
           </div>
-        ))}
-      </dl>
+          <h1 className="text-right text-xl font-semibold text-ink-900">{t(REPORT_TEXT.TITLE)}</h1>
+        </header>
+      )}
+
+      {!isEmbedded && (
+        <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
+          {patientFields.map((field) => (
+            <div key={field.label} className="min-w-0">
+              <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
+              <dd className="font-medium text-ink-800">{field.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       <section className="flex flex-col gap-2 break-inside-avoid">
         <h2 className={SECTION_TITLE_CLASSES}>{t(AUDIOMETRY_TEXT.AUDIOGRAM_TITLE)}</h2>
@@ -297,7 +324,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       </div>
 
       {/* Diagnóstico y observaciones siempre arrancan en la segunda hoja. */}
-      <div className="flex break-before-page flex-col gap-2">
+      <div className={tailwind('flex flex-col gap-2', !isEmbedded && 'break-before-page')}>
         {textSections.map((section) => (
           <section key={section.key} className="flex break-inside-avoid flex-col gap-1">
             <h2 className={SECTION_TITLE_CLASSES}>{section.title}</h2>
@@ -309,17 +336,19 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         ))}
       </div>
 
-      <footer className="mt-1 flex break-inside-avoid items-end justify-between gap-6 pt-2">
-        <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
-          <p className="text-sm font-medium text-ink-800">{professional}</p>
-          <p className="text-[10px] uppercase tracking-wide text-ink-500">
-            {t(REPORT_TEXT.SIGNATURE)}
+      {!isEmbedded && (
+        <footer className="mt-1 flex break-inside-avoid items-end justify-between gap-6 pt-2">
+          <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
+            <p className="text-sm font-medium text-ink-800">{professional}</p>
+            <p className="text-[10px] uppercase tracking-wide text-ink-500">
+              {t(REPORT_TEXT.SIGNATURE)}
+            </p>
+          </div>
+          <p className="text-[10px] text-ink-500">
+            {t(REPORT_TEXT.PRINTED_ON, { date: formatDate(new Date().toISOString()) })}
           </p>
-        </div>
-        <p className="text-[10px] text-ink-500">
-          {t(REPORT_TEXT.PRINTED_ON, { date: formatDate(new Date().toISOString()) })}
-        </p>
-      </footer>
+        </footer>
+      )}
     </article>
   );
 };
