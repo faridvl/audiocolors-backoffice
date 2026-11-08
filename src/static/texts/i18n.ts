@@ -620,6 +620,7 @@ export const TEXT = {
         TITLE: 'patients.clinicalSummary.document.title',
         PHONE: 'patients.clinicalSummary.document.phone',
         ISSUED: 'patients.clinicalSummary.document.issued',
+        BRANCH: 'patients.clinicalSummary.document.branch',
         AUTHORSHIP: 'patients.clinicalSummary.document.authorship',
       },
     },

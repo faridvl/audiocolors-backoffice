@@ -55,7 +55,7 @@ const TABLE_CLASSES = 'w-full border-collapse text-xs';
 const HEAD_CELL_CLASSES = 'border border-ink-200 bg-ink-50 px-2 py-1 text-left font-semibold';
 const CELL_CLASSES = 'border border-ink-200 px-2 py-1';
 
-interface AudiometryPrintReportProps {
+export interface AudiometryPrintReportProps {
   header: PrintReportHeader;
   entryDate: string;
   professional: string;

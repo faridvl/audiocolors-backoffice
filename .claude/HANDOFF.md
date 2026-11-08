@@ -91,6 +91,10 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   De otoscopía y audiometría va solo la última, sin selector. La firma es una sola, al final: la
   línea para firmar a mano y debajo el nombre del profesional con sesión iniciada (con su título,
   p. ej. "Msc. …"); no hay firma digital ni imagen.
+  Nombre del archivo: "{Tipo} - {Clínica} - {Paciente} - {Cédula}", con el tipo desde es.json:
+  "Resumen clínico - AudioColors - Juan Pérez Mora - 112340567.pdf" y, al imprimir audiometría
+  sola, "Audiometría - AudioColors - …" (hoy sale solo con el nombre de la clínica). Sin cédula,
+  se omite ese tramo.
 
 ## En qué estamos
 

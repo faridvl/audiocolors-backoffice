@@ -823,6 +823,8 @@
         "title": "Resumen del expediente",
         "phone": "Teléfono",
         "issued": "Emitido",
+        "branch_one": "Sede",
+        "branch_other": "Sedes",
         "authorship": "{{author}}, {{date}}"
       }
     },
