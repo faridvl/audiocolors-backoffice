@@ -6,7 +6,7 @@ import { PatientStatusPill } from '@/components/containers/patients/patient-stat
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
 import { PatientMaintenancePills } from '@/components/containers/patients/patient-flags/patient-maintenance-pills';
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
-import { PatientPriorityCheck } from '@/components/containers/patients/patient-flags/patient-priority-check';
+import { PatientPriorityButton } from '@/components/containers/patients/patients-list/patient-priority-button';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import {
@@ -96,6 +96,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <Typography variant={TypographyVariant.SUBTITLE} as="p" className="break-words">
               {getFullName(patient.firstName, patient.lastName)}
             </Typography>
+            <PatientPriorityButton patient={patient} />
             <PatientStatusPill status={patient.status} />
           </div>
           {identity && (
@@ -112,7 +113,6 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
           <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
           <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
           <VideoCandidateCheck patient={patient} />
-          <PatientPriorityCheck patient={patient} />
         </div>
 
         <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 lg:grid-cols-2">

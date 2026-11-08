@@ -1,5 +1,5 @@
 import React from "react";
-import { Footprints } from "lucide-react";
+import { Flag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TEXT } from "@/static/texts/i18n";
 import { Button, ButtonVariant } from "@/components/common/button/button";
@@ -8,7 +8,7 @@ import { getFullName } from "@/shared/utils/formatters";
 import { Patient } from "@/types/patients/patient";
 import { tailwind } from "@/utils/tailwind-utils";
 
-/** Marca o quita la prioridad desde la fila de la lista; no cambia el orden. */
+/** Marca o quita la prioridad desde la lista o el expediente; no cambia el orden. */
 export const PatientPriorityButton: React.FC<{ patient: Patient }> = ({
   patient,
 }) => {
@@ -31,10 +31,15 @@ export const PatientPriorityButton: React.FC<{ patient: Patient }> = ({
         action,
         name: getFullName(patient.firstName, patient.lastName),
       })}
-      icon={<Footprints className="h-4 w-4" aria-hidden />}
+      icon={
+        <Flag
+          className={tailwind("h-4 w-4", isOn && "fill-current")}
+          aria-hidden
+        />
+      }
       className={tailwind(
         "px-2 py-1.5",
-        isOn && "bg-danger/10 text-danger hover:bg-danger/20",
+        isOn ? "bg-danger/10 text-danger hover:bg-danger/20" : "text-ink-400",
       )}
     />
   );
