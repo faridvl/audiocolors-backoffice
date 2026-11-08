@@ -34,63 +34,85 @@ export interface PatientSummaryPrintProps {
   audiometries: SummaryAudiometry[];
 }
 
-const SECTION_BREAK_CLASSES = 'break-before-page';
+const SHEET_BREAK_CLASSES = 'break-before-page';
 // La última sección no suelta su cierre: la firma nunca queda sola en una hoja.
 const KEEP_WITH_SIGNATURE_CLASSES = 'break-after-avoid';
+// En pantalla cada hoja es una A4 con su margen; al imprimir el margen lo pone el body.
+const SHEET_CLASSES =
+  'flex w-[210mm] min-h-[297mm] shrink-0 flex-col gap-4 bg-white p-[12mm] shadow-md print:min-h-0 print:w-auto print:p-0 print:shadow-none';
 
-/** Solo se ve al imprimir: logo y ficha, las secciones elegidas (cada una en su hoja) y una firma. */
-export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
-  tenant,
-  summaryPatient,
-  issuedAt,
-  professionalName,
-  showPatientSheet,
-  templates,
-  templateValues,
-  background,
-  otoscopy,
-  audiometries,
-}) => {
-  const sections: { key: string; node: React.ReactNode }[] = [
-    ...templates.map((template) => ({
-      key: `template-${template.uuid}`,
-      node: <SummaryTemplateSection template={template} values={templateValues} />,
-    })),
-    ...(background
-      ? [
-          {
-            key: 'background',
-            node: <SummaryClinicalHistorySection summaryBackground={background} />,
-          },
-        ]
-      : []),
-    ...audiometries.map((audiometry, index) => ({
-      key: `audiometry-${index}`,
-      node: <SummaryAudiometrySection audiometry={audiometry} />,
-    })),
-    ...(otoscopy ? [{ key: 'otoscopy', node: <SummaryOtoscopySection entry={otoscopy} /> }] : []),
-  ];
-
-  return (
-    <div data-print-summary="" className="hidden flex-col gap-4 bg-white text-ink-700 print:flex">
+/**
+ * El resumen armado como hojas A4: lo que se ve en la vista previa es lo que sale al imprimir.
+ * Va memoizado para que un re-render del padre no pise lo que el usuario corrigió a mano.
+ */
+export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = React.memo(
+  ({
+    tenant,
+    summaryPatient,
+    issuedAt,
+    professionalName,
+    showPatientSheet,
+    templates,
+    templateValues,
+    background,
+    otoscopy,
+    audiometries,
+  }) => {
+    const sections: { key: string; node: React.ReactNode }[] = [
+      ...templates.map((template) => ({
+        key: `template-${template.uuid}`,
+        node: <SummaryTemplateSection template={template} values={templateValues} />,
+      })),
+      ...(background
+        ? [
+            {
+              key: 'background',
+              node: <SummaryClinicalHistorySection summaryBackground={background} />,
+            },
+          ]
+        : []),
+      ...audiometries.map((audiometry, index) => ({
+        key: `audiometry-${index}`,
+        node: <SummaryAudiometrySection audiometry={audiometry} />,
+      })),
+      ...(otoscopy ? [{ key: 'otoscopy', node: <SummaryOtoscopySection entry={otoscopy} /> }] : []),
+    ];
+    const header = (
       <SummaryHeader
         tenant={tenant}
         summaryPatient={summaryPatient}
         issuedAt={issuedAt}
         showPatientSheet={showPatientSheet}
       />
-      {sections.map((section, index) => (
-        <div
-          key={section.key}
-          className={tailwind(
-            index > 0 && SECTION_BREAK_CLASSES,
-            index === sections.length - 1 && KEEP_WITH_SIGNATURE_CLASSES,
-          )}
-        >
-          {section.node}
-        </div>
-      ))}
-      <SummarySignature professionalName={professionalName} />
-    </div>
-  );
-};
+    );
+    const signature = <SummarySignature professionalName={professionalName} />;
+
+    return (
+      <div
+        data-print-summary=""
+        className="flex flex-col items-center gap-4 text-ink-700 print:block print:gap-0"
+      >
+        {sections.length === 0 && (
+          <div className={SHEET_CLASSES}>
+            {header}
+            {signature}
+          </div>
+        )}
+        {sections.map((section, index) => {
+          const isLast = index === sections.length - 1;
+          return (
+            <div
+              key={section.key}
+              className={tailwind(SHEET_CLASSES, index > 0 && SHEET_BREAK_CLASSES)}
+            >
+              {index === 0 && header}
+              <div className={tailwind(isLast && KEEP_WITH_SIGNATURE_CLASSES)}>{section.node}</div>
+              {isLast && signature}
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
+);
+PatientSummaryPrint.displayName = 'PatientSummaryPrint';

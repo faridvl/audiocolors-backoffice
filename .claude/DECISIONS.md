@@ -1003,3 +1003,19 @@ audiometría (D59).
   hay campo aparte.
 - La tarjeta de plantillas la ve todo el que ve al paciente; historia clínica, otoscopía y
   audiometría solo con el permiso clínico (RULES §7). Sin registros, la tarjeta sale deshabilitada.
+
+## D65 · Vista previa editable del resumen antes de imprimir (2026-11-08)
+
+"Generar" ya no imprime de una vez: abre una vista previa a pantalla completa con las hojas A4 del
+resumen (el mismo componente de impresión), para revisar y corregir textos antes de imprimir.
+
+- Las correcciones viven solo en esa vista y solo salen en el PDF: no se guardan ni llaman a la API.
+- Se pueden corregir: el contenido de las plantillas, las respuestas de la historia clínica, los
+  textos de otoscopía, diagnóstico y observaciones de cada audiometría, los datos de la ficha y el
+  nombre bajo la firma. No se corrigen gráficos, logo, tablas numéricas ni Weber.
+- Los cambios quedan en el DOM (`contentEditable="plaintext-only"`); el componente de impresión es
+  `memo` y recibe props congeladas al generar, para que un re-render no los pise.
+- "Volver" regresa al modal con la selección intacta; si hay cambios pide confirmar. Esc hace lo
+  mismo y cerrar nunca imprime.
+- Al imprimir salen las hojas con las correcciones, sin barra, fondo gris ni resaltado. En celular
+  las hojas se escalan al ancho con `zoom` (`--summary-zoom`).

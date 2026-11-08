@@ -9,6 +9,7 @@ import {
 } from '@/shared/utils/document-template-markdown';
 import { tailwind } from '@/utils/tailwind-utils';
 import { SummaryTemplate } from './patient-summary-types';
+import { SummaryEditableText } from './summary-editable-text';
 import { SummarySectionTitle } from './summary-section-title';
 
 const DEFAULT_HEADING_LEVEL = 1;
@@ -46,17 +47,28 @@ const BlockLine: React.FC<{ block: Block; values: Record<string, string> }> = ({
     <Runs runs={parseRuns(block.text, block.kind === BlockKind.HEADING)} values={values} />
   );
   if (block.kind === BlockKind.HEADING) {
-    return <h3 className={HEADING_CLASSES[block.level ?? DEFAULT_HEADING_LEVEL]}>{runs}</h3>;
+    return (
+      <SummaryEditableText
+        as="h3"
+        className={HEADING_CLASSES[block.level ?? DEFAULT_HEADING_LEVEL]}
+      >
+        {runs}
+      </SummaryEditableText>
+    );
   }
   if (block.kind === BlockKind.LIST_ITEM) {
     return (
       <p className="flex gap-2 pl-4 text-sm text-ink-800">
         <span className="shrink-0">{block.marker}</span>
-        <span>{runs}</span>
+        <SummaryEditableText className="min-w-0 flex-1">{runs}</SummaryEditableText>
       </p>
     );
   }
-  return <p className="text-sm text-ink-800">{runs}</p>;
+  return (
+    <SummaryEditableText as="p" className="text-sm text-ink-800">
+      {runs}
+    </SummaryEditableText>
+  );
 };
 
 interface SummaryTemplateSectionProps {

@@ -14,6 +14,7 @@ import {
 } from '../patient-background/clinical-history';
 import { SummaryBackground } from './patient-summary-types';
 import { buildAuthorship } from './summary-authorship';
+import { SummaryEditableText } from './summary-editable-text';
 import { SummarySectionTitle } from './summary-section-title';
 
 interface SummaryClinicalHistorySectionProps {
@@ -66,7 +67,7 @@ export const SummaryClinicalHistorySection: React.FC<SummaryClinicalHistorySecti
                     </span>
                     {answer && detail && field.detailLabel && (
                       <span className="block text-xs text-ink-600">
-                        {field.detailLabel} {detail}
+                        {field.detailLabel} <SummaryEditableText>{detail}</SummaryEditableText>
                       </span>
                     )}
                   </li>
@@ -77,9 +78,9 @@ export const SummaryClinicalHistorySection: React.FC<SummaryClinicalHistorySecti
           {group.texts.map((field) => (
             <div key={field.id} className="break-inside-avoid">
               <Typography variant={TypographyVariant.HELPER}>{field.label}</Typography>
-              <p className="whitespace-pre-line text-sm text-ink-800">
+              <SummaryEditableText as="p" className="whitespace-pre-line text-sm text-ink-800">
                 {textOf(answers[field.id])}
-              </p>
+              </SummaryEditableText>
             </div>
           ))}
         </div>

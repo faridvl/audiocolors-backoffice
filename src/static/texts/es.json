@@ -805,12 +805,22 @@
     },
     "clinicalSummary": {
       "title": "Generar resumen",
-      "description": "Elige qué va en el resumen. Al generarlo se abre la ventana de impresión.",
+      "description": "Elige qué va en el resumen. Antes de imprimirlo lo vas a poder revisar y corregir.",
       "close": "Cerrar",
       "generate": "Generar resumen",
       "noRecords": "Sin registros",
       "noAnswers": "Sin respuestas",
       "loadError": "No se pudieron cargar los datos del resumen.",
+      "preview": {
+        "title": "Vista previa del resumen",
+        "help": "Toca un texto para corregirlo. Los cambios solo salen en este PDF.",
+        "back": "Volver",
+        "print": "Imprimir",
+        "discardTitle": "¿Descartar los cambios?",
+        "discardMessage": "Si vuelves, se pierden los textos que corregiste en esta vista previa.",
+        "discardConfirm": "Descartar y volver",
+        "discardCancel": "Seguir editando"
+      },
       "cardLoadError": "No se pudo cargar",
       "retry": "Reintentar",
       "templatesPlaceholder": "Elige las plantillas",

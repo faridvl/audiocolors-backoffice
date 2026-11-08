@@ -623,6 +623,16 @@ export const TEXT = {
       AUDIOMETRY_REMOVE: 'patients.clinicalSummary.audiometryRemove',
       AUDIOMETRY_EMPTY: 'patients.clinicalSummary.audiometryEmpty',
       AUDIOMETRY_OPTION: 'patients.clinicalSummary.audiometryOption',
+      PREVIEW: {
+        TITLE: 'patients.clinicalSummary.preview.title',
+        HELP: 'patients.clinicalSummary.preview.help',
+        BACK: 'patients.clinicalSummary.preview.back',
+        PRINT: 'patients.clinicalSummary.preview.print',
+        DISCARD_TITLE: 'patients.clinicalSummary.preview.discardTitle',
+        DISCARD_MESSAGE: 'patients.clinicalSummary.preview.discardMessage',
+        DISCARD_CONFIRM: 'patients.clinicalSummary.preview.discardConfirm',
+        DISCARD_CANCEL: 'patients.clinicalSummary.preview.discardCancel',
+      },
       FILE_TYPE: {
         SUMMARY: 'patients.clinicalSummary.fileType.summary',
         AUDIOMETRY: 'patients.clinicalSummary.fileType.audiometry',

@@ -11,6 +11,7 @@ import {
 import { formatPhoneForDisplay } from '@/shared/utils/phone';
 import { TEXT } from '@/static/texts/i18n';
 import { SummaryPatient, SummaryTenant } from './patient-summary-types';
+import { SummaryEditableText } from './summary-editable-text';
 
 const REPORT_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY.REPORT;
 const DOCUMENT_TEXT = TEXT.PATIENTS.CLINICAL_SUMMARY.DOCUMENT;
@@ -79,7 +80,12 @@ export const SummaryHeader: React.FC<SummaryHeaderProps> = ({
           {fields.map((field) => (
             <div key={field.label} className="min-w-0">
               <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
-              <dd className="min-h-[1.25em] text-sm font-medium text-ink-800">{field.value}</dd>
+              <SummaryEditableText
+                as="dd"
+                className="min-h-[1.25em] text-sm font-medium text-ink-800"
+              >
+                {field.value}
+              </SummaryEditableText>
             </div>
           ))}
         </dl>

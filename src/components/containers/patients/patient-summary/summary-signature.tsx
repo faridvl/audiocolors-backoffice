@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { SummaryEditableText } from './summary-editable-text';
 
 interface SummarySignatureProps {
   professionalName: string;
@@ -8,6 +9,8 @@ interface SummarySignatureProps {
 export const SummarySignature: React.FC<SummarySignatureProps> = ({ professionalName }) => (
   <footer className="mt-16 flex break-before-avoid break-inside-avoid flex-col gap-1">
     <div className="w-80 max-w-full border-t border-ink-700" />
-    <Typography variant={TypographyVariant.BODY_SEMIBOLD}>{professionalName}</Typography>
+    <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+      <SummaryEditableText>{professionalName}</SummaryEditableText>
+    </Typography>
   </footer>
 );

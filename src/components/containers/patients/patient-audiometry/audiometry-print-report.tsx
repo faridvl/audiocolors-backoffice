@@ -152,7 +152,10 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   return (
     <article
       {...(isEmbedded ? { 'data-print-summary-section': '' } : { 'data-print-report': '' })}
-      className="hidden flex-col gap-2 bg-white text-xs leading-snug text-ink-700 print:flex"
+      className={tailwind(
+        'flex-col gap-2 bg-white text-xs leading-snug text-ink-700',
+        isEmbedded ? 'flex' : 'hidden print:flex',
+      )}
     >
       {isEmbedded && (
         <header className="flex flex-col gap-1 border-b border-ink-300 pb-1">
@@ -299,7 +302,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
             <h2 className={SECTION_TITLE_CLASSES}>{section.title}</h2>
             <ReadOnlyValue
               value={section.text}
-              className="block whitespace-pre-line text-sm text-ink-800"
+              className="block min-h-[1.25em] whitespace-pre-line text-sm text-ink-800"
+              isCorrectable={isEmbedded}
             />
           </section>
         ))}

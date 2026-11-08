@@ -5,6 +5,7 @@ import { EMPTY_VALUE } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { SummaryOtoscopy } from './patient-summary-types';
 import { buildAuthorship } from './summary-authorship';
+import { SummaryEditableText } from './summary-editable-text';
 import { SummarySectionTitle } from './summary-section-title';
 
 const BACKGROUND_TEXT = TEXT.PATIENTS.BACKGROUND;
@@ -29,9 +30,12 @@ export const SummaryOtoscopySection: React.FC<SummaryOtoscopySectionProps> = ({ 
       {ears.map((ear) => (
         <div key={ear.key} className="break-inside-avoid">
           <Typography variant={TypographyVariant.ACCENT}>{ear.label}</Typography>
-          <p className="whitespace-pre-line text-sm text-ink-800">
+          <SummaryEditableText
+            as="p"
+            className="min-h-[1.25em] whitespace-pre-line text-sm text-ink-800"
+          >
             {ear.text?.trim() || EMPTY_VALUE}
-          </p>
+          </SummaryEditableText>
         </div>
       ))}
     </section>

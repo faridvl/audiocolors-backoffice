@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/use-permissions';
@@ -17,7 +16,6 @@ import { usePatientBackgroundQuery } from '@/shared/api/querys/patient-backgroun
 import { useOtoscopyEntriesQuery } from '@/shared/api/querys/patient-otoscopy-entries-query';
 import { Permission } from '@/shared/auth/permissions';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
-import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, getPatientBranchUuids } from '@/types/patients/patient';
@@ -59,7 +57,11 @@ export interface SummaryCardState {
 const byNewest = <T extends { createdAt: string }>(a: T, b: T) =>
   new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 
-const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+export interface SummaryPreview {
+  printProps: PatientSummaryPrintProps;
+  /** Título del documento: el nombre con que el navegador propone guardar el PDF. */
+  fileName: string;
+}
 
 export function usePatientSummary(patient: Patient) {
   const { t } = useTranslation();
@@ -79,25 +81,8 @@ export function usePatientSummary(patient: Patient) {
   const [templateUuids, setTemplateUuids] = useState<string[]>([]);
   // Mientras el usuario no elija, rige el valor por defecto: la audiometría válida más reciente.
   const [chosenAudiometryUuids, setChosenAudiometryUuids] = useState<string[] | null>(null);
-  const [printProps, setPrintProps] = useState<PatientSummaryPrintProps | null>(null);
-  // Cada generación lleva un número: si cambia durante la espera, esa impresión se cancela.
-  const generationRef = useRef(0);
-  const stopPrintRef = useRef<(() => void) | null>(null);
-
-  const cancelGeneration = useCallback(() => {
-    generationRef.current += 1;
-    stopPrintRef.current?.();
-    stopPrintRef.current = null;
-    setPrintProps(null);
-  }, []);
-
-  useEffect(
-    () => () => {
-      generationRef.current += 1;
-      stopPrintRef.current?.();
-    },
-    [],
-  );
+  // Datos congelados al generar: la vista previa no cambia aunque las consultas se refresquen.
+  const [preview, setPreview] = useState<SummaryPreview | null>(null);
 
   const branchesQuery = useBranchesQuery();
   const templatesQuery = useDocumentTemplatesQuery();
@@ -215,14 +200,13 @@ export function usePatientSummary(patient: Patient) {
     checked[SummaryCard.BACKGROUND] ||
     checked[SummaryCard.OTOSCOPY] ||
     checked[SummaryCard.AUDIOMETRY];
-  const isGenerating = printProps !== null;
   const canGenerate =
     hasSomething &&
     !isTemplatesIncomplete &&
     !isAudiometryIncomplete &&
     !isLoadingChosen &&
     !hasChosenError &&
-    !isGenerating;
+    preview === null;
 
   const branchNames = useMemo(
     () =>
@@ -232,9 +216,8 @@ export function usePatientSummary(patient: Patient) {
     [patient, branchesQuery.data],
   );
 
-  const handleGenerate = async () => {
+  const handleGenerate = () => {
     if (!canGenerate) return;
-    const generation = ++generationRef.current;
     const issuedAt = new Date().toISOString();
     const professionalName = user?.fullName ?? '';
     const clinicName = tenant?.businessName ?? '';
@@ -309,25 +292,15 @@ export function usePatientSummary(patient: Patient) {
       ),
     };
 
-    // Se monta ya pintado y, tras un par de cuadros e imágenes cargadas, se abre la impresión.
-    flushSync(() => setPrintProps(props));
-    await nextFrame();
-    await nextFrame();
-    await waitForImages(document);
-    // Se cerró el modal (o cambió de paciente) durante la espera: no se imprime.
-    if (generation !== generationRef.current) return;
-    stopPrintRef.current = printWithFileName(
-      buildPrintFileName({
+    setPreview({
+      printProps: props,
+      fileName: buildPrintFileName({
         type: t(SUMMARY_TEXT.FILE_TYPE.SUMMARY),
         clinic: clinicName,
         patient: patientName,
         documentId: patient.documentId,
       }),
-      () => {
-        stopPrintRef.current = null;
-        setPrintProps(null);
-      },
-    );
+    });
   };
 
   const audiometryOptions: AudiometryOption[] = [...validAudiometries]
@@ -351,10 +324,9 @@ export function usePatientSummary(patient: Patient) {
     toggleCard,
     changeTemplates: setTemplateUuids,
     isLoadingChosen,
-    cancelGeneration,
     canGenerate,
-    isGenerating,
     handleGenerate,
-    printProps,
+    preview,
+    closePreview: () => setPreview(null),
   };
 }

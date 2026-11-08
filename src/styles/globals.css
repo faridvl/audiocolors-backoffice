@@ -89,4 +89,11 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* Los textos corregibles de la vista previa se resaltan en pantalla, nunca en el papel. */
+  [data-summary-editable] {
+    background: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
 }
