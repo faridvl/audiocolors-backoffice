@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2, Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
@@ -8,12 +8,15 @@ import { AppointmentTypeListRow } from './appointment-type-list-row';
 import { EditAppointmentTypeModal } from './edit-appointment-type-modal';
 import { useAppointmentTypesSettings } from './use-appointment-types-settings';
 
+const NEW_TYPE_KEY = 'new-appointment-type';
+
 export const AppointmentTypesSettingsContainer: React.FC = () => {
   const { t } = useTranslation();
   const {
     appointmentTypes,
     currentControl,
     editingType,
+    isAdding,
     isLoading,
     isError,
     refetch,
@@ -21,6 +24,8 @@ export const AppointmentTypesSettingsContainer: React.FC = () => {
     handleEdit,
     handleCloseEdit,
     handleSave,
+    handleCreate,
+    handleAdd,
   } = useAppointmentTypesSettings();
 
   if (isLoading) {
@@ -50,6 +55,15 @@ export const AppointmentTypesSettingsContainer: React.FC = () => {
 
   return (
     <div className="flex w-full flex-col gap-4">
+      <Button
+        variant={ButtonVariant.PRIMARY}
+        onClick={handleAdd}
+        icon={<Plus className="h-4 w-4" aria-hidden />}
+        className="w-full sm:w-auto sm:self-end"
+      >
+        {t(TEXT.SETTINGS.APPOINTMENT_TYPES.ADD)}
+      </Button>
+
       {appointmentTypes.length === 0 ? (
         <Typography variant={TypographyVariant.BODY} className="py-6 text-center text-ink-500">
           {t(TEXT.SETTINGS.APPOINTMENT_TYPES.EMPTY)}
@@ -66,13 +80,17 @@ export const AppointmentTypesSettingsContainer: React.FC = () => {
         </ul>
       )}
 
-      {editingType && (
+      {(editingType || isAdding) && (
         <EditAppointmentTypeModal
-          key={editingType.uuid}
+          key={editingType?.uuid ?? NEW_TYPE_KEY}
           appointmentType={editingType}
           currentControl={currentControl}
+          existingNames={appointmentTypes
+            .filter((type) => type.uuid !== editingType?.uuid)
+            .map((type) => type.name)}
           isSaving={isSaving}
           onSave={handleSave}
+          onCreate={handleCreate}
           onClose={handleCloseEdit}
         />
       )}

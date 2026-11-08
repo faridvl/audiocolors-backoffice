@@ -234,7 +234,7 @@ test("1. dato vacío: la ficha y la historia muestran el campo en blanco", async
     await expect(term.locator("xpath=following-sibling::dd[1]")).toHaveText("");
   }
 
-  await page.getByRole("button", { name: /Preguntas/ }).click();
+  await page.getByRole("button", { name: /Formularios/ }).click();
   const main = page.locator("main");
   await expect(main).toBeVisible();
   const mainText = await main.innerText();

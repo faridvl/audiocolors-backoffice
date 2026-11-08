@@ -1,5 +1,7 @@
+import { DEFAULT_COUNTRY, findCountryByDigits, type PhoneCountry } from './phone-countries';
+
 /**
- * Teléfonos de Costa Rica (XXXX-XXXX) y de otros países (+ y solo dígitos).
+ * Teléfonos de Costa Rica (XXXX-XXXX) y de otros países (`+<código> <dígitos>`).
  * `patient.phone` lleva `+506 XXXX-XXXX` y lo comparte Zynka; el contacto, `XXXX-XXXX`.
  */
 
@@ -8,22 +10,28 @@ const LOCAL_DIGITS = 8;
 const LOCAL_PHONE_PATTERN = /^\d{4}-\d{4}$/;
 const INTERNATIONAL_PREFIX = '+';
 const DIALING_PREFIX = '00';
+/** Total mínimo con el código de país: con menos no hay número real. */
 const MIN_INTERNATIONAL_DIGITS = 8;
 const MAX_INTERNATIONAL_DIGITS = 15;
 /** Largo máximo que acepta el API para un teléfono. */
 export const PHONE_MAX_LENGTH = 20;
-/** Un `+` con 8 dígitos que empiezan así es un número de Costa Rica escrito de más. */
-const COSTA_RICA_LEADING_DIGIT = /^[245678]/;
 const COUNTRY_CODE_START = /^[1-9]/;
 const INTERNATIONAL_CHARS = /^\+[\d\s-]*$/;
 /** Marcas de dirección, espacios no separables y otros invisibles que trae el pegado. */
 const INVISIBLE_CHARS = /[​-‏‪- ⁦-⁩ ﻿]/g;
 const BEFORE_FIRST_DIGIT = /^[^+\d]+/;
+const TRUNK_PREFIX = /^0/;
+/** Números ticos (fijos y móviles) empiezan en 2, 4, 5, 6, 7 u 8. */
+const COSTA_RICA_LOCAL_START = /^[245678]/;
+/**
+ * Con el código repetido al frente (`57 300 1234567`) solo se quita si el resto tiene al menos
+ * esto: más corto podría ser un número nacional que empieza igual (Brasil, `55 9…`).
+ */
+const MIN_NATIONAL_AFTER_REPEATED_CODE = 10;
 
 export enum PhoneError {
   LOCAL_FORMAT = 'local-format',
   INTERNATIONAL_FORMAT = 'international-format',
-  COSTA_RICA_WITH_PLUS = 'costa-rica-with-plus',
 }
 
 const digitsOf = (value: string) => value.replace(/\D/g, '');
@@ -52,10 +60,102 @@ function tidySeparators(value: string): string {
   return value.replace(/[^\d\s-]/g, '').replace(/[\s-]{2,}/g, (run) => run[0]);
 }
 
+/** `+<código> <dígitos>` si el código se reconoce; si no, `+` y los dígitos tal cual. */
+function formatInternational(digits: string): string {
+  const country = findCountryByDigits(digits);
+  if (!country) return `${INTERNATIONAL_PREFIX}${digits}`;
+  const national = digits.slice(country.dialCode.length);
+  return national
+    ? `${INTERNATIONAL_PREFIX}${country.dialCode} ${national}`
+    : `${INTERNATIONAL_PREFIX}${country.dialCode}`;
+}
+
 /**
- * Lo que se ve en el campo al escribir. Con `+` es internacional y sin máscara. Sin `+`,
- * hasta 8 dígitos lleva la máscara XXXX-XXXX; un 506 con 8 dígitos se pasa a Costa Rica; con
- * más dígitos se dejan solos y la validación avisa.
+ * País del número cargado: el del código si lo trae, Costa Rica si es local (hasta 8 dígitos
+ * sin `+`) y `preferred` (o Costa Rica) si está vacío. `null` es un dato viejo que no se
+ * reconoce: el campo lo deja tal cual y sin máscara. Con código compartido (+1) gana `preferred`.
+ */
+export function detectPhoneCountry(value: string, preferred?: PhoneCountry): PhoneCountry | null {
+  const cleaned = cleanPhone(value).trim();
+  if (!cleaned) return preferred ?? DEFAULT_COUNTRY;
+
+  const digits = digitsOf(cleaned);
+  if (cleaned.startsWith(INTERNATIONAL_PREFIX))
+    return findCountryByDigits(digits, preferred) ?? null;
+  if (digits.length <= LOCAL_DIGITS) return DEFAULT_COUNTRY;
+  // Más de 8 dígitos sin `+` solo llega al pasar a Costa Rica con un número de otro país cargado.
+  return preferred?.dialCode === COSTA_RICA_CODE ? preferred : null;
+}
+
+/** Lo que se ve en el campo junto al país elegido: el número sin su código. */
+export function toNationalInput(value: string, country: PhoneCountry): string {
+  const cleaned = cleanPhone(value).trim();
+  const digits = digitsOf(cleaned);
+  const nationalDigits = cleaned.startsWith(INTERNATIONAL_PREFIX)
+    ? digits.slice(country.dialCode.length)
+    : digits;
+  return country.dialCode === DEFAULT_COUNTRY.dialCode
+    ? formatLocalDigits(nationalDigits)
+    : nationalDigits;
+}
+
+/** `+` y 8 dígitos ticos: un número de Costa Rica, no otro código (+222…). */
+const isCostaRicaLocalAfterPlus = (digits: string) =>
+  digits.length === LOCAL_DIGITS &&
+  COSTA_RICA_LOCAL_START.test(digits) &&
+  !digits.startsWith(COSTA_RICA_CODE);
+
+/** Dígitos del país extranjero sin 0 de larga distancia ni el código si viene repetido. */
+function toForeignNationalDigits(digits: string, country: PhoneCountry): string {
+  const withoutTrunk = digits.replace(TRUNK_PREFIX, '');
+  const hasRepeatedCode =
+    withoutTrunk.startsWith(country.dialCode) &&
+    withoutTrunk.length - country.dialCode.length >= MIN_NATIONAL_AFTER_REPEATED_CODE;
+  return hasRepeatedCode
+    ? withoutTrunk.slice(country.dialCode.length).replace(TRUNK_PREFIX, '')
+    : withoutTrunk;
+}
+
+/**
+ * Valor del formulario al escribir con un país elegido. Costa Rica: XXXX-XXXX; otro país:
+ * `+<código> <dígitos>` (vacío si no hay dígitos, para que el campo obligatorio avise).
+ * Un número pegado con `+` y código trae su propio país (salvo `+` y 8 dígitos ticos con
+ * Costa Rica elegido). En otro país se quita el 0 de larga distancia y el código repetido.
+ */
+export function composePhoneValue(country: PhoneCountry, input: string): string {
+  const cleaned = cleanPhone(input);
+  const digits = digitsOf(cleaned);
+  if (cleaned.startsWith(INTERNATIONAL_PREFIX)) {
+    if (country.dialCode === COSTA_RICA_CODE && isCostaRicaLocalAfterPlus(digits)) {
+      return formatLocalDigits(digits);
+    }
+    return normalizePhone(cleaned).slice(0, PHONE_MAX_LENGTH);
+  }
+
+  if (country.dialCode === COSTA_RICA_CODE) {
+    if (isCostaRicaWithCode(digits)) return formatLocalDigits(digits.slice(COSTA_RICA_CODE.length));
+    return formatLocalDigits(digits.slice(0, LOCAL_DIGITS));
+  }
+  const national = toForeignNationalDigits(digits, country).slice(
+    0,
+    MAX_INTERNATIONAL_DIGITS - country.dialCode.length,
+  );
+  return national ? `${INTERNATIONAL_PREFIX}${country.dialCode} ${national}` : '';
+}
+
+/**
+ * Valor al elegir otro país con un número ya escrito: conserva todos los dígitos (no corta a 8
+ * en Costa Rica) y la validación avisa si no calzan con el país nuevo.
+ */
+export function switchPhoneCountry(country: PhoneCountry, nationalInput: string): string {
+  const digits = digitsOf(cleanPhone(nationalInput));
+  if (country.dialCode === COSTA_RICA_CODE) return formatLocalDigits(digits);
+  return digits ? `${INTERNATIONAL_PREFIX}${country.dialCode} ${digits}` : '';
+}
+
+/**
+ * Lo que se ve en el campo de un número que no se reconoce (dato viejo): sin `+` y con más
+ * de 8 dígitos se deja solo, sin máscara; con `+`, sin máscara.
  */
 export function formatPhoneInput(value: string): string {
   const cleaned = cleanPhone(value);
@@ -68,20 +168,13 @@ export function formatPhoneInput(value: string): string {
   const digits = digitsOf(cleaned);
   if (isCostaRicaWithCode(digits)) return formatLocalDigits(digits.slice(COSTA_RICA_CODE.length));
   if (digits.length <= LOCAL_DIGITS) return formatLocalDigits(digits);
-  // Más de 8 dígitos sin `+` no es de Costa Rica: sin guion, para que no parezca válido.
   return digits.slice(0, PHONE_MAX_LENGTH);
 }
 
-/** El prefijo "+506" se ve mientras el número se lee como de Costa Rica (hasta 8 dígitos, sin `+`). */
-export function shouldShowCountryPrefix(value: string): boolean {
-  const cleaned = cleanPhone(value);
-  return !cleaned.startsWith(INTERNATIONAL_PREFIX) && digitsOf(cleaned).length <= LOCAL_DIGITS;
-}
-
 /**
- * Forma de guardar el teléfono de un contacto: Costa Rica `XXXX-XXXX`, otro país `+` y
- * solo dígitos. Un `+506` o un 506 con 8 dígitos también es Costa Rica. Un valor que no
- * se reconoce (dato viejo) se devuelve tal cual, sin cortarlo.
+ * Forma de guardar el teléfono de un contacto: Costa Rica `XXXX-XXXX`, otro país
+ * `+<código> <dígitos>`. Un `+506` o un 506 con 8 dígitos también es Costa Rica. Un valor que
+ * no se reconoce (dato viejo) se devuelve tal cual, sin cortarlo.
  */
 export function normalizePhone(value: string): string {
   const cleaned = cleanPhone(value).trim();
@@ -89,13 +182,28 @@ export function normalizePhone(value: string): string {
   const digits = digitsOf(cleaned);
 
   if (isCostaRicaWithCode(digits)) return formatLocalDigits(digits.slice(COSTA_RICA_CODE.length));
-  if (cleaned.startsWith(INTERNATIONAL_PREFIX)) return `${INTERNATIONAL_PREFIX}${digits}`;
+  if (cleaned.startsWith(INTERNATIONAL_PREFIX)) return formatInternational(digits);
   if (digits.length === LOCAL_DIGITS) return formatLocalDigits(digits);
   return tidySeparators(cleaned).trim();
 }
 
-/** Forma de guardar el teléfono del paciente: los de Costa Rica llevan `+506 `. */
-export function toPatientPhone(value: string): string {
+/**
+ * Igual que `normalizePhone`, pero si el campo sigue como se mostró al abrir el formulario
+ * devuelve el valor guardado tal cual: un dato viejo (`+13055551234`) no se reescribe.
+ */
+export function normalizePhoneUnlessUnchanged(value: string, storedValue?: string): string {
+  if (storedValue !== undefined && value === formatPhoneForDisplay(storedValue)) {
+    return storedValue;
+  }
+  return normalizePhone(value);
+}
+
+/**
+ * Forma de guardar el teléfono del paciente: los de Costa Rica llevan `+506 `.
+ * `isStored`: viene de la base sin tocar, un `+` se deja como está.
+ */
+export function toPatientPhone(value: string, isStored = false): string {
+  if (isStored && value.startsWith(INTERNATIONAL_PREFIX)) return value;
   const normalized = normalizePhone(value);
   return LOCAL_PHONE_PATTERN.test(normalized)
     ? `${INTERNATIONAL_PREFIX}${COSTA_RICA_CODE} ${normalized}`
@@ -113,10 +221,6 @@ export function validatePhone(value: string): PhoneError | null {
   if (!INTERNATIONAL_CHARS.test(cleaned)) return PhoneError.INTERNATIONAL_FORMAT;
 
   const digits = digitsOf(cleaned);
-  if (digits.length === LOCAL_DIGITS && COSTA_RICA_LEADING_DIGIT.test(digits)) {
-    return PhoneError.COSTA_RICA_WITH_PLUS;
-  }
-
   const isValid =
     COUNTRY_CODE_START.test(digits) &&
     !digits.startsWith(COSTA_RICA_CODE) &&
@@ -171,54 +275,6 @@ export function isSamePhone(first: string, second: string): boolean {
   return shorter.length >= LOCAL_DIGITS && longer.endsWith(shorter);
 }
 
-// Códigos de país de 2 dígitos (UIT); los de 1 son 1 y 7, y los demás tienen 3.
-const ONE_DIGIT_COUNTRY_CODES = ['1', '7'];
-const TWO_DIGIT_COUNTRY_CODES = new Set([
-  '20',
-  '27',
-  '30',
-  '31',
-  '32',
-  '33',
-  '34',
-  '36',
-  '39',
-  '40',
-  '41',
-  '43',
-  '44',
-  '45',
-  '46',
-  '47',
-  '48',
-  '49',
-  '51',
-  '52',
-  '53',
-  '54',
-  '55',
-  '56',
-  '57',
-  '58',
-  '60',
-  '61',
-  '62',
-  '63',
-  '64',
-  '65',
-  '66',
-  '81',
-  '82',
-  '84',
-  '86',
-  '90',
-  '91',
-  '92',
-  '93',
-  '94',
-  '95',
-  '98',
-]);
 const NATIONAL_GROUP_SIZE = 4;
 /** Cómo se parte el número nacional según su largo (el resto se agrupa de a 4). */
 const NATIONAL_GROUPS: Record<number, number[]> = {
@@ -231,13 +287,9 @@ const NATIONAL_GROUPS: Record<number, number[]> = {
   11: [3, 4, 4],
   12: [4, 4, 4],
 };
+const NORTH_AMERICA_CODE = '1';
 const TEN_DIGIT_NATIONAL = 10;
 const TEN_DIGIT_GROUPS = [3, 3, 4];
-
-function countryCodeLength(digits: string): number {
-  if (ONE_DIGIT_COUNTRY_CODES.includes(digits[0])) return 1;
-  return TWO_DIGIT_COUNTRY_CODES.has(digits.slice(0, 2)) ? 2 : 3;
-}
 
 function splitInGroups(digits: string, sizes: number[]): string[] {
   let start = 0;
@@ -257,12 +309,13 @@ export function formatPhoneForDisplay(value: string): string {
   if (!normalized.startsWith(INTERNATIONAL_PREFIX)) return normalized;
 
   const digits = digitsOf(normalized);
-  const codeLength = countryCodeLength(digits);
-  const code = digits.slice(0, codeLength);
-  const national = digits.slice(codeLength);
+  const country = findCountryByDigits(digits);
+  if (!country) return normalized;
+  const code = country.dialCode;
+  const national = digits.slice(code.length);
 
   let sizes = NATIONAL_GROUPS[national.length];
-  if (ONE_DIGIT_COUNTRY_CODES.includes(code) && national.length === TEN_DIGIT_NATIONAL) {
+  if (code === NORTH_AMERICA_CODE && national.length === TEN_DIGIT_NATIONAL) {
     sizes = TEN_DIGIT_GROUPS;
   }
   if (!sizes) {

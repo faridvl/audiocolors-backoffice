@@ -3,6 +3,7 @@
     "buttons": {
       "save": "Guardar",
       "cancel": "Cancelar",
+      "clear": "Limpiar",
       "loading": "Cargando...",
       "retry": "Reintentar"
     },
@@ -31,7 +32,12 @@
       "keepEditing": "Seguir editando"
     },
     "optional": "(Opcional)",
-    "phoneHint": "¿Otro país? Escribe + y el código. Ej.: +1 305 555 1234",
+    "phoneHint": "¿Otro país? Elige su código en la lista.",
+    "phoneCountry": {
+      "label": "País del teléfono",
+      "search": "Buscar país o código",
+      "empty": "No encontramos ese país."
+    },
     "forbidden": "Tu usuario no tiene acceso a esta sección.",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
@@ -50,8 +56,10 @@
     "unreadCount_one": "{{count}} notificación sin leer",
     "unreadCount_other": "{{count}} notificaciones sin leer",
     "emptyTitle": "No hay notificaciones",
-    "emptyDescription": "Las novedades de cada versión aparecen acá.",
+    "emptyDescription": "Acá aparecen las novedades de cada versión y los pacientes sin movimiento.",
     "releaseTitle": "Versión {{version}}",
+    "stalePatientTitle": "{{name}} lleva 6 meses o más sin movimiento",
+    "stalePatientDetail": "Último movimiento: {{date}}",
     "releases": {
       "v1_0_0": {
         "clinicalHistory": {
@@ -127,8 +135,8 @@
         "description": "Nombre y duración de cada tipo de cita."
       },
       "QUESTIONS": {
-        "title": "Preguntas",
-        "description": "Las preguntas que la clínica hace a sus pacientes. Los cambios no afectan las respuestas ya guardadas."
+        "title": "Formularios",
+        "description": "Los formularios que la clínica llena con sus pacientes. Los cambios no afectan las respuestas ya guardadas."
       }
     },
     "appointmentTypes": {
@@ -141,6 +149,10 @@
       "noDuration": "Sin definir (30 minutos)",
       "minutes": "{{count}} minutos",
       "saved": "Tipo de cita guardado",
+      "created": "Tipo de cita agregado",
+      "add": "Agregar tipo de cita",
+      "newTitle": "Nuevo tipo de cita",
+      "duplicateName": "Ya existe un tipo de cita con ese nombre.",
       "isControl": "Cuenta como control",
       "isControlHint": "Es el que se cuenta en la tarjeta \"Controles este mes\" de Pacientes.",
       "controlBadge": "Controles del mes",
@@ -153,8 +165,8 @@
     }
   },
   "questions": {
-    "title": "Preguntas",
-    "pageTitle": "Preguntas · AudioColors Gestión Clínica",
+    "title": "Formularios",
+    "pageTitle": "Formularios · AudioColors Gestión Clínica",
     "clinicalHistory": "Historia clínica",
     "unfilledSection": "{{title}} sin llenar",
     "unfilledSections_one": "{{count}} sección sin llenar",
@@ -166,7 +178,7 @@
     "sectionsCount_other": "{{count}} secciones",
     "unsavedChanges": "Hay cambios sin guardar",
     "newSection": "Nueva sección",
-    "newSectionTitle": "Nueva sección de preguntas",
+    "newSectionTitle": "Nueva sección del formulario",
     "sectionName": "Nombre de la sección",
     "sectionNamePlaceholder": "Ej. Seguimiento",
     "sectionNameRequired": "Escribe el nombre de la sección",
@@ -382,9 +394,8 @@
           "documentMax": "Máximo 20 caracteres",
           "documentDuplicate": "Esta cédula ya está registrada",
           "phoneRequired": "El teléfono es obligatorio",
-          "phoneLocal": "Formato: 8888-8888. Si es de otro país, empieza con +.",
-          "phoneInternational": "Revisa el número: con + y el código del país, de 8 a 15 dígitos.",
-          "phoneCostaRicaWithPlus": "Parece un número de Costa Rica: escríbelo sin el +"
+          "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
+          "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos."
         }
       }
     },
@@ -518,6 +529,7 @@
       "VIDEO_CANDIDATE_CHANGED": "Candidato a video",
       "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
       "RENEW_PRESCRIPTION_CHANGED": "Renovar receta",
+      "PRIORITY_CHANGED": "Prioridad",
       "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
       "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada",
       "PHYSICAL_EXAM_UPDATED": "Exploración física modificada",
@@ -526,8 +538,8 @@
       "MAINTENANCE_CHECK_CHANGED": "Mantenimiento",
       "MAINTENANCE_NOTE_CHANGED": "Nota de mantenimiento",
       "MAINTENANCE_NOTE_ADDED": "Nota de mantenimiento",
-      "QUESTIONNAIRE_FILLED": "Preguntas llenadas",
-      "QUESTIONNAIRE_CORRECTED": "Preguntas corregidas"
+      "QUESTIONNAIRE_FILLED": "Formulario llenado",
+      "QUESTIONNAIRE_CORRECTED": "Formulario corregido"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -560,7 +572,8 @@
         "WARRANTY_CHANGED": "Garantía activada",
         "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato",
         "WARRANTY_EXPIRED_CHANGED": "Garantía marcada como expirada",
-        "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta"
+        "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta",
+        "PRIORITY_CHANGED": "Marcado como prioridad"
       },
       "labShipment": {
         "sent": "Audífonos enviados al laboratorio el {{date}}",
@@ -569,9 +582,9 @@
         "deliveredWithNote": "Registró la entrega de audífonos del laboratorio ({{date}}) con nota"
       },
       "maintenance": {
-        "UNMARKED": "Mantenimiento {{number}}: sin marcar",
-        "ATTENDED": "Mantenimiento {{number}}: asistido",
-        "MISSED": "Mantenimiento {{number}}: perdido"
+        "UNMARKED": "Mantenimiento {{number}}: pendiente",
+        "ATTENDED": "Mantenimiento {{number}}: vino",
+        "MISSED": "Mantenimiento {{number}}: lo perdió"
       },
       "contactAttempts": "Intentos: {{before}} → {{after}}",
       "maintenanceDone": "Mantenimiento {{number}}: hecho",
@@ -585,7 +598,8 @@
         "WARRANTY_CHANGED": "Garantía desactivada",
         "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato",
         "WARRANTY_EXPIRED_CHANGED": "Garantía ya no marcada como expirada",
-        "RENEW_PRESCRIPTION_CHANGED": "Ya no hay que renovar la receta"
+        "RENEW_PRESCRIPTION_CHANGED": "Ya no hay que renovar la receta",
+        "PRIORITY_CHANGED": "Prioridad quitada"
       }
     }
   },
@@ -665,13 +679,17 @@
       },
       "maintenance": {
         "rowTitle": "Mantenimiento {{number}}",
+        "choiceAttended": "Vino",
+        "choiceMissed": "Lo perdió",
+        "choiceLabel": "Mantenimiento {{number}}: {{choice}}",
         "toasts": {
-          "UNMARKED": "Mantenimiento {{number}} sin marcar",
-          "ATTENDED": "Mantenimiento {{number}} marcado como asistido"
+          "UNMARKED": "Mantenimiento {{number}} pendiente",
+          "ATTENDED": "Mantenimiento {{number}}: vino",
+          "MISSED": "Mantenimiento {{number}}: lo perdió"
         },
         "pillLabels": {
-          "ATTENDED": "Mantenimiento {{number}}: asistido",
-          "MISSED": "Mantenimiento {{number}}: perdido"
+          "ATTENDED": "Mantenimiento {{number}}: vino",
+          "MISSED": "Mantenimiento {{number}}: lo perdió"
         },
         "pill": "Mant. {{number}}",
         "notesToggleLabel": "{{action}} · {{title}}",
@@ -694,41 +712,53 @@
         "hasActiveWarranty": "Garantía activa",
         "isVideoCandidate": "Candidato a video",
         "warrantyExpired": "Garantía expirada",
-        "renewPrescription": "Renovar receta"
+        "renewPrescription": "Renovar receta",
+        "isPriority": "Prioridad"
+      },
+      "priority": {
+        "mark": "Marcar como prioridad",
+        "unmark": "Quitar prioridad",
+        "patientAction": "{{action}}: {{name}}"
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
         "hasActiveWarranty": "Garantía activada",
         "isVideoCandidate": "Marcado como candidato a video",
         "warrantyExpired": "Garantía marcada como expirada",
-        "renewPrescription": "Marcado para renovar la receta"
+        "renewPrescription": "Marcado para renovar la receta",
+        "isPriority": "Paciente marcado como prioridad"
       },
       "toastsOff": {
         "hearingAidsInLab": "Audífonos devueltos al paciente",
         "hasActiveWarranty": "Garantía desactivada",
         "isVideoCandidate": "Ya no es candidato a video",
         "warrantyExpired": "Garantía ya no marcada como expirada",
-        "renewPrescription": "Ya no hay que renovar la receta"
+        "renewPrescription": "Ya no hay que renovar la receta",
+        "isPriority": "Prioridad quitada"
       },
       "columns": {
         "hearingAidsInLab": "Audífonos",
         "hasActiveWarranty": "Garantía",
         "isVideoCandidate": "Video",
         "warrantyExpired": "Garantía expirada",
-        "renewPrescription": "Receta"
+        "renewPrescription": "Receta",
+        "isPriority": "Prioridad"
       },
       "values": {
         "hearingAidsInLab": "En laboratorio",
         "hasActiveWarranty": "Activa",
         "isVideoCandidate": "Candidato",
         "warrantyExpired": "Expirada",
-        "renewPrescription": "Renovar"
+        "renewPrescription": "Renovar",
+        "isPriority": "Prioritario"
       },
       "offValues": {
         "hasActiveWarranty": "Sin garantía"
       },
       "labShipment": {
         "dateLabel": "Fecha de envío",
+        "filterDayLabel": "Día de envío",
+        "filterDayClear": "Quitar día",
         "shippedOn": "Enviados el {{date}}",
         "changeDate": "Cambiar fecha",
         "dateUpdated": "Fecha de envío actualizada",
@@ -839,16 +869,9 @@
       }
     },
     "physicalExam": {
-      "loading": "Cargando otoscopias...",
-      "loadError": "No se pudo cargar el historial de otoscopias",
-      "new": "Nueva otoscopia",
-      "empty": "Todavía no hay otoscopias registradas.",
       "save": "Guardar otoscopia",
-      "saved": "Otoscopia guardada",
-      "correctedSaved": "Otoscopia corregida",
-      "emptyError": "Escribe lo observado en al menos un oído para guardar la otoscopia.",
-      "previewRight": "OD: {{detail}}",
-      "previewLeft": "OI: {{detail}}"
+      "saved": "Otoscopia guardada en Control de evolución",
+      "emptyError": "Escribe lo observado en al menos un oído para guardar la otoscopia."
     },
     "background": {
       "title": "Historia clínica",

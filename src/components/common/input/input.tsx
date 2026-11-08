@@ -47,6 +47,10 @@ interface FormFieldProps {
   endAdornment?: React.ReactNode;
   /** Texto gris dentro del campo, a la izquierda; no es parte del valor (p. ej. "+506"). */
   startAdornment?: string;
+  /** Control interactivo dentro del campo, a la izquierda (p. ej. el selector de país). */
+  startControl?: React.ReactNode;
+  /** Lo que muestra el campo en lugar del valor de Formik (p. ej. el número sin su código). */
+  displayValue?: string;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
@@ -68,6 +72,8 @@ export const FormField: React.FC<FormFieldProps> = ({
   inputMode,
   endAdornment,
   startAdornment,
+  startControl,
+  displayValue,
 }) => {
   const { t } = useTranslation();
   const [{ value }, { error, touched }] = useField<unknown>(name);
@@ -105,6 +111,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           disabled={disabled}
           maxLength={maxLength}
           inputMode={inputMode}
+          {...(displayValue !== undefined ? { value: displayValue } : {})}
           aria-invalid={errorText ? true : undefined}
           aria-describedby={describedBy}
           className={tailwind(
@@ -112,6 +119,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             as === "textarea" && "min-h-[88px] resize-none",
             (isPassword || endAdornment) && "pr-11",
             startAdornment && "pl-[4.5rem]",
+            startControl && "pl-[7.5rem]",
           )}
           {...(onChange ? { onChange } : {})}
         >
@@ -125,6 +133,12 @@ export const FormField: React.FC<FormFieldProps> = ({
           >
             {startAdornment}
           </span>
+        )}
+
+        {startControl && (
+          <div className="absolute inset-y-0 left-0 flex items-stretch">
+            {startControl}
+          </div>
         )}
 
         {isPassword && (

@@ -856,3 +856,65 @@ Hasta ahora el switch "Audífonos en laboratorio" guardaba solo una fecha (`hear
 En el modal "Indicadores del paciente", pestaña Mantenimiento, cada Mantenimiento 1 a 4 es una casilla con su título ("Mantenimiento N"): marcada es asistido y desmarcada es no asistido. La nota se relaciona con cada mantenimiento. Reemplaza los tres estados de D40 solo en la UI: el API, la base y el enum (`UNMARKED`, `ATTENDED`, `MISSED`) no cambian, y la pantalla solo escribe `ATTENDED` (marcar) o `UNMARKED` (desmarcar). Un registro viejo en `MISSED` se ve desmarcado y, al marcarlo, pasa a `ATTENDED`. Las píldoras del expediente no se tocan y siguen mostrando `MISSED` en rojo si el dato existe. Se descartaron los chips de la ronda anterior.
 
 **Diseño:** lista con divisores finos, casilla nativa con la etiqueta asociada (tocar el texto también marca, 44 px de alto) y, a la derecha, un texto gris "Agregar nota" o "N notas" que abre las notas debajo de la fila, con sangría tras la casilla: las 2 más recientes, "Ver todas (N)" y una línea con el campo y "Guardar". Una sola fila abierta a la vez.
+
+## D47 · La tarjeta de otoscopia siempre crea; el historial vive en Control de evolución (2026-11-07)
+
+La tarjeta "Exploración física (Otoscopia)" muestra siempre el formulario de una otoscopia nueva (OD, OI, contador 0/1000 y "Guardar otoscopia"). Al guardar sale el aviso "Otoscopia guardada" y los campos se vacían para registrar otra. Ya no hay "Último registro", "Ver anteriores", "Nueva otoscopia" ni corrección desde la tarjeta, y se quitó la nota "Lo puedes corregir hoy; después queda fijo." Reemplaza el comportamiento de otoscopías de 2026-10-28.
+
+El historial se consulta solo en Control de evolución: el API crea una nota de categoría EXTERNAL_TEST ("Pruebas") al guardar, y el front solo refresca la lista de notas del paciente (no crea la nota). Depende de la rama `feature/otoscopia-en-evolucion` del API.
+
+"Cancelar" pasa a "Limpiar" (texto genérico `common.buttons.clear`): aparece solo cuando hay texto y vacía los campos sin guardar. "Guardar otoscopia" está deshabilitado mientras ambos campos estén vacíos. Se borraron la query del historial, la mutation de corrección y los componentes de la vista del último registro.
+
+## D48 · Mantenimiento vuelve a tres estados, con dos botones "Vino" y "Lo perdió" (2026-11-07)
+
+Reemplaza la casilla de D46. Cada Mantenimiento 1 a 4 muestra su título y dos botones: "Vino" (azul al activarse, `ATTENDED`) y "Lo perdió" (rojo, `MISSED`). Tocar uno lo marca; tocar el que ya está activo vuelve a pendiente (`UNMARKED`, sin color). Se guarda al tocar, con la misma mutation; el API no cambia y lo ya marcado como hecho (`ATTENDED`) se ve azul sin migración. Los botones llevan `aria-pressed` y nombre "Mantenimiento N: vino / lo perdió". En celular el acceso a las notas baja a una segunda línea si no cabe. Colores con tokens `brand` y `danger`; las píldoras del expediente ya pintaban `MISSED` en rojo.
+
+Textos: "asistido" pasa a "vino", "perdido" a "lo perdió" y "sin marcar" a "pendiente" en avisos, píldoras y bitácora.
+
+## D49 · Tipos de cita: se pueden agregar desde Configuración, no quitar (2026-11-07)
+
+Configuración, Tipos de cita, tiene el botón "Agregar tipo de cita", que abre el mismo modal de edición vacío. El nombre es obligatorio y no puede repetirse (sin distinguir mayúsculas): el API no rechaza duplicados, por eso se valida en el cliente. Un tipo nuevo nace de 30 min, igual que el resto de los valores por defecto del modal. Al guardar se refresca la lista y sale el aviso; sin tipos se ve "La clínica todavía no tiene tipos de cita." con el mismo botón. No se pueden quitar tipos: las citas viejas los referencian.
+
+## D50 · Teléfonos con selector de país; Costa Rica por defecto y mismo formato guardado (2026-11-07)
+
+`PhoneField` lleva un selector con bandera y código (+506 Costa Rica al inicio) y una lista completa de países con buscador, en `src/shared/utils/phone-countries.ts`, sin librerías (libphonenumber pesa demasiado para lo que se necesita).
+
+- Lo guardado de Costa Rica no cambia: `patient.phone` es `+506 XXXX-XXXX` (lo comparte Zynka) y el contacto `XXXX-XXXX`. Otro país se guarda `+<código> <dígitos>`; `normalizePhone` reformatea al guardar.
+- Al cargar un valor se detecta el país por su código. Con código compartido gana un dueño fijo (+1 EE. UU., +7 Rusia, +44 Reino Unido) salvo que el usuario haya elegido otro en esa sesión. Los países de +1 con código propio (Jamaica, República Dominicana, Puerto Rico y demás islas) usan el código de 4 dígitos.
+- Un valor viejo que no se reconoce (largo, sin `+`) se deja tal cual, sin máscara y sin cortarlo, y el selector muestra un globo.
+- Validación: Costa Rica 8 dígitos; otros países de 8 a 15 dígitos en total, contando el código (el API acepta hasta 20 caracteres). Se quitó la regla "Costa Rica con +": con el selector marcaba como error números extranjeros cortos.
+- Las banderas son emoji generados desde el ISO: en Windows se ven como letras del país.
+- Con un país extranjero elegido, al escribir o pegar: se quita el 0 de larga distancia inicial (`07911 123456` con Reino Unido es `+44 7911123456`) y el código repetido sin `+` (`57 300 1234567` con Colombia es `+57 3001234567`). El código solo se quita si lo que queda tiene 10 dígitos o más: con menos podría ser un número nacional que empieza igual (Brasil, `55 9…`); por eso `34 612345678` con España queda con el 34 repetido y la validación no lo atrapa. Quitar el 0 también afecta a países que lo conservan (Italia).
+- Con Costa Rica elegido, `+` seguido de exactamente 8 dígitos que empiezan en 2, 4, 5, 6, 7 u 8 (y no en 506) se toma como número tico (`+22223333` es `2222-3333`) y no como otro código (+222). Un `+` con otro código reconocible cambia el selector a ese país.
+- Al cambiar de país con un número cargado no se cortan dígitos (`switchPhoneCountry`): con Costa Rica quedan más de 8 y el campo muestra el error de formato.
+- Un valor viejo como `+13055551234` no se reescribe si el usuario no tocó el teléfono al editar otro dato: el formulario guarda el valor original (`storedPhone`) y `normalizePhoneUnlessUnchanged` lo devuelve tal cual.
+- Pruebas de `phone.ts`: `yarn test:phone` (tsc a caché y `node --test`), sin agregar un runner.
+
+## D51 · Prioridad de paciente: ícono en la fila, filtro y casilla en el expediente (2026-11-07)
+
+`PatientFlag.PRIORITY` (`isPriority` en el API, con `prioritySince`) se marca y desmarca con `PUT /patients/:uuid/flags`, con toast e invalidación de la lista.
+
+- En la lista va un botón de ícono a la par del lápiz, con `aria-pressed`, tooltip y `aria-label` "Marcar como prioridad" / "Quitar prioridad" más el nombre; marcado se pinta con el token `danger`. No reordena la lista.
+- lucide-react no trae un ícono de persona corriendo: se usa `Footprints`.
+- El filtro "Prioridad" sale solo en "Indicadores" (el filtro recorre `PatientFlag`).
+- En el expediente es una casilla "Prioridad" (como la de video), no una píldora: las píldoras abren el modal de indicadores, que no lleva prioridad. Usa un hook ligero (`usePatientPriority`) porque `usePatientFlags` consulta los envíos a laboratorio.
+- La tarjeta móvil reserva más espacio al título (`cardTitleClassName="pr-20"`) por los dos botones.
+- La bitácora registra `PRIORITY_CHANGED` (meta `{ isOn }`, como `RENEW_PRESCRIPTION_CHANGED`): "Marcado como prioridad" / "Prioridad quitada".
+
+## D52 · Filtro "Audífonos en laboratorio" con día de envío (2026-11-07)
+
+Con el filtro de laboratorio activo aparece un selector de un solo día (`LabDateField`, máximo hoy) y un botón "Quitar día". Con día elegido el API (`hearingAidsInLabDate`) devuelve solo los enviados ese día. Quitar el filtro de laboratorio limpia el día (también al usar un preset). La etiqueta de la lista no cambia.
+
+## D53 · Notificación de pacientes sin movimiento (2026-11-07)
+
+`NotificationKind.STALE_PATIENT`: una notificación por paciente de `GET /patients/stale` (React Query, 5 min), "{nombre} lleva 6 meses o más sin movimiento" y el detalle "Último movimiento: {fecha}".
+
+- Id `stale-${uuid}-${lastMovementAt}`: si el paciente vuelve a quedar inactivo tras un movimiento nuevo, el aviso reaparece como no leído aunque se hubiera limpiado el anterior.
+- Leerla no la quita; solo sale con "Limpiar". Al tocarla se marca leída, se cierra el panel y se abre la ficha. Cuentan en el contador de no leídas.
+- Orden: versiones arriba y pacientes después, del más antiguo al más reciente (el orden del API). Se descartó mezclar por fecha: los pacientes pueden ser muchos y enterrarían la versión nueva, y por fecha siempre quedarían debajo de todas formas.
+- Si la consulta falla, la bandeja muestra solo las versiones.
+- La armada de ids y orden es lógica pura en `build-notifications.ts`; `yarn test:notifications` la prueba.
+
+## D54 · Tipos de cita: el nombre repetido se detecta sin mayúsculas, tildes ni espacios (2026-11-07)
+
+Completa D49: al agregar o editar un tipo de cita, "control " (con espacio al final) y "Contról" cuentan como repetidos de "Control". La comparación (`toComparableName`) quita tildes, mayúsculas y espacios en los extremos; el nombre se guarda como lo escribió el usuario, ya sin espacios en los extremos.

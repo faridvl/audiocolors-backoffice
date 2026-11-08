@@ -64,7 +64,7 @@ export const PatientContactsFields: React.FC<PatientContactsFieldsProps> = ({
                       label={t(TEXT.PATIENTS.CONTACTS.PHONE)}
                       required
                       hint={index === 0 ? undefined : ''}
-                      className="sm:w-52"
+                      className="sm:w-64"
                     />
                   </div>
                 </div>

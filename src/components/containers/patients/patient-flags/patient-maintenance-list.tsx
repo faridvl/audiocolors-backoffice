@@ -18,7 +18,7 @@ export const PatientMaintenanceList: React.FC<{ patient: Patient }> = ({ patient
   const { openNumber, registerRow, handleToggle } = useMaintenanceOpenRow();
 
   return (
-    <div className="flex flex-col divide-y divide-ink-100">
+    <div className="flex flex-col divide-y divide-ink-200">
       {rows.map((row) => (
         <PatientMaintenanceRow
           key={row.maintenanceNumber}

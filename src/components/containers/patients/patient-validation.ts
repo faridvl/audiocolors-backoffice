@@ -5,7 +5,7 @@ import { PatientContact } from '@/types/patients/patient-contact';
 import {
   formatPhoneForDisplay,
   isSamePhone,
-  normalizePhone,
+  normalizePhoneUnlessUnchanged,
   PhoneError,
   toPatientPhone,
   validatePhoneUnlessUnchanged,
@@ -58,10 +58,9 @@ const buildBaseFields = (isBranchRequired: boolean) => ({
 const CONTACT_NAME_MAX_LENGTH = 80;
 
 const PHONE_ERROR_MESSAGES: Record<PhoneError, string> = {
-  [PhoneError.LOCAL_FORMAT]: 'Formato: 8888-8888. Si es de otro país, empieza con +.',
+  [PhoneError.LOCAL_FORMAT]: 'Formato: 8888-8888. Si es de otro país, elígelo en la lista.',
   [PhoneError.INTERNATIONAL_FORMAT]:
-    'Revisa el número: con + y el código del país, de 8 a 15 dígitos.',
-  [PhoneError.COSTA_RICA_WITH_PLUS]: 'Parece un número de Costa Rica: escríbelo sin el +',
+    'Revisa el número: con el código del país, de 8 a 15 dígitos.',
 };
 
 /** `unchangedPhones`: teléfonos que vienen de la base; si no se tocan, no se validan. */
@@ -119,6 +118,8 @@ export interface PatientContactFormValues {
   uuid?: string;
   name: string;
   phone: string;
+  /** Teléfono como está en la base: si el campo no cambió, se guarda sin reescribirlo. */
+  storedPhone?: string;
 }
 
 export interface PatientFormValues {
@@ -145,16 +146,22 @@ export function resolveContactsForSave(
 ): { phone: string | undefined; contacts: PatientContactFormValues[] } {
   const filled = contacts
     .filter((contact) => contact.phone.trim())
-    .map((contact) => ({
-      ...(contact.uuid && { uuid: contact.uuid }),
-      name: (contact.name.trim() || patientFullName).slice(0, CONTACT_NAME_MAX_LENGTH),
-      phone: normalizePhone(contact.phone),
-    }));
-  const primaryPhone = filled[0]?.phone;
+    .map((contact) => {
+      const phone = normalizePhoneUnlessUnchanged(contact.phone, contact.storedPhone);
+      return {
+        contact: {
+          ...(contact.uuid && { uuid: contact.uuid }),
+          name: (contact.name.trim() || patientFullName).slice(0, CONTACT_NAME_MAX_LENGTH),
+          phone,
+        },
+        isStored: phone === contact.storedPhone,
+      };
+    });
+  const primary = filled[0];
 
   return {
-    phone: primaryPhone ? toPatientPhone(primaryPhone) : undefined,
-    contacts: filled,
+    phone: primary ? toPatientPhone(primary.contact.phone, primary.isStored) : undefined,
+    contacts: filled.map(({ contact }) => contact),
   };
 }
 
@@ -172,6 +179,7 @@ export function buildInitialContacts(
     uuid,
     name,
     phone: formatPhoneForDisplay(phone),
+    storedPhone: phone,
   }));
   if (!patientPhone) {
     return formContacts.length > 0 ? formContacts : [{ name: '', phone: '' }];
@@ -179,7 +187,14 @@ export function buildInitialContacts(
 
   const primary = formContacts.find((contact) => isSamePhone(contact.phone, patientPhone));
   if (!primary) {
-    return [{ name: patientFullName, phone: formatPhoneForDisplay(patientPhone) }, ...formContacts];
+    return [
+      {
+        name: patientFullName,
+        phone: formatPhoneForDisplay(patientPhone),
+        storedPhone: patientPhone,
+      },
+      ...formContacts,
+    ];
   }
   return [primary, ...formContacts.filter((contact) => contact !== primary)];
 }

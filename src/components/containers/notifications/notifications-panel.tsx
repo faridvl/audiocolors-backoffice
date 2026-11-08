@@ -7,10 +7,12 @@ import { TEXT } from '@/static/texts/i18n';
 import { NotificationList } from './notification-list';
 import { ReleaseDetail } from './release-detail';
 import { AppNotification } from './use-notifications';
+import { ReleaseNotification } from './build-notifications';
+import { Release } from '@/static/releases';
 
 interface NotificationsPanelProps {
   notifications: AppNotification[];
-  selected: AppNotification | null;
+  selected: ReleaseNotification<Release> | null;
   isUnread: (id: string) => boolean;
   onSelect: (id: string) => void;
   onBack: () => void;

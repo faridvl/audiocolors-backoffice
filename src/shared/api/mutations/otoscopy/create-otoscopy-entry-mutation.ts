@@ -4,8 +4,8 @@ import { toast } from 'sonner';
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
-import { FETCH_OTOSCOPY_ENTRIES_KEY } from '@/shared/api/querys/otoscopy-entries-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import { FETCH_PATIENT_NOTES_KEY } from '@/shared/api/querys/patient-notes-query';
 import { TEXT } from '@/static/texts/i18n';
 import { OtoscopyEntry, OtoscopyEntryPayload } from '@/types/patients/otoscopy-entry';
 
@@ -14,7 +14,7 @@ interface CreateOtoscopyEntryVariables {
   entry: OtoscopyEntryPayload;
 }
 
-/** Los avisos y el refresco viven aquí para que ocurran aunque el formulario ya se haya cerrado. */
+/** El API deja la otoscopia como nota de Control de evolución, por eso se refresca esa lista. */
 export function useCreateOtoscopyEntryMutation() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -30,7 +30,7 @@ export function useCreateOtoscopyEntryMutation() {
       ),
     onSuccess: (_entry, { patientUuid }) => {
       toast.success(t(TEXT.PATIENTS.PHYSICAL_EXAM.SAVED));
-      void queryClient.invalidateQueries({ queryKey: [FETCH_OTOSCOPY_ENTRIES_KEY, patientUuid] });
+      void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_NOTES_KEY, patientUuid] });
       void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
     },
     onError: (error) => toast.error(error.message),

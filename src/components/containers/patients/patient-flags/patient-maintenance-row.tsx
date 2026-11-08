@@ -1,15 +1,19 @@
-import { ChevronDown, MessageSquare } from 'lucide-react';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { TEXT } from '@/static/texts/i18n';
-import { MaintenanceStatus } from '@/types/patients/patient';
-import { tailwind } from '@/utils/tailwind-utils';
-import { MaintenanceNotesPanel } from './maintenance-notes-panel';
+import { Check, ChevronDown, MessageSquare, X } from "lucide-react";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { TEXT } from "@/static/texts/i18n";
+import { MaintenanceStatus } from "@/types/patients/patient";
+import { tailwind } from "@/utils/tailwind-utils";
+import { MaintenanceNotesPanel } from "./maintenance-notes-panel";
 import {
+  MAINTENANCE_CHOICE_ACTIVE_STYLES,
+  MAINTENANCE_CHOICE_BASE_STYLES,
+  MAINTENANCE_CHOICE_ICON_STYLES,
+  MAINTENANCE_CHOICE_INACTIVE_STYLES,
   MAINTENANCE_NOTES_BUTTON_STYLES,
   MAINTENANCE_NOTES_CHEVRON_STYLES,
-} from './patient-maintenance-styles';
-import { MaintenanceRow } from './use-patient-maintenance';
+} from "./patient-maintenance-styles";
+import { MaintenanceRow } from "./use-patient-maintenance";
 
 interface PatientMaintenanceRowProps {
   row: MaintenanceRow;
@@ -25,7 +29,24 @@ interface PatientMaintenanceRowProps {
   onRetryNotes: () => void;
 }
 
-/** Una línea por mantenimiento: casilla con su título y, a la derecha, el acceso a las notas. */
+/** El ícono del botón activo refuerza el color: el estado no depende solo del tono. */
+const CHOICES = [
+  {
+    status: MaintenanceStatus.ATTENDED,
+    label: TEXT.PATIENTS.FLAGS.MAINTENANCE.CHOICE_ATTENDED,
+    Icon: Check,
+  },
+  {
+    status: MaintenanceStatus.MISSED,
+    label: TEXT.PATIENTS.FLAGS.MAINTENANCE.CHOICE_MISSED,
+    Icon: X,
+  },
+] as const;
+
+/**
+ * Una línea por mantenimiento: título, "Vino" / "Lo perdió" y el acceso a las notas.
+ * Tocar el botón activo vuelve a pendiente.
+ */
 export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   row,
   patientUuid,
@@ -43,11 +64,11 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   const values = { number: row.maintenanceNumber };
   const title = t(TEXT.PATIENTS.FLAGS.MAINTENANCE.ROW_TITLE, values);
   const panelId = `maintenance-notes-${row.maintenanceNumber}`;
-  const checkboxId = `maintenance-check-${row.maintenanceNumber}`;
   const noteCount = row.notes.length;
 
   const notesText = () => {
-    if (hasNotesError) return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_UNKNOWN);
+    if (hasNotesError)
+      return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_UNKNOWN);
     if (noteCount > 0) {
       return t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_COUNT, {
         count: noteCount,
@@ -58,28 +79,50 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
 
   return (
     <div ref={rowRef} className="min-w-0">
-      <div className="flex items-center justify-between gap-2">
-        <label
-          htmlFor={checkboxId}
-          className={tailwind(
-            'flex min-h-[44px] min-w-0 flex-1 items-center gap-3 text-sm font-semibold text-ink-800 md:text-base',
-            isSaving ? 'cursor-wait' : 'cursor-pointer',
-          )}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 py-1 md:gap-x-4">
+        <span className="min-w-[8rem] flex-1 truncate text-sm font-semibold text-ink-800 md:text-base">
+          {title}
+        </span>
+        <div
+          role="group"
+          aria-label={title}
+          className="flex shrink-0 items-center gap-2 md:ml-2"
         >
-          <input
-            id={checkboxId}
-            type="checkbox"
-            checked={row.status === MaintenanceStatus.ATTENDED}
-            disabled={isSaving}
-            onChange={(event) =>
-              onStatusChange(
-                event.target.checked ? MaintenanceStatus.ATTENDED : MaintenanceStatus.UNMARKED,
-              )
-            }
-            className="h-5 w-5 shrink-0 cursor-[inherit] accent-brand"
-          />
-          <span className="truncate">{title}</span>
-        </label>
+          {CHOICES.map(({ status, label, Icon }) => {
+            const isActive = row.status === status;
+            const choiceLabel = t(label);
+            return (
+              <button
+                key={status}
+                type="button"
+                aria-pressed={isActive}
+                aria-label={t(TEXT.PATIENTS.FLAGS.MAINTENANCE.CHOICE_LABEL, {
+                  number: row.maintenanceNumber,
+                  choice: choiceLabel,
+                })}
+                disabled={isSaving}
+                onClick={() =>
+                  onStatusChange(isActive ? MaintenanceStatus.UNMARKED : status)
+                }
+                className={tailwind(
+                  MAINTENANCE_CHOICE_BASE_STYLES,
+  MAINTENANCE_CHOICE_ICON_STYLES,
+                  isActive
+                    ? MAINTENANCE_CHOICE_ACTIVE_STYLES[status]
+                    : MAINTENANCE_CHOICE_INACTIVE_STYLES,
+                )}
+              >
+                {isActive && (
+                  <Icon
+                    aria-hidden="true"
+                    className={MAINTENANCE_CHOICE_ICON_STYLES}
+                  />
+                )}
+                {choiceLabel}
+              </button>
+            );
+          })}
+        </div>
         <button
           type="button"
           onClick={onToggleNotes}
@@ -91,9 +134,9 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
             title,
           })}
           className={tailwind(
-            'flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-sm font-medium text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand',
+            "ml-auto flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-sm font-medium text-brand-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand",
             MAINTENANCE_NOTES_BUTTON_STYLES,
-            isOpen && 'bg-brand-50',
+            isOpen && "bg-brand-50",
           )}
         >
           {isLoadingNotes ? (
@@ -108,9 +151,9 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
               <ChevronDown
                 aria-hidden="true"
                 className={tailwind(
-                  'h-4 w-4 shrink-0',
+                  "h-4 w-4 shrink-0",
                   MAINTENANCE_NOTES_CHEVRON_STYLES,
-                  isOpen && 'rotate-180',
+                  isOpen && "rotate-180",
                 )}
               />
             </>

@@ -21,6 +21,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   FileClock,
+  Flag,
   Video,
   Wrench,
   PhoneCall,
@@ -91,6 +92,7 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: FileClock,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.PRIORITY_CHANGED]: { icon: Flag, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.CLINICAL_HISTORY_CREATED]: {
       icon: ClipboardList,
       tone: ActionTone.NEUTRAL,
@@ -374,6 +376,7 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
     case PatientActivityAction.VIDEO_CANDIDATE_CHANGED:
     case PatientActivityAction.WARRANTY_EXPIRED_CHANGED:
     case PatientActivityAction.RENEW_PRESCRIPTION_CHANGED:
+    case PatientActivityAction.PRIORITY_CHANGED:
       return context.t(
         `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
       );
