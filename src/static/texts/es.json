@@ -820,15 +820,24 @@
       "templatesSelected_other": "{{count}} plantillas",
       "templatesRemove": "Quitar {{label}}",
       "templatesEmpty": "Todavía no hay plantillas de documento.",
+      "audiometryPlaceholder": "Elige las audiometrías",
+      "audiometrySearch": "Buscar audiometría",
+      "audiometryNoResults": "No hay audiometrías con ese dato.",
+      "audiometrySelected_one": "{{count}} audiometría",
+      "audiometrySelected_other": "{{count}} audiometrías",
+      "audiometryRemove": "Quitar {{label}}",
+      "audiometryEmpty": "Sin audiometrías válidas",
+      "audiometryOption": "{{date}} · {{author}}",
       "fileType": {
         "summary": "Resumen clínico",
         "audiometry": "Audiometría"
       },
       "sections": {
+        "technicalSheet": "Ficha técnica",
         "templates": "Plantillas de documento",
         "background": "Historia clínica",
         "otoscopy": "Última otoscopía",
-        "audiometry": "Última audiometría"
+        "audiometry": "Audiometrías"
       },
       "document": {
         "title": "Resumen del expediente",
@@ -1043,6 +1052,21 @@
         "entryAuthorDate": "Registrada por {{author}} · {{date}}",
         "entryLoading": "Cargando la audiometría…",
         "print": "Imprimir",
+        "invalidate": {
+          "button": "Marcar como mal hecha",
+          "tag": "Mal hecha",
+          "title": "Marcar como mal hecha",
+          "warning": "Esto no se puede deshacer. La audiometría se queda en el historial y se puede imprimir, pero ya no entra en los resúmenes.",
+          "reasonLabel": "Motivo",
+          "reasonPlaceholder": "Cuenta qué salió mal con esta audiometría",
+          "reasonCount": "{{current}} de {{max}}",
+          "cancel": "Cancelar",
+          "confirm": "Marcar como mal hecha",
+          "success": "Audiometría marcada como mal hecha",
+          "alreadyMarked": "Esa audiometría ya estaba marcada como mal hecha.",
+          "banner": "Mal hecha. Marcada por {{author}} · {{date}}",
+          "bannerReason": "Motivo: {{reason}}"
+        },
         "report": {
           "title": "Informe de audiometría",
           "patient": "Paciente",

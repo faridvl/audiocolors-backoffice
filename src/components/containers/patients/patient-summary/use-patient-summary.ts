@@ -10,13 +10,13 @@ import {
   useDocumentTemplatesQuery,
 } from '@/shared/api/querys/document-templates-query';
 import {
+  useAudiometryEntriesDetailQueries,
   useAudiometryEntriesQuery,
-  useAudiometryEntryQuery,
 } from '@/shared/api/querys/patient-audiometry-entries-query';
 import { usePatientBackgroundQuery } from '@/shared/api/querys/patient-background-query';
 import { useOtoscopyEntriesQuery } from '@/shared/api/querys/patient-otoscopy-entries-query';
 import { Permission } from '@/shared/auth/permissions';
-import { calculateAge, formatCalendarDate } from '@/shared/utils/formatters';
+import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
@@ -25,14 +25,25 @@ import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
 import { PatientSummaryPrintProps } from './patient-summary-print';
 import { resolveKnownAuthor } from './summary-authorship';
 import { buildSummaryAudiometry, buildTemplateValues } from './summary-print-data';
+import {
+  filterValidAudiometries,
+  resolveDefaultAudiometryUuids,
+  resolveSelectedAudiometries,
+} from './summary-audiometry-selection';
 
 const SUMMARY_TEXT = TEXT.PATIENTS.CLINICAL_SUMMARY;
 
 export enum SummaryCard {
+  TECHNICAL_SHEET = 'TECHNICAL_SHEET',
   TEMPLATES = 'TEMPLATES',
   BACKGROUND = 'BACKGROUND',
   OTOSCOPY = 'OTOSCOPY',
   AUDIOMETRY = 'AUDIOMETRY',
+}
+
+export interface AudiometryOption {
+  value: string;
+  label: string;
 }
 
 export interface SummaryCardState {
@@ -59,12 +70,15 @@ export function usePatientSummary(patient: Patient) {
   const clinicalUuid = canViewClinical ? patient.uuid : '';
 
   const [checked, setChecked] = useState<Record<SummaryCard, boolean>>({
+    [SummaryCard.TECHNICAL_SHEET]: true,
     [SummaryCard.TEMPLATES]: false,
     [SummaryCard.BACKGROUND]: false,
     [SummaryCard.OTOSCOPY]: false,
     [SummaryCard.AUDIOMETRY]: false,
   });
   const [templateUuids, setTemplateUuids] = useState<string[]>([]);
+  // Mientras el usuario no elija, rige el valor por defecto: la audiometría válida más reciente.
+  const [chosenAudiometryUuids, setChosenAudiometryUuids] = useState<string[] | null>(null);
   const [printProps, setPrintProps] = useState<PatientSummaryPrintProps | null>(null);
   // Cada generación lleva un número: si cambia durante la espera, esa impresión se cancela.
   const generationRef = useRef(0);
@@ -94,13 +108,14 @@ export function usePatientSummary(patient: Patient) {
   const templates = templatesQuery.data ?? [];
   const background = backgroundQuery.data ?? null;
   const latestOtoscopy = [...(otoscopyQuery.data ?? [])].sort(byNewest)[0] ?? null;
-  const latestAudiometryUuid =
-    [...(audiometryListQuery.data ?? [])].sort(byNewest)[0]?.uuid ?? null;
+  const audiometryList = audiometryListQuery.data ?? [];
+  const validAudiometries = filterValidAudiometries(audiometryList);
+  const audiometryUuids = chosenAudiometryUuids ?? resolveDefaultAudiometryUuids(audiometryList);
 
-  // El detalle de la audiometría y el contenido de las plantillas se piden solo si se eligen.
-  const audiometryQuery = useAudiometryEntryQuery(
+  // El detalle de las audiometrías y el contenido de las plantillas se piden solo si se eligen.
+  const audiometryDetailQueries = useAudiometryEntriesDetailQueries(
     clinicalUuid,
-    checked[SummaryCard.AUDIOMETRY] ? latestAudiometryUuid : null,
+    checked[SummaryCard.AUDIOMETRY] ? audiometryUuids : [],
   );
   const templateContentQueries = useDocumentTemplatesContentQueries(
     checked[SummaryCard.TEMPLATES] ? templateUuids : [],
@@ -109,10 +124,21 @@ export function usePatientSummary(patient: Patient) {
   const failedContentQueries = checked[SummaryCard.TEMPLATES]
     ? templateContentQueries.filter((query) => query.isError)
     : [];
-  const isAudiometryDetailFailed = checked[SummaryCard.AUDIOMETRY] && audiometryQuery.isError;
+  const failedAudiometryQueries = checked[SummaryCard.AUDIOMETRY]
+    ? audiometryDetailQueries.filter((query) => query.isError)
+    : [];
+  const isAudiometryDetailFailed = failedAudiometryQueries.length > 0;
 
   // Las sedes no son una tarjeta: si fallan, la ficha sale sin ellas y no se bloquea nada.
   const cardStates: SummaryCardState[] = [
+    {
+      card: SummaryCard.TECHNICAL_SHEET,
+      isAvailable: true,
+      isChecked: checked[SummaryCard.TECHNICAL_SHEET],
+      isLoading: false,
+      isError: false,
+      onRetry: () => undefined,
+    },
     {
       card: SummaryCard.TEMPLATES,
       isAvailable: templates.length > 0,
@@ -144,13 +170,13 @@ export function usePatientSummary(patient: Patient) {
           },
           {
             card: SummaryCard.AUDIOMETRY,
-            isAvailable: latestAudiometryUuid !== null,
+            isAvailable: validAudiometries.length > 0,
             isChecked: checked[SummaryCard.AUDIOMETRY],
             isLoading: audiometryListQuery.isLoading,
             isError: audiometryListQuery.isError || isAudiometryDetailFailed,
             onRetry: () => {
               if (audiometryListQuery.isError) void audiometryListQuery.refetch();
-              if (isAudiometryDetailFailed) void audiometryQuery.refetch();
+              failedAudiometryQueries.forEach((query) => void query.refetch());
             },
           },
         ]
@@ -163,7 +189,7 @@ export function usePatientSummary(patient: Patient) {
     backgroundQuery,
     otoscopyQuery,
     audiometryListQuery,
-    audiometryQuery,
+    ...audiometryDetailQueries,
     ...templateContentQueries,
   ].reduce((total, query) => total + query.failureCount, 0);
 
@@ -179,17 +205,24 @@ export function usePatientSummary(patient: Patient) {
 
   const isLoadingChosen =
     (checked[SummaryCard.TEMPLATES] && templateContentQueries.some((query) => query.isLoading)) ||
-    (checked[SummaryCard.AUDIOMETRY] && audiometryQuery.isLoading);
+    (checked[SummaryCard.AUDIOMETRY] && audiometryDetailQueries.some((query) => query.isLoading));
   const hasTemplatesChosen = checked[SummaryCard.TEMPLATES] && templateUuids.length > 0;
   const isTemplatesIncomplete = checked[SummaryCard.TEMPLATES] && templateUuids.length === 0;
+  const isAudiometryIncomplete = checked[SummaryCard.AUDIOMETRY] && audiometryUuids.length === 0;
   const hasSomething =
+    checked[SummaryCard.TECHNICAL_SHEET] ||
     hasTemplatesChosen ||
     checked[SummaryCard.BACKGROUND] ||
     checked[SummaryCard.OTOSCOPY] ||
     checked[SummaryCard.AUDIOMETRY];
   const isGenerating = printProps !== null;
   const canGenerate =
-    hasSomething && !isTemplatesIncomplete && !isLoadingChosen && !hasChosenError && !isGenerating;
+    hasSomething &&
+    !isTemplatesIncomplete &&
+    !isAudiometryIncomplete &&
+    !isLoadingChosen &&
+    !hasChosenError &&
+    !isGenerating;
 
   const branchNames = useMemo(
     () =>
@@ -237,13 +270,19 @@ export function usePatientSummary(patient: Patient) {
       patientAge: age,
       patientBirthDate: formatCalendarDate(patient.birthDate),
     };
-    const audiometryEntry = audiometryQuery.data;
+    const chosenAudiometries = checked[SummaryCard.AUDIOMETRY]
+      ? resolveSelectedAudiometries(
+          audiometryDetailQueries.flatMap((query) => (query.data ? [query.data] : [])),
+          audiometryUuids,
+        )
+      : [];
 
     const props: PatientSummaryPrintProps = {
       tenant: { name: clinicName, logoUrl: tenant?.logoUrl ?? null },
       summaryPatient: { patient, branchNames },
       issuedAt,
       professionalName,
+      showPatientSheet: checked[SummaryCard.TECHNICAL_SHEET],
       templates: chosenTemplates,
       templateValues: values,
       background:
@@ -257,18 +296,17 @@ export function usePatientSummary(patient: Patient) {
             }
           : null,
       otoscopy: checked[SummaryCard.OTOSCOPY] ? latestOtoscopy : null,
-      audiometry:
-        checked[SummaryCard.AUDIOMETRY] && audiometryEntry
-          ? buildSummaryAudiometry(
-              audiometryEntry,
-              header,
-              resolveKnownAuthor(
-                user,
-                audiometryEntry.createdByUuid ?? '',
-                audiometryEntry.createdByName,
-              ),
-            )
-          : null,
+      audiometries: chosenAudiometries.map((audiometryEntry) =>
+        buildSummaryAudiometry(
+          audiometryEntry,
+          header,
+          resolveKnownAuthor(
+            user,
+            audiometryEntry.createdByUuid ?? '',
+            audiometryEntry.createdByName,
+          ),
+        ),
+      ),
     };
 
     // Se monta ya pintado y, tras un par de cuadros e imágenes cargadas, se abre la impresión.
@@ -292,10 +330,24 @@ export function usePatientSummary(patient: Patient) {
     );
   };
 
+  const audiometryOptions: AudiometryOption[] = [...validAudiometries]
+    .sort(byNewest)
+    .map((entry) => {
+      const date = formatDateTime(entry.createdAt);
+      const author = resolveKnownAuthor(user, entry.createdByUuid ?? '', entry.createdByName);
+      return {
+        value: entry.uuid,
+        label: author ? t(SUMMARY_TEXT.AUDIOMETRY_OPTION, { date, author }) : date,
+      };
+    });
+
   return {
     cardStates,
     templates,
     templateUuids,
+    audiometryOptions,
+    audiometryUuids,
+    changeAudiometries: setChosenAudiometryUuids,
     toggleCard,
     changeTemplates: setTemplateUuids,
     isLoadingChosen,

@@ -22,13 +22,16 @@ export interface PatientSummaryPrintProps {
   issuedAt: string;
   /** Nombre completo del usuario con sesión: va bajo la firma. */
   professionalName: string;
+  /** Con la ficha técnica apagada, la hoja lleva solo logo, título y firma. */
+  showPatientSheet: boolean;
   /** Plantillas elegidas; vacío si no se eligió ninguna. */
   templates: SummaryTemplate[];
   /** Valor de cada variable de las plantillas, con los datos del paciente. */
   templateValues: Record<string, string>;
   background: SummaryBackground | null;
   otoscopy: SummaryOtoscopy | null;
-  audiometry: SummaryAudiometry | null;
+  /** Una por cada audiometría elegida, de la más antigua a la más nueva. */
+  audiometries: SummaryAudiometry[];
 }
 
 const SECTION_BREAK_CLASSES = 'break-before-page';
@@ -41,11 +44,12 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
   summaryPatient,
   issuedAt,
   professionalName,
+  showPatientSheet,
   templates,
   templateValues,
   background,
   otoscopy,
-  audiometry,
+  audiometries,
 }) => {
   const sections: { key: string; node: React.ReactNode }[] = [
     ...templates.map((template) => ({
@@ -60,15 +64,21 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
           },
         ]
       : []),
+    ...audiometries.map((audiometry, index) => ({
+      key: `audiometry-${index}`,
+      node: <SummaryAudiometrySection audiometry={audiometry} />,
+    })),
     ...(otoscopy ? [{ key: 'otoscopy', node: <SummaryOtoscopySection entry={otoscopy} /> }] : []),
-    ...(audiometry
-      ? [{ key: 'audiometry', node: <SummaryAudiometrySection audiometry={audiometry} /> }]
-      : []),
   ];
 
   return (
     <div data-print-summary="" className="hidden flex-col gap-4 bg-white text-ink-700 print:flex">
-      <SummaryHeader tenant={tenant} summaryPatient={summaryPatient} issuedAt={issuedAt} />
+      <SummaryHeader
+        tenant={tenant}
+        summaryPatient={summaryPatient}
+        issuedAt={issuedAt}
+        showPatientSheet={showPatientSheet}
+      />
       {sections.map((section, index) => (
         <div
           key={section.key}

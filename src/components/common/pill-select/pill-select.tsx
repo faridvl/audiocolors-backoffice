@@ -18,7 +18,17 @@ export interface PillSelectOption {
   icon?: React.ReactNode;
   /** Con `icon`, deja el texto solo para lectores de pantalla. */
   isLabelHidden?: boolean;
+  /** Opción atenuada y tachada (p. ej. un registro descartado que sigue visible). */
+  isMuted?: boolean;
+  /** Etiqueta corta a la derecha del texto (p. ej. "Mal hecha"). */
+  badge?: string;
 }
+
+const PillSelectBadge: React.FC<{ label: string }> = ({ label }) => (
+  <span className="shrink-0 rounded-full bg-danger/10 px-2 py-0.5 text-xs font-semibold text-danger no-underline">
+    {label}
+  </span>
+);
 
 export enum PillSelectVariant {
   /** Píldora de la barra de filtros. */
@@ -126,10 +136,16 @@ export const PillSelect: React.FC<PillSelectProps> = ({
                 'truncate',
                 !selectedLabel && !buttonLabel && 'text-ink-400',
                 !buttonLabel && selectedOption?.isLabelHidden && 'sr-only',
+                !buttonLabel && selectedOption?.isMuted && 'text-ink-400 line-through',
               )}
             >
               {buttonLabel ?? (selectedLabel || placeholder)}
             </span>
+            {!buttonLabel && selectedOption?.badge && (
+              <span className="ml-2 flex shrink-0">
+                <PillSelectBadge label={selectedOption.badge} />
+              </span>
+            )}
             <ChevronDown
               className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500 transition-transform group-data-[open]:rotate-180"
               aria-hidden
@@ -187,9 +203,16 @@ export const PillSelect: React.FC<PillSelectProps> = ({
                           {option.icon}
                         </span>
                       )}
-                      <span className={tailwind('truncate', option.isLabelHidden && 'sr-only')}>
+                      <span
+                        className={tailwind(
+                          'truncate',
+                          option.isLabelHidden && 'sr-only',
+                          option.isMuted && 'text-ink-400 line-through',
+                        )}
+                      >
                         {option.shortLabel ?? option.label}
                       </span>
+                      {option.badge && <PillSelectBadge label={option.badge} />}
                     </span>
                     <Check
                       className="invisible h-4 w-4 shrink-0 text-ink-900 group-data-[selected]:visible"

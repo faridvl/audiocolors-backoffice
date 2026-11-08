@@ -16,6 +16,8 @@ interface SummaryOptionCardProps {
   isError: boolean;
   onRetry: () => void;
   onChange: (isChecked: boolean) => void;
+  /** Texto de la tarjeta apagada en lugar de "Sin registros" (p. ej. cuando solo hay datos descartados). */
+  emptyText?: string;
   /** Contenido extra que se muestra cuando la tarjeta está marcada. */
   children?: React.ReactNode;
 }
@@ -31,6 +33,7 @@ export const SummaryOptionCard: React.FC<SummaryOptionCardProps> = ({
   isError,
   onRetry,
   onChange,
+  emptyText,
   children,
 }) => {
   const { t } = useTranslation();
@@ -60,7 +63,7 @@ export const SummaryOptionCard: React.FC<SummaryOptionCardProps> = ({
             </div>
           ) : (
             <Typography variant={TypographyVariant.HELPER} as="span">
-              {t(TEXT.PATIENTS.CLINICAL_SUMMARY.NO_RECORDS)}
+              {emptyText ?? t(TEXT.PATIENTS.CLINICAL_SUMMARY.NO_RECORDS)}
             </Typography>
           )}
         </div>

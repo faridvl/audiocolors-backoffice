@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useCreateAudiometryEntryMutation } from '@/shared/api/mutations/audiometry/create-audiometry-entry-mutation';
+import { useInvalidateAudiometryEntryMutation } from '@/shared/api/mutations/audiometry/invalidate-audiometry-entry-mutation';
 import {
   FETCH_AUDIOMETRY_ENTRY_KEY,
   useAudiometryEntriesQuery,
@@ -54,6 +55,13 @@ import {
 
 export const NEW_ENTRY_OPTION_VALUE = 'new';
 
+/** Quién marcó la audiometría como mal hecha, cuándo y por qué. */
+export interface AudiometryInvalidationNotice {
+  author: string;
+  date: string;
+  reason: string;
+}
+
 /** Datos del paciente y de la clínica que el informe impreso muestra en su encabezado. */
 export interface PrintReportHeader {
   clinicName: string;
@@ -98,6 +106,7 @@ const isSpeechFieldInputValid = (field: SpeechField, text: string): boolean => {
 
 /** Estado de la audiometría del paciente: una nueva editable o una guardada en solo lectura. */
 export function useAudiometryPoc(patientUuid: string) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const resolveAuthorLabel = useResolveAuthorLabel();
   const entriesQuery = useAudiometryEntriesQuery(patientUuid);
@@ -309,6 +318,24 @@ export function useAudiometryPoc(patientUuid: string) {
   };
   const canSave = !isReadOnly && !isSaving && hasAudiometryData(formState);
 
+  const [isInvalidateModalOpen, setIsInvalidateModalOpen] = useState(false);
+  const { executeInvalidateEntry, isPending: isInvalidating } =
+    useInvalidateAudiometryEntryMutation({
+      onInvalidated: () => setIsInvalidateModalOpen(false),
+    });
+  const handleOpenInvalidateModal = () => setIsInvalidateModalOpen(true);
+  const handleCloseInvalidateModal = () => {
+    if (!isInvalidating) setIsInvalidateModalOpen(false);
+  };
+  const handleInvalidate = (reason: string) => {
+    if (!canInvalidate || !selectedEntryUuid || isInvalidating) return;
+    executeInvalidateEntry({
+      patientUuid,
+      entryUuid: selectedEntryUuid,
+      reason,
+    });
+  };
+
   const handleSave = () => {
     if (!canSave) return;
     executeCreateEntry({ patientUuid, payload: stateToPayload(formState, summaries) });
@@ -317,8 +344,23 @@ export function useAudiometryPoc(patientUuid: string) {
   const entryOptions = entries.map((entry) => ({
     value: entry.uuid,
     label: formatDateTime(entry.createdAt),
+    isMuted: entry.invalidatedAt !== null,
+    badge:
+      entry.invalidatedAt !== null ? t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.INVALIDATE.TAG) : undefined,
   }));
   const selectedEntry = entries.find((entry) => entry.uuid === selectedEntryUuid);
+  const invalidationNotice: AudiometryInvalidationNotice | null = selectedEntry?.invalidatedAt
+    ? {
+        author: resolveAuthorLabel(
+          selectedEntry.invalidatedByUuid ?? '',
+          selectedEntry.invalidatedByName,
+        ),
+        date: formatDateTime(selectedEntry.invalidatedAt),
+        reason: selectedEntry.invalidationReason ?? '',
+      }
+    : null;
+  // Solo se marca una audiometría guardada que aún no está marcada.
+  const canInvalidate = selectedEntry !== undefined && selectedEntry.invalidatedAt === null;
   const selectedEntryAuthor = selectedEntry
     ? resolveAuthorLabel(selectedEntry.createdByUuid ?? '', selectedEntry.createdByName)
     : null;
@@ -334,7 +376,6 @@ export function useAudiometryPoc(patientUuid: string) {
     patientAge: calculateAge(patient?.birthDate),
     patientBirthDate: formatCalendarDate(patient?.birthDate),
   };
-  const { t } = useTranslation();
   const handlePrint = () =>
     printWithFileName(
       buildPrintFileName({
@@ -359,6 +400,13 @@ export function useAudiometryPoc(patientUuid: string) {
     selectedEntryValue: selectedEntryUuid ?? NEW_ENTRY_OPTION_VALUE,
     selectedEntry,
     selectedEntryAuthor,
+    invalidationNotice,
+    canInvalidate,
+    isInvalidateModalOpen,
+    isInvalidating,
+    handleOpenInvalidateModal,
+    handleCloseInvalidateModal,
+    handleInvalidate,
     handleSelectEntry,
     isLoadingEntry: entriesQuery.isLoading || (isReadOnly && entryQuery.isLoading),
     isExpanded,

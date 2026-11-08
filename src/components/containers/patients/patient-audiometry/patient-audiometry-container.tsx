@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Printer } from 'lucide-react';
+import { Ban, Plus, Printer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionVariant } from '@/components/common/accordion/accordion';
 import { Button, ButtonVariant } from '@/components/common/button/button';
@@ -17,6 +17,7 @@ import { WeberTest } from './weber-test';
 import { AudiometryNotesFields } from './audiometry-notes';
 import { AudiometryStatusStrip, StatusStripTone } from './audiometry-status-strip';
 import { AudiometryPrintReport } from './audiometry-print-report';
+import { InvalidateAudiometryModal } from './invalidate-audiometry-modal';
 import { SpeechWordList } from './speech-word-list';
 import { SpeechWordListSelectors } from './speech-word-list-selectors';
 import { SpeechAudiogramChart } from './speech-audiogram-chart';
@@ -54,6 +55,13 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     selectedEntry,
     selectedEntryAuthor,
     handleSelectEntry,
+    invalidationNotice,
+    canInvalidate,
+    isInvalidateModalOpen,
+    isInvalidating,
+    handleOpenInvalidateModal,
+    handleCloseInvalidateModal,
+    handleInvalidate,
     isLoadingEntry,
     isExpanded,
     marks,
@@ -141,6 +149,16 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                     {t(AUDIOMETRY_TEXT.PRINT)}
                   </Button>
                 )}
+                {selectedEntry && canInvalidate && (
+                  <Button
+                    variant={ButtonVariant.SECONDARY}
+                    onClick={handleOpenInvalidateModal}
+                    className="border-danger/40 text-danger hover:bg-danger/10"
+                  >
+                    <Ban className="h-4 w-4" aria-hidden />
+                    {t(AUDIOMETRY_TEXT.INVALIDATE.BUTTON)}
+                  </Button>
+                )}
               </div>
               {selectedEntry && (
                 <Typography variant={TypographyVariant.HELPER}>{entryAuthorDate}</Typography>
@@ -165,7 +183,19 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   })}
                 />
               )}
-              {isReadOnly && (
+              {invalidationNotice && (
+                <AudiometryStatusStrip
+                  tone={StatusStripTone.WARNING}
+                  message={t(AUDIOMETRY_TEXT.INVALIDATE.BANNER, {
+                    author: invalidationNotice.author,
+                    date: invalidationNotice.date,
+                  })}
+                  detail={t(AUDIOMETRY_TEXT.INVALIDATE.BANNER_REASON, {
+                    reason: invalidationNotice.reason,
+                  })}
+                />
+              )}
+              {isReadOnly && !invalidationNotice && (
                 <AudiometryStatusStrip
                   tone={StatusStripTone.INFO}
                   message={t(AUDIOMETRY_TEXT.READ_ONLY_NOTICE)}
@@ -324,6 +354,13 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
           )}
         </Accordion>
       </div>
+      {isInvalidateModalOpen && (
+        <InvalidateAudiometryModal
+          isLoading={isInvalidating}
+          onConfirm={handleInvalidate}
+          onCancel={handleCloseInvalidateModal}
+        />
+      )}
       {selectedEntry && (
         <AudiometryPrintReport
           header={printReportHeader}

@@ -20,12 +20,14 @@ interface SummaryHeaderProps {
   tenant: SummaryTenant;
   summaryPatient: SummaryPatient;
   issuedAt: string;
+  showPatientSheet: boolean;
 }
 
 export const SummaryHeader: React.FC<SummaryHeaderProps> = ({
   tenant,
   summaryPatient,
   issuedAt,
+  showPatientSheet,
 }) => {
   const { t } = useTranslation();
   const { patient, branchNames } = summaryPatient;
@@ -72,14 +74,16 @@ export const SummaryHeader: React.FC<SummaryHeaderProps> = ({
           {t(DOCUMENT_TEXT.TITLE)}
         </Typography>
       </div>
-      <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
-        {fields.map((field) => (
-          <div key={field.label} className="min-w-0">
-            <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
-            <dd className="min-h-[1.25em] text-sm font-medium text-ink-800">{field.value}</dd>
-          </div>
-        ))}
-      </dl>
+      {showPatientSheet && (
+        <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
+          {fields.map((field) => (
+            <div key={field.label} className="min-w-0">
+              <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
+              <dd className="min-h-[1.25em] text-sm font-medium text-ink-800">{field.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </header>
   );
 };

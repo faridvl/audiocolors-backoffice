@@ -18,6 +18,7 @@ interface PatientSummaryModalProps {
 const SUMMARY_TEXT = TEXT.PATIENTS.CLINICAL_SUMMARY;
 
 const CARD_TITLES: Record<SummaryCard, string> = {
+  [SummaryCard.TECHNICAL_SHEET]: SUMMARY_TEXT.SECTIONS.TECHNICAL_SHEET,
   [SummaryCard.TEMPLATES]: SUMMARY_TEXT.SECTIONS.TEMPLATES,
   [SummaryCard.BACKGROUND]: SUMMARY_TEXT.SECTIONS.BACKGROUND,
   [SummaryCard.OTOSCOPY]: SUMMARY_TEXT.SECTIONS.OTOSCOPY,
@@ -69,6 +70,11 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
                 isLoading={state.isLoading}
                 isError={state.isError}
                 onRetry={state.onRetry}
+                emptyText={
+                  state.card === SummaryCard.AUDIOMETRY
+                    ? t(SUMMARY_TEXT.AUDIOMETRY_EMPTY)
+                    : undefined
+                }
                 onChange={(isChecked) => summary.toggleCard(state.card, isChecked)}
               >
                 {state.card === SummaryCard.TEMPLATES && (
@@ -86,6 +92,21 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
                       ariaLabel={t(SUMMARY_TEXT.SECTIONS.TEMPLATES)}
                       getSummaryLabel={(count) => t(SUMMARY_TEXT.TEMPLATES_SELECTED, { count })}
                       getRemoveLabel={(label) => t(SUMMARY_TEXT.TEMPLATES_REMOVE, { label })}
+                    />
+                  </div>
+                )}
+                {state.card === SummaryCard.AUDIOMETRY && (
+                  <div className="mt-3 border-t border-ink-100 pt-3">
+                    <MultiSelect
+                      options={summary.audiometryOptions}
+                      selectedValues={summary.audiometryUuids}
+                      onChange={summary.changeAudiometries}
+                      placeholder={t(SUMMARY_TEXT.AUDIOMETRY_PLACEHOLDER)}
+                      searchPlaceholder={t(SUMMARY_TEXT.AUDIOMETRY_SEARCH)}
+                      emptyText={t(SUMMARY_TEXT.AUDIOMETRY_NO_RESULTS)}
+                      ariaLabel={t(SUMMARY_TEXT.SECTIONS.AUDIOMETRY)}
+                      getSummaryLabel={(count) => t(SUMMARY_TEXT.AUDIOMETRY_SELECTED, { count })}
+                      getRemoveLabel={(label) => t(SUMMARY_TEXT.AUDIOMETRY_REMOVE, { label })}
                     />
                   </div>
                 )}
