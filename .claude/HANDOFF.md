@@ -91,8 +91,11 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   etiquetas, guardar y reabrir). Rediseño visual hecho (D61: sin "Cuándo se usa", panel compacto,
   encabezado en una línea) y probado a 375, 768 y 1440. Vista previa del PDF en la misma página
   (D62), revisada y corregida en 375, 768 y 1440 con las plantillas simuladas (el API de dev no tiene la
-  rama). Pendiente: qa contra el API local de la rama; el encabezado fijo de la vista previa es blanco
-  sobre fondo gris claro (revisar si molesta).
+  rama). Qa contra el API local de la rama hecha: crear, editar, reabrir, vista previa, descargar,
+  texto vacío, variable desconocida, nombre repetido y 375/768/1440 sin scroll horizontal. Corregido
+  lo que encontró: `{{clave}}` escrita de un solo golpe (dictado, autocompletado) caía el editor (D63).
+  Sigue: decidir si se sube a `develop` (front y API). Menor: un párrafo que empieza con "1. " vuelve
+  como lista numerada al reabrir.
 - **Audiometría (2026-11-08, en `develop` del front y del API):** acordeón completo (tonal,
   logoaudiometría, listas de palabras, Resumen, notas) que se guarda con historial por paciente; una
   guardada se ve solo lectura y se imprime como informe A4 reconstruido desde la BD (D59). Campo de

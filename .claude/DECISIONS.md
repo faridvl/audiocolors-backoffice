@@ -980,3 +980,11 @@ El editor deja de pedir "Cuándo se usa": ya no está en el formulario, la valid
 - Por debajo de 640 px la hoja mide 720 px y solo el contenedor de páginas se desplaza de lado; a 304 px el texto no se leía.
 - El encabezado con los botones queda fijo al bajar; en celular no muestra el nombre de la plantilla.
 - Sin nombre, el archivo se descarga como "Plantilla sin nombre.pdf".
+
+## D63 · Las variables `{{clave}}` se convierten después de cada cambio, no con una regla de entrada (2026-11-08)
+
+La regla de entrada de TipTap (`nodeInputRule`) calcula mal la posición cuando el texto llega en un solo evento más largo que la variable (dictado, autocompletado, teclados predictivos): el editor lanzaba `RangeError: Position N out of range` y se perdía lo escrito. Ahora un plugin de ProseMirror (`appendTransaction`) revisa el texto tras cada cambio y convierte toda `{{clave}}` completa en etiqueta, conservando el formato (negrita, etc.).
+
+- Cubre por igual teclear, pegar y dictar; reemplaza también la regla de pegado.
+- Una `{{clave}}` partida entre dos formatos distintos (mitad en negrita) queda como texto.
+- Deshacer quita la etiqueta junto con la última tecla, no por separado.
