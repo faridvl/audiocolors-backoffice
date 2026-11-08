@@ -1051,9 +1051,6 @@
           "birthDate": "Fecha de nacimiento",
           "date": "Fecha de la audiometría",
           "professional": "Profesional",
-          "ptaMethod": "Método del PTA",
-          "gradeScale": "Escala del grado",
-          "failedOfPresented": "{{failed}} de {{presented}}",
           "frequencyHz": "{{frequency}} Hz",
           "signature": "Firma del profesional",
           "printedOn": "Impreso el {{date}}"

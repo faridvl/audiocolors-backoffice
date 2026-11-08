@@ -19,13 +19,18 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm;
+    /* Sin margen de hoja el navegador no pone fecha, título, URL ni número de página; el margen
+       pasa a ser padding del body, que se repite en cada hoja con box-decoration-break. */
+    margin: 0;
   }
 
   /* Informe suelto de audiometría. Con el resumen montado manda el resumen (reglas de abajo),
      aunque el informe de la audiometría también esté en la página. */
   body:has([data-print-report]):not(:has([data-print-summary])) {
     background: white;
+    padding: 12mm;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   body:has([data-print-report]):not(:has([data-print-summary]))
@@ -56,6 +61,9 @@
   /* Resumen del paciente: lo único que sale al imprimir. */
   body:has([data-print-summary]) {
     background: white;
+    padding: 12mm;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   body:has([data-print-summary])

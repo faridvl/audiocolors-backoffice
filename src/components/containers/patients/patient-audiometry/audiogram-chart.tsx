@@ -57,6 +57,8 @@ interface AudiogramChartProps {
   onPlace: (ear: Ear, frequencyHz: number, thresholdDb: number) => void;
   onRemove: (ear: Ear, tool: AudiometryTool, frequencyHz: number) => void;
   isReadOnly?: boolean;
+  /** Etiquetas de grado junto al gráfico (móvil); el informe usa una sola columna central. */
+  hasGradeLabels?: boolean;
 }
 
 export const AudiogramChart: React.FC<AudiogramChartProps> = ({
@@ -67,6 +69,7 @@ export const AudiogramChart: React.FC<AudiogramChartProps> = ({
   onPlace,
   onRemove,
   isReadOnly = false,
+  hasGradeLabels = true,
 }) => {
   const { t } = useTranslation();
 
@@ -247,7 +250,9 @@ export const AudiogramChart: React.FC<AudiogramChartProps> = ({
               });
           })}
         </svg>
-        <GradeLabelsColumn gradingScale={gradingScale} className="w-20 shrink-0 md:hidden" />
+        {hasGradeLabels && (
+          <GradeLabelsColumn gradingScale={gradingScale} className="w-20 shrink-0 md:hidden" />
+        )}
       </div>
     </figure>
   );

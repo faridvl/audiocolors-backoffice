@@ -24,7 +24,6 @@ import {
 import {
   EAR_LABEL_KEYS,
   GRADE_LABEL_KEYS,
-  GRADING_SCALE_LABEL_KEYS,
   PTA_TYPE_LABEL_KEYS,
   WEBER_LABEL_KEYS,
 } from './audiometry-labels';
@@ -64,7 +63,8 @@ export interface AudiometryPrintReportProps {
   speechMarks: SpeechMarks;
   weber: Record<number, WeberResult>;
   summaries: Record<Ear, EarSummary>;
-  ptaType: PtaType;
+  /** Método elegido en la audiometría; sin él la fila muestra la etiqueta genérica del PTA. */
+  ptaType: PtaType | null;
   speechFieldValues: SpeechFieldValues;
   failedWords: FailedWordsValues;
   presentedWords: number;
@@ -88,8 +88,6 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   summaries,
   ptaType,
   speechFieldValues,
-  failedWords,
-  presentedWords,
   notes,
   isEmbedded = false,
 }) => {
@@ -116,7 +114,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   const summaryRows = [
     {
       key: 'pta',
-      label: t(SUMMARY_TEXT.PTA),
+      label: ptaType ? t(PTA_TYPE_LABEL_KEYS[ptaType]) : t(SUMMARY_TEXT.PTA),
       getValue: (ear: Ear) =>
         summaries[ear].pta !== null
           ? t(SUMMARY_TEXT.PTA_VALUE, { value: summaries[ear].pta })
@@ -139,26 +137,6 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       key: 'discrimination',
       label: t(SUMMARY_TEXT.MAX_DISCRIMINATION),
       getValue: (ear: Ear) => earValue(ear, SpeechField.MAX_DISCRIMINATION),
-    },
-    {
-      key: 'failed',
-      label: t(SUMMARY_TEXT.FAILED_WORDS),
-      getValue: (ear: Ear) =>
-        failedWords[ear] !== ''
-          ? t(REPORT_TEXT.FAILED_OF_PRESENTED, {
-              failed: failedWords[ear],
-              presented: presentedWords,
-            })
-          : empty,
-    },
-  ];
-
-  const summaryNotes = [
-    { key: 'pta-method', label: t(REPORT_TEXT.PTA_METHOD), value: t(PTA_TYPE_LABEL_KEYS[ptaType]) },
-    {
-      key: 'scale',
-      label: t(REPORT_TEXT.GRADE_SCALE),
-      value: t(GRADING_SCALE_LABEL_KEYS[gradingScale]),
     },
   ];
 
@@ -232,6 +210,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
                 onPlace={NO_OP}
                 onRemove={NO_OP}
                 isReadOnly
+                hasGradeLabels={false}
               />
             </React.Fragment>
           ))}
@@ -305,16 +284,6 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
                         {row.getValue(ear)}
                       </td>
                     ))}
-                  </tr>
-                ))}
-                {summaryNotes.map((row) => (
-                  <tr key={row.key}>
-                    <th scope="row" className={tailwind(CELL_CLASSES, 'text-left font-medium')}>
-                      {row.label}
-                    </th>
-                    <td colSpan={EARS.length} className={CELL_CLASSES}>
-                      {row.value}
-                    </td>
                   </tr>
                 ))}
               </tbody>
