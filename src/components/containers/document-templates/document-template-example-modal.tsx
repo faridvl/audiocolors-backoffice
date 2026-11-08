@@ -7,6 +7,9 @@ import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 import { useDocumentTemplateExample } from './use-document-template-example';
 
+/** Oculta la barra y las miniaturas del visor y ajusta la página al ancho. */
+const PDF_VIEWER_PARAMS = '#toolbar=0&navpanes=0&view=FitH';
+
 interface DocumentTemplateExampleModalProps {
   content: string;
   onClose: () => void;
@@ -57,7 +60,7 @@ export const DocumentTemplateExampleModal: React.FC<DocumentTemplateExampleModal
           )}
           {pdfUrl && (
             <iframe
-              src={pdfUrl}
+              src={`${pdfUrl}${PDF_VIEWER_PARAMS}`}
               title={t(TEXT.DOCUMENT_TEMPLATES.EXAMPLE.FRAME_TITLE)}
               className="h-full w-full border-0"
             />

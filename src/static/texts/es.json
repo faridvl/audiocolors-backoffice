@@ -189,7 +189,7 @@
     "pageTitle": "Plantillas · AudioColors Gestión Clínica",
     "loading": "Cargando plantillas...",
     "loadError": "No se pudieron cargar las plantillas",
-    "empty": "La clínica todavía no tiene plantillas.",
+    "empty": "Aún no tienes plantillas. Crea una para armar documentos con los datos del paciente, como un consentimiento informado.",
     "new": "Nueva plantilla",
     "edit": "Editar",
     "editLabel": "Editar {{name}}",
@@ -202,8 +202,9 @@
     "description": "Cuándo se usa",
     "descriptionPlaceholder": "Ej. Antes de la primera consulta",
     "content": "Mensaje",
-    "contentPlaceholder": "Escribe el texto. Usa las variables de la derecha para poner los datos del paciente.",
+    "contentPlaceholder": "Escribe el texto. Usa las variables de la lista para poner los datos del paciente.",
     "viewExample": "Ver ejemplo",
+    "formatHelp": "El formato se ve en Ver ejemplo.",
     "toolbar": {
       "label": "Formato del texto",
       "bold": "Negrita",
@@ -214,7 +215,7 @@
       "numberedList": "Lista numerada"
     },
     "variables": {
-      "title": "Variables disponibles",
+      "title": "Variables disponibles ({{total}})",
       "intro": "Cada variable se cambia por el dato del paciente cuando se arma el documento.",
       "insert": "Insertar {{variable}}",
       "inUse": "En uso",

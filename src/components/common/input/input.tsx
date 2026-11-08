@@ -22,9 +22,14 @@ export const inputBaseClasses =
   "focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 " +
   "disabled:cursor-not-allowed disabled:bg-ink-50";
 
+/** Etiqueta en mayúscula pequeña (NOMBRE, MENSAJE) para los formularios que la piden. */
+export const FIELD_LABEL_CLASSES = "text-xs font-semibold uppercase tracking-wide text-ink-600";
+
 interface FormFieldProps {
   name: string;
   label: string;
+  /** Cambia el estilo de la etiqueta (p. ej. `FIELD_LABEL_CLASSES`). */
+  labelClassName?: string;
   type?: string;
   placeholder?: string;
   required?: boolean;
@@ -56,6 +61,7 @@ interface FormFieldProps {
 export const FormField: React.FC<FormFieldProps> = ({
   name,
   label,
+  labelClassName,
   type = "text",
   placeholder,
   required = false,
@@ -94,7 +100,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   return (
     <div className={tailwind("flex flex-col gap-1.5", className)}>
       <label htmlFor={name}>
-        <Typography variant={TypographyVariant.BODY}>
+        <Typography variant={TypographyVariant.BODY} className={labelClassName}>
           {label}
           {required && <span className="ml-0.5 text-danger">*</span>}
           {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}

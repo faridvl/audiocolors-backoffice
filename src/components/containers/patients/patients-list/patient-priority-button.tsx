@@ -9,8 +9,9 @@ import { Patient } from "@/types/patients/patient";
 import { tailwind } from "@/utils/tailwind-utils";
 
 /** Marca o quita la prioridad desde la lista o el expediente; no cambia el orden. */
-export const PatientPriorityButton: React.FC<{ patient: Patient }> = ({
+export const PatientPriorityButton: React.FC<{ patient: Patient; className?: string }> = ({
   patient,
+  className,
 }) => {
   const { t } = useTranslation();
   const { isOn, isUpdating, handleToggle } = usePatientPriority(patient);
@@ -38,8 +39,9 @@ export const PatientPriorityButton: React.FC<{ patient: Patient }> = ({
         />
       }
       className={tailwind(
-        "px-2 py-1.5",
-        isOn ? "bg-danger/10 text-danger hover:bg-danger/20" : "text-ink-400",
+        "min-h-[44px] min-w-[44px] px-2 py-1.5 sm:min-h-0 sm:min-w-0",
+        isOn ? "bg-danger/10 text-danger hover:bg-danger/20" : "text-ink-500",
+        className,
       )}
     />
   );

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useField } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { inputBaseClasses } from '@/components/common/input/input';
+import { FIELD_LABEL_CLASSES, inputBaseClasses } from '@/components/common/input/input';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TextFormat } from '@/shared/utils/document-template-text';
 import { TEXT } from '@/static/texts/i18n';
@@ -43,6 +43,7 @@ const TOOLBAR_ACTIONS: { format: TextFormat; icon: LucideIcon; labelKey: string 
 interface DocumentTemplateContentFieldProps {
   textareaRef: React.RefObject<HTMLTextAreaElement>;
   onFormat: (format: TextFormat) => void;
+  onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onViewExample: () => void;
 }
 
@@ -50,6 +51,7 @@ interface DocumentTemplateContentFieldProps {
 export const DocumentTemplateContentField: React.FC<DocumentTemplateContentFieldProps> = ({
   textareaRef,
   onFormat,
+  onKeyDown,
   onViewExample,
 }) => {
   const { t } = useTranslation();
@@ -60,7 +62,7 @@ export const DocumentTemplateContentField: React.FC<DocumentTemplateContentField
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between gap-2">
         <label htmlFor={CONTENT_ID}>
-          <Typography variant={TypographyVariant.BODY} inline>
+          <Typography variant={TypographyVariant.BODY} className={FIELD_LABEL_CLASSES} inline>
             {t(TEXT.DOCUMENT_TEMPLATES.CONTENT)}
             <span className="ml-0.5 text-danger">*</span>
           </Typography>
@@ -68,7 +70,7 @@ export const DocumentTemplateContentField: React.FC<DocumentTemplateContentField
         <button
           type="button"
           onClick={onViewExample}
-          className="rounded-md px-1 py-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+          className="flex min-h-[44px] items-center rounded-md px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
         >
           <Typography variant={TypographyVariant.LINK} inline>
             {t(TEXT.DOCUMENT_TEMPLATES.VIEW_EXAMPLE)}
@@ -88,17 +90,22 @@ export const DocumentTemplateContentField: React.FC<DocumentTemplateContentField
             title={t(labelKey)}
             aria-label={t(labelKey)}
             onClick={() => onFormat(format)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-ink-200 bg-white text-ink-700 transition-colors hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+            className="flex h-11 w-11 items-center justify-center rounded-lg border border-ink-200 bg-white text-ink-700 transition-colors sm:h-10 sm:w-10 hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
           >
             <Icon className="h-4 w-4" aria-hidden />
           </button>
         ))}
       </div>
 
+      <Typography variant={TypographyVariant.HELPER}>
+        {t(TEXT.DOCUMENT_TEMPLATES.FORMAT_HELP)}
+      </Typography>
+
       <textarea
         {...field}
         id={CONTENT_ID}
         ref={textareaRef}
+        onKeyDown={onKeyDown}
         maxLength={DOCUMENT_TEMPLATE_CONTENT_MAX_LENGTH}
         placeholder={t(TEXT.DOCUMENT_TEMPLATES.CONTENT_PLACEHOLDER)}
         aria-invalid={errorText ? true : undefined}

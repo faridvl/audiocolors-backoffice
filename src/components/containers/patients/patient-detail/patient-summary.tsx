@@ -96,7 +96,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <Typography variant={TypographyVariant.SUBTITLE} as="p" className="break-words">
               {getFullName(patient.firstName, patient.lastName)}
             </Typography>
-            <PatientPriorityButton patient={patient} />
+            <PatientPriorityButton patient={patient} className="-my-2" />
             <PatientStatusPill status={patient.status} />
           </div>
           {identity && (

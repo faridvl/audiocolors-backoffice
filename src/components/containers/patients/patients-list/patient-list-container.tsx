@@ -365,13 +365,13 @@ export const PatientListContainer: React.FC = () => {
           noResultsDescription="Prueba con otro nombre o cédula, o cambia los filtros."
           cardTitleClassName="pr-20"
           rowActions={(patient) => (
-            <div className="flex items-center justify-end gap-1">
+            <div className="flex items-center justify-end gap-2">
               <PatientPriorityButton patient={patient} />
               <Button
                 variant={ButtonVariant.GHOST}
                 onClick={() => navigateToEdit(patient.uuid)}
                 aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
-                className="px-2 py-1.5"
+                className="min-h-[44px] min-w-[44px] px-2 py-1.5 sm:min-h-0 sm:min-w-0"
               >
                 <Pencil className="h-4 w-4" aria-hidden />
               </Button>

@@ -143,6 +143,7 @@ export const TEXT = {
     CONTENT: 'documentTemplates.content',
     CONTENT_PLACEHOLDER: 'documentTemplates.contentPlaceholder',
     VIEW_EXAMPLE: 'documentTemplates.viewExample',
+    FORMAT_HELP: 'documentTemplates.formatHelp',
     TOOLBAR: {
       LABEL: 'documentTemplates.toolbar.label',
       BOLD: 'documentTemplates.toolbar.bold',

@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef } from 'react';
+import { KeyboardEvent, useLayoutEffect, useRef } from 'react';
 import { useFormikContext } from 'formik';
 import {
   applyTextFormat,
+  continueList,
   findUsedVariables,
   insertAtSelection,
   TextEdit,
@@ -56,10 +57,21 @@ export function useDocumentTemplateContent() {
     applyEdit(insertAtSelection(values.content, start, end, variableToken(variable)));
   };
 
+  // Enter en una línea de lista sigue la lista; el resto de Enter escribe el salto normal.
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return;
+    const { start, end } = readSelection();
+    const edit = continueList(values.content, start, end);
+    if (!edit) return;
+    event.preventDefault();
+    applyEdit(edit);
+  };
+
   return {
     textareaRef,
     usedVariables: findUsedVariables(values.content),
     handleFormat,
     handleInsertVariable,
+    handleKeyDown,
   };
 }

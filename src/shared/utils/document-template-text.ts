@@ -113,3 +113,31 @@ export function applyTextFormat(
   if (format === TextFormat.BULLET_LIST) return prefixLines(value, start, end, () => BULLET_PREFIX);
   return prefixLines(value, start, end, (index) => `${index + 1}. `);
 }
+
+const LIST_LINE_PATTERN = /^(?:- |(\d+)\. )/;
+
+/**
+ * Enter dentro de un ítem de lista: abre el siguiente ítem; en un ítem vacío quita el marcador y
+ * termina la lista. Devuelve `null` cuando el Enter no tiene nada especial (texto normal o selección).
+ */
+export function continueList(value: string, start: number, end: number): TextEdit | null {
+  if (start !== end) return null;
+  const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+  const marker = LIST_LINE_PATTERN.exec(value.slice(lineStart, start));
+  if (!marker) return null;
+
+  const lineEndIndex = value.indexOf('\n', start);
+  const lineEnd = lineEndIndex === -1 ? value.length : lineEndIndex;
+  const isItemEmpty = start === lineStart + marker[0].length && start === lineEnd;
+
+  if (isItemEmpty) {
+    return {
+      value: value.slice(0, lineStart) + value.slice(start),
+      selectionStart: lineStart,
+      selectionEnd: lineStart,
+    };
+  }
+
+  const nextMarker = marker[1] === undefined ? BULLET_PREFIX : `${Number(marker[1]) + 1}. `;
+  return insertAtSelection(value, start, end, `\n${nextMarker}`);
+}

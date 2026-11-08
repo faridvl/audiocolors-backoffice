@@ -44,6 +44,7 @@ export function useDocumentTemplateEditor(templateUuid: string | null, onBack: (
           // Un nombre repetido se corrige en su campo; lo demás sale como aviso.
           if (error instanceof ApiError && error.status === HttpStatus.CONFLICT) {
             helpers.setFieldError('name', t(TEXT.DOCUMENT_TEMPLATES.ERRORS.DUPLICATE_NAME));
+            helpers.setSubmitting(false);
             return;
           }
           toast.error(error.message);
