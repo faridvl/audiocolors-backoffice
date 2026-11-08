@@ -14,7 +14,7 @@ export interface SummaryPatient {
   branchNames: string[];
 }
 
-/** Plantilla de documento ya llenada con los datos del paciente. */
+/** Plantilla de documento tal como se guardó, con sus variables sin llenar. */
 export interface SummaryTemplate {
   uuid: string;
   name: string;

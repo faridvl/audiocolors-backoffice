@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { usePermissions } from '@/hooks/use-permissions';
-import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useSession } from '@/hooks/use-session';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import {
@@ -17,14 +16,14 @@ import {
 import { usePatientBackgroundQuery } from '@/shared/api/querys/patient-background-query';
 import { useOtoscopyEntriesQuery } from '@/shared/api/querys/patient-otoscopy-entries-query';
 import { Permission } from '@/shared/auth/permissions';
-import { fillVariables } from '@/shared/utils/document-template-text';
-import { calculateAge, formatDate } from '@/shared/utils/formatters';
+import { calculateAge, formatCalendarDate } from '@/shared/utils/formatters';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, getPatientBranchUuids } from '@/types/patients/patient';
 import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
 import { PatientSummaryPrintProps } from './patient-summary-print';
+import { resolveKnownAuthor } from './summary-authorship';
 import { buildSummaryAudiometry, buildTemplateValues } from './summary-print-data';
 
 const SUMMARY_TEXT = TEXT.PATIENTS.CLINICAL_SUMMARY;
@@ -41,6 +40,9 @@ export interface SummaryCardState {
   isAvailable: boolean;
   isChecked: boolean;
   isLoading: boolean;
+  /** La consulta de esta tarjeta falló: dice "No se pudo cargar" y ofrece reintentar. */
+  isError: boolean;
+  onRetry: () => void;
 }
 
 const byNewest = <T extends { createdAt: string }>(a: T, b: T) =>
@@ -52,7 +54,6 @@ export function usePatientSummary(patient: Patient) {
   const { t } = useTranslation();
   const { user, tenant } = useSession();
   const { can } = usePermissions();
-  const resolveAuthorLabel = useResolveAuthorLabel();
   const canViewClinical = can(Permission.VIEW_CLINICAL_RECORD);
   // Sin uuid las consultas clínicas no se hacen: un rol sin acceso no las pide.
   const clinicalUuid = canViewClinical ? patient.uuid : '';
@@ -65,6 +66,24 @@ export function usePatientSummary(patient: Patient) {
   });
   const [templateUuids, setTemplateUuids] = useState<string[]>([]);
   const [printProps, setPrintProps] = useState<PatientSummaryPrintProps | null>(null);
+  // Cada generación lleva un número: si cambia durante la espera, esa impresión se cancela.
+  const generationRef = useRef(0);
+  const stopPrintRef = useRef<(() => void) | null>(null);
+
+  const cancelGeneration = useCallback(() => {
+    generationRef.current += 1;
+    stopPrintRef.current?.();
+    stopPrintRef.current = null;
+    setPrintProps(null);
+  }, []);
+
+  useEffect(
+    () => () => {
+      generationRef.current += 1;
+      stopPrintRef.current?.();
+    },
+    [],
+  );
 
   const branchesQuery = useBranchesQuery();
   const templatesQuery = useDocumentTemplatesQuery();
@@ -87,29 +106,23 @@ export function usePatientSummary(patient: Patient) {
     checked[SummaryCard.TEMPLATES] ? templateUuids : [],
   );
 
-  const listQueries = [
-    templatesQuery,
-    branchesQuery,
-    ...(canViewClinical ? [backgroundQuery, otoscopyQuery, audiometryListQuery] : []),
-  ];
-  const failedQueries = [...listQueries, audiometryQuery, ...templateContentQueries].filter(
-    (query) => query.isError,
-  );
-  const hasError = failedQueries.length > 0;
-  const failureCount = failedQueries.reduce((total, query) => total + query.failureCount, 0);
+  const failedContentQueries = checked[SummaryCard.TEMPLATES]
+    ? templateContentQueries.filter((query) => query.isError)
+    : [];
+  const isAudiometryDetailFailed = checked[SummaryCard.AUDIOMETRY] && audiometryQuery.isError;
 
-  useEffect(() => {
-    if (hasError) toast.error(t(SUMMARY_TEXT.LOAD_ERROR));
-  }, [hasError, failureCount, t]);
-
-  const retry = () => failedQueries.forEach((query) => void query.refetch());
-
+  // Las sedes no son una tarjeta: si fallan, la ficha sale sin ellas y no se bloquea nada.
   const cardStates: SummaryCardState[] = [
     {
       card: SummaryCard.TEMPLATES,
       isAvailable: templates.length > 0,
       isChecked: checked[SummaryCard.TEMPLATES],
       isLoading: templatesQuery.isLoading,
+      isError: templatesQuery.isError || failedContentQueries.length > 0,
+      onRetry: () => {
+        if (templatesQuery.isError) void templatesQuery.refetch();
+        failedContentQueries.forEach((query) => void query.refetch());
+      },
     },
     ...(canViewClinical
       ? [
@@ -118,22 +131,48 @@ export function usePatientSummary(patient: Patient) {
             isAvailable: background !== null,
             isChecked: checked[SummaryCard.BACKGROUND],
             isLoading: backgroundQuery.isLoading,
+            isError: backgroundQuery.isError,
+            onRetry: () => void backgroundQuery.refetch(),
           },
           {
             card: SummaryCard.OTOSCOPY,
             isAvailable: latestOtoscopy !== null,
             isChecked: checked[SummaryCard.OTOSCOPY],
             isLoading: otoscopyQuery.isLoading,
+            isError: otoscopyQuery.isError,
+            onRetry: () => void otoscopyQuery.refetch(),
           },
           {
             card: SummaryCard.AUDIOMETRY,
             isAvailable: latestAudiometryUuid !== null,
             isChecked: checked[SummaryCard.AUDIOMETRY],
             isLoading: audiometryListQuery.isLoading,
+            isError: audiometryListQuery.isError || isAudiometryDetailFailed,
+            onRetry: () => {
+              if (audiometryListQuery.isError) void audiometryListQuery.refetch();
+              if (isAudiometryDetailFailed) void audiometryQuery.refetch();
+            },
           },
         ]
       : []),
   ];
+
+  const hasError = cardStates.some((state) => state.isError);
+  const failureCount = [
+    templatesQuery,
+    backgroundQuery,
+    otoscopyQuery,
+    audiometryListQuery,
+    audiometryQuery,
+    ...templateContentQueries,
+  ].reduce((total, query) => total + query.failureCount, 0);
+
+  useEffect(() => {
+    if (hasError) toast.error(t(SUMMARY_TEXT.LOAD_ERROR));
+  }, [hasError, failureCount, t]);
+
+  // Una tarjeta marcada con su consulta caída bloquea generar; una sin marcar no estorba.
+  const hasChosenError = cardStates.some((state) => state.isChecked && state.isError);
 
   const toggleCard = (card: SummaryCard, isChecked: boolean) =>
     setChecked((current) => ({ ...current, [card]: isChecked }));
@@ -155,7 +194,7 @@ export function usePatientSummary(patient: Patient) {
     checked[SummaryCard.AUDIOMETRY];
   const isGenerating = printProps !== null;
   const canGenerate =
-    hasSomething && !isTemplatesIncomplete && !isLoadingChosen && !hasError && !isGenerating;
+    hasSomething && !isTemplatesIncomplete && !isLoadingChosen && !hasChosenError && !isGenerating;
 
   const branchNames = useMemo(
     () =>
@@ -167,6 +206,7 @@ export function usePatientSummary(patient: Patient) {
 
   const handleGenerate = async () => {
     if (!canGenerate) return;
+    const generation = ++generationRef.current;
     const issuedAt = new Date().toISOString();
     const professionalName = user?.fullName ?? '';
     const clinicName = tenant?.businessName ?? '';
@@ -180,16 +220,10 @@ export function usePatientSummary(patient: Patient) {
       ageText: age !== null ? t(TEXT.PATIENTS.DETAIL.AGE, { count: age }) : '',
       issuedAt,
     });
-    const filledTemplates = hasTemplatesChosen
+    const chosenTemplates = hasTemplatesChosen
       ? templateContentQueries.flatMap((query) =>
           query.data
-            ? [
-                {
-                  uuid: query.data.uuid,
-                  name: query.data.name,
-                  content: fillVariables(query.data.content, values),
-                },
-              ]
+            ? [{ uuid: query.data.uuid, name: query.data.name, content: query.data.content }]
             : [],
         )
       : [];
@@ -200,7 +234,7 @@ export function usePatientSummary(patient: Patient) {
       patientName,
       patientDocumentId: patient.documentId ?? '',
       patientAge: age,
-      patientBirthDate: patient.birthDate ? formatDate(patient.birthDate) : '',
+      patientBirthDate: formatCalendarDate(patient.birthDate),
     };
     const audiometryEntry = audiometryQuery.data;
 
@@ -209,12 +243,14 @@ export function usePatientSummary(patient: Patient) {
       summaryPatient: { patient, branchNames },
       issuedAt,
       professionalName,
-      templates: filledTemplates,
+      templates: chosenTemplates,
+      templateValues: values,
       background:
         checked[SummaryCard.BACKGROUND] && background
           ? {
               background,
-              authorName: resolveAuthorLabel(
+              authorName: resolveKnownAuthor(
+                user,
                 background.updatedByUuid ?? background.createdByUuid ?? '',
               ),
             }
@@ -225,7 +261,8 @@ export function usePatientSummary(patient: Patient) {
           ? buildSummaryAudiometry(
               audiometryEntry,
               header,
-              resolveAuthorLabel(
+              resolveKnownAuthor(
+                user,
                 audiometryEntry.createdByUuid ?? '',
                 audiometryEntry.createdByName,
               ),
@@ -238,14 +275,19 @@ export function usePatientSummary(patient: Patient) {
     await nextFrame();
     await nextFrame();
     await waitForImages(document);
-    printWithFileName(
+    // Se cerró el modal (o cambió de paciente) durante la espera: no se imprime.
+    if (generation !== generationRef.current) return;
+    stopPrintRef.current = printWithFileName(
       buildPrintFileName({
         type: t(SUMMARY_TEXT.FILE_TYPE.SUMMARY),
         clinic: clinicName,
         patient: patientName,
         documentId: patient.documentId,
       }),
-      () => setPrintProps(null),
+      () => {
+        stopPrintRef.current = null;
+        setPrintProps(null);
+      },
     );
   };
 
@@ -255,10 +297,8 @@ export function usePatientSummary(patient: Patient) {
     templateUuids,
     toggleCard,
     toggleTemplate,
-    isLoadingLists: listQueries.some((query) => query.isLoading),
     isLoadingChosen,
-    hasError,
-    retry,
+    cancelGeneration,
     canGenerate,
     isGenerating,
     handleGenerate,

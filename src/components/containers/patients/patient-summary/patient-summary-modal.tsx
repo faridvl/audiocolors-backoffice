@@ -29,13 +29,19 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
   const { t } = useTranslation();
   const summary = usePatientSummary(patient);
 
+  // Cerrar en plena espera cancela la impresión que iba a abrirse.
+  const handleClose = () => {
+    summary.cancelGeneration();
+    onClose();
+  };
+
   return (
     <>
       <div
         role="dialog"
         aria-modal="true"
         className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
-        onClick={onClose}
+        onClick={handleClose}
       >
         <div
           className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white p-5"
@@ -54,9 +60,6 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
           </div>
 
           <div className="mt-4 flex min-h-0 flex-col gap-2 overflow-y-auto">
-            {summary.isLoadingLists && (
-              <Typography variant={TypographyVariant.HELPER}>{t(SUMMARY_TEXT.LOADING)}</Typography>
-            )}
             {summary.cardStates.map((state) => (
               <SummaryOptionCard
                 key={state.card}
@@ -64,11 +67,13 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
                 isChecked={state.isChecked}
                 isAvailable={state.isAvailable}
                 isLoading={state.isLoading}
+                isError={state.isError}
+                onRetry={state.onRetry}
                 onChange={(isChecked) => summary.toggleCard(state.card, isChecked)}
               >
                 {state.card === SummaryCard.TEMPLATES && (
-                  <div className="mt-2 flex flex-col gap-2 border-t border-ink-100 pt-2">
-                    <Typography variant={TypographyVariant.HELPER}>
+                  <div className="mt-3 flex flex-col border-t border-ink-100 pb-1 pt-3">
+                    <Typography variant={TypographyVariant.HELPER} className="px-3 pb-1">
                       {t(SUMMARY_TEXT.TEMPLATES_HINT)}
                     </Typography>
                     {summary.templates.map((template) => (
@@ -77,7 +82,7 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
                         label={template.name}
                         isChecked={summary.templateUuids.includes(template.uuid)}
                         onChange={(isChecked) => summary.toggleTemplate(template.uuid, isChecked)}
-                        className="min-h-[32px]"
+                        className="min-h-[44px] w-full px-3"
                       />
                     ))}
                   </div>
@@ -86,19 +91,8 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
             ))}
           </div>
 
-          {summary.hasError && (
-            <div className="mt-3 flex items-center justify-between gap-3">
-              <Typography variant={TypographyVariant.HELPER} className="text-danger">
-                {t(SUMMARY_TEXT.LOAD_ERROR)}
-              </Typography>
-              <Button variant={ButtonVariant.SECONDARY} onClick={summary.retry}>
-                {t(SUMMARY_TEXT.RETRY)}
-              </Button>
-            </div>
-          )}
-
           <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant={ButtonVariant.SECONDARY} onClick={onClose}>
+            <Button type="button" variant={ButtonVariant.SECONDARY} onClick={handleClose}>
               {t(SUMMARY_TEXT.CLOSE)}
             </Button>
             <Button

@@ -182,7 +182,7 @@
       "controlRemove": "Al guardar no quedará ningún control y la tarjeta \"Controles este mes\" dejará de verse.",
       "editTitle": "Editar tipo de cita",
       "editLabel": "Editar {{name}}",
-    "updatedAt": "Actualizada el {{date}}",
+      "updatedAt": "Actualizada el {{date}}",
       "minutesShort": "{{count}} min"
     }
   },
@@ -762,7 +762,7 @@
       "noResultsDescription": "Prueba con otro nombre o cambia el filtro.",
       "registeredBy": "Registrado por:",
       "editLabel": "Editar {{name}}",
-    "updatedAt": "Actualizada el {{date}}",
+      "updatedAt": "Actualizada el {{date}}",
       "deleteLabel": "Eliminar {{name}}"
     },
     "preview": {
@@ -807,10 +807,11 @@
       "title": "Generar resumen",
       "description": "Elige qué va en el resumen. Al generarlo se abre la ventana de impresión.",
       "close": "Cerrar",
-      "generate": "Generar",
+      "generate": "Generar resumen",
       "noRecords": "Sin registros",
-      "loading": "Cargando datos…",
+      "noAnswers": "Sin respuestas",
       "loadError": "No se pudieron cargar los datos del resumen.",
+      "cardLoadError": "No se pudo cargar",
       "retry": "Reintentar",
       "templatesHint": "Marca las plantillas que quieras incluir.",
       "templatesEmpty": "Todavía no hay plantillas de documento.",

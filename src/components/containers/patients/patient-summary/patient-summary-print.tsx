@@ -1,4 +1,5 @@
 import React from 'react';
+import { tailwind } from '@/utils/tailwind-utils';
 import {
   SummaryAudiometry,
   SummaryBackground,
@@ -21,14 +22,18 @@ export interface PatientSummaryPrintProps {
   issuedAt: string;
   /** Nombre completo del usuario con sesión: va bajo la firma. */
   professionalName: string;
-  /** Plantillas elegidas, ya llenadas; vacío si no se eligió ninguna. */
+  /** Plantillas elegidas; vacío si no se eligió ninguna. */
   templates: SummaryTemplate[];
+  /** Valor de cada variable de las plantillas, con los datos del paciente. */
+  templateValues: Record<string, string>;
   background: SummaryBackground | null;
   otoscopy: SummaryOtoscopy | null;
   audiometry: SummaryAudiometry | null;
 }
 
 const SECTION_BREAK_CLASSES = 'break-before-page';
+// La última sección no suelta su cierre: la firma nunca queda sola en una hoja.
+const KEEP_WITH_SIGNATURE_CLASSES = 'break-after-avoid';
 
 /** Solo se ve al imprimir: logo y ficha, las secciones elegidas (cada una en su hoja) y una firma. */
 export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
@@ -37,6 +42,7 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
   issuedAt,
   professionalName,
   templates,
+  templateValues,
   background,
   otoscopy,
   audiometry,
@@ -44,7 +50,7 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
   const sections: { key: string; node: React.ReactNode }[] = [
     ...templates.map((template) => ({
       key: `template-${template.uuid}`,
-      node: <SummaryTemplateSection template={template} />,
+      node: <SummaryTemplateSection template={template} values={templateValues} />,
     })),
     ...(background
       ? [
@@ -64,7 +70,13 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = ({
     <div data-print-summary="" className="hidden flex-col gap-4 bg-white text-ink-700 print:flex">
       <SummaryHeader tenant={tenant} summaryPatient={summaryPatient} issuedAt={issuedAt} />
       {sections.map((section, index) => (
-        <div key={section.key} className={index > 0 ? SECTION_BREAK_CLASSES : undefined}>
+        <div
+          key={section.key}
+          className={tailwind(
+            index > 0 && SECTION_BREAK_CLASSES,
+            index === sections.length - 1 && KEEP_WITH_SIGNATURE_CLASSES,
+          )}
+        >
           {section.node}
         </div>
       ))}

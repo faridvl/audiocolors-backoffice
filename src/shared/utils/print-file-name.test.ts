@@ -35,6 +35,13 @@ describe('nombre del archivo impreso', () => {
     );
   });
 
+  it('quita la barra invertida y los inválidos de Windows', () => {
+    assert.equal(
+      buildPrintFileName({ type: 'Resumen clínico', clinic: 'A\\B', patient: 'Ana|Mora' }),
+      'Resumen clínico - A B - Ana Mora',
+    );
+  });
+
   it('un tramo que solo tenía caracteres inválidos se omite', () => {
     assert.equal(
       buildPrintFileName({ type: 'Resumen clínico', clinic: '***', patient: 'Ana' }),

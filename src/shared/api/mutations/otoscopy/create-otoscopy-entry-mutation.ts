@@ -5,6 +5,7 @@ import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import { FETCH_OTOSCOPY_ENTRIES_KEY } from '@/shared/api/querys/patient-otoscopy-entries-query';
 import { FETCH_PATIENT_NOTES_KEY } from '@/shared/api/querys/patient-notes-query';
 import { TEXT } from '@/static/texts/i18n';
 import { OtoscopyEntry, OtoscopyEntryPayload } from '@/types/patients/otoscopy-entry';
@@ -31,6 +32,7 @@ export function useCreateOtoscopyEntryMutation() {
     onSuccess: (_entry, { patientUuid }) => {
       toast.success(t(TEXT.PATIENTS.PHYSICAL_EXAM.SAVED));
       void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_NOTES_KEY, patientUuid] });
+      void queryClient.invalidateQueries({ queryKey: [FETCH_OTOSCOPY_ENTRIES_KEY, patientUuid] });
       void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
     },
     onError: (error) => toast.error(error.message),

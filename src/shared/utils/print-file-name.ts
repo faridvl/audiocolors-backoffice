@@ -1,5 +1,5 @@
 /** Caracteres que el navegador no admite en el nombre de un archivo guardado. */
-const INVALID_PRINT_NAME_CHARS = /[\/:*?"<>|\u0000-\u001f]+/g;
+const INVALID_PRINT_NAME_CHARS = /[\\/:*?"<>|\u0000-\u001f]+/g;
 const PART_SEPARATOR = ' - ';
 
 export interface PrintFileNameParts {

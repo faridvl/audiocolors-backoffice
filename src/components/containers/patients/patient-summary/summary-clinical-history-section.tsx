@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { EMPTY_VALUE } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import {
   buildStandardFields,
@@ -27,9 +26,16 @@ export const SummaryClinicalHistorySection: React.FC<SummaryClinicalHistorySecti
   const { t } = useTranslation();
   const { background, authorName } = summaryBackground;
   const answers = resolveAnswers(background);
+  // Lo que no se respondió no se imprime: la hoja lleva solo lo que el paciente contestó.
   const groups = groupFields(
     withoutPhysicalExam(background.templateSnapshot ?? buildStandardFields(t)),
-  );
+  )
+    .map((group) => ({
+      ...group,
+      booleans: group.booleans.filter((field) => yesNoOf(answers[field.id]) !== null),
+      texts: group.texts.filter((field) => textOf(answers[field.id]) !== ''),
+    }))
+    .filter((group) => group.booleans.length > 0 || group.texts.length > 0);
 
   return (
     <section data-print-summary-section="" className="flex flex-col gap-3">
@@ -37,6 +43,11 @@ export const SummaryClinicalHistorySection: React.FC<SummaryClinicalHistorySecti
         title={t(TEXT.PATIENTS.CLINICAL_SUMMARY.SECTIONS.BACKGROUND)}
         authorship={buildAuthorship(t, authorName, background.updatedAt)}
       />
+      {groups.length === 0 && (
+        <Typography variant={TypographyVariant.BODY}>
+          {t(TEXT.PATIENTS.CLINICAL_SUMMARY.NO_ANSWERS)}
+        </Typography>
+      )}
       {groups.map((group) => (
         <div key={group.key} className="flex flex-col gap-1">
           {group.title && <Typography variant={TypographyVariant.ACCENT}>{group.title}</Typography>}
@@ -67,7 +78,7 @@ export const SummaryClinicalHistorySection: React.FC<SummaryClinicalHistorySecti
             <div key={field.id} className="break-inside-avoid">
               <Typography variant={TypographyVariant.HELPER}>{field.label}</Typography>
               <p className="whitespace-pre-line text-sm text-ink-800">
-                {textOf(answers[field.id]) || EMPTY_VALUE}
+                {textOf(answers[field.id])}
               </p>
             </div>
           ))}

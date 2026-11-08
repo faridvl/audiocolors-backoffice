@@ -8,7 +8,7 @@ import {
   useAudiometryEntryQuery,
 } from '@/shared/api/querys/patient-audiometry-entries-query';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
-import { calculateAge, formatDate, formatDateTime } from '@/shared/utils/formatters';
+import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useSession } from '@/hooks/use-session';
 import { printWithFileName } from '@/shared/utils/print-document';
@@ -332,7 +332,7 @@ export function useAudiometryPoc(patientUuid: string) {
     patientName: patient ? `${patient.firstName} ${patient.lastName}`.trim() : '',
     patientDocumentId: patient?.documentId ?? '',
     patientAge: calculateAge(patient?.birthDate),
-    patientBirthDate: patient?.birthDate ? formatDate(patient.birthDate) : '',
+    patientBirthDate: formatCalendarDate(patient?.birthDate),
   };
   const { t } = useTranslation();
   const handlePrint = () =>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
@@ -37,6 +37,11 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   // Pestaña con la que abre el modal de indicadores; null = cerrado.
   const [flagsSection, setFlagsSection] = useState<PatientFlagSection | null>(null);
   const [isEditingContacts, setIsEditingContacts] = useState(false);
+
+  // El resumen es de un paciente: al pasar a otro se cierra para no imprimir los datos del anterior.
+  useEffect(() => {
+    setIsGeneratingSummary(false);
+  }, [uuid]);
 
   if (isLoading) {
     return (

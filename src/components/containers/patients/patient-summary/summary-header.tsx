@@ -2,7 +2,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrandLogo } from '@/components/common/brand/brand-logo';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { calculateAge, EMPTY_VALUE, formatDate } from '@/shared/utils/formatters';
+import {
+  calculateAge,
+  EMPTY_VALUE,
+  formatCalendarDate,
+  formatDate,
+} from '@/shared/utils/formatters';
 import { formatPhoneForDisplay } from '@/shared/utils/phone';
 import { TEXT } from '@/static/texts/i18n';
 import { SummaryPatient, SummaryTenant } from './patient-summary-types';
@@ -31,7 +36,7 @@ export const SummaryHeader: React.FC<SummaryHeaderProps> = ({
     { label: t(REPORT_TEXT.DOCUMENT_ID), value: patient.documentId ?? EMPTY_VALUE },
     {
       label: t(REPORT_TEXT.BIRTH_DATE),
-      value: patient.birthDate ? formatDate(patient.birthDate) : EMPTY_VALUE,
+      value: patient.birthDate ? formatCalendarDate(patient.birthDate) : EMPTY_VALUE,
     },
     {
       label: t(REPORT_TEXT.AGE),
