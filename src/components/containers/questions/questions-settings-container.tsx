@@ -30,27 +30,11 @@ export const QuestionsSettingsContainer: React.FC = () => {
   } = useQuestionsSettings();
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col items-end gap-1.5">
-        <Button
-          variant={ButtonVariant.SECONDARY}
-          icon={<Plus className="h-4 w-4" aria-hidden />}
-          onClick={handleOpenNameModal}
-          disabled={!canAddSection}
-        >
-          {t(TEXT.QUESTIONS.NEW_SECTION)}
-        </Button>
-        {!canAddSection && (
-          <Typography variant={TypographyVariant.HELPER} className="text-right">
-            {t(TEXT.QUESTIONS.NEW_SECTION_DISABLED_HINT)}
-          </Typography>
-        )}
-      </div>
-
+    <div className="flex flex-col gap-3">
       {sections.map((section) => (
         <Accordion
           key={section.key}
-          variant={AccordionVariant.PLAIN}
+          variant={AccordionVariant.CARD}
           title={section.title}
           subtitle={
             section.state === QuestionSectionState.DRAFT
@@ -84,6 +68,25 @@ export const QuestionsSettingsContainer: React.FC = () => {
           <Button variant={ButtonVariant.SECONDARY} onClick={refetchTemplates} className="mt-2">
             {t(TEXT.GENERAL.BUTTONS.RETRY)}
           </Button>
+        </div>
+      )}
+
+      {!isLoadingTemplates && !hasTemplatesError && (
+        <div className="flex flex-col gap-1.5">
+          <button
+            type="button"
+            onClick={handleOpenNameModal}
+            disabled={!canAddSection}
+            className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-card border border-dashed border-ink-300 text-sm font-semibold text-ink-700 transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-ink-300 disabled:hover:bg-transparent disabled:hover:text-ink-700"
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+            {t(TEXT.QUESTIONS.NEW_SECTION)}
+          </button>
+          {!canAddSection && (
+            <Typography variant={TypographyVariant.HELPER}>
+              {t(TEXT.QUESTIONS.NEW_SECTION_DISABLED_HINT)}
+            </Typography>
+          )}
         </div>
       )}
 

@@ -83,6 +83,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   de mantenimiento (D40).
   Para el desarrollo futuro de roles (no preguntar antes): solo el profesional
   médico agrega notas (2026-11-01).
+- Configuración → Preguntas (2026-11-07, rama `feature/preguntas-acordeon`, subida sin PR): sin
+  el texto de arriba, cada sección en tarjeta y "Nueva sección" debajo de la lista.
 - **Al publicar** (orden): la migración del API, el API y el front, juntos (si
   pasa tiempo entre la migración y el API, correr la reconciliación de envíos al
   laboratorio de `.claude/DATABASE.md` del API). Después: contar pacientes con

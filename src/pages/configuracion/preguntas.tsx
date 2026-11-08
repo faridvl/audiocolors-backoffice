@@ -15,7 +15,7 @@ export default function QuestionsSettingsPage() {
         <title>{t(TEXT.QUESTIONS.PAGE_TITLE)}</title>
       </Head>
 
-      <SettingsLayout section={SettingsSection.QUESTIONS}>
+      <SettingsLayout section={SettingsSection.QUESTIONS} showsDescription={false}>
         <QuestionsSettingsContainer />
       </SettingsLayout>
     </>
