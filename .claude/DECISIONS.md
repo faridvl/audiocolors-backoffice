@@ -1063,3 +1063,12 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
   tipo y 2 MB antes de enviar; el API repite la validación.
 - El informe de audiometría espera las imágenes antes de imprimir, y su nombre de archivo usa el
   nombre vigente de la clínica.
+
+## D69 · Rastreo en Archivos, informe e impresión (2026-11-08)
+
+- Reemplaza lo que D67 dejó fuera: el informe y la impresión de rastreo ahora se soportan. El botón Imprimir se muestra también en rastreo. El resumen del paciente sigue solo con clínicas.
+- El informe de rastreo muestra el tipo, el audiograma de vía aérea, el resultado Pasa/Refiere y las observaciones; no lleva Weber, logoaudiometría, tabla de PTA ni diagnóstico.
+- Archivos no muestra las audiometrías mal hechas (se reutiliza `filterValidAudiometries`); siguen visibles en Audiometría con su franja. La tarjeta lleva la píldora "Pruebas" (`CategoryPill`, la misma de Control de evolución) y el tipo; en rastreo, el resultado en lugar del PTA.
+- La vista previa se arma desde los datos de la audiometría (`buildSummaryAudiometry`), sin generar ni subir un PDF.
+- Control de evolución: la nota con `audiometryEntryUuid` abre esa audiometría en el expediente por el parámetro de URL `audiometria=<uuid>`. Un uuid que no existe se ignora.
+

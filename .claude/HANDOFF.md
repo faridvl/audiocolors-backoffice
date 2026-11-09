@@ -133,6 +133,13 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Audiometría por tipos, Archivos y notas (2026-11-08, rama `feature/audiometria-tipos`, local):**
+  la nota de audiometría en Control de evolución abre esa audiometría (`?audiometria=<uuid>`); Archivos
+  oculta las mal hechas, muestra la píldora Pruebas y el tipo; el informe y la impresión de rastreo
+  funcionan (D69). Lint, typecheck y pruebas `test:*` en verde. Sin probar en navegador: la navegación
+  desde la nota (incluida tocar dos veces la misma), la vista previa de rastreo y la impresión real.
+  Depende del API: `audiometryEntryUuid` en cada nota y el tipo en el texto de la nota.
+
 - **Correcciones de logo y Archivos (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):**
   informe de audiometría legible en celular (zoom mínimo 0.7 y desplazamiento bajo 640 px; la
   impresión no cambia), "Quitar logo" como botón secundario de peligro con papelera, tarjetas de

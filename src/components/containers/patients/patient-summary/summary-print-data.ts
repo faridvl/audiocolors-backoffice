@@ -7,11 +7,14 @@ import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient'
 import { Tenant } from '@/types/tenant/tenant';
 import { buildAudiometryReportData } from '../patient-audiometry/audiometry-report-data';
 import { AudiometryTypeCode } from '../patient-audiometry/audiometry-constants';
-import { payloadToState } from '../patient-audiometry/audiometry-payload-mapper';
-import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
+import {
+  payloadToState,
+  screeningPayloadToState,
+} from '../patient-audiometry/audiometry-payload-mapper';
+import { buildEmptyFormState, PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
 import { SummaryAudiometry } from './patient-summary-types';
 
-/** El informe impreso aún no soporta el rastreo: el resumen trabaja solo con clínicas. */
+/** El resumen del paciente incluye solo audiometrías clínicas; el rastreo no lleva Weber ni logoaudiometría. */
 export const isClinicalEntry = (
   entry: AudiometryEntry | undefined,
 ): entry is ClinicalAudiometryEntry =>
@@ -65,7 +68,9 @@ export function buildTemplateValues({
     [DocumentTemplateVariable.DIAGNOSIS]: latestAudiometryNotes?.diagnosis ?? '',
     [DocumentTemplateVariable.OBSERVATIONS]: latestAudiometryNotes?.observations ?? '',
     [DocumentTemplateVariable.CLINIC_NAME]: clinic?.businessName ?? '',
-    [DocumentTemplateVariable.CLINIC_PHONE]: clinic?.phone ? formatPhoneForDisplay(clinic.phone) : '',
+    [DocumentTemplateVariable.CLINIC_PHONE]: clinic?.phone
+      ? formatPhoneForDisplay(clinic.phone)
+      : '',
     [DocumentTemplateVariable.CLINIC_EMAIL]: clinic?.email ?? '',
     [DocumentTemplateVariable.CLINIC_ADDRESS]: clinic?.address ?? '',
   };
@@ -73,17 +78,24 @@ export function buildTemplateValues({
 
 /** Lo que recibe el informe de audiometría suelto, a partir de la audiometría guardada. */
 export function buildSummaryAudiometry(
-  entry: ClinicalAudiometryEntry,
+  entry: AudiometryEntry,
   header: PrintReportHeader,
   professional: string,
 ): SummaryAudiometry {
-  const state = payloadToState(entry.payload);
+  const isScreening = entry.typeCode === AudiometryTypeCode.SCREENING;
+  // El rastreo solo tiene vía aérea y observaciones: lo demás va vacío y el informe no lo muestra.
+  const screeningState = isScreening ? screeningPayloadToState(entry.payload) : null;
+  const state = screeningState
+    ? { ...buildEmptyFormState(), marks: screeningState.marks, notes: screeningState.notes }
+    : payloadToState(entry.payload as ClinicalAudiometryEntry['payload']);
   const { summaries, presentedWords } = buildAudiometryReportData(state);
 
   return {
     header,
     entryDate: formatDateTime(entry.createdAt),
     professional,
+    typeName: entry.typeName,
+    screening: screeningState ? { result: screeningState.result } : undefined,
     marks: state.marks,
     gradingScale: state.gradingScale,
     speechMarks: state.speechMarks,

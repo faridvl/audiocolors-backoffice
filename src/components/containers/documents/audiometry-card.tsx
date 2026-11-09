@@ -2,7 +2,11 @@ import React from 'react';
 import { Activity, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { CategoryPill } from '@/components/common/badge/category-pill';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
+import { AudiometryTypeCode } from '@/components/containers/patients/patient-audiometry/audiometry-constants';
+import { SCREENING_RESULT_LABEL_KEYS } from '@/components/containers/patients/patient-audiometry/audiometry-labels';
+import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
 import { TEXT } from '@/static/texts/i18n';
 import { AudiometryArchiveItem } from './archive-items';
 
@@ -35,33 +39,27 @@ export const AudiometryCard: React.FC<AudiometryCardProps> = ({ item, onOpen }) 
           {item.displayName}
         </Typography>
         <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-ink-400" aria-hidden />
-        {item.isInvalidated && (
-          <span className="shrink-0 rounded bg-danger/10 px-1.5 py-0.5 text-xs font-semibold text-danger">
-            {t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.INVALIDATE.TAG)}
-          </span>
-        )}
       </span>
+      <CategoryPill>{DOCUMENT_CATEGORY_LABELS[DocumentCategory.EXTERNAL_TEST]}</CategoryPill>
       <Typography variant={TypographyVariant.HELPER} className="mt-1.5">
         {t(TEXT.DOCUMENTS.AUDIOMETRY.DETAIL)}
       </Typography>
+      <Typography variant={TypographyVariant.HELPER}>{item.typeName}</Typography>
       <Typography variant={TypographyVariant.HELPER}>{item.dateLabel}</Typography>
       <Typography variant={TypographyVariant.HELPER} className="font-semibold text-ink-700">
-        {t(TEXT.DOCUMENTS.AUDIOMETRY.PTA_SUMMARY, {
-          right: item.ptaRight ?? MISSING_PTA_DASH,
-          left: item.ptaLeft ?? MISSING_PTA_DASH,
-        })}
+        {item.typeCode === AudiometryTypeCode.SCREENING
+          ? item.screeningResult
+            ? t(SCREENING_RESULT_LABEL_KEYS[item.screeningResult])
+            : MISSING_PTA_DASH
+          : t(TEXT.DOCUMENTS.AUDIOMETRY.PTA_SUMMARY, {
+              right: item.ptaRight ?? MISSING_PTA_DASH,
+              left: item.ptaLeft ?? MISSING_PTA_DASH,
+            })}
       </Typography>
       <Typography variant={TypographyVariant.HELPER}>
         {t(TEXT.DOCUMENTS.LIST.REGISTERED_BY)}{' '}
         <span className="italic">{resolveAuthorLabel(item.createdByUuid, item.createdByName)}</span>
       </Typography>
-      {item.isInvalidated && item.invalidationReason && (
-        <Typography variant={TypographyVariant.HELPER} className="text-danger-700">
-          {t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.INVALIDATE.BANNER_REASON, {
-            reason: item.invalidationReason,
-          })}
-        </Typography>
-      )}
     </button>
   );
 };

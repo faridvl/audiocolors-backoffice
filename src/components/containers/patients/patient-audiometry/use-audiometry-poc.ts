@@ -84,7 +84,7 @@ export interface PrintReportHeader {
   patientBirthDate: string;
 }
 
-const buildEmptyFormState = (): AudiometryFormState => ({
+export const buildEmptyFormState = (): AudiometryFormState => ({
   marks: buildEmptyMarks(),
   weber: buildDefaultWeber(),
   speechMarks: buildEmptySpeechMarks(),

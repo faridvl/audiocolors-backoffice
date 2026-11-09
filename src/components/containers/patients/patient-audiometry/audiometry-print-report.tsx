@@ -15,6 +15,7 @@ import {
   FailedWordsValues,
   GradingScale,
   PtaType,
+  ScreeningResult,
   SpeechField,
   SpeechFieldValues,
   SpeechMarks,
@@ -25,6 +26,7 @@ import {
   EAR_LABEL_KEYS,
   GRADE_LABEL_KEYS,
   PTA_TYPE_LABEL_KEYS,
+  SCREENING_RESULT_LABEL_KEYS,
   WEBER_LABEL_KEYS,
 } from './audiometry-labels';
 import { GradeLabelsCenter } from './grade-labels-column';
@@ -76,6 +78,10 @@ export interface AudiometryPrintReportProps {
   isEmbedded?: boolean;
   /** Informe suelto de una audiometría marcada como mal hecha: se avisa arriba, bien visible. */
   invalidation?: AudiometryInvalidationNotice | null;
+  /** Nombre del tipo de audiometría; sin él no se muestra el dato. */
+  typeName?: string;
+  /** Solo en rastreo: informe con vía aérea, resultado y observaciones, sin las pruebas de una clínica. */
+  screening?: { result: ScreeningResult | null };
   /** Para mostrar el informe suelto en pantalla (por ejemplo en un modal); por defecto solo sale al imprimir. */
   isVisibleOnScreen?: boolean;
 }
@@ -95,6 +101,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   notes,
   isEmbedded = false,
   invalidation = null,
+  typeName,
+  screening,
   isVisibleOnScreen = false,
 }) => {
   const { t } = useTranslation();
@@ -109,6 +117,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     { label: t(REPORT_TEXT.BIRTH_DATE), value: header.patientBirthDate },
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
+    { label: t(AUDIOMETRY_TEXT.TYPE.LABEL), value: typeName ?? '' },
   ].filter((field) => field.value !== '');
   const embeddedFields = [
     { label: t(REPORT_TEXT.DATE), value: entryDate },
@@ -146,8 +155,13 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     },
   ];
 
+  const diagnosisSection = {
+    key: 'diagnosis',
+    title: t(AUDIOMETRY_TEXT.NOTES.DIAGNOSIS_TITLE),
+    text: notes.diagnosis,
+  };
   const textSections = [
-    { key: 'diagnosis', title: t(AUDIOMETRY_TEXT.NOTES.DIAGNOSIS_TITLE), text: notes.diagnosis },
+    ...(screening ? [] : [diagnosisSection]),
     {
       key: 'observations',
       title: t(AUDIOMETRY_TEXT.NOTES.OBSERVATIONS_TITLE),
@@ -236,81 +250,97 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
           ))}
         </div>
       </section>
-      <section className="flex break-inside-avoid flex-col gap-2">
-        <h2 className={SECTION_TITLE_CLASSES}>{t(SUMMARY_TEXT.WEBER_TITLE)}</h2>
-        <table className={TABLE_CLASSES}>
-          <thead>
-            <tr>
-              {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
-                <th key={frequencyHz} className={HEAD_CELL_CLASSES}>
-                  {t(REPORT_TEXT.FREQUENCY_HZ, { frequency: frequencyHz })}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
-                <td key={frequencyHz} className={CELL_CLASSES}>
-                  {weber[frequencyHz] ? (
-                    <span className="inline-flex items-center gap-1.5">
-                      {WEBER_ICONS[weber[frequencyHz]]}
-                      {t(WEBER_LABEL_KEYS[weber[frequencyHz]])}
-                    </span>
-                  ) : (
-                    empty
-                  )}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <div className="grid grid-cols-2 items-start gap-4">
-        <section className="flex min-w-0 break-inside-avoid flex-col gap-2">
-          <h2 className={SECTION_TITLE_CLASSES}>{t(AUDIOMETRY_TEXT.SPEECH.TITLE)}</h2>
-          <SpeechAudiogramChart
-            marks={speechMarks}
-            activeEar={Ear.RIGHT}
-            onPlace={NO_OP}
-            onRemove={NO_OP}
-            isReadOnly
-          />
+      {screening && (
+        <section className="flex break-inside-avoid flex-col gap-1">
+          <h2 className={SECTION_TITLE_CLASSES}>{t(AUDIOMETRY_TEXT.SCREENING.RESULT_LABEL)}</h2>
+          <p className="text-sm font-semibold text-ink-900">
+            {screening.result ? t(SCREENING_RESULT_LABEL_KEYS[screening.result]) : empty}
+          </p>
         </section>
+      )}
 
-        <div className="flex min-w-0 flex-col gap-2">
+      {!screening && (
+        <>
           <section className="flex break-inside-avoid flex-col gap-2">
-            <h2 className={SECTION_TITLE_CLASSES}>{t(SUMMARY_TEXT.TITLE)}</h2>
+            <h2 className={SECTION_TITLE_CLASSES}>{t(SUMMARY_TEXT.WEBER_TITLE)}</h2>
             <table className={TABLE_CLASSES}>
               <thead>
                 <tr>
-                  <th className={HEAD_CELL_CLASSES}>{t(SUMMARY_TEXT.METRIC)}</th>
-                  {EARS.map((ear) => (
-                    <th key={ear} className={tailwind(HEAD_CELL_CLASSES, EAR_TEXT_CLASSES[ear])}>
-                      {t(EAR_LABEL_KEYS[ear])}
+                  {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
+                    <th key={frequencyHz} className={HEAD_CELL_CLASSES}>
+                      {t(REPORT_TEXT.FREQUENCY_HZ, { frequency: frequencyHz })}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {summaryRows.map((row) => (
-                  <tr key={row.key}>
-                    <th scope="row" className={tailwind(CELL_CLASSES, 'text-left font-medium')}>
-                      {row.label}
-                    </th>
-                    {EARS.map((ear) => (
-                      <td key={ear} className={tailwind(CELL_CLASSES, 'font-medium')}>
-                        {row.getValue(ear)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                <tr>
+                  {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
+                    <td key={frequencyHz} className={CELL_CLASSES}>
+                      {weber[frequencyHz] ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          {WEBER_ICONS[weber[frequencyHz]]}
+                          {t(WEBER_LABEL_KEYS[weber[frequencyHz]])}
+                        </span>
+                      ) : (
+                        empty
+                      )}
+                    </td>
+                  ))}
+                </tr>
               </tbody>
             </table>
           </section>
-        </div>
-      </div>
+
+          <div className="grid grid-cols-2 items-start gap-4">
+            <section className="flex min-w-0 break-inside-avoid flex-col gap-2">
+              <h2 className={SECTION_TITLE_CLASSES}>{t(AUDIOMETRY_TEXT.SPEECH.TITLE)}</h2>
+              <SpeechAudiogramChart
+                marks={speechMarks}
+                activeEar={Ear.RIGHT}
+                onPlace={NO_OP}
+                onRemove={NO_OP}
+                isReadOnly
+              />
+            </section>
+
+            <div className="flex min-w-0 flex-col gap-2">
+              <section className="flex break-inside-avoid flex-col gap-2">
+                <h2 className={SECTION_TITLE_CLASSES}>{t(SUMMARY_TEXT.TITLE)}</h2>
+                <table className={TABLE_CLASSES}>
+                  <thead>
+                    <tr>
+                      <th className={HEAD_CELL_CLASSES}>{t(SUMMARY_TEXT.METRIC)}</th>
+                      {EARS.map((ear) => (
+                        <th
+                          key={ear}
+                          className={tailwind(HEAD_CELL_CLASSES, EAR_TEXT_CLASSES[ear])}
+                        >
+                          {t(EAR_LABEL_KEYS[ear])}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summaryRows.map((row) => (
+                      <tr key={row.key}>
+                        <th scope="row" className={tailwind(CELL_CLASSES, 'text-left font-medium')}>
+                          {row.label}
+                        </th>
+                        {EARS.map((ear) => (
+                          <td key={ear} className={tailwind(CELL_CLASSES, 'font-medium')}>
+                            {row.getValue(ear)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </section>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Diagnóstico, observaciones y firma pasan juntos a la hoja siguiente si no caben. */}
       <div className="flex break-inside-avoid flex-col gap-2">

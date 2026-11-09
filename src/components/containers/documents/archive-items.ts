@@ -1,6 +1,11 @@
+import {
+  AudiometryTypeCode,
+  ScreeningResult,
+} from '@/components/containers/patients/patient-audiometry/audiometry-constants';
 import { AudiometryEntryListItem } from '@/types/patients/audiometry-entry';
 import { DocumentItem, PatientDocument } from '@/types/documents/document.types';
 import { formatDateTime } from '@/shared/utils/formatters';
+import { sortArchiveItems } from './archive-sort';
 import { mapToDocumentItem } from './document-items';
 
 export enum ArchiveItemType {
@@ -26,9 +31,10 @@ export interface AudiometryArchiveItem {
   ptaLeft: number | null;
   createdByUuid: string;
   createdByName: string | null;
-  /** Solo si la audiometría está marcada como mal hecha. */
-  invalidationReason: string | null;
-  isInvalidated: boolean;
+  typeCode: AudiometryTypeCode;
+  typeName: string;
+  /** Solo en rastreo. */
+  screeningResult: ScreeningResult | null;
 }
 
 /** Lo que muestra la pestaña Archivos: archivos subidos y audiometrías guardadas, en una sola lista. */
@@ -59,14 +65,10 @@ export function mapAudiometryToArchiveItem(
     ptaLeft: entry.ptaLeft ?? null,
     createdByUuid: entry.createdByUuid ?? '',
     createdByName: entry.createdByName,
-    // Una lista vieja o en caché puede no traer la marca: `!= null` cubre null y undefined.
-    isInvalidated: entry.invalidatedAt != null,
-    invalidationReason: entry.invalidationReason ?? null,
+    typeCode: entry.typeCode,
+    typeName: entry.typeName,
+    screeningResult: entry.screeningResult ?? null,
   };
 }
 
-/** De la más reciente a la más antigua; una fecha ilegible queda al final. */
-export function sortArchiveItems(items: ArchiveItem[]): ArchiveItem[] {
-  const timeOf = (item: ArchiveItem) => (Number.isNaN(item.sortTime) ? -Infinity : item.sortTime);
-  return [...items].sort((a, b) => timeOf(b) - timeOf(a));
-}
+export { sortArchiveItems };

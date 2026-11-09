@@ -157,7 +157,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                     {t(AUDIOMETRY_TEXT.NEW_ENTRY_BUTTON)}
                   </Button>
                 )}
-                {selectedEntry && !isScreening && (
+                {selectedEntry && (
                   <Button variant={ButtonVariant.SECONDARY} onClick={handlePrint}>
                     <Printer className="h-4 w-4" aria-hidden />
                     {t(AUDIOMETRY_TEXT.PRINT)}
@@ -421,11 +421,13 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
           onCancel={handleCancelTypeChange}
         />
       )}
-      {selectedEntry && !isScreening && (
+      {selectedEntry && (
         <AudiometryPrintReport
           header={printReportHeader}
           entryDate={formatDateTime(selectedEntry.createdAt)}
           professional={selectedEntryAuthor ?? ''}
+          typeName={selectedEntry.typeName}
+          screening={isScreening ? { result: screeningResult } : undefined}
           marks={marks}
           gradingScale={gradingScale}
           speechMarks={speechMarks}

@@ -29,6 +29,7 @@ import {
   mapFileToArchiveItem,
   sortArchiveItems,
 } from './archive-items';
+import { filterValidAudiometries } from '../patients/patient-summary/summary-audiometry-selection';
 import { useDocumentPreview } from './use-document-preview';
 
 /** Solo se pagina en movil: el grid de escritorio ya muestra varias columnas a la vez. */
@@ -93,7 +94,7 @@ export function useDocuments(patientUuid: string) {
     () =>
       sortArchiveItems([
         ...(data ?? []).map(mapFileToArchiveItem),
-        ...(audiometryEntries ?? []).map((entry) =>
+        ...filterValidAudiometries(audiometryEntries ?? []).map((entry) =>
           mapAudiometryToArchiveItem(entry, audiometryName),
         ),
       ]),
