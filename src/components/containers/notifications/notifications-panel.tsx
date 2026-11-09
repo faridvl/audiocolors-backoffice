@@ -47,7 +47,7 @@ export const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
       <div
         role="dialog"
         aria-label={t(TEXT.NOTIFICATIONS.TITLE)}
-        className="absolute right-0 top-full z-50 mt-2 flex max-h-[min(36rem,calc(100dvh-6rem))] w-[min(24rem,calc(100vw-2rem))] origin-top-right flex-col overflow-hidden rounded-lg border border-ink-200 bg-white shadow-lg"
+        className="absolute right-0 top-full z-50 mt-2 flex max-h-[min(36rem,calc(100dvh-6rem))] w-[min(30rem,calc(100vw-2rem))] origin-top-right flex-col overflow-hidden rounded-lg border border-ink-200 bg-white shadow-lg"
       >
         <div className="flex min-h-[52px] items-center gap-1 border-b border-ink-100 px-2">
           {selected && (
