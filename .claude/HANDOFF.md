@@ -133,6 +133,12 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Versión 2.0.0 (2026-11-08, rama `release/2.0.0` del front y del API, con PR a `develop` abierto en cada repo):**
+  changelog de 20 cambios aprobado por el usuario y cargado en `releases.ts`/`es.json`; el API
+  sube a 2.0.0 en sus cuatro `package.json`. Cubre todo lo que hay en `develop` (no incluye
+  `feature/audiometria-tipos` ni otras ramas locales). Sigue: mergear los PR a `develop` y luego
+  PR de `develop` a `main`, con permiso del usuario.
+
 - **Audiometría por tipos, Archivos y notas (2026-11-08, rama `feature/audiometria-tipos`, local):**
   la nota de audiometría en Control de evolución abre esa audiometría (`?audiometria=<uuid>`); Archivos
   oculta las mal hechas, muestra la píldora Pruebas y el tipo; el informe y la impresión de rastreo

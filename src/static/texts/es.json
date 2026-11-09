@@ -115,6 +115,88 @@
           "title": "Agenda",
           "description": "las citas se pueden mover de hora más de una vez."
         }
+      },
+      "v2_0_0": {
+        "audiometry": {
+          "title": "Audiometría",
+          "description": "registro completo por paciente con historial e informe para imprimir; se puede marcar como mal hecha indicando el motivo."
+        },
+        "patientSummary": {
+          "title": "Resumen del paciente",
+          "description": "se genera desde el expediente eligiendo plantillas y audiometrías, con vista previa editable antes de imprimir."
+        },
+        "documentTemplates": {
+          "title": "Plantillas de documento",
+          "description": "sección en Configuración para redactar documentos con datos del paciente y de la clínica."
+        },
+        "clinic": {
+          "title": "Clínica",
+          "description": "nombre, logo, teléfono, correo y dirección editables; el logo aparece en el menú y en los documentos."
+        },
+        "questions": {
+          "title": "Preguntas",
+          "description": "la clínica crea sus propias secciones de preguntas y cada paciente las llena varias veces; la historia clínica pasa a esta sección."
+        },
+        "maintenance": {
+          "title": "Mantenimientos",
+          "description": "los mantenimientos 1 a 4 de cada paciente, con su estado y un historial de notas."
+        },
+        "laboratory": {
+          "title": "Laboratorio",
+          "description": "historial de envíos y entregas de audífonos."
+        },
+        "otoscopy": {
+          "title": "Otoscopia",
+          "description": "historial por paciente con los dos oídos; cada registro queda anotado en Control de evolución."
+        },
+        "contactAttempts": {
+          "title": "Intentos de contacto",
+          "description": "registro de los intentos de contacto con cada paciente."
+        },
+        "priority": {
+          "title": "Prioridad",
+          "description": "bandera de prioridad en la lista de pacientes y en el expediente."
+        },
+        "stalePatients": {
+          "title": "Pacientes sin movimiento",
+          "description": "aviso en Notificaciones de los pacientes con 6 meses o más sin movimiento."
+        },
+        "patients": {
+          "title": "Pacientes",
+          "description": "un paciente puede tener más de una sede, se aceptan teléfonos de otros países y se puede registrar sin fecha de nacimiento."
+        },
+        "agenda": {
+          "title": "Agenda",
+          "description": "se registra un paciente nuevo al agendar la cita; al cambiar la duración de un tipo de cita se actualizan las citas siguientes."
+        },
+        "files": {
+          "title": "Archivos",
+          "description": "las audiometrías aparecen junto con el resto de documentos."
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "la sección Preguntas queda organizada en tarjetas."
+        },
+        "mobile": {
+          "title": "Celular",
+          "description": "el informe de audiometría se lee bien en pantallas angostas."
+        },
+        "agendaHours": {
+          "title": "Agenda",
+          "description": "se muestran las citas fuera del horario de 8:00 a 18:00 y el día de cada cita se calcula con la hora de Costa Rica."
+        },
+        "maintenanceMonth": {
+          "title": "Mantenimientos",
+          "description": "el mes de próximos mantenimientos ya no incluye el primer día del mes siguiente."
+        },
+        "clinicalHistory": {
+          "title": "Historia clínica",
+          "description": "guardar sin todas las respuestas ya no borra las anteriores."
+        },
+        "security": {
+          "title": "Seguridad",
+          "description": "cada clínica accede únicamente a sus propios pacientes, citas y tipos de cita."
+        }
       }
     },
     "kinds": {
