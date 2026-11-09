@@ -1082,4 +1082,15 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
   poner una contraseña nueva a cualquier usuario de su clínica.
 - No se borra: se desactiva y se reactiva. Un usuario inactivo no puede iniciar sesión.
 - Nadie se desactiva ni se cambia el rol a sí mismo, y la clínica nunca queda sin un OWNER activo.
+- El rol OWNER no se crea ni se asigna desde la pantalla ni el API: se asignan ADMIN, DOCTOR y STAFF.
+- Un token emitido (1 h) sigue sirviendo hasta vencer aunque el usuario se desactive; login y
+  `/auth/me` ya lo rechazan. Cerrarlo del todo (consultar estado por petición) queda para después.
+- Un OWNER no administra a otro OWNER (ni rol, ni estado, ni contraseña): los dueños no se tocan
+  desde la pantalla, y así la clínica no puede quedar sin OWNER activo.
+- Cada acción de administración relee al actor en la base: debe estar ACTIVE y ser OWNER en ese
+  momento (el token no basta).
+- La firma y el avatar los cambia solo su dueño (la firma sale en documentos clínicos).
+- Un rol viejo (USER, MEDICO o vacío) se muestra como "Rol anterior" y no se pisa al editar otros
+  datos. El default de la columna `role` pasa a STAFF.
+- Los correos se guardan y se comparan en minúsculas.
 - Los roles siguen fijos (D20); los permisos configurables quedan para después.
