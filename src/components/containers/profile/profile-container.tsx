@@ -48,11 +48,14 @@ export const ProfileContainer: React.FC = () => {
             label={t(TEXT.SETTINGS.USERS.FORM.ROLE)}
             value={t(TEXT.SETTINGS.USERS.ROLES[user.role])}
           />
+          {!profile.attendsPatients && (
+            <Typography variant={TypographyVariant.HELPER}>{t(TEXTS.NOT_PROFESSIONAL)}</Typography>
+          )}
         </div>
       </FormViewSection>
 
-      <FormViewSection title={t(TEXTS.PROFESSIONAL)}>
-        {profile.attendsPatients ? (
+      {profile.attendsPatients && (
+        <FormViewSection title={t(TEXTS.PROFESSIONAL)}>
           <Formik
             initialValues={profile.initialValues}
             validationSchema={profile.schema}
@@ -93,10 +96,8 @@ export const ProfileContainer: React.FC = () => {
               </div>
             </Form>
           </Formik>
-        ) : (
-          <Typography variant={TypographyVariant.BODY}>{t(TEXTS.NOT_PROFESSIONAL)}</Typography>
-        )}
-      </FormViewSection>
+        </FormViewSection>
+      )}
     </div>
   );
 };
