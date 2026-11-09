@@ -314,7 +314,16 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 - **Logo y nombre de la clínica (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):** Configuración → Clínica edita el nombre y sube/quita el logo (D68); menú y documentos usan `ClinicBrand`. Probado en navegador sin logo y con logo (1440 y 390 px, capturas en `test-results/clinica-logo-nombre/`), validación de tipo/tamaño y cambio de nombre sin recargar. Sin probar: subida y borrado reales (bucket real), usuario sin permiso, informe y resumen impresos. Requiere el API de `feature/clinica-logo-y-nombre`.
 
-## Roles y especialidades (corte en curso)
+## Roles y especialidades (terminado y probado, local sin push ni PR)
 
-- Hecho y commiteado: alta/edicion en paginas `/configuracion/usuarios/nuevo` y `/[uuid]`, lista con atiende pacientes y especialidades, bitacora en la ficha.
-- Hecho: `/perfil` con "Mi perfil" en `UserMenu` y variable "profesional" con `formatProfessionalName` (probado en navegador contra el API local a 375 y 1440). Cerrado el 2026-11-09 (D73): 401 con un refresh, DELETE_PATIENT, boton Volver al inicio y perfil sin datos profesionales si no atiende. Sigue: qa con Playwright por rol (Recepcion, Administracion, Propietario con y sin atender pacientes), incluido el 401 con token viejo, y entrega de la rama.
+- Rama `feature/roles-especialidades` en el front y en el API (contiene `feature/usuarios`, D70). D71 a D73.
+- Probado en navegador contra el API local y la base Docker 5433 con cada rol: lo clínico por usuario,
+  "Nueva audiometría" e invalidar solo con Audiología (API 403 sin ella), Configuración, Bitácora y
+  Usuarios bloqueados para Recepción, alta y edición en páginas, usuarios nuevos que inician sesión,
+  bitácora en una línea, Propietario que administra a otro Propietario (Administración lo ve de
+  lectura), nadie cambia su propio estado, variable profesional "Lic. Nombre · Cód. N", documento y
+  paciente de otra clínica en 404, Agenda de Recepción con "Agendada por", sesión vencida, 375, 1024
+  y 1440 px sin scroll horizontal, foco de teclado en la tabla de usuarios.
+- Sigue: permiso del usuario para push y PR (los dos repos, incluida `feature/usuarios`). Antes de
+  publicar, en producción (solo lectura): conteo de roles; los ADMIN actuales pierden el acceso clínico
+  hasta que el Propietario les active "Atiende pacientes".
