@@ -317,4 +317,4 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 ## Roles y especialidades (corte en curso)
 
 - Hecho y commiteado: alta/edicion en paginas `/configuracion/usuarios/nuevo` y `/[uuid]`, lista con atiende pacientes y especialidades, bitacora en la ficha.
-- Hecho: `/perfil` con "Mi perfil" en `UserMenu` y variable "profesional" con `formatProfessionalName` (probado en navegador contra el API local a 375 y 1440). Falta: revision de qa y entrega de la rama.
+- Hecho: `/perfil` con "Mi perfil" en `UserMenu` y variable "profesional" con `formatProfessionalName` (probado en navegador contra el API local a 375 y 1440). Cerrado el 2026-11-09 (D73): 401 con un refresh, DELETE_PATIENT, boton Volver al inicio y perfil sin datos profesionales si no atiende. Sigue: qa con Playwright por rol (Recepcion, Administracion, Propietario con y sin atender pacientes), incluido el 401 con token viejo, y entrega de la rama.

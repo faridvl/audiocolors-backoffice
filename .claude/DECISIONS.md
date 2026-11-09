@@ -1155,3 +1155,15 @@ independientes:
 - El profesional de las variables de documento y de la firma es quien genera el documento (sesion `/auth/me`): `formatProfessionalName` da `Lic. Ana Mora · Cod. 1234` y omite titulo o colegiado si faltan.
 - La abreviatura MSC se muestra `MSc.`; el prefijo `Cod.` vive en `documentTemplates.licensePrefix`.
 - `/perfil` guarda titulo y colegiado con `PATCH /users/:uuid` sobre uno mismo, solo si el usuario atiende pacientes, e invalida `authMe`.
+
+## D73 · Cierre de la aplicación de D71 en pantalla (2026-11-09)
+
+- `getSelectableRoles` calcula en local los niveles que ofrece el selector de Usuarios según quién edita (ADMIN: Recepción y Administración; OWNER: también Propietario). El API sigue siendo quien rechaza.
+- "Ver" en la lista de usuarios se deriva de `!canEdit` (no de un permiso aparte): si no puede editar a esa persona, la acción pasa a "Ver".
+- La fila de la tabla es clicable y además lleva un enlace en el nombre, para teclado y lectores de pantalla.
+- `ResponsiveTable` renderiza las dos versiones (tabla y tarjetas); la oculta lleva `aria-hidden` e `inert` para que no reciba foco ni se lea dos veces.
+- 401: el cliente intenta `/auth/refresh` una sola vez y repite la petición. Si el refresh falla, o el reintento vuelve a dar 401, cierra la sesión y manda al login. El refresh usa `fetch` directo, así que no hay bucle; el 403 conserva su único reintento.
+- `DELETE_PATIENT` (Administración o Propietario) existe en `permissions.ts`, igual que en el API. No hay pantalla de eliminar paciente, así que no hay acción que ocultar.
+- Sin permiso, `RequirePermission` y Configuración sin pestañas muestran el mensaje y el botón "Volver al inicio" (`common.backHome`), para no dejar un callejón sin salida.
+- Perfil: sin "Atiende pacientes" no se muestra "Datos profesionales"; una nota gris pequeña (`profile.notProfessional`) queda dentro de la tarjeta "Tu cuenta".
+- Ya estaban resueltos por permisos: menú y Configuración sin "Usuarios" para Recepción, y Mantenimiento oculto sin acceso clínico (D72). La ficha del paciente no tiene campos clínicos propios (como `bloodType`), así que no hay nada más que ocultar en el front.
