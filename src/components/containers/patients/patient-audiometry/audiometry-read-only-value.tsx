@@ -21,8 +21,7 @@ export const ReadOnlyValue: React.FC<ReadOnlyValueProps> = ({
   const isEmpty = value === null || value === undefined || String(value).trim() === '';
 
   const classes = tailwind(className, isEmpty && 'text-ink-500');
-  const content = isEmpty ? t(TEXT.GENERAL.NOT_RECORDED) : value;
   if (isCorrectable)
-    return <SummaryEditableText className={classes}>{content}</SummaryEditableText>;
-  return <span className={classes}>{content}</span>;
+    return <SummaryEditableText className={classes}>{isEmpty ? '' : value}</SummaryEditableText>;
+  return <span className={classes}>{isEmpty ? t(TEXT.GENERAL.NOT_RECORDED) : value}</span>;
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { useBackdropClose } from '@/hooks/use-backdrop-close';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 
 interface ConfirmDialogProps {
@@ -23,6 +24,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onCancel,
 }) => {
   useEscapeKey(onCancel);
+  const backdropProps = useBackdropClose(onCancel);
 
   return (
     <div
@@ -30,7 +32,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       aria-modal="true"
       aria-label={title}
       className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/70 sm:items-center sm:p-4"
-      onClick={onCancel}
+      {...backdropProps}
     >
       <div
         className="w-full max-w-sm rounded-t-card bg-white p-5 sm:rounded-card"

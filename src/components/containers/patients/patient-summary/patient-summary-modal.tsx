@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { MultiSelect } from '@/components/common/multi-select/multi-select';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { useBackdropClose } from '@/hooks/use-backdrop-close';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient } from '@/types/patients/patient';
 import { PatientSummaryPreview } from './patient-summary-preview';
@@ -29,6 +30,7 @@ const CARD_TITLES: Record<SummaryCard, string> = {
 export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patient, onClose }) => {
   const { t } = useTranslation();
   const summary = usePatientSummary(patient);
+  const backdropProps = useBackdropClose(onClose);
 
   // El modal sigue montado tras la vista previa: al volver, la selección está como se dejó.
   if (summary.preview) {
@@ -40,7 +42,7 @@ export const PatientSummaryModal: React.FC<PatientSummaryModalProps> = ({ patien
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/70 p-4"
-      onClick={onClose}
+      {...backdropProps}
     >
       <div
         className="flex max-h-full w-full max-w-md flex-col rounded-card bg-white p-5"

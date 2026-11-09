@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { X } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { useBackdropClose } from '@/hooks/use-backdrop-close';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { TEXT } from '@/static/texts/i18n';
 
@@ -22,6 +23,7 @@ interface SheetDialogProps {
 export const SheetDialog: React.FC<SheetDialogProps> = ({ title, status, onClose, children }) => {
   const { t } = useTranslation();
   useEscapeKey(onClose);
+  const backdropProps = useBackdropClose(onClose);
 
   return (
     <div
@@ -29,7 +31,7 @@ export const SheetDialog: React.FC<SheetDialogProps> = ({ title, status, onClose
       aria-modal="true"
       aria-label={title}
       className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/60 sm:items-center sm:p-4"
-      onClick={onClose}
+      {...backdropProps}
     >
       <div
         className="max-h-[92dvh] w-full max-w-md animate-fade-in overflow-y-auto rounded-t-card bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:rounded-card sm:pb-5"
