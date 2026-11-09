@@ -43,9 +43,9 @@ export const DocumentTemplateVariableChips: React.FC<DocumentTemplateVariableChi
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => onInsert(variable)}
                     title={t(TEXT.DOCUMENT_TEMPLATES.VARIABLES.INSERT, { variable: label })}
-                    className="flex min-h-[40px] w-full min-w-0 items-center justify-between gap-1 rounded-md border border-ink-200 bg-white px-2 text-xs text-ink-700 transition-colors hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:min-h-8"
+                    className="flex min-h-[40px] w-full min-w-0 items-center justify-between gap-1 rounded-md border border-ink-200 bg-white px-2 py-1 text-left text-xs leading-tight text-ink-700 transition-colors hover:border-brand hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand sm:min-h-8"
                   >
-                    <span className="truncate">{label}</span>
+                    <span className="min-w-0 break-words">{label}</span>
                     {usedVariables.has(variable) && (
                       <>
                         <Check className="h-3 w-3 shrink-0 text-success" aria-hidden />
