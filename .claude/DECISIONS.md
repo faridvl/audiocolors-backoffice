@@ -1190,3 +1190,7 @@ independientes:
 - Al entrar a la pantalla ningún acordeón está abierto: ni Audiometría, ni Preguntas y sus secciones, ni los antecedentes, ni las secciones de Configuración → Formularios. Solo se abren por una acción de la persona.
 - Acciones que sí abren: tocar el acordeón, crear una "Nueva sección", guardarla, "Actualizar" un registro y abrir una audiometría desde el enlace `?audiometria=<uuid>` de la nota de Control de evolución.
 - Se quitó la apertura automática de la única sección (Preguntas y Configuración) y el estado inicial abierto de Audiometría. Una sección con cambios sin guardar muestra su aviso en el subtítulo aunque esté cerrada.
+
+## D77 · Mi perfil: identidad, campos al ancho de su dato y vista previa (2026-11-09)
+
+- Mi perfil usa el encabezado de identidad (avatar con iniciales, nombre, correo y nivel de acceso en `Badge`), las mismas tarjetas y el mismo ancho `max-w-6xl` de Configuración, campos al ancho de su dato (Título 13rem y colegiado 14rem desde `sm`) y una vista previa del nombre como sale en los documentos (`formatProfessionalName`, mismo prefijo y título abreviado que el resumen del paciente). El aviso de colegiado faltante va dentro de la vista previa, en tono de advertencia. El avatar se extrajo a `UserAvatar` y lo comparte la barra superior.
