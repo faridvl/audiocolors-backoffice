@@ -1,5 +1,5 @@
 import { UserRole } from '../../../types/auth/auth';
-import { ManagedUser, UserStatus } from '../../../types/users/user';
+import { ASSIGNABLE_USER_ROLES, ManagedUser, UserStatus } from '../../../types/users/user';
 
 const SORT_LOCALE = 'es';
 
@@ -12,28 +12,51 @@ export function sortUsers(users: ManagedUser[]): ManagedUser[] {
 }
 
 export interface UserActions {
+  canEdit: boolean;
+  canSetPassword: boolean;
   canChangeRole: boolean;
   canToggleStatus: boolean;
 }
 
-function isLastActiveOwner(user: ManagedUser, users: ManagedUser[]): boolean {
-  if (user.role !== UserRole.OWNER || user.status !== UserStatus.ACTIVE) return false;
-  return (
-    users.filter((item) => item.role === UserRole.OWNER && item.status === UserStatus.ACTIVE)
-      .length <= 1
-  );
-}
-
-/** Lo que el OWNER puede hacer con un usuario; el API repite estas reglas. */
+/**
+ * Lo que el OWNER puede hacer con un usuario; el API repite estas reglas.
+ * Un OWNER ajeno se ve solo de lectura; el propio OWNER edita sus datos, sin rol ni estado.
+ */
 export function getUserActions(
   user: ManagedUser,
-  users: ManagedUser[],
   currentUserUuid: string | undefined,
 ): UserActions {
   const isSelf = user.uuid === currentUserUuid;
-  const isLastOwner = isLastActiveOwner(user, users);
+  const isOtherOwner = user.role === UserRole.OWNER && !isSelf;
   return {
-    canChangeRole: !isSelf && !isLastOwner,
-    canToggleStatus: !isSelf && !isLastOwner,
+    canEdit: !isOtherOwner,
+    canSetPassword: !isOtherOwner,
+    canChangeRole: !isOtherOwner && !isSelf,
+    canToggleStatus: !isOtherOwner && !isSelf,
   };
+}
+
+/** Un rol que la pantalla reconoce (incluye OWNER, que se ve pero no se asigna). */
+export function isKnownRole(role: string | null): role is UserRole {
+  return Object.values(UserRole).includes(role as UserRole);
+}
+
+/** USER, MEDICO o vacío: roles de antes de que los roles fueran fijos. */
+export function isLegacyRole(role: string | null): boolean {
+  return !isKnownRole(role);
+}
+
+export function isAssignableRole(role: string | null): role is UserRole {
+  return ASSIGNABLE_USER_ROLES.includes(role as UserRole);
+}
+
+/** Valor inicial del selector: solo un rol asignable se preselecciona; el resto queda sin elegir. */
+export function getInitialRoleSelection(role: string | null): UserRole | '' {
+  return isAssignableRole(role) ? role : '';
+}
+
+/** El rol viaja en el PATCH solo si la persona eligió uno distinto del actual. */
+export function getRoleChange(selected: string, current: string | null): UserRole | undefined {
+  if (!isAssignableRole(selected) || selected === current) return undefined;
+  return selected;
 }

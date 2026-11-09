@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { ActionMenu, ActionMenuItem } from '@/components/common/action-menu/action-menu';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ConfirmDialog } from '@/components/common/confirm-dialog/confirm-dialog';
-import { ResponsiveTable, TableColumn } from '@/components/common/table/responsive-table';
+import {
+  ResponsiveTable,
+  TableBreakpoint,
+  TableColumn,
+} from '@/components/common/table/responsive-table';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 import { ManagedUser, UserStatus } from '@/types/users/user';
@@ -13,9 +17,17 @@ import { UserFormModal } from './user-form-modal';
 import { UserPasswordModal } from './user-password-modal';
 import { USER_STATUS_CLASSES } from './users-styles';
 import { useUsersSettings } from './use-users-settings';
+import { isKnownRole, isLegacyRole } from './users-logic';
 
 const TEXTS = TEXT.SETTINGS.USERS;
 const ICON_CLASSES = 'h-4 w-4';
+const EMAIL_COLUMN_MAX_WIDTH = 'max-w-[16rem]';
+
+const YouPill: React.FC<{ label: string }> = ({ label }) => (
+  <span className="shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand-700">
+    {label}
+  </span>
+);
 
 export const UsersSettingsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -37,25 +49,36 @@ export const UsersSettingsContainer: React.FC = () => {
       header: t(TEXTS.COLUMNS.NAME),
       isCardTitle: true,
       render: (user) => (
-        <span className="flex flex-wrap items-center gap-2">
-          <Typography variant={TypographyVariant.ACCENT}>{user.fullName}</Typography>
-          {isCurrentUser(user) && (
-            <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand-700">
-              {t(TEXTS.YOU)}
-            </span>
-          )}
+        <span className="flex items-center gap-2 whitespace-nowrap">
+          <Typography variant={TypographyVariant.ACCENT} as="span">
+            {user.fullName}
+          </Typography>
+          {isCurrentUser(user) && <YouPill label={t(TEXTS.YOU)} />}
+        </span>
+      ),
+      renderCard: (user) => (
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Typography variant={TypographyVariant.ACCENT} as="span" className="break-words">
+            {user.fullName}
+          </Typography>
+          {isCurrentUser(user) && <YouPill label={t(TEXTS.YOU)} />}
         </span>
       ),
     },
     {
       key: 'email',
       header: t(TEXTS.COLUMNS.EMAIL),
-      render: (user) => <span className="break-all">{user.email}</span>,
+      render: (user) => (
+        <span className={tailwind('block truncate', EMAIL_COLUMN_MAX_WIDTH)} title={user.email}>
+          {user.email}
+        </span>
+      ),
+      renderCard: (user) => <span className="break-words">{user.email}</span>,
     },
     {
       key: 'role',
       header: t(TEXTS.COLUMNS.ROLE),
-      render: (user) => t(TEXTS.ROLES[user.role]),
+      render: (user) => (isKnownRole(user.role) ? t(TEXTS.ROLES[user.role]) : t(TEXTS.LEGACY_ROLE)),
     },
     {
       key: 'status',
@@ -74,44 +97,57 @@ export const UsersSettingsContainer: React.FC = () => {
     {
       key: 'specialty',
       header: t(TEXTS.COLUMNS.SPECIALTY),
-      render: (user) => user.specialty || t(TEXTS.NO_VALUE),
+      render: (user) => user.specialty ?? '',
     },
   ];
 
   const buildMenuItems = (user: ManagedUser): ActionMenuItem[] => {
-    const { canToggleStatus } = getActions(user);
-    const items: ActionMenuItem[] = [
-      {
+    const { canEdit, canSetPassword, canToggleStatus } = getActions(user);
+    const items: ActionMenuItem[] = [];
+    if (canEdit) {
+      items.push({
         label: t(TEXTS.ACTIONS.EDIT),
         icon: <Pencil className={ICON_CLASSES} aria-hidden />,
         onClick: () => editor.openFor(user),
-      },
-      {
+      });
+    }
+    if (canSetPassword) {
+      items.push({
         label: t(TEXTS.ACTIONS.SET_PASSWORD),
         icon: <KeyRound className={ICON_CLASSES} aria-hidden />,
         onClick: () => password.open(user),
-      },
-    ];
-    if (!canToggleStatus) return items;
-    const isActive = user.status === UserStatus.ACTIVE;
-    items.push({
-      label: t(isActive ? TEXTS.ACTIONS.DEACTIVATE : TEXTS.ACTIONS.REACTIVATE),
-      icon: isActive ? (
-        <UserX className={ICON_CLASSES} aria-hidden />
-      ) : (
-        <UserCheck className={ICON_CLASSES} aria-hidden />
-      ),
-      isDanger: isActive,
-      onClick: () => status.open(user),
-    });
+      });
+    }
+    if (canToggleStatus) {
+      const isActive = user.status === UserStatus.ACTIVE;
+      items.push({
+        label: t(isActive ? TEXTS.ACTIONS.DEACTIVATE : TEXTS.ACTIONS.REACTIVATE),
+        icon: isActive ? (
+          <UserX className={ICON_CLASSES} aria-hidden />
+        ) : (
+          <UserCheck className={ICON_CLASSES} aria-hidden />
+        ),
+        isDanger: isActive,
+        onClick: () => status.open(user),
+      });
+    }
     return items;
   };
 
-  const getRoleLockReason = (user: ManagedUser | null): string | null => {
-    if (!user) return null;
-    if (isCurrentUser(user)) return t(TEXTS.FORM.ROLE_SELF_HINT);
-    return getActions(user).canChangeRole ? null : t(TEXTS.FORM.ROLE_LAST_OWNER_HINT);
+  const renderRowActions = (user: ManagedUser) => {
+    const items = buildMenuItems(user);
+    if (items.length === 0) return null;
+    return <ActionMenu ariaLabel={t(TEXTS.ACTIONS_LABEL, { name: user.fullName })} items={items} />;
   };
+
+  const getRoleLockReason = (user: ManagedUser | null): string | null =>
+    user && !getActions(user).canChangeRole ? t(TEXTS.FORM.ROLE_SELF_HINT) : null;
+
+  const getLockedRoleLabel = (user: ManagedUser | null): string | null =>
+    user && isKnownRole(user.role) ? t(TEXTS.ROLES[user.role]) : null;
+
+  const getRoleHint = (user: ManagedUser | null): string | null =>
+    user && isLegacyRole(user.role) ? t(TEXTS.FORM.ROLE_LEGACY_HINT) : null;
 
   const isDeactivating = status.user?.status === UserStatus.ACTIVE;
   const statusDialog = isDeactivating
@@ -146,13 +182,9 @@ export const UsersSettingsContainer: React.FC = () => {
         onRetry={() => refetch()}
         emptyTitle={t(TEXTS.EMPTY_TITLE)}
         errorTitle={t(TEXTS.LOAD_ERROR)}
+        breakpoint={TableBreakpoint.XL}
         cardTitleClassName="pr-12"
-        rowActions={(user) => (
-          <ActionMenu
-            ariaLabel={t(TEXTS.ACTIONS_LABEL, { name: user.fullName })}
-            items={buildMenuItems(user)}
-          />
-        )}
+        rowActions={renderRowActions}
       />
 
       {editor.isOpen && (
@@ -163,6 +195,8 @@ export const UsersSettingsContainer: React.FC = () => {
           validationSchema={editor.schema}
           isSaving={editor.isSaving}
           roleLockReason={getRoleLockReason(editor.user)}
+          lockedRoleLabel={getLockedRoleLabel(editor.user)}
+          roleHint={getRoleHint(editor.user)}
           onSubmit={editor.submit}
           onClose={editor.close}
         />
@@ -184,6 +218,9 @@ export const UsersSettingsContainer: React.FC = () => {
           message={t(statusDialog.message, { name: status.user.fullName })}
           confirmLabel={t(statusDialog.confirm)}
           cancelLabel={t(TEXT.GENERAL.BUTTONS.CANCEL)}
+          isDanger={isDeactivating}
+          isConfirming={status.isChanging}
+          errorMessage={status.error}
           onConfirm={status.confirm}
           onCancel={status.close}
         />

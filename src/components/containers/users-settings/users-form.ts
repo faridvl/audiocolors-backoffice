@@ -4,6 +4,7 @@ import { PhoneError, validatePhone } from '@/shared/utils/phone';
 import { TEXT } from '@/static/texts/i18n';
 import { UserRole } from '@/types/auth/auth';
 import {
+  ASSIGNABLE_USER_ROLES,
   ManagedUser,
   USER_EMAIL_MAX_LENGTH,
   USER_FULL_NAME_MAX_LENGTH,
@@ -13,13 +14,15 @@ import {
   USER_PASSWORD_UPPERCASE_PATTERN,
   USER_SPECIALTY_MAX_LENGTH,
 } from '@/types/users/user';
+import { getInitialRoleSelection } from './users-logic';
 
 const ERRORS = TEXT.SETTINGS.USERS.ERRORS;
 
 export interface UserFormValues {
   fullName: string;
   email: string;
-  role: UserRole;
+  /** Vacío = sin elegir: en una edición significa que el rol no cambia. */
+  role: UserRole | '';
   specialty: string;
   phone: string;
   password: string;
@@ -45,7 +48,7 @@ export function buildUserFormInitialValues(user: ManagedUser | null): UserFormVa
   return {
     fullName: user?.fullName ?? '',
     email: user?.email ?? '',
-    role: user?.role ?? UserRole.STAFF,
+    role: getInitialRoleSelection(user?.role ?? null),
     specialty: user?.specialty ?? '',
     phone: user?.phoneNumber ?? '',
     password: '',
@@ -63,7 +66,7 @@ export const buildPasswordSchema = (t: TFunction) =>
 export const buildUserPasswordSchema = (t: TFunction) =>
   Yup.object({ password: buildPasswordSchema(t) });
 
-/** En una edición el correo y la contraseña no se tocan, así que no se validan. */
+/** En una edición el correo y la contraseña no se tocan, y el rol es opcional: sin elegir, no cambia. */
 export const buildUserSchema = (t: TFunction, isNew: boolean) =>
   Yup.object({
     fullName: Yup.string()
@@ -77,7 +80,11 @@ export const buildUserSchema = (t: TFunction, isNew: boolean) =>
           .max(USER_EMAIL_MAX_LENGTH, t(ERRORS.EMAIL_INVALID))
           .email(t(ERRORS.EMAIL_INVALID))
       : Yup.string(),
-    role: Yup.mixed<UserRole>().oneOf(Object.values(UserRole)).required(),
+    role: isNew
+      ? Yup.string()
+          .required(t(ERRORS.ROLE_REQUIRED))
+          .oneOf([...ASSIGNABLE_USER_ROLES], t(ERRORS.ROLE_REQUIRED))
+      : Yup.string().oneOf([...ASSIGNABLE_USER_ROLES, '']),
     specialty: Yup.string().max(USER_SPECIALTY_MAX_LENGTH, t(ERRORS.SPECIALTY_MAX)),
     phone: Yup.string().test('valid-phone', (value, context) => {
       const error = validatePhone(value ?? '');

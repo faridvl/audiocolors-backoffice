@@ -29,6 +29,8 @@ export interface TableColumn<T> {
   /** Ancho de la columna en desktop, p.ej. 'w-48' o '30%'. */
   width?: string;
   render: (row: T) => React.ReactNode;
+  /** Cómo se ve el valor en la tarjeta, si distinto de la tabla (p.ej. texto que se parte en vez de cortarse). */
+  renderCard?: (row: T) => React.ReactNode;
   /** Oculta la columna en la tarjeta de movil (p.ej. datos redundantes). */
   hideOnCard?: boolean;
   /** Marca la columna que encabeza la tarjeta en movil. */
@@ -37,6 +39,22 @@ export interface TableColumn<T> {
 
 /** Color hex para la franja superior de la tarjeta movil (p.ej. sede del paciente). `undefined` no dibuja franja. */
 type RowAccentColor<T> = (row: T) => string | undefined;
+
+/** Desde qué ancho se muestra la tabla; por debajo, tarjetas. */
+export enum TableBreakpoint {
+  MD = "MD",
+  XL = "XL",
+}
+
+// Clases completas y fijas: Tailwind no detecta nombres armados con texto.
+const TABLE_VISIBILITY: Record<TableBreakpoint, string> = {
+  [TableBreakpoint.MD]: "hidden md:block",
+  [TableBreakpoint.XL]: "hidden xl:block",
+};
+const CARDS_VISIBILITY: Record<TableBreakpoint, string> = {
+  [TableBreakpoint.MD]: "md:hidden",
+  [TableBreakpoint.XL]: "xl:hidden",
+};
 
 export enum TableState {
   LOADING = "LOADING",
@@ -57,6 +75,8 @@ interface ResponsiveTableProps<T> {
   onRowClick?: (row: T) => void;
   onRetry?: () => void;
   rowActions?: (row: T) => React.ReactNode;
+  /** Desde qué ancho se muestra la tabla en lugar de tarjetas (por defecto, md). */
+  breakpoint?: TableBreakpoint;
   /** Espacio a la derecha del título de la tarjeta móvil, para que las acciones no lo tapen. */
   cardTitleClassName?: string;
   /** Color de acento en el borde superior de la tarjeta movil (p.ej. por sede). */
@@ -101,6 +121,7 @@ export function ResponsiveTable<T>({
   onRowClick,
   onRetry,
   rowActions,
+  breakpoint = TableBreakpoint.MD,
   cardTitleClassName = "pr-8",
   rowAccentColor,
   getRowGroup,
@@ -183,7 +204,12 @@ export function ResponsiveTable<T>({
   return (
     <>
       {/* Desktop: tabla */}
-      <div className="hidden overflow-hidden rounded-card border border-ink-200 bg-white md:block">
+      <div
+        className={tailwind(
+          "overflow-hidden rounded-card border border-ink-200 bg-white",
+          TABLE_VISIBILITY[breakpoint],
+        )}
+      >
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-ink-200 bg-ink-50">
@@ -253,7 +279,12 @@ export function ResponsiveTable<T>({
       </div>
 
       {/* Movil: una tarjeta por registro */}
-      <div className="flex flex-col gap-2 md:hidden">
+      <div
+        className={tailwind(
+          "flex flex-col gap-2",
+          CARDS_VISIBILITY[breakpoint],
+        )}
+      >
         {rows.map((row, index) => (
           <React.Fragment key={getRowKey(row)}>
             {groupStartLabel(index) && (
@@ -284,7 +315,7 @@ export function ResponsiveTable<T>({
                 className="flex w-full flex-col gap-3 text-left disabled:cursor-default"
               >
                 <div className={cardTitleClassName}>
-                  {titleColumn.render(row)}
+                  {(titleColumn.renderCard ?? titleColumn.render)(row)}
                 </div>
 
                 <dl className="flex flex-col gap-1.5 border-t border-ink-100 pt-3">
@@ -302,7 +333,7 @@ export function ResponsiveTable<T>({
                         </Typography>
                       </dt>
                       <dd className="min-w-0 text-right text-sm text-ink-700">
-                        {column.render(row)}
+                        {(column.renderCard ?? column.render)(row)}
                       </dd>
                     </div>
                   ))}

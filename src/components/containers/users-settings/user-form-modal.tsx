@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { UserPlus, UserCog } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FocusFirstError } from '@/components/common/form/focus-first-error';
+import { FormDirtyReporter } from '@/components/common/form/form-dirty-reporter';
 import { FormField } from '@/components/common/input/input';
 import { PhoneField } from '@/components/common/phone-field/phone-field';
 import { TEXT } from '@/static/texts/i18n';
@@ -26,6 +27,10 @@ interface UserFormModalProps {
   isSaving: boolean;
   /** Por qué no se puede cambiar el rol; sin motivo, el rol se elige. */
   roleLockReason: string | null;
+  /** Rol que se muestra cuando el selector está bloqueado. */
+  lockedRoleLabel: string | null;
+  /** Aviso fijo bajo el selector cuando no está bloqueado (p.ej. rol anterior). */
+  roleHint: string | null;
   onSubmit: (values: UserFormValues, helpers: FormikHelpers<UserFormValues>) => void;
   onClose: () => void;
 }
@@ -36,11 +41,15 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   validationSchema,
   isSaving,
   roleLockReason,
+  lockedRoleLabel,
+  roleHint,
   onSubmit,
   onClose,
 }) => {
   const { t } = useTranslation();
   const isNew = user === null;
+  const isRoleLocked = roleLockReason !== null;
+  const [isDirty, setIsDirty] = useState(false);
   const FORM = TEXT.SETTINGS.USERS.FORM;
 
   return (
@@ -53,11 +62,13 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
           <UserCog className="h-5 w-5 text-brand-700" aria-hidden />
         )
       }
+      isDirty={isDirty}
       onClose={onClose}
     >
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         <Form className="mt-5 flex min-h-0 flex-1 flex-col gap-4">
           <FocusFirstError />
+          <FormDirtyReporter onDirtyChange={setIsDirty} />
           <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1 py-1">
             <FormField
               name="fullName"
@@ -79,16 +90,23 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
               name="role"
               as="select"
               label={t(FORM.ROLE)}
-              disabled={roleLockReason !== null}
-              hint={roleLockReason ?? undefined}
+              disabled={isRoleLocked}
+              hint={roleLockReason ?? roleHint ?? undefined}
               isHintAlwaysVisible
-              required
+              required={isNew}
+              displayValue={isRoleLocked && user?.role ? user.role : undefined}
             >
-              {ASSIGNABLE_USER_ROLES.map((role) => (
-                <option key={role} value={role}>
-                  {t(TEXT.SETTINGS.USERS.ROLES[role])}
-                </option>
-              ))}
+              {isRoleLocked && user?.role ? (
+                <option value={user.role}>{lockedRoleLabel}</option>
+              ) : (
+                <option value="">{t(FORM.ROLE_PLACEHOLDER)}</option>
+              )}
+              {!isRoleLocked &&
+                ASSIGNABLE_USER_ROLES.map((role) => (
+                  <option key={role} value={role}>
+                    {t(TEXT.SETTINGS.USERS.ROLES[role])}
+                  </option>
+                ))}
             </FormField>
             <FormField
               name="specialty"

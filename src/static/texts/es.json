@@ -297,7 +297,7 @@
       "emptyTitle": "Aún no hay usuarios",
       "add": "Nuevo usuario",
       "you": "Tú",
-      "noValue": "—",
+      "legacyRole": "Rol anterior",
       "columns": {
         "name": "Nombre",
         "email": "Correo",
@@ -330,7 +330,8 @@
         "emailReadOnly": "El correo no se puede cambiar.",
         "role": "Rol",
         "roleSelfHint": "No puedes cambiar tu propio rol.",
-        "roleLastOwnerHint": "Es el único propietario activo de la clínica, así que su rol no se puede cambiar.",
+        "rolePlaceholder": "Elige un rol",
+        "roleLegacyHint": "Tiene un rol anterior. Si no eliges uno nuevo, se queda como está.",
         "specialty": "Especialidad",
         "phone": "Teléfono",
         "password": "Contraseña temporal",
@@ -349,7 +350,8 @@
         "deactivateConfirm": "Desactivar",
         "reactivateTitle": "¿Reactivar a {{name}}?",
         "reactivateMessage": "{{name}} volverá a poder iniciar sesión con su contraseña actual.",
-        "reactivateConfirm": "Reactivar"
+        "reactivateConfirm": "Reactivar",
+        "error": "No pudimos cambiar el estado. Intenta de nuevo."
       },
       "toasts": {
         "created": "Usuario creado",
@@ -360,6 +362,7 @@
       },
       "errors": {
         "fullNameRequired": "Escribe el nombre completo",
+        "roleRequired": "Elige un rol",
         "fullNameMax": "El nombre es demasiado largo",
         "emailRequired": "Escribe el correo",
         "emailInvalid": "Revisa el correo: no parece válido",

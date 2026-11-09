@@ -2,7 +2,13 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { UserRole } from '../../../types/auth/auth';
 import { ManagedUser, UserStatus } from '../../../types/users/user';
-import { getUserActions, sortUsers } from './users-logic';
+import {
+  getInitialRoleSelection,
+  getRoleChange,
+  getUserActions,
+  isLegacyRole,
+  sortUsers,
+} from './users-logic';
 
 const buildUser = (overrides: Partial<ManagedUser>): ManagedUser => ({
   uuid: 'u',
@@ -38,39 +44,87 @@ describe('sortUsers', () => {
 
 describe('getUserActions', () => {
   const owner = buildUser({ uuid: 'owner', role: UserRole.OWNER });
-  const secondOwner = buildUser({ uuid: 'owner2', role: UserRole.OWNER });
+  const otherOwner = buildUser({ uuid: 'owner2', role: UserRole.OWNER });
   const doctor = buildUser({ uuid: 'doc', role: UserRole.DOCTOR });
 
-  it('uno mismo no cambia su rol ni se desactiva', () => {
-    const actions = getUserActions(owner, [owner, secondOwner, doctor], 'owner');
-    assert.equal(actions.canChangeRole, false);
-    assert.equal(actions.canToggleStatus, false);
+  it('el propio OWNER edita sus datos y su contraseña, sin rol ni estado', () => {
+    assert.deepEqual(getUserActions(owner, 'owner'), {
+      canEdit: true,
+      canSetPassword: true,
+      canChangeRole: false,
+      canToggleStatus: false,
+    });
   });
 
-  it('otro usuario sí puede cambiar de rol y desactivarse', () => {
-    const actions = getUserActions(doctor, [owner, doctor], 'owner');
-    assert.equal(actions.canChangeRole, true);
-    assert.equal(actions.canToggleStatus, true);
+  it('otro OWNER se ve solo de lectura', () => {
+    assert.deepEqual(getUserActions(otherOwner, 'owner'), {
+      canEdit: false,
+      canSetPassword: false,
+      canChangeRole: false,
+      canToggleStatus: false,
+    });
   });
 
-  it('el único OWNER activo no se toca', () => {
+  it('un inactivo que es otro OWNER tampoco se toca', () => {
     const inactiveOwner = buildUser({
       uuid: 'old',
       role: UserRole.OWNER,
       status: UserStatus.INACTIVE,
     });
-    const actions = getUserActions(owner, [owner, inactiveOwner, doctor], 'someone-else');
-    assert.equal(actions.canChangeRole, false);
-    assert.equal(actions.canToggleStatus, false);
+    assert.equal(getUserActions(inactiveOwner, 'owner').canToggleStatus, false);
   });
 
-  it('con dos OWNER activos, otro OWNER sí se puede tocar', () => {
-    const actions = getUserActions(secondOwner, [owner, secondOwner], 'owner');
-    assert.equal(actions.canToggleStatus, true);
+  it('otro usuario puede editarse, cambiar de rol y desactivarse', () => {
+    assert.deepEqual(getUserActions(doctor, 'owner'), {
+      canEdit: true,
+      canSetPassword: true,
+      canChangeRole: true,
+      canToggleStatus: true,
+    });
   });
 
   it('un inactivo se puede reactivar', () => {
     const inactive = buildUser({ uuid: 'in', status: UserStatus.INACTIVE });
-    assert.equal(getUserActions(inactive, [owner, inactive], 'owner').canToggleStatus, true);
+    assert.equal(getUserActions(inactive, 'owner').canToggleStatus, true);
+  });
+
+  it('un usuario con rol viejo o vacío se administra como cualquier otro', () => {
+    const legacy = buildUser({ uuid: 'leg', role: 'MEDICO' });
+    const empty = buildUser({ uuid: 'nul', role: null });
+    assert.equal(getUserActions(legacy, 'owner').canChangeRole, true);
+    assert.equal(getUserActions(empty, 'owner').canEdit, true);
+  });
+});
+
+describe('roles', () => {
+  it('USER, MEDICO y vacío son roles anteriores; los fijos no', () => {
+    assert.equal(isLegacyRole('USER'), true);
+    assert.equal(isLegacyRole('MEDICO'), true);
+    assert.equal(isLegacyRole(null), true);
+    assert.equal(isLegacyRole(UserRole.OWNER), false);
+    assert.equal(isLegacyRole(UserRole.STAFF), false);
+  });
+
+  it('solo un rol asignable se preselecciona al editar', () => {
+    assert.equal(getInitialRoleSelection(UserRole.DOCTOR), UserRole.DOCTOR);
+    assert.equal(getInitialRoleSelection(UserRole.OWNER), '');
+    assert.equal(getInitialRoleSelection('USER'), '');
+    assert.equal(getInitialRoleSelection(null), '');
+  });
+
+  it('el rol no viaja si no se tocó', () => {
+    assert.equal(getRoleChange(UserRole.DOCTOR, UserRole.DOCTOR), undefined);
+    assert.equal(getRoleChange('', 'MEDICO'), undefined);
+    assert.equal(getRoleChange('', null), undefined);
+  });
+
+  it('el rol viaja si se eligió uno distinto, también desde un rol anterior', () => {
+    assert.equal(getRoleChange(UserRole.ADMIN, UserRole.STAFF), UserRole.ADMIN);
+    assert.equal(getRoleChange(UserRole.STAFF, 'USER'), UserRole.STAFF);
+    assert.equal(getRoleChange(UserRole.STAFF, null), UserRole.STAFF);
+  });
+
+  it('OWNER nunca viaja como rol nuevo', () => {
+    assert.equal(getRoleChange(UserRole.OWNER, UserRole.STAFF), undefined);
   });
 });

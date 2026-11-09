@@ -22,7 +22,7 @@ import {
   UserFormValues,
   UserPasswordFormValues,
 } from './users-form';
-import { getUserActions, sortUsers } from './users-logic';
+import { getRoleChange, getUserActions, sortUsers } from './users-logic';
 
 const TOASTS = TEXT.SETTINGS.USERS.TOASTS;
 
@@ -43,6 +43,7 @@ export function useUsersSettings() {
   const [editor, setEditor] = useState<Editor>(null);
   const [passwordUser, setPasswordUser] = useState<ManagedUser | null>(null);
   const [statusUser, setStatusUser] = useState<ManagedUser | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   const users = useMemo(() => sortUsers(data ?? []), [data]);
   const currentUserUuid = sessionUser?.uuid;
@@ -55,7 +56,7 @@ export function useUsersSettings() {
 
   const refreshUsers = () => queryClient.invalidateQueries({ queryKey: [FETCH_USERS_KEY] });
 
-  const getActions = (user: ManagedUser) => getUserActions(user, users, currentUserUuid);
+  const getActions = (user: ManagedUser) => getUserActions(user, currentUserUuid);
   const isCurrentUser = (user: ManagedUser) => user.uuid === currentUserUuid;
 
   const showApiError = <Values extends object>(
@@ -92,6 +93,9 @@ export function useUsersSettings() {
     };
 
     if (editingUser) {
+      const role = isCurrentUser(editingUser)
+        ? undefined
+        : getRoleChange(values.role, editingUser.role);
       executeUpdateUser(
         {
           userUuid: editingUser.uuid,
@@ -99,7 +103,7 @@ export function useUsersSettings() {
             fullName,
             specialty,
             phoneNumber,
-            ...(isCurrentUser(editingUser) ? {} : { role: values.role }),
+            ...(role ? { role } : {}),
           },
         },
         {
@@ -111,6 +115,12 @@ export function useUsersSettings() {
           },
         },
       );
+      return;
+    }
+
+    // El esquema ya exige rol en el alta; esto solo acota el tipo.
+    if (values.role === '') {
+      helpers.setSubmitting(false);
       return;
     }
 
@@ -152,6 +162,16 @@ export function useUsersSettings() {
     );
   };
 
+  const openStatusDialog = (user: ManagedUser) => {
+    setStatusError(null);
+    setStatusUser(user);
+  };
+
+  const closeStatusDialog = () => {
+    setStatusError(null);
+    setStatusUser(null);
+  };
+
   const confirmStatusChange = () => {
     if (!statusUser) return;
     const isDeactivating = statusUser.status === UserStatus.ACTIVE;
@@ -163,10 +183,10 @@ export function useUsersSettings() {
       {
         onSuccess: () => {
           void refreshUsers();
+          closeStatusDialog();
           toast.success(t(isDeactivating ? TOASTS.DEACTIVATED : TOASTS.REACTIVATED));
         },
-        onError: (error: Error) => toast.error(error.message),
-        onSettled: () => setStatusUser(null),
+        onError: () => setStatusError(t(TEXT.SETTINGS.USERS.STATUS_DIALOG.ERROR)),
       },
     );
   };
@@ -201,8 +221,9 @@ export function useUsersSettings() {
     status: {
       user: statusUser,
       isChanging: isChangingStatus,
-      open: setStatusUser,
-      close: () => setStatusUser(null),
+      error: statusError,
+      open: openStatusDialog,
+      close: closeStatusDialog,
       confirm: confirmStatusChange,
     },
   };

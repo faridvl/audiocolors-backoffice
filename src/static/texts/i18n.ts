@@ -146,7 +146,7 @@ export const TEXT = {
       EMPTY_TITLE: 'settings.users.emptyTitle',
       ADD: 'settings.users.add',
       YOU: 'settings.users.you',
-      NO_VALUE: 'settings.users.noValue',
+      LEGACY_ROLE: 'settings.users.legacyRole',
       COLUMNS: {
         NAME: 'settings.users.columns.name',
         EMAIL: 'settings.users.columns.email',
@@ -179,7 +179,8 @@ export const TEXT = {
         EMAIL_READ_ONLY: 'settings.users.form.emailReadOnly',
         ROLE: 'settings.users.form.role',
         ROLE_SELF_HINT: 'settings.users.form.roleSelfHint',
-        ROLE_LAST_OWNER_HINT: 'settings.users.form.roleLastOwnerHint',
+        ROLE_PLACEHOLDER: 'settings.users.form.rolePlaceholder',
+        ROLE_LEGACY_HINT: 'settings.users.form.roleLegacyHint',
         SPECIALTY: 'settings.users.form.specialty',
         PHONE: 'settings.users.form.phone',
         PASSWORD: 'settings.users.form.password',
@@ -199,6 +200,7 @@ export const TEXT = {
         REACTIVATE_TITLE: 'settings.users.statusDialog.reactivateTitle',
         REACTIVATE_MESSAGE: 'settings.users.statusDialog.reactivateMessage',
         REACTIVATE_CONFIRM: 'settings.users.statusDialog.reactivateConfirm',
+        ERROR: 'settings.users.statusDialog.error',
       },
       TOASTS: {
         CREATED: 'settings.users.toasts.created',
@@ -209,6 +211,7 @@ export const TEXT = {
       },
       ERRORS: {
         FULL_NAME_REQUIRED: 'settings.users.errors.fullNameRequired',
+        ROLE_REQUIRED: 'settings.users.errors.roleRequired',
         FULL_NAME_MAX: 'settings.users.errors.fullNameMax',
         EMAIL_REQUIRED: 'settings.users.errors.emailRequired',
         EMAIL_INVALID: 'settings.users.errors.emailInvalid',
