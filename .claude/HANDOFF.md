@@ -133,7 +133,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
-- **Usuarios (2026-11-09, terminado y probado, local sin push ni PR):** Configuración → Usuarios
+- **Usuarios (2026-11-09, terminado y probado, en `develop`):** Configuración → Usuarios
   para que el OWNER administre los usuarios de su clínica (D70). Ramas `feature/usuarios` en el front
   y en el API. Revisado (cuestionador y revisor-ux), corregido y probado por qa en navegador contra el
   API local y la base Docker `audiocolors-prueba-db`: crear, correo duplicado en mayúsculas, cambio de
@@ -314,7 +314,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 - **Logo y nombre de la clínica (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):** Configuración → Clínica edita el nombre y sube/quita el logo (D68); menú y documentos usan `ClinicBrand`. Probado en navegador sin logo y con logo (1440 y 390 px, capturas en `test-results/clinica-logo-nombre/`), validación de tipo/tamaño y cambio de nombre sin recargar. Sin probar: subida y borrado reales (bucket real), usuario sin permiso, informe y resumen impresos. Requiere el API de `feature/clinica-logo-y-nombre`.
 
-## Roles y especialidades (terminado y probado, local sin push ni PR)
+## Roles y especialidades (terminado y probado, en `develop` desde 2026-11-09; API y migraciones de desarrollo aplicadas)
 
 - Rama `feature/roles-especialidades` en el front y en el API (contiene `feature/usuarios`, D70). D71 a D73.
 - Probado en navegador contra el API local y la base Docker 5433 con cada rol: lo clínico por usuario,
