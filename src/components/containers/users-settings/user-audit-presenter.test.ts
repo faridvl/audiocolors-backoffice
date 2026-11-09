@@ -104,11 +104,24 @@ describe('buildAuditItems', () => {
     );
   });
 
+  it('la creación como la registra el API (atiende anterior en false) sale en una línea', () => {
+    const items = buildAuditItems(
+      [
+        buildEntry({ field: UserAuditField.ROLE, before: null, after: 'RECEPTION' }),
+        buildEntry({ field: UserAuditField.ATTENDS_PATIENTS, before: 'false', after: 'true' }),
+        buildEntry({ field: UserAuditField.SPECIALTIES, before: null, after: 'AUDIOLOGY,SPEECH_THERAPY' }),
+      ],
+      t,
+    );
+    assert.equal(items.length, 1);
+    assert.match(items[0].text, /^Usuario creado con nivel Recepción, atiende pacientes: /);
+  });
+
   it('un cambio sin nivel anterior, en un instante sin creación completa, muestra "Sin nivel"', () => {
     const items = buildAuditItems(
       [
         buildEntry({ field: UserAuditField.ROLE, before: null, after: 'ADMIN' }),
-        buildEntry({ field: UserAuditField.ATTENDS_PATIENTS, before: 'false', after: 'true' }),
+        buildEntry({ field: UserAuditField.ATTENDS_PATIENTS, before: 'true', after: 'false' }),
       ],
       t,
     );

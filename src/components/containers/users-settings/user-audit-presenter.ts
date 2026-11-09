@@ -6,6 +6,7 @@ import { isKnownRole } from './users-logic';
 const TEXTS = TEXT.SETTINGS.USERS;
 const SPECIALTIES_SEPARATOR = ',';
 const ATTENDS_TRUE = 'true';
+const ATTENDS_FALSE = 'false';
 
 /** Orden de las entradas que ocurren en el mismo instante. */
 const FIELD_ORDER: UserAuditField[] = [
@@ -60,10 +61,14 @@ export function formatAuditChange(entry: UserAuditEntry, t: TFunction): string {
 
 const fieldRank = (field: UserAuditField): number => FIELD_ORDER.indexOf(field);
 
+/** El API registra la creación con "atiende" anterior en false, no vacío. */
+const isCreationBefore = ({ field, before }: UserAuditEntry): boolean =>
+  isEmpty(before) || (field === UserAuditField.ATTENDS_PATIENTS && before === ATTENDS_FALSE);
+
 /** Una creación deja el nivel y todo lo demás sin valor anterior, en el mismo instante. */
 function describeCreation(group: UserAuditEntry[], t: TFunction): string | null {
   const roleEntry = group.find(({ field }) => field === UserAuditField.ROLE);
-  if (!roleEntry || !group.every(({ before }) => isEmpty(before))) return null;
+  if (!roleEntry || !group.every(isCreationBefore)) return null;
 
   const role = formatAuditValue(UserAuditField.ROLE, roleEntry.after, t);
   const attends = group.find(({ field }) => field === UserAuditField.ATTENDS_PATIENTS);
