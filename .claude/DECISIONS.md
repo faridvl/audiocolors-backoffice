@@ -1167,3 +1167,4 @@ independientes:
 - Sin permiso, `RequirePermission` y Configuración sin pestañas muestran el mensaje y el botón "Volver al inicio" (`common.backHome`), para no dejar un callejón sin salida.
 - Perfil: sin "Atiende pacientes" no se muestra "Datos profesionales"; una nota gris pequeña (`profile.notProfessional`) queda dentro de la tarjeta "Tu cuenta".
 - Ya estaban resueltos por permisos: menú y Configuración sin "Usuarios" para Recepción, y Mantenimiento oculto sin acceso clínico (D72). La ficha del paciente no tiene campos clínicos propios (como `bloodType`), así que no hay nada más que ocultar en el front.
+- El front ahora permite al Propietario administrar a otro Propietario (editar, contraseña, nivel y estado), como ya hacía el API; `getUserActions` recibe el nivel del actor y sin actor un Propietario ajeno queda de solo lectura. Nadie cambia su propio nivel ni estado, y el API valida que quede un Propietario activo.

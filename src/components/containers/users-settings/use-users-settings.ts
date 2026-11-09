@@ -36,7 +36,7 @@ export function useUsersSettings() {
 
   const refreshUsers = () => queryClient.invalidateQueries({ queryKey: [FETCH_USERS_KEY] });
 
-  const getActions = (user: ManagedUser) => getUserActions(user, currentUserUuid);
+  const getActions = (user: ManagedUser) => getUserActions(user, currentUserUuid, sessionUser?.role);
   const isCurrentUser = (user: ManagedUser) => user.uuid === currentUserUuid;
 
   const handleSubmitPassword = (

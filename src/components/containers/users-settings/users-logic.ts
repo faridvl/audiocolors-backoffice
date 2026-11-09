@@ -30,19 +30,21 @@ export function getAssignableRoles(actorRole: UserRole | null | undefined): User
 
 /**
  * Lo que el actor (OWNER o ADMIN) puede hacer con un usuario; el API repite estas reglas.
- * Un OWNER ajeno se ve solo de lectura; el propio usuario edita sus datos, sin nivel ni estado.
+ * Un OWNER ajeno es administrable solo por otro OWNER; para el resto de actores (o sin actor) se ve
+ * de solo lectura. El propio usuario edita sus datos, sin nivel ni estado.
  */
 export function getUserActions(
   user: ManagedUser,
   currentUserUuid: string | undefined,
+  actorRole: UserRole | null | undefined,
 ): UserActions {
   const isSelf = user.uuid === currentUserUuid;
-  const isOtherOwner = user.role === UserRole.OWNER && !isSelf;
+  const isLockedOwner = user.role === UserRole.OWNER && !isSelf && actorRole !== UserRole.OWNER;
   return {
-    canEdit: !isOtherOwner,
-    canSetPassword: !isOtherOwner,
-    canChangeRole: !isOtherOwner && !isSelf,
-    canToggleStatus: !isOtherOwner && !isSelf,
+    canEdit: !isLockedOwner,
+    canSetPassword: !isLockedOwner,
+    canChangeRole: !isLockedOwner && !isSelf,
+    canToggleStatus: !isLockedOwner && !isSelf,
   };
 }
 

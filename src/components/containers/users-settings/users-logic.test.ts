@@ -52,7 +52,7 @@ describe('getUserActions', () => {
   const doctor = buildUser({ uuid: 'doc', role: UserRole.ADMIN });
 
   it('el propio OWNER edita sus datos y su contraseña, sin rol ni estado', () => {
-    assert.deepEqual(getUserActions(owner, 'owner'), {
+    assert.deepEqual(getUserActions(owner, 'owner', UserRole.OWNER), {
       canEdit: true,
       canSetPassword: true,
       canChangeRole: false,
@@ -60,8 +60,17 @@ describe('getUserActions', () => {
     });
   });
 
-  it('otro OWNER se ve solo de lectura', () => {
-    assert.deepEqual(getUserActions(otherOwner, 'owner'), {
+  it('un OWNER administra a otro OWNER: editar, contraseña, nivel y estado', () => {
+    assert.deepEqual(getUserActions(otherOwner, 'owner', UserRole.OWNER), {
+      canEdit: true,
+      canSetPassword: true,
+      canChangeRole: true,
+      canToggleStatus: true,
+    });
+  });
+
+  it('un ADMIN ve a un OWNER de solo lectura', () => {
+    assert.deepEqual(getUserActions(otherOwner, 'admin', UserRole.ADMIN), {
       canEdit: false,
       canSetPassword: false,
       canChangeRole: false,
@@ -69,17 +78,23 @@ describe('getUserActions', () => {
     });
   });
 
-  it('un inactivo que es otro OWNER tampoco se toca', () => {
+  it('sin actor, un OWNER ajeno queda de solo lectura', () => {
+    assert.equal(getUserActions(otherOwner, 'owner', undefined).canEdit, false);
+    assert.equal(getUserActions(otherOwner, undefined, null).canToggleStatus, false);
+  });
+
+  it('un inactivo que es otro OWNER solo lo reactiva otro OWNER', () => {
     const inactiveOwner = buildUser({
       uuid: 'old',
       role: UserRole.OWNER,
       status: UserStatus.INACTIVE,
     });
-    assert.equal(getUserActions(inactiveOwner, 'owner').canToggleStatus, false);
+    assert.equal(getUserActions(inactiveOwner, 'owner', UserRole.OWNER).canToggleStatus, true);
+    assert.equal(getUserActions(inactiveOwner, 'admin', UserRole.ADMIN).canToggleStatus, false);
   });
 
   it('otro usuario puede editarse, cambiar de rol y desactivarse', () => {
-    assert.deepEqual(getUserActions(doctor, 'owner'), {
+    assert.deepEqual(getUserActions(doctor, 'owner', UserRole.OWNER), {
       canEdit: true,
       canSetPassword: true,
       canChangeRole: true,
@@ -89,14 +104,14 @@ describe('getUserActions', () => {
 
   it('un inactivo se puede reactivar', () => {
     const inactive = buildUser({ uuid: 'in', status: UserStatus.INACTIVE });
-    assert.equal(getUserActions(inactive, 'owner').canToggleStatus, true);
+    assert.equal(getUserActions(inactive, 'owner', UserRole.OWNER).canToggleStatus, true);
   });
 
   it('un usuario con rol viejo o vacío se administra como cualquier otro', () => {
     const legacy = buildUser({ uuid: 'leg', role: 'MEDICO' });
     const empty = buildUser({ uuid: 'nul', role: null });
-    assert.equal(getUserActions(legacy, 'owner').canChangeRole, true);
-    assert.equal(getUserActions(empty, 'owner').canEdit, true);
+    assert.equal(getUserActions(legacy, 'owner', UserRole.OWNER).canChangeRole, true);
+    assert.equal(getUserActions(empty, 'owner', UserRole.OWNER).canEdit, true);
   });
 });
 

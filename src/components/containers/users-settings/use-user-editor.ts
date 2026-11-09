@@ -52,7 +52,7 @@ export function useUserEditor(userUuid?: string) {
     [isNew, users, userUuid],
   );
   const isSelf = user !== null && user.uuid === sessionUser?.uuid;
-  const actions = user ? getUserActions(user, sessionUser?.uuid) : null;
+  const actions = user ? getUserActions(user, sessionUser?.uuid, sessionUser?.role) : null;
   const canEditClinicalAccess = can(Permission.MANAGE_CLINICAL_ACCESS);
   const assignableRoles = useMemo(() => getAssignableRoles(sessionUser?.role), [sessionUser?.role]);
 
