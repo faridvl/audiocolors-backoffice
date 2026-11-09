@@ -5,7 +5,7 @@ export function usePermissions() {
   const { user, isLoading } = useSession();
 
   return {
-    can: (permission: Permission) => hasPermission(user?.role, permission),
+    can: (permission: Permission) => hasPermission(user, permission),
     isLoading: isLoading || !user,
   };
 }

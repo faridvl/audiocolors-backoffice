@@ -85,7 +85,6 @@ export function useUsersSettings() {
 
   const handleSubmitUser = (values: UserFormValues, helpers: FormikHelpers<UserFormValues>) => {
     const fullName = values.fullName.trim();
-    const specialty = values.specialty.trim();
     const phoneNumber = values.phone.trim() ? toPatientPhone(values.phone) : '';
     const callbacks = {
       onError: (error: Error) => showApiError(error, helpers, USER_FORM_FIELDS),
@@ -101,7 +100,6 @@ export function useUsersSettings() {
           userUuid: editingUser.uuid,
           changes: {
             fullName,
-            specialty,
             phoneNumber,
             ...(role ? { role } : {}),
           },
@@ -130,7 +128,6 @@ export function useUsersSettings() {
         fullName,
         password: values.password,
         role: values.role,
-        ...(specialty ? { specialty } : {}),
         ...(phoneNumber ? { phoneNumber } : {}),
       },
       {

@@ -65,7 +65,7 @@ export function usePatientBackground(patientUuid: string, onExpand: () => void) 
 
   return {
     background: background ?? null,
-    // STAFF no tiene acceso a antecedentes clínicos: la tarjeta no se muestra.
+    // Sin "Atiende pacientes" no hay acceso a antecedentes clínicos: la tarjeta no se muestra.
     isHidden: isForbiddenError(error),
     summaryFields,
     formFields,

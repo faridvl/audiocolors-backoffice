@@ -79,7 +79,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         onGenerateSummary={() => setIsGeneratingSummary(true)}
       />
 
-      {/* El empleado ve los datos generales y los archivos, nada clínico. */}
+      {/* Sin "Atiende pacientes" solo se ven los datos generales: nada clínico ni archivos. */}
       {can(Permission.VIEW_CLINICAL_RECORD) && (
         <>
           <PatientPhysicalExamContainer patientUuid={patient.uuid} />
@@ -89,7 +89,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         </>
       )}
 
-      <DocumentsContainer patientUuid={patient.uuid} />
+      {can(Permission.VIEW_PATIENT_FILES) && <DocumentsContainer patientUuid={patient.uuid} />}
 
       {isChangingStatus && (
         <ChangePatientStatusModal

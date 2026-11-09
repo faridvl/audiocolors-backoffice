@@ -1,38 +1,59 @@
-import { UserRole } from '@/types/auth/auth';
+import { ClinicalSpecialty, UserRole } from '../../types/auth/auth';
 
-/** Lo que cada rol puede ver o hacer en pantalla. El API valida lo mismo: ocultar no protege. */
+/** Lo que el usuario puede ver o hacer en pantalla. El API valida lo mismo: ocultar no protege. */
 export enum Permission {
-  /** Historia clínica y Control de evolución del expediente. */
+  /** Historia clínica, evolución, preguntas, notas y mantenimientos: solo si atiende pacientes. */
   VIEW_CLINICAL_RECORD = 'VIEW_CLINICAL_RECORD',
+  /** Sección Archivos del paciente (listar y subir): solo quien atiende pacientes. */
+  VIEW_PATIENT_FILES = 'VIEW_PATIENT_FILES',
+  /** Crear o invalidar pruebas: atiende pacientes y tiene Audiología. Verlas no lo exige. */
+  EDIT_AUDIOLOGY_TESTS = 'EDIT_AUDIOLOGY_TESTS',
   VIEW_ACTIVITY = 'VIEW_ACTIVITY',
   EDIT_CLINICAL_TEMPLATE = 'EDIT_CLINICAL_TEMPLATE',
   EDIT_APPOINTMENT_TYPES = 'EDIT_APPOINTMENT_TYPES',
-  /** Ver los datos de contacto de la clínica en Configuración. */
   VIEW_CLINIC = 'VIEW_CLINIC',
-  /** Cambiarlos: el API solo lo permite al dueño y a administración. */
   EDIT_CLINIC = 'EDIT_CLINIC',
-  /** Administrar los usuarios de la clínica: solo el dueño. */
+  /** Crear, desactivar y poner contraseña a los usuarios (con límites). */
   MANAGE_USERS = 'MANAGE_USERS',
+  /** Atiende pacientes, especialidades y nivel Propietario: solo el Propietario. */
+  MANAGE_CLINICAL_ACCESS = 'MANAGE_CLINICAL_ACCESS',
 }
 
-const ALL_PERMISSIONS = Object.values(Permission);
-const OWNER_ONLY_PERMISSIONS: Permission[] = [Permission.MANAGE_USERS];
-const withoutOwnerOnly = (permissions: Permission[]) =>
-  permissions.filter((permission) => !OWNER_ONLY_PERMISSIONS.includes(permission));
+export interface PermissionSubject {
+  role: UserRole;
+  attendsPatients: boolean;
+  specialties: ClinicalSpecialty[];
+}
+
+const MANAGEMENT_ROLES: UserRole[] = [UserRole.ADMIN, UserRole.OWNER];
 
 /**
- * STAFF es el empleado (recepción, secretaría): ve pacientes, contactos, citas y
- * archivos, pero nada clínico. El médico puede ser además el dueño.
+ * Los permisos salen del nivel y de "Atiende pacientes", no de una tabla por rol: ningún nivel,
+ * ni el Propietario, ve datos clínicos sin atender pacientes (D71).
  */
-const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  [UserRole.OWNER]: ALL_PERMISSIONS,
-  [UserRole.ADMIN]: withoutOwnerOnly(ALL_PERMISSIONS),
-  [UserRole.DOCTOR]: withoutOwnerOnly(ALL_PERMISSIONS).filter(
-    (permission) => permission !== Permission.EDIT_CLINIC,
-  ),
-  [UserRole.STAFF]: [],
-};
+export function hasPermission(
+  subject: PermissionSubject | null | undefined,
+  permission: Permission,
+): boolean {
+  if (!subject) return false;
+  const isManagement = MANAGEMENT_ROLES.includes(subject.role);
 
-export function hasPermission(role: UserRole | undefined, permission: Permission): boolean {
-  return role ? (ROLE_PERMISSIONS[role]?.includes(permission) ?? false) : false;
+  switch (permission) {
+    case Permission.VIEW_CLINICAL_RECORD:
+    case Permission.VIEW_PATIENT_FILES:
+      return subject.attendsPatients;
+    case Permission.EDIT_AUDIOLOGY_TESTS:
+      return subject.attendsPatients && subject.specialties.includes(ClinicalSpecialty.AUDIOLOGY);
+    case Permission.VIEW_ACTIVITY:
+    case Permission.EDIT_CLINICAL_TEMPLATE:
+    case Permission.EDIT_APPOINTMENT_TYPES:
+    case Permission.VIEW_CLINIC:
+    case Permission.EDIT_CLINIC:
+    case Permission.MANAGE_USERS:
+      return isManagement;
+    case Permission.MANAGE_CLINICAL_ACCESS:
+      return subject.role === UserRole.OWNER;
+    default:
+      return false;
+  }
 }

@@ -1,4 +1,6 @@
+import { env } from '@/shared/api/config';
 import { CookiesManager } from '@/shared/utils/cookies-manager';
+import { LoginResponse } from '@/types/auth/auth';
 import { routesPublic } from '@/shared/navigation/routes';
 
 // En local, un origen que el API no tiene en ALLOWED_ORIGINS (CORS) falla igual
@@ -42,6 +44,36 @@ interface ApiErrorBody {
 const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
   Array.isArray(body?.details) ? body.details : [];
 
+/** Aviso para que la sesión (`/auth/me`) se relea cuando el acceso del usuario cambió. */
+export const ACCESS_REFRESHED_EVENT = 'access-refreshed';
+const REFRESH_ENDPOINT = '/auth/refresh';
+
+/**
+ * Un 403 puede ser un acceso cambiado después de iniciar sesión (el token lleva el acceso viejo).
+ * Se pide un token nuevo; devuelve false si no se pudo.
+ */
+const refreshAccessToken = async (): Promise<boolean> => {
+  const token = CookiesManager.getAccessToken();
+  if (!token) return false;
+  try {
+    const response = await fetch(`${env.API.IDENTITY_URL}${REFRESH_ENDPOINT}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    });
+    if (!response.ok) return false;
+    const refreshed = await parseJsonBody<LoginResponse>(response);
+    if (!refreshed?.access_token) return false;
+    CookiesManager.setSession(
+      refreshed.access_token,
+      refreshed.user?.name ?? CookiesManager.getUserName() ?? '',
+    );
+    window.dispatchEvent(new Event(ACCESS_REFRESHED_EVENT));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 export const handleSessionExpired = (): void => {
   CookiesManager.clearAll();
   if (typeof window !== 'undefined') {
@@ -73,7 +105,7 @@ const parseJsonBody = async <T>(response: Response): Promise<T | null> => {
   }
 };
 
-async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
+async function fetcher<T>(url: string, options: RequestInit = {}, isRetry = false): Promise<T> {
   const token = CookiesManager.getAccessToken();
 
   const headers = new Headers({
@@ -101,6 +133,11 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
 
     const errorBody = await parseJsonBody<ApiErrorBody>(response);
     throw new Error(resolveErrorMessage(errorBody, 'Credenciales inválidas'));
+  }
+
+  const isAccessDenied = response.status === HttpStatus.FORBIDDEN;
+  if (isAccessDenied && token && !isRetry && (await refreshAccessToken())) {
+    return fetcher<T>(url, options, true);
   }
 
   if (response.status === 204) return null as T;

@@ -1094,3 +1094,53 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
   datos. El default de la columna `role` pasa a STAFF.
 - Los correos se guardan y se comparan en minúsculas.
 - Los roles siguen fijos (D20); los permisos configurables quedan para después.
+
+## D71 · Niveles de acceso y "Atiende pacientes" (2026-11-09)
+
+Reemplaza los roles OWNER/ADMIN/DOCTOR/STAFF como base de los permisos. Cada usuario tiene dos cosas
+independientes:
+
+- **Nivel de acceso** (uno, acumulativo):
+  - **Recepción:** pacientes (datos generales y contactos), agenda y citas. Nada clínico y **ningún
+    archivo** del paciente (ni ver ni subir).
+  - **Administración:** lo de Recepción + Configuración (sedes, tipos de cita, formularios y
+    plantillas clínicas, plantillas de documento), bitácora y usuarios con límites (abajo).
+  - **Propietario:** lo de Administración + todo Usuarios, suscripción y exportar o borrar datos.
+    La clínica nunca queda sin un Propietario activo.
+- **Atiende pacientes** (sí/no): la única puerta al expediente clínico (historia clínica, evolución,
+  pruebas, preguntas) y a Archivos. Lleva una o varias especialidades de un catálogo fijo de la
+  plataforma (Audiología, Otorrinolaringología, Terapia del lenguaje, Medicina general), elegidas
+  de una lista, sin texto libre. Todo profesional ve el expediente completo; la edición de pruebas
+  se limita a su especialidad cuando existan pruebas de otra especialidad (hoy todas son de
+  Audiología).
+- Lo que ve una persona = su nivel + el expediente si atiende pacientes (mínimo necesario, HIPAA y
+  Ley 8968). Sin "Atiende pacientes", ningún nivel ve datos clínicos, ni el Propietario.
+- **Quién asigna qué:**
+  - Administración crea usuarios, los desactiva y reactiva, les pone contraseña y asigna los niveles
+    Recepción o Administración.
+  - Solo el Propietario activa o quita "Atiende pacientes" y las especialidades, da el nivel
+    Propietario y administra a otro Propietario. Puede activarse "Atiende pacientes" a sí mismo.
+  - Nadie más se cambia su propio nivel ni su acceso clínico. Así un administrador no puede abrirse
+    (ni abrirle a otro) los expedientes.
+  - Cada cambio de nivel, de acceso clínico o de especialidad queda en la bitácora.
+- **Título y colegiado:** los pone el propio profesional en su perfil, no el dueño. El acceso clínico
+  no espera al colegiado; si falta, su perfil lo avisa.
+- La variable "profesional" de las plantillas de documento es título + nombre + número de colegiado.
+- Agregar y editar usuario son páginas propias, no un modal.
+- Migración: OWNER → Propietario con "Atiende pacientes" (Audiología), para no cortarle el acceso
+  que ya tiene; ADMIN → Administración sin acceso clínico; DOCTOR → Recepción + "Atiende pacientes"
+  (Audiología); STAFF y roles viejos → Recepción. El texto libre de especialidad se descarta.
+- El API valida todo; ocultar en pantalla no protege. Sustituye D20 y la parte de roles de D70.
+
+## D72 · Aplicación de D71 en las pantallas (2026-11-09)
+
+- Archivos del paciente cuenta como clínico: sin "Atiende pacientes" no se renderiza la sección.
+- Mantenimiento (pastillas y sección de indicadores) se oculta sin acceso clínico, porque el API lo
+  protege con `@ClinicalAccess()`.
+- Indicadores y prioridad del paciente quedan abiertos a cualquier nivel: son datos generales del
+  paciente y el endpoint no pide acceso clínico.
+- Crear e invalidar pruebas pide además Audiología; ver pruebas solo pide atender pacientes.
+- 403: el cliente llama una vez a `/auth/refresh`, guarda el token nuevo, refresca la sesión y repite
+  la petición; si vuelve a fallar, se muestra el error. Cubre el cambio de acceso con token viejo.
+- Los niveles asignables desde Usuarios pasan a Recepción y Administración; Propietario lo da solo
+  el Propietario (pantalla de Usuarios en el encargo siguiente).

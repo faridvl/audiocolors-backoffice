@@ -61,6 +61,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     handlePrint,
     isSaving,
     canSave,
+    canEdit,
     handleSave,
     formVersion,
     entryOptions,
@@ -117,7 +118,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
   } = useAudiometryPoc(patientUuid);
 
   const historyOptions = [
-    { value: NEW_ENTRY_OPTION_VALUE, label: t(AUDIOMETRY_TEXT.NEW_ENTRY) },
+    ...(canEdit ? [{ value: NEW_ENTRY_OPTION_VALUE, label: t(AUDIOMETRY_TEXT.NEW_ENTRY) }] : []),
     ...entryOptions,
   ];
 
@@ -148,7 +149,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   isLabelFull
                   className="min-w-0 lg:w-auto lg:min-w-64"
                 />
-                {selectedEntry && (
+                {selectedEntry && canEdit && (
                   <Button
                     variant={ButtonVariant.SECONDARY}
                     onClick={() => handleSelectEntry(NEW_ENTRY_OPTION_VALUE)}

@@ -13,7 +13,6 @@ export interface ManagedUser {
   /** Un usuario viejo puede traer USER, MEDICO o vacío: por eso no es solo `UserRole`. */
   role: string | null;
   status: UserStatus;
-  specialty: string | null;
   phoneNumber: string | null;
   createdAt: string;
 }
@@ -28,14 +27,12 @@ export interface CreateUserPayload {
   fullName: string;
   password: string;
   role: UserRole;
-  specialty?: string;
   phoneNumber?: string;
 }
 
 export interface UpdateUserPayload {
   fullName?: string;
   phoneNumber?: string;
-  specialty?: string;
   role?: UserRole;
 }
 
@@ -45,11 +42,10 @@ export const USERS_PAGE_LIMIT = 100;
 
 export const USER_FULL_NAME_MAX_LENGTH = 120;
 export const USER_EMAIL_MAX_LENGTH = 160;
-export const USER_SPECIALTY_MAX_LENGTH = 120;
 export const USER_PASSWORD_MIN_LENGTH = 8;
 export const USER_PASSWORD_MAX_LENGTH = 72;
 export const USER_PASSWORD_UPPERCASE_PATTERN = /[A-Z]/;
 export const USER_PASSWORD_DIGIT_PATTERN = /\d/;
 
 /** El rol OWNER no se asigna desde la pantalla ni el API. */
-export const ASSIGNABLE_USER_ROLES: UserRole[] = [UserRole.ADMIN, UserRole.DOCTOR, UserRole.STAFF];
+export const ASSIGNABLE_USER_ROLES: UserRole[] = [UserRole.RECEPTION, UserRole.ADMIN];

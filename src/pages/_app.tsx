@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { ACCESS_REFRESHED_EVENT } from '@/shared/api/api-service-client';
+import { SESSION_QUERY_KEY } from '@/hooks/use-session';
 import '@/styles/globals.css';
 import '@/shared/i18n/i18n';
 
@@ -18,6 +20,14 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         },
       }),
   );
+
+  useEffect(() => {
+    const refreshSession = () => {
+      void queryClient.invalidateQueries({ queryKey: [SESSION_QUERY_KEY] });
+    };
+    window.addEventListener(ACCESS_REFRESHED_EVENT, refreshSession);
+    return () => window.removeEventListener(ACCESS_REFRESHED_EVENT, refreshSession);
+  }, [queryClient]);
 
   return (
     <>

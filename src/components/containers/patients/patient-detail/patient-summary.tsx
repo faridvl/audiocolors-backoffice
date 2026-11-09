@@ -8,6 +8,8 @@ import { PatientMaintenancePills } from '@/components/containers/patients/patien
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
 import { PatientPriorityButton } from '@/components/containers/patients/patients-list/patient-priority-button';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import {
   calculateAge,
@@ -63,6 +65,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
   onGenerateSummary,
 }) => {
   const { t } = useTranslation();
+  const { can } = usePermissions();
   const { data: branches } = useBranchesQuery();
 
   const age = calculateAge(patient.birthDate);
@@ -113,7 +116,9 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
 
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
           <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
-          <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
+          {can(Permission.VIEW_CLINICAL_RECORD) && (
+            <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
+          )}
           <VideoCandidateCheck patient={patient} />
         </div>
 

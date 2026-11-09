@@ -11,6 +11,8 @@ import {
   FETCH_PATIENT_LAB_SHIPMENTS_KEY,
   usePatientLabShipmentsQuery,
 } from '@/shared/api/querys/patient-lab-shipments-query';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { toClinicDayKey } from '@/shared/utils/dates';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
@@ -80,7 +82,12 @@ export function usePatientFlags(
     };
   };
 
-  const sections = Object.values(PatientFlagSection).map((section) => ({
+  // Mantenimientos es parte del expediente clínico: sin "Atiende pacientes" la sección no existe.
+  const { can } = usePermissions();
+  const visibleSections = Object.values(PatientFlagSection).filter(
+    (section) => section !== PatientFlagSection.MAINTENANCE || can(Permission.VIEW_CLINICAL_RECORD),
+  );
+  const sections = visibleSections.map((section) => ({
     key: section,
     title: t(`${TEXT.PATIENTS.FLAGS.SECTION_PREFIX}.${section}`),
     flags: SECTION_FLAGS[section].map(buildItem),

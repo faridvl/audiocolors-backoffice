@@ -14,9 +14,8 @@ const buildUser = (overrides: Partial<ManagedUser>): ManagedUser => ({
   uuid: 'u',
   email: 'u@example.com',
   fullName: 'Usuario',
-  role: UserRole.STAFF,
+  role: UserRole.RECEPTION,
   status: UserStatus.ACTIVE,
-  specialty: null,
   phoneNumber: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   ...overrides,
@@ -45,7 +44,7 @@ describe('sortUsers', () => {
 describe('getUserActions', () => {
   const owner = buildUser({ uuid: 'owner', role: UserRole.OWNER });
   const otherOwner = buildUser({ uuid: 'owner2', role: UserRole.OWNER });
-  const doctor = buildUser({ uuid: 'doc', role: UserRole.DOCTOR });
+  const doctor = buildUser({ uuid: 'doc', role: UserRole.ADMIN });
 
   it('el propio OWNER edita sus datos y su contraseña, sin rol ni estado', () => {
     assert.deepEqual(getUserActions(owner, 'owner'), {
@@ -102,29 +101,29 @@ describe('roles', () => {
     assert.equal(isLegacyRole('MEDICO'), true);
     assert.equal(isLegacyRole(null), true);
     assert.equal(isLegacyRole(UserRole.OWNER), false);
-    assert.equal(isLegacyRole(UserRole.STAFF), false);
+    assert.equal(isLegacyRole(UserRole.RECEPTION), false);
   });
 
   it('solo un rol asignable se preselecciona al editar', () => {
-    assert.equal(getInitialRoleSelection(UserRole.DOCTOR), UserRole.DOCTOR);
+    assert.equal(getInitialRoleSelection(UserRole.ADMIN), UserRole.ADMIN);
     assert.equal(getInitialRoleSelection(UserRole.OWNER), '');
     assert.equal(getInitialRoleSelection('USER'), '');
     assert.equal(getInitialRoleSelection(null), '');
   });
 
   it('el rol no viaja si no se tocó', () => {
-    assert.equal(getRoleChange(UserRole.DOCTOR, UserRole.DOCTOR), undefined);
+    assert.equal(getRoleChange(UserRole.ADMIN, UserRole.ADMIN), undefined);
     assert.equal(getRoleChange('', 'MEDICO'), undefined);
     assert.equal(getRoleChange('', null), undefined);
   });
 
   it('el rol viaja si se eligió uno distinto, también desde un rol anterior', () => {
-    assert.equal(getRoleChange(UserRole.ADMIN, UserRole.STAFF), UserRole.ADMIN);
-    assert.equal(getRoleChange(UserRole.STAFF, 'USER'), UserRole.STAFF);
-    assert.equal(getRoleChange(UserRole.STAFF, null), UserRole.STAFF);
+    assert.equal(getRoleChange(UserRole.ADMIN, UserRole.RECEPTION), UserRole.ADMIN);
+    assert.equal(getRoleChange(UserRole.RECEPTION, 'USER'), UserRole.RECEPTION);
+    assert.equal(getRoleChange(UserRole.RECEPTION, null), UserRole.RECEPTION);
   });
 
   it('OWNER nunca viaja como rol nuevo', () => {
-    assert.equal(getRoleChange(UserRole.OWNER, UserRole.STAFF), undefined);
+    assert.equal(getRoleChange(UserRole.OWNER, UserRole.RECEPTION), undefined);
   });
 });

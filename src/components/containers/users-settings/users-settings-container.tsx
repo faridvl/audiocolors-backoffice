@@ -23,7 +23,6 @@ const TEXTS = TEXT.SETTINGS.USERS;
 const ICON_CLASSES = 'h-4 w-4';
 // Topes para que la tabla quepa en el ancho de Configuración a 1440 px.
 const USER_COLUMN_MAX_WIDTH = 'max-w-[15rem]';
-const SPECIALTY_COLUMN_MAX_WIDTH = 'max-w-[8rem]';
 
 const YouPill: React.FC<{ label: string }> = ({ label }) => (
   <span className="shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand-700">
@@ -53,7 +52,12 @@ export const UsersSettingsContainer: React.FC = () => {
       render: (user) => (
         <span className={tailwind('flex flex-col', USER_COLUMN_MAX_WIDTH)}>
           <span className="flex min-w-0 items-center gap-2">
-            <Typography variant={TypographyVariant.ACCENT} as="span" className="truncate" title={user.fullName}>
+            <Typography
+              variant={TypographyVariant.ACCENT}
+              as="span"
+              className="truncate"
+              title={user.fullName}
+            >
               {user.fullName}
             </Typography>
             {isCurrentUser(user) && <YouPill label={t(TEXTS.YOU)} />}
@@ -96,16 +100,6 @@ export const UsersSettingsContainer: React.FC = () => {
           {t(TEXTS.STATUS[user.status])}
         </span>
       ),
-    },
-    {
-      key: 'specialty',
-      header: t(TEXTS.COLUMNS.SPECIALTY),
-      render: (user) => (
-        <span className={tailwind('block truncate', SPECIALTY_COLUMN_MAX_WIDTH)} title={user.specialty ?? undefined}>
-          {user.specialty ?? ''}
-        </span>
-      ),
-      renderCard: (user) => <span className="break-words">{user.specialty ?? ''}</span>,
     },
   ];
 

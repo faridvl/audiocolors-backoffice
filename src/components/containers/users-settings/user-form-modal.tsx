@@ -14,7 +14,6 @@ import {
   USER_EMAIL_MAX_LENGTH,
   USER_FULL_NAME_MAX_LENGTH,
   USER_PASSWORD_MAX_LENGTH,
-  USER_SPECIALTY_MAX_LENGTH,
 } from '@/types/users/user';
 import { UserFormValues } from './users-form';
 import { UserModalShell } from './user-modal-shell';
@@ -108,12 +107,6 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
                   </option>
                 ))}
             </FormField>
-            <FormField
-              name="specialty"
-              label={t(FORM.SPECIALTY)}
-              maxLength={USER_SPECIALTY_MAX_LENGTH}
-              optional
-            />
             <PhoneField name="phone" label={t(FORM.PHONE)} />
             {isNew && (
               <FormField

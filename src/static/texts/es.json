@@ -93,7 +93,7 @@
         },
         "roles": {
           "title": "Permisos por rol",
-          "description": "el personal de recepción accede a pacientes, agenda y archivos, sin la información clínica."
+          "description": "Recepción ve pacientes y agenda; Administración suma la configuración; la información clínica y los archivos son solo de quien atiende pacientes."
         },
         "warranty": {
           "title": "Garantía",
@@ -302,18 +302,29 @@
         "name": "Nombre",
         "email": "Correo",
         "role": "Rol",
-        "status": "Estado",
-        "specialty": "Especialidad"
+        "status": "Estado"
       },
       "status": {
         "ACTIVE": "Activo",
         "INACTIVE": "Inactivo"
       },
       "roles": {
-        "OWNER": "Propietario",
-        "ADMIN": "Administrador",
-        "DOCTOR": "Médico",
-        "STAFF": "Personal"
+        "RECEPTION": "Recepción",
+        "ADMIN": "Administración",
+        "OWNER": "Propietario"
+      },
+      "specialties": {
+        "AUDIOLOGY": "Audiología",
+        "ENT": "Otorrinolaringología",
+        "SPEECH_THERAPY": "Terapia del lenguaje",
+        "GENERAL_MEDICINE": "Medicina general"
+      },
+      "titles": {
+        "LIC": "Lic.",
+        "LICDA": "Licda.",
+        "MSC": "Msc.",
+        "DR": "Dr.",
+        "DRA": "Dra."
       },
       "actionsLabel": "Acciones de {{name}}",
       "actions": {
@@ -332,7 +343,6 @@
         "roleSelfHint": "No puedes cambiar tu propio rol.",
         "rolePlaceholder": "Elige un rol",
         "roleLegacyHint": "Tiene un rol anterior. Si no eliges uno nuevo, se queda como está.",
-        "specialty": "Especialidad",
         "phone": "Teléfono",
         "password": "Contraseña temporal",
         "passwordHint": "Mínimo 8 caracteres, con una mayúscula y un número. Compártela con la persona para su primer ingreso.",
@@ -367,7 +377,6 @@
         "emailRequired": "Escribe el correo",
         "emailInvalid": "Revisa el correo: no parece válido",
         "emailTaken": "Ya existe un usuario con este correo",
-        "specialtyMax": "La especialidad es demasiado larga",
         "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
         "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
         "passwordRequired": "Escribe la contraseña",

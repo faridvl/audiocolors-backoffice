@@ -13,7 +13,9 @@ import {
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
+import { usePermissions } from '@/hooks/use-permissions';
 import { useSession } from '@/hooks/use-session';
+import { Permission } from '@/shared/auth/permissions';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
@@ -160,7 +162,10 @@ export function useAudiometryPoc(patientUuid: string) {
   const entries = entriesQuery.data ?? [];
   const selectedEntryUuid =
     chosenEntryUuid === undefined ? (entries[0]?.uuid ?? null) : chosenEntryUuid;
-  const isReadOnly = selectedEntryUuid !== null;
+  const { can } = usePermissions();
+  // Verlas no exige Audiología; crear o invalidar sí.
+  const canEdit = can(Permission.EDIT_AUDIOLOGY_TESTS);
+  const isReadOnly = selectedEntryUuid !== null || !canEdit;
   const entryQuery = useAudiometryEntryQuery(patientUuid, selectedEntryUuid);
   const loadedEntry = entryQuery.data;
   const selectedEntry = entries.find((entry) => entry.uuid === selectedEntryUuid);
@@ -507,7 +512,8 @@ export function useAudiometryPoc(patientUuid: string) {
       }
     : null;
   // Solo se marca una audiometría guardada que aún no está marcada.
-  const canInvalidate = selectedEntry !== undefined && selectedEntry.invalidatedAt == null;
+  const canInvalidate =
+    canEdit && selectedEntry !== undefined && selectedEntry.invalidatedAt == null;
   const selectedEntryAuthor = selectedEntry
     ? resolveAuthorLabel(selectedEntry.createdByUuid ?? '', selectedEntry.createdByName)
     : null;
@@ -554,6 +560,7 @@ export function useAudiometryPoc(patientUuid: string) {
     handlePrint,
     isSaving,
     canSave,
+    canEdit,
     handleSave,
     formVersion,
     entryOptions,

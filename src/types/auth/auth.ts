@@ -1,8 +1,24 @@
+/** Nivel de acceso, acumulativo: Recepción < Administración < Propietario. */
 export enum UserRole {
-  OWNER = 'OWNER',
+  RECEPTION = 'RECEPTION',
   ADMIN = 'ADMIN',
-  DOCTOR = 'DOCTOR',
-  STAFF = 'STAFF',
+  OWNER = 'OWNER',
+}
+
+/** Catálogo fijo de la plataforma: se elige de una lista, sin texto libre. */
+export enum ClinicalSpecialty {
+  AUDIOLOGY = 'AUDIOLOGY',
+  ENT = 'ENT',
+  SPEECH_THERAPY = 'SPEECH_THERAPY',
+  GENERAL_MEDICINE = 'GENERAL_MEDICINE',
+}
+
+export enum ProfessionalTitle {
+  LIC = 'LIC',
+  LICDA = 'LICDA',
+  MSC = 'MSC',
+  DR = 'DR',
+  DRA = 'DRA',
 }
 
 export interface LoginPayload {
@@ -24,6 +40,11 @@ export interface SessionUser {
   fullName: string;
   email: string;
   role: UserRole;
+  /** Única puerta al expediente clínico y a los archivos del paciente. */
+  attendsPatients: boolean;
+  specialties: ClinicalSpecialty[];
+  professionalTitle: ProfessionalTitle | null;
+  licenseNumber: string | null;
   avatarUrl?: string;
   phoneNumber?: string;
 }

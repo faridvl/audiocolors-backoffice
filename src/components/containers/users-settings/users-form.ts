@@ -12,7 +12,6 @@ import {
   USER_PASSWORD_MAX_LENGTH,
   USER_PASSWORD_MIN_LENGTH,
   USER_PASSWORD_UPPERCASE_PATTERN,
-  USER_SPECIALTY_MAX_LENGTH,
 } from '@/types/users/user';
 import { getInitialRoleSelection } from './users-logic';
 
@@ -23,7 +22,6 @@ export interface UserFormValues {
   email: string;
   /** Vacío = sin elegir: en una edición significa que el rol no cambia. */
   role: UserRole | '';
-  specialty: string;
   phone: string;
   password: string;
 }
@@ -32,7 +30,7 @@ export interface UserPasswordFormValues {
   password: string;
 }
 
-export const USER_FORM_FIELDS = ['fullName', 'email', 'role', 'specialty', 'phone', 'password'];
+export const USER_FORM_FIELDS = ['fullName', 'email', 'role', 'phone', 'password'];
 
 /** El API nombra el teléfono `phoneNumber`; el formulario lo llama `phone`. */
 export const API_FIELD_TO_FORM_FIELD: Record<string, string> = {
@@ -49,7 +47,6 @@ export function buildUserFormInitialValues(user: ManagedUser | null): UserFormVa
     fullName: user?.fullName ?? '',
     email: user?.email ?? '',
     role: getInitialRoleSelection(user?.role ?? null),
-    specialty: user?.specialty ?? '',
     phone: user?.phoneNumber ?? '',
     password: '',
   };
@@ -85,7 +82,6 @@ export const buildUserSchema = (t: TFunction, isNew: boolean) =>
           .required(t(ERRORS.ROLE_REQUIRED))
           .oneOf([...ASSIGNABLE_USER_ROLES], t(ERRORS.ROLE_REQUIRED))
       : Yup.string().oneOf([...ASSIGNABLE_USER_ROLES, '']),
-    specialty: Yup.string().max(USER_SPECIALTY_MAX_LENGTH, t(ERRORS.SPECIALTY_MAX)),
     phone: Yup.string().test('valid-phone', (value, context) => {
       const error = validatePhone(value ?? '');
       return error === null ? true : context.createError({ message: t(PHONE_ERROR_KEYS[error]) });
