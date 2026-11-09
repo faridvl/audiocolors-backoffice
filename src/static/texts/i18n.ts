@@ -187,6 +187,7 @@ export const TEXT = {
         SET_PASSWORD: 'settings.users.actions.setPassword',
         DEACTIVATE: 'settings.users.actions.deactivate',
         REACTIVATE: 'settings.users.actions.reactivate',
+        VIEW: 'settings.users.actions.view',
       },
       FORM: {
         NEW_TITLE: 'settings.users.form.newTitle',
@@ -205,6 +206,7 @@ export const TEXT = {
         BACK: 'settings.users.form.back',
         NOT_FOUND: 'settings.users.form.notFound',
         OWNER_READ_ONLY: 'settings.users.form.ownerReadOnly',
+        OWNER_CREATE_ONLY: 'settings.users.form.ownerCreateOnly',
         ROLE_LEVELS_TITLE: 'settings.users.form.roleLevelsTitle',
         CLINICAL_ACCESS_TITLE: 'settings.users.form.clinicalAccessTitle',
         ATTENDS_PATIENTS: 'settings.users.form.attendsPatients',

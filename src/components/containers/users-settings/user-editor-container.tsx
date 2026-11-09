@@ -65,10 +65,11 @@ const ClinicalAccessSection: React.FC<ClinicalAccessSectionProps> = ({
 
   return (
     <fieldset className="flex flex-col gap-3 border-t border-ink-100 pt-4">
-      <legend className="sr-only">{t(FORM.CLINICAL_ACCESS_TITLE)}</legend>
-      <Typography variant={TypographyVariant.SUBTITLE} as="h2">
-        {t(FORM.CLINICAL_ACCESS_TITLE)}
-      </Typography>
+      <legend className="p-0">
+        <Typography variant={TypographyVariant.SUBTITLE} as="h2">
+          {t(FORM.CLINICAL_ACCESS_TITLE)}
+        </Typography>
+      </legend>
 
       {canEdit ? (
         <>
@@ -166,6 +167,7 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
     : user && isLegacyRole(user.role)
       ? t(FORM.ROLE_LEGACY_HINT)
       : undefined;
+  const isCreatingWithoutOwnerLevel = isNew && !editor.assignableRoles.includes(UserRole.OWNER);
   const isLicensePending = Boolean(user?.attendsPatients && !user.licenseNumber);
 
   return (
@@ -228,6 +230,9 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
                 </option>
               ))}
           </FormField>
+          {isCreatingWithoutOwnerLevel && (
+            <Typography variant={TypographyVariant.HELPER}>{t(FORM.OWNER_CREATE_ONLY)}</Typography>
+          )}
           <RoleLevels roles={editor.assignableRoles} />
           <PhoneField name="phone" label={t(FORM.PHONE)} disabled={isLocked} />
           {isNew && (

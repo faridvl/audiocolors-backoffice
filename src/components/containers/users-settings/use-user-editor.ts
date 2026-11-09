@@ -28,6 +28,7 @@ import {
   getAssignableRoles,
   getClinicalAccessChange,
   getRoleChange,
+  getSelectableRoles,
   getUserActions,
 } from './users-logic';
 
@@ -38,7 +39,7 @@ export function useUserEditor(userUuid?: string) {
   const { t } = useTranslation();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user: sessionUser } = useSession();
+  const { user: sessionUser, isLoading: isLoadingSession } = useSession();
   const { can } = usePermissions();
   const { data: users, isLoading: isLoadingUsers, isError, refetch } = useUsersQuery();
   const { data: catalogs } = useUserCatalogsQuery();
@@ -55,13 +56,18 @@ export function useUserEditor(userUuid?: string) {
   const canEditClinicalAccess = can(Permission.MANAGE_CLINICAL_ACCESS);
   const assignableRoles = useMemo(() => getAssignableRoles(sessionUser?.role), [sessionUser?.role]);
 
+  const selectableRoles = useMemo(
+    () => getSelectableRoles(assignableRoles, user?.role),
+    [assignableRoles, user?.role],
+  );
+
   const schema = useMemo(
-    () => buildUserSchema(t, isNew, assignableRoles),
-    [t, isNew, assignableRoles],
+    () => buildUserSchema(t, isNew, selectableRoles),
+    [t, isNew, selectableRoles],
   );
   const initialValues = useMemo(
-    () => buildUserFormInitialValues(user, assignableRoles),
-    [user, assignableRoles],
+    () => buildUserFormInitialValues(user, selectableRoles),
+    [user, selectableRoles],
   );
 
   const specialtyOptions = (catalogs?.specialties ?? Object.values(ClinicalSpecialty)).map(
@@ -152,14 +158,14 @@ export function useUserEditor(userUuid?: string) {
     isNew,
     user,
     isSelf,
-    isLoading: isLoadingUsers,
+    isLoading: isLoadingUsers || isLoadingSession,
     isError,
     isNotFound: !isNew && !isLoadingUsers && !isError && user === null,
     refetch,
     isReadOnly: actions !== null && !actions.canEdit,
     canChangeRole: actions?.canChangeRole ?? true,
     canEditClinicalAccess,
-    assignableRoles,
+    assignableRoles: selectableRoles,
     specialtyOptions,
     initialValues,
     schema,

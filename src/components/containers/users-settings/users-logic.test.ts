@@ -5,6 +5,7 @@ import { ManagedUser, UserStatus } from '../../../types/users/user';
 import {
   getInitialRoleSelection,
   getRoleChange,
+  getSelectableRoles,
   getUserActions,
   isLegacyRole,
   sortUsers,
@@ -129,5 +130,27 @@ describe('roles', () => {
 
   it('OWNER nunca viaja como rol nuevo', () => {
     assert.equal(getRoleChange(UserRole.OWNER, UserRole.RECEPTION), undefined);
+  });
+});
+
+describe('getSelectableRoles', () => {
+  const assignable = [UserRole.RECEPTION, UserRole.ADMIN];
+
+  it('suma el nivel actual si Administración ve a un propietario, para que quede elegido', () => {
+    assert.deepEqual(getSelectableRoles(assignable, UserRole.OWNER), [
+      UserRole.RECEPTION,
+      UserRole.ADMIN,
+      UserRole.OWNER,
+    ]);
+  });
+
+  it('no duplica un nivel que ya se puede asignar', () => {
+    assert.deepEqual(getSelectableRoles(assignable, UserRole.ADMIN), assignable);
+  });
+
+  it('no agrega un nivel anterior o vacío', () => {
+    assert.deepEqual(getSelectableRoles(assignable, 'MEDICO'), assignable);
+    assert.deepEqual(getSelectableRoles(assignable, null), assignable);
+    assert.deepEqual(getSelectableRoles(assignable, undefined), assignable);
   });
 });

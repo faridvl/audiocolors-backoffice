@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyRound, Pencil, Plus, UserCheck, UserX } from 'lucide-react';
+import { Eye, KeyRound, Pencil, Plus, UserCheck, UserX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenu, ActionMenuItem } from '@/components/common/action-menu/action-menu';
 import { Badge } from '@/components/common/badge/badge';
@@ -125,6 +125,13 @@ export const UsersSettingsContainer: React.FC = () => {
       items.push({
         label: t(TEXTS.ACTIONS.EDIT),
         icon: <Pencil className={ICON_CLASSES} aria-hidden />,
+        onClick: () => openEditor(user),
+      });
+    }
+    if (!canEdit) {
+      items.push({
+        label: t(TEXTS.ACTIONS.VIEW),
+        icon: <Eye className={ICON_CLASSES} aria-hidden />,
         onClick: () => openEditor(user),
       });
     }

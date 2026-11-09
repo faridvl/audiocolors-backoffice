@@ -337,7 +337,8 @@
         "edit": "Editar",
         "setPassword": "Poner contraseña nueva",
         "deactivate": "Desactivar",
-        "reactivate": "Reactivar"
+        "reactivate": "Reactivar",
+        "view": "Ver"
       },
       "form": {
         "newTitle": "Nuevo usuario",
@@ -355,12 +356,13 @@
         "create": "Crear usuario",
         "back": "Volver a usuarios",
         "notFound": "No encontramos a este usuario.",
-        "ownerReadOnly": "Solo otro propietario puede editar a un propietario.",
+        "ownerReadOnly": "Solo un propietario puede editar a otro propietario.",
+        "ownerCreateOnly": "Solo un propietario puede crear otros propietarios.",
         "roleLevelsTitle": "Qué puede hacer cada nivel",
         "clinicalAccessTitle": "Acceso clínico",
         "attendsPatients": "Atiende pacientes",
         "attendsDescription": "Atiende consultas y firma los documentos clínicos.",
-        "attendsOwnerOnly": "Solo el propietario cambia si atiende pacientes y sus especialidades.",
+        "attendsOwnerOnly": "Solo el propietario puede cambiar si atiende pacientes y sus especialidades.",
         "specialties": "Especialidades",
         "specialtiesPlaceholder": "Elige al menos una",
         "noSpecialties": "Sin especialidades",

@@ -63,6 +63,17 @@ export function isAssignableRole(
   return assignable.includes(role as UserRole);
 }
 
+/** Opciones del selector: las asignables y, si es otro nivel conocido, el actual, para que la ficha lo muestre elegido. */
+export function getSelectableRoles(
+  assignable: UserRole[],
+  currentRole: string | null | undefined,
+): UserRole[] {
+  if (!currentRole || !isKnownRole(currentRole) || assignable.includes(currentRole)) {
+    return assignable;
+  }
+  return [...assignable, currentRole];
+}
+
 /** Valor inicial del selector: solo un rol asignable se preselecciona; el resto queda sin elegir. */
 export function getInitialRoleSelection(
   role: string | null,
