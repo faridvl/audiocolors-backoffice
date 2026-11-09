@@ -19,6 +19,7 @@ import { useTenantQuery } from '@/shared/api/querys/tenant-query';
 import { Permission } from '@/shared/auth/permissions';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
+import { formatProfessionalName } from '@/shared/utils/professional-name';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, getPatientBranchUuids } from '@/types/patients/patient';
 import { buildEntryDateLabels } from '../patient-audiometry/audiometry-entry-date-labels';
@@ -244,7 +245,13 @@ export function usePatientSummary(patient: Patient) {
   const handleGenerate = () => {
     if (!canGenerate) return;
     const issuedAt = new Date().toISOString();
-    const professionalName = user?.fullName ?? '';
+    // El profesional del documento es quien lo genera: sale de su sesión.
+    const professionalName = formatProfessionalName({
+      title: user?.professionalTitle ? t(TEXT.SETTINGS.USERS.TITLES[user.professionalTitle]) : null,
+      fullName: user?.fullName ?? '',
+      licenseNumber: user?.licenseNumber,
+      licensePrefix: t(TEXT.DOCUMENT_TEMPLATES.LICENSE_PREFIX),
+    });
     const clinicName = tenant?.businessName ?? '';
     const patientName = `${patient.firstName} ${patient.lastName}`.trim();
     const age = calculateAge(patient.birthDate);

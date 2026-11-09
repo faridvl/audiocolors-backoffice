@@ -328,7 +328,7 @@
       "titles": {
         "LIC": "Lic.",
         "LICDA": "Licda.",
-        "MSC": "Msc.",
+        "MSC": "MSc.",
         "DR": "Dr.",
         "DRA": "Dra."
       },
@@ -445,6 +445,7 @@
     }
   },
   "documentTemplates": {
+    "licensePrefix": "Cód.",
     "pageTitle": "Plantillas · AudioColors Gestión Clínica",
     "loading": "Cargando plantillas...",
     "loadError": "No se pudieron cargar las plantillas",
@@ -569,7 +570,7 @@
       },
       "profesional": {
         "label": "Profesional",
-        "example": "Dra. Ana Vargas"
+        "example": "Dra. Ana Vargas · Cód. 1234"
       }
     },
     "errors": {

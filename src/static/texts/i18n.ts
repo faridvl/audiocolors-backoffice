@@ -293,6 +293,7 @@ export const TEXT = {
     },
   },
   DOCUMENT_TEMPLATES: {
+    LICENSE_PREFIX: 'documentTemplates.licensePrefix',
     PAGE_TITLE: 'documentTemplates.pageTitle',
     LOADING: 'documentTemplates.loading',
     LOAD_ERROR: 'documentTemplates.loadError',
