@@ -622,6 +622,7 @@
     "sectionNameRequired": "Escribe el nombre de la sección",
     "sectionContinue": "Continuar",
     "sectionNewHint": "Agrega las preguntas y guarda para crear la sección.",
+    "saveBarLabel": "Cambios en {{title}}",
     "sectionSaved": "Sección guardada",
     "sectionsLoading": "Cargando secciones...",
     "sectionsLoadError": "No se pudieron cargar las secciones",

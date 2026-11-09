@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -11,8 +11,49 @@ import { TEXT } from '@/static/texts/i18n';
 import { SettingsCard } from '../settings/settings-card';
 import { SettingsSectionError, SettingsSectionLoading } from '../settings/settings-section-state';
 import { NewQuestionnaireSectionModal } from './questionnaire-template/new-questionnaire-section-modal';
-import { QuestionSectionState } from './question-sections';
+import { QuestionSectionState, SettingsQuestionSection } from './question-sections';
 import { useQuestionsSettings } from './use-questions-settings';
+
+interface QuestionSectionBlockProps {
+  section: SettingsQuestionSection;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
+/** La tarjeta de una sección y, debajo, la barra fija de Guardar de su formulario. */
+const QuestionSectionBlock: React.FC<QuestionSectionBlockProps> = ({
+  section,
+  isExpanded,
+  onToggle,
+}) => {
+  const { t } = useTranslation();
+  const [footerSlot, setFooterSlot] = useState<HTMLDivElement | null>(null);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <Accordion
+        variant={AccordionVariant.CARD}
+        title={section.title}
+        subtitle={
+          section.state === QuestionSectionState.DRAFT
+            ? t(TEXT.QUESTIONS.UNSAVED_CHANGES)
+            : undefined
+        }
+        subtitleTone={AccordionSubtitleTone.WARNING}
+        isExpanded={isExpanded}
+        onToggle={onToggle}
+        isLazy
+      >
+        {section.render(footerSlot)}
+      </Accordion>
+      {/* Sticky dentro de su bloque: con varias secciones abiertas, cada barra queda con la suya. */}
+      <div
+        ref={setFooterSlot}
+        className={isExpanded ? 'sticky bottom-0 z-10 empty:hidden' : 'hidden'}
+      />
+    </div>
+  );
+};
 
 export const QuestionsSettingsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -45,22 +86,12 @@ export const QuestionsSettingsContainer: React.FC = () => {
         </SettingsCard>
       ) : (
         sections.map((section) => (
-          <Accordion
+          <QuestionSectionBlock
             key={section.key}
-            variant={AccordionVariant.CARD}
-            title={section.title}
-            subtitle={
-              section.state === QuestionSectionState.DRAFT
-                ? t(TEXT.QUESTIONS.UNSAVED_CHANGES)
-                : undefined
-            }
-            subtitleTone={AccordionSubtitleTone.WARNING}
+            section={section}
             isExpanded={isSectionExpanded(section.key)}
             onToggle={() => handleToggleSection(section.key)}
-            isLazy
-          >
-            {section.render()}
-          </Accordion>
+          />
         ))
       )}
 

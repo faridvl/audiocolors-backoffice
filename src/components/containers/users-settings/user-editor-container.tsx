@@ -18,6 +18,12 @@ import {
   USER_FULL_NAME_MAX_LENGTH,
   USER_PASSWORD_MAX_LENGTH,
 } from '@/types/users/user';
+import { SettingsCard } from '../settings/settings-card';
+import {
+  SETTINGS_FIELD_LABEL_HIDDEN,
+  SettingsFieldRow,
+  SettingsFieldWidth,
+} from '../settings/settings-field-row';
 import { UserAuditList } from './user-audit-list';
 import { UserFormValues } from './users-form';
 import { isKnownRole, isLegacyRole } from './users-logic';
@@ -67,54 +73,51 @@ const ClinicalAccessSection: React.FC<ClinicalAccessSectionProps> = ({
     .map(({ label }) => label);
 
   return (
-    <fieldset className="flex flex-col gap-3 border-t border-ink-100 pt-4">
-      <legend className="p-0">
-        <Typography variant={TypographyVariant.SUBTITLE} as="h2">
-          {t(FORM.CLINICAL_ACCESS_TITLE)}
-        </Typography>
-      </legend>
-
-      {canEdit ? (
-        <>
+    <>
+      <SettingsFieldRow label={t(FORM.CLINICAL_ACCESS_TITLE)} width={SettingsFieldWidth.LONG}>
+        {canEdit ? (
           <Switch
             isChecked={values.attendsPatients}
             onChange={(isChecked) => void setFieldValue('attendsPatients', isChecked)}
             label={t(FORM.ATTENDS_PATIENTS)}
             description={t(FORM.ATTENDS_DESCRIPTION)}
           />
-          {values.attendsPatients && (
-            <FormMultiSelectField
-              name="specialties"
-              label={t(FORM.SPECIALTIES)}
-              options={specialtyOptions}
-              placeholder={t(FORM.SPECIALTIES_PLACEHOLDER)}
-              required
-              isSheetOnMobile
-            />
-          )}
-        </>
-      ) : (
-        <div className="flex flex-col gap-1">
-          <Typography variant={TypographyVariant.BODY}>
-            {t(FORM.ATTENDS_PATIENTS)}:{' '}
-            {t(values.attendsPatients ? TEXT.GENERAL.YES : TEXT.GENERAL.NO)}
-          </Typography>
-          {values.attendsPatients && (
+        ) : (
+          <div className="flex flex-col gap-1">
             <Typography variant={TypographyVariant.BODY}>
-              {t(FORM.SPECIALTIES)}:{' '}
-              {selectedLabels.length > 0 ? selectedLabels.join(', ') : t(FORM.NO_SPECIALTIES)}
+              {t(FORM.ATTENDS_PATIENTS)}:{' '}
+              {t(values.attendsPatients ? TEXT.GENERAL.YES : TEXT.GENERAL.NO)}
             </Typography>
-          )}
-          <Typography variant={TypographyVariant.HELPER}>{t(FORM.ATTENDS_OWNER_ONLY)}</Typography>
-        </div>
-      )}
+            {values.attendsPatients && (
+              <Typography variant={TypographyVariant.BODY}>
+                {t(FORM.SPECIALTIES)}:{' '}
+                {selectedLabels.length > 0 ? selectedLabels.join(', ') : t(FORM.NO_SPECIALTIES)}
+              </Typography>
+            )}
+            <Typography variant={TypographyVariant.HELPER}>{t(FORM.ATTENDS_OWNER_ONLY)}</Typography>
+          </div>
+        )}
+        {isLicensePending && (
+          <Typography variant={TypographyVariant.HELPER} className="text-warning-700">
+            {t(FORM.LICENSE_PENDING)}
+          </Typography>
+        )}
+      </SettingsFieldRow>
 
-      {isLicensePending && (
-        <Typography variant={TypographyVariant.HELPER} className="text-warning-700">
-          {t(FORM.LICENSE_PENDING)}
-        </Typography>
+      {canEdit && values.attendsPatients && (
+        <SettingsFieldRow label={t(FORM.SPECIALTIES)} isRequired>
+          <FormMultiSelectField
+            name="specialties"
+            label={t(FORM.SPECIALTIES)}
+            labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+            options={specialtyOptions}
+            placeholder={t(FORM.SPECIALTIES_PLACEHOLDER)}
+            required
+            isSheetOnMobile
+          />
+        </SettingsFieldRow>
       )}
-    </fieldset>
+    </>
   );
 };
 
@@ -130,7 +133,7 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
       variant={ButtonVariant.GHOST}
       onClick={editor.goBack}
       icon={<ArrowLeft className="h-4 w-4" aria-hidden />}
-      className="w-fit"
+      className="w-fit px-0 hover:bg-transparent hover:text-ink-900"
     >
       {t(FORM.BACK)}
     </Button>
@@ -174,7 +177,7 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
   const isLicensePending = Boolean(user?.attendsPatients && !user.licenseNumber);
 
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-5">
+    <div className="flex w-full flex-col gap-5">
       {backButton}
       <Typography variant={TypographyVariant.HEADER} as="h1">
         {t(isNew ? FORM.NEW_TITLE : FORM.EDIT_TITLE)}
@@ -189,93 +192,126 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
         onSubmit={editor.submit}
         enableReinitialize
       >
-        <Form className="flex flex-col gap-4">
+        <Form className="w-full">
           <FocusFirstError />
           <FormDirtyReporter onDirtyChange={setIsDirty} />
-          <FormField
-            name="fullName"
-            label={t(FORM.FULL_NAME)}
-            maxLength={USER_FULL_NAME_MAX_LENGTH}
-            disabled={isLocked}
-            required
-          />
-          <FormField
-            name="email"
-            type="email"
-            label={t(FORM.EMAIL)}
-            maxLength={USER_EMAIL_MAX_LENGTH}
-            disabled={!isNew}
-            hint={isNew ? undefined : t(FORM.EMAIL_READ_ONLY)}
-            isHintAlwaysVisible
-            required={isNew}
-          />
-          <FormField
-            name="role"
-            as="select"
-            label={t(FORM.ROLE)}
-            labelAddon={<RoleLevels roles={editor.assignableRoles} />}
-            disabled={isLocked || isRoleLocked}
-            hint={roleHint}
-            isHintAlwaysVisible
-            required={isNew}
-            displayValue={isRoleLocked && user?.role ? user.role : undefined}
-          >
-            {isRoleLocked && user?.role ? (
-              <option value={user.role}>
-                {isKnownRole(user.role) ? t(TEXTS.ROLES[user.role]) : t(TEXTS.LEGACY_ROLE)}
-              </option>
-            ) : (
-              <option value="">{t(FORM.ROLE_PLACEHOLDER)}</option>
+          <SettingsCard>
+            <SettingsFieldRow label={t(FORM.FULL_NAME)} isRequired>
+              <FormField
+                name="fullName"
+                label={t(FORM.FULL_NAME)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                maxLength={USER_FULL_NAME_MAX_LENGTH}
+                disabled={isLocked}
+                required
+              />
+            </SettingsFieldRow>
+
+            <SettingsFieldRow
+              label={t(FORM.EMAIL)}
+              hint={isNew ? undefined : t(FORM.EMAIL_READ_ONLY)}
+              isRequired={isNew}
+            >
+              <FormField
+                name="email"
+                type="email"
+                label={t(FORM.EMAIL)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                maxLength={USER_EMAIL_MAX_LENGTH}
+                disabled={!isNew}
+                required={isNew}
+              />
+            </SettingsFieldRow>
+
+            <SettingsFieldRow
+              label={t(FORM.ROLE)}
+              hint={roleHint}
+              isRequired={isNew}
+              labelAddon={<RoleLevels roles={editor.assignableRoles} />}
+              width={SettingsFieldWidth.SHORT}
+            >
+              <FormField
+                name="role"
+                as="select"
+                label={t(FORM.ROLE)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                disabled={isLocked || isRoleLocked}
+                required={isNew}
+                displayValue={isRoleLocked && user?.role ? user.role : undefined}
+              >
+                {isRoleLocked && user?.role ? (
+                  <option value={user.role}>
+                    {isKnownRole(user.role) ? t(TEXTS.ROLES[user.role]) : t(TEXTS.LEGACY_ROLE)}
+                  </option>
+                ) : (
+                  <option value="">{t(FORM.ROLE_PLACEHOLDER)}</option>
+                )}
+                {!isRoleLocked &&
+                  editor.assignableRoles.map((role) => (
+                    <option key={role} value={role}>
+                      {t(TEXTS.ROLES[role])}
+                    </option>
+                  ))}
+              </FormField>
+              {isCreatingWithoutOwnerLevel && (
+                <Typography variant={TypographyVariant.HELPER} className="mt-1.5">
+                  {t(FORM.OWNER_CREATE_ONLY)}
+                </Typography>
+              )}
+            </SettingsFieldRow>
+
+            <SettingsFieldRow label={t(FORM.PHONE)} width={SettingsFieldWidth.SHORT}>
+              <PhoneField
+                name="phone"
+                label={t(FORM.PHONE)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                disabled={isLocked}
+              />
+            </SettingsFieldRow>
+
+            {isNew && (
+              <SettingsFieldRow label={t(FORM.PASSWORD)} hint={t(FORM.PASSWORD_HINT)} isRequired>
+                <FormField
+                  name="password"
+                  type="password"
+                  label={t(FORM.PASSWORD)}
+                  labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                  maxLength={USER_PASSWORD_MAX_LENGTH}
+                  required
+                />
+              </SettingsFieldRow>
             )}
-            {!isRoleLocked &&
-              editor.assignableRoles.map((role) => (
-                <option key={role} value={role}>
-                  {t(TEXTS.ROLES[role])}
-                </option>
-              ))}
-          </FormField>
-          {isCreatingWithoutOwnerLevel && (
-            <Typography variant={TypographyVariant.HELPER}>{t(FORM.OWNER_CREATE_ONLY)}</Typography>
-          )}
-          <PhoneField name="phone" label={t(FORM.PHONE)} disabled={isLocked} className="max-w-xs" />
-          {isNew && (
-            <FormField
-              name="password"
-              type="password"
-              label={t(FORM.PASSWORD)}
-              maxLength={USER_PASSWORD_MAX_LENGTH}
-              hint={t(FORM.PASSWORD_HINT)}
-              required
-            />
-          )}
 
-          {(!isNew || editor.canEditClinicalAccess) && (
-            <ClinicalAccessSection
-              canEdit={editor.canEditClinicalAccess && !isLocked}
-              isLicensePending={isLicensePending}
-              specialtyOptions={editor.specialtyOptions}
-            />
-          )}
+            {(!isNew || editor.canEditClinicalAccess) && (
+              <ClinicalAccessSection
+                canEdit={editor.canEditClinicalAccess && !isLocked}
+                isLicensePending={isLicensePending}
+                specialtyOptions={editor.specialtyOptions}
+              />
+            )}
 
-          {!isLocked && (
-            <div className="sticky bottom-0 z-10 -mx-1 flex flex-col-reverse gap-2 border-t border-ink-200 bg-ink-50 px-1 py-3 sm:flex-row sm:justify-end">
-              <Button
-                variant={ButtonVariant.SECONDARY}
-                onClick={editor.goBack}
-                disabled={editor.isSaving}
-              >
-                {t(TEXT.GENERAL.BUTTONS.CANCEL)}
-              </Button>
-              <Button
-                type="submit"
-                variant={ButtonVariant.PRIMARY}
-                isLoading={editor.isSaving}
-                disabled={!isNew && !isDirty}
-              >
-                {t(isNew ? FORM.CREATE : TEXT.GENERAL.BUTTONS.SAVE)}
-              </Button>
-            </div>
-          )}
+            {!isLocked && (
+              <div className="flex flex-col-reverse gap-2 border-t border-ink-100 pt-4 sm:flex-row sm:justify-end">
+                <Button
+                  variant={ButtonVariant.SECONDARY}
+                  onClick={editor.goBack}
+                  disabled={editor.isSaving}
+                  className="w-full sm:w-auto"
+                >
+                  {t(TEXT.GENERAL.BUTTONS.CANCEL)}
+                </Button>
+                <Button
+                  type="submit"
+                  variant={ButtonVariant.PRIMARY}
+                  isLoading={editor.isSaving}
+                  disabled={!isNew && !isDirty}
+                  className="w-full sm:w-auto"
+                >
+                  {t(isNew ? FORM.CREATE : TEXT.GENERAL.BUTTONS.SAVE)}
+                </Button>
+              </div>
+            )}
+          </SettingsCard>
         </Form>
       </Formik>
 

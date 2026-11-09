@@ -47,8 +47,9 @@ export function useQuestionsSettings() {
       key: HISTORY_KEY,
       title: t(TEXT.QUESTIONS.CLINICAL_HISTORY),
       state: stateOf(HISTORY_KEY),
-      render: () =>
+      render: (footerSlot) =>
         createElement(ClinicalHistoryTemplateContainer, {
+          footerSlot,
           onDirtyChange: handleHistoryDirtyChange,
         }),
     },
@@ -56,8 +57,9 @@ export function useQuestionsSettings() {
       key: template.uuid,
       title: template.name,
       state: stateOf(template.uuid),
-      render: () =>
+      render: (footerSlot) =>
         createElement(QuestionnaireTemplateContainer, {
+          footerSlot,
           sectionKey: template.uuid,
           template,
           onDirtyChange: handleDirtyChange,
@@ -70,8 +72,9 @@ export function useQuestionsSettings() {
       title: pending.name,
       // Aunque no se haya tocado nada, no está guardada: se avisa igual.
       state: QuestionSectionState.DRAFT,
-      render: () =>
+      render: (footerSlot) =>
         createElement(QuestionnaireTemplateContainer, {
+          footerSlot,
           sectionKey: DRAFT_KEY,
           template: null,
           draftName: pending.name,

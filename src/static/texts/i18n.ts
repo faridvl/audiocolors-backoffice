@@ -374,6 +374,7 @@ export const TEXT = {
     SECTION_NAME_REQUIRED: 'questions.sectionNameRequired',
     SECTION_CONTINUE: 'questions.sectionContinue',
     SECTION_NEW_HINT: 'questions.sectionNewHint',
+    SAVE_BAR_LABEL: 'questions.saveBarLabel',
     SECTION_SAVED: 'questions.sectionSaved',
     SECTIONS_LOADING: 'questions.sectionsLoading',
     SECTIONS_LOAD_ERROR: 'questions.sectionsLoadError',

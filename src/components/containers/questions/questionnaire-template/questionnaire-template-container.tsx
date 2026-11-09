@@ -8,10 +8,12 @@ import { inputBaseClasses } from '@/components/common/input/input';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { ClinicalTemplateEditor } from '@/components/containers/clinical-history-template/clinical-template-editor';
 import { TEXT } from '@/static/texts/i18n';
+import { tailwind } from '@/utils/tailwind-utils';
 import {
   ClinicalTemplate,
   QUESTIONNAIRE_NAME_MAX_LENGTH,
 } from '@/types/clinical-templates/clinical-template';
+import { SectionSaveBar } from '../section-save-bar';
 import { QuestionnaireTemplateFormValues } from './questionnaire-template-form';
 import { useQuestionnaireTemplate } from './use-questionnaire-template';
 
@@ -24,6 +26,8 @@ interface QuestionnaireTemplateContainerProps {
   onSaved?: (template: ClinicalTemplate) => void;
   /** Solo en el borrador: descartarlo antes de crearlo. */
   onCancel?: () => void;
+  /** Dónde dibujar la barra de Guardar, fuera de la tarjeta de la sección. */
+  footerSlot?: HTMLElement | null;
 }
 
 /** Una sección propia de Preguntas: su nombre y sus preguntas, con el mismo editor de la historia. */
@@ -34,6 +38,7 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
   onDirtyChange,
   onSaved,
   onCancel,
+  footerSlot,
 }) => {
   const { t } = useTranslation();
   const { initialValues, validationSchema, isPending, handleSubmit } = useQuestionnaireTemplate({
@@ -46,6 +51,7 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
     [onDirtyChange, sectionKey],
   );
   const nameId = `questionnaire-name-${sectionKey}`;
+  const formId = `questionnaire-form-${sectionKey}`;
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
 
@@ -66,7 +72,7 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
       enableReinitialize
     >
       {({ values, errors, touched, dirty, handleChange, handleBlur }) => (
-        <Form className="flex w-full flex-col gap-4 pb-2">
+        <Form id={formId} className={tailwind('flex w-full flex-col gap-4', !footerSlot && 'pb-2')}>
           <FormDirtyReporter onDirtyChange={handleDirtyChange} />
 
           <label htmlFor={nameId} className="flex scroll-mb-24 scroll-mt-4 flex-col gap-1.5">
@@ -109,37 +115,35 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
           />
 
           {/* Fija abajo: con muchas preguntas, guardar no obliga a bajar hasta el final. */}
-          <div className="sticky bottom-0 z-10 flex flex-col gap-2 border-t border-ink-100 bg-white py-3 shadow-[0_-6px_8px_-6px] shadow-ink-900/10">
-            {!template && (
-              <Typography variant={TypographyVariant.HELPER} className="hidden sm:block">
-                {t(TEXT.QUESTIONS.SECTION_NEW_HINT)}
-              </Typography>
-            )}
-            <div className="flex justify-end gap-3">
-              {onCancel && (
-                <Button
-                  type="button"
-                  variant={ButtonVariant.SECONDARY}
-                  onClick={() =>
-                    values.name.trim() || values.questions.length > 0
-                      ? setIsConfirmingCancel(true)
-                      : onCancel()
-                  }
-                  disabled={isPending}
-                >
-                  {t(TEXT.GENERAL.BUTTONS.CANCEL)}
-                </Button>
-              )}
+          <SectionSaveBar
+            slot={footerSlot}
+            label={t(TEXT.QUESTIONS.SAVE_BAR_LABEL, { title: template?.name ?? draftName })}
+            hint={template ? undefined : t(TEXT.QUESTIONS.SECTION_NEW_HINT)}
+          >
+            {onCancel && (
               <Button
-                type="submit"
-                variant={ButtonVariant.PRIMARY}
-                isLoading={isPending}
-                disabled={!!template && !dirty}
+                type="button"
+                variant={ButtonVariant.SECONDARY}
+                onClick={() =>
+                  values.name.trim() || values.questions.length > 0
+                    ? setIsConfirmingCancel(true)
+                    : onCancel()
+                }
+                disabled={isPending}
               >
-                {t(TEXT.GENERAL.BUTTONS.SAVE)}
+                {t(TEXT.GENERAL.BUTTONS.CANCEL)}
               </Button>
-            </div>
-          </div>
+            )}
+            <Button
+              type="submit"
+              form={formId}
+              variant={ButtonVariant.PRIMARY}
+              isLoading={isPending}
+              disabled={!!template && !dirty}
+            >
+              {t(TEXT.GENERAL.BUTTONS.SAVE)}
+            </Button>
+          </SectionSaveBar>
 
           {isConfirmingCancel && (
             <ConfirmDialog

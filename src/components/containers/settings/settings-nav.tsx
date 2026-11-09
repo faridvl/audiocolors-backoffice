@@ -58,7 +58,7 @@ export const SettingsNav: React.FC<SettingsNavProps> = ({ sections, activeSectio
                       !isList &&
                         (isActive
                           ? 'bg-brand-50 text-brand-700'
-                          : 'text-ink-600 hover:text-ink-900'),
+                          : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900'),
                     )}
                   >
                     {isActive && (

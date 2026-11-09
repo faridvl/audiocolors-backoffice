@@ -33,7 +33,8 @@ export interface QuestionSectionEntry extends QuestionSectionBase {
 }
 
 export interface SettingsQuestionSection extends QuestionSectionBase {
-  render: () => ReactNode;
+  /** `footerSlot`: dónde dibujar la barra de Guardar, fuera de la tarjeta. */
+  render: (footerSlot: HTMLElement | null) => ReactNode;
 }
 
 export interface QuestionsSubtitle {

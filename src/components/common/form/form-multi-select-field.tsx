@@ -13,6 +13,7 @@ import { tailwind } from '@/utils/tailwind-utils';
 interface FormMultiSelectFieldProps {
   name: string;
   label: string;
+  labelClassName?: string;
   options: PillSelectOption[];
   placeholder?: string;
   /** Ayuda bajo el campo; se oculta mientras hay error. */
@@ -27,6 +28,7 @@ interface FormMultiSelectFieldProps {
 export const FormMultiSelectField: React.FC<FormMultiSelectFieldProps> = ({
   name,
   label,
+  labelClassName,
   options,
   placeholder,
   hint,
@@ -43,7 +45,7 @@ export const FormMultiSelectField: React.FC<FormMultiSelectFieldProps> = ({
 
   return (
     <div className={tailwind('flex flex-col gap-1.5', className)}>
-      <Typography variant={TypographyVariant.BODY}>
+      <Typography variant={TypographyVariant.BODY} className={labelClassName}>
         {label}
         {required && <span className="ml-0.5 text-danger">*</span>}
         {optional && <span className="ml-1 text-ink-400">{t(TEXT.GENERAL.OPTIONAL)}</span>}
