@@ -225,7 +225,9 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         <div className="grid grid-cols-[1fr_auto_1fr] gap-3">
           {AUDIOGRAM_EARS.map((ear, index) => (
             <React.Fragment key={ear}>
-              {index === CENTER_COLUMN_INDEX && <GradeLabelsCenter gradingScale={gradingScale} />}
+              {index === CENTER_COLUMN_INDEX && (
+                <GradeLabelsCenter gradingScale={gradingScale} isSheetSize />
+              )}
               <AudiogramChart
                 ear={ear}
                 marks={marks}
