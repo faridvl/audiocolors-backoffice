@@ -66,7 +66,7 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
       enableReinitialize
     >
       {({ values, errors, touched, dirty, handleChange, handleBlur }) => (
-        <Form className="flex w-full flex-col gap-4">
+        <Form className="flex w-full flex-col gap-4 pb-2">
           <FormDirtyReporter onDirtyChange={handleDirtyChange} />
 
           <label htmlFor={nameId} className="flex scroll-mb-24 scroll-mt-4 flex-col gap-1.5">
@@ -109,7 +109,7 @@ export const QuestionnaireTemplateContainer: React.FC<QuestionnaireTemplateConta
           />
 
           {/* Fija abajo: con muchas preguntas, guardar no obliga a bajar hasta el final. */}
-          <div className="sticky bottom-0 z-10 flex flex-col gap-2 border-t border-ink-100 bg-white py-3">
+          <div className="sticky bottom-0 z-10 flex flex-col gap-2 border-t border-ink-100 bg-white py-3 shadow-[0_-6px_8px_-6px] shadow-ink-900/10">
             {!template && (
               <Typography variant={TypographyVariant.HELPER} className="hidden sm:block">
                 {t(TEXT.QUESTIONS.SECTION_NEW_HINT)}

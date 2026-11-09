@@ -18,46 +18,78 @@ export enum SettingsSection {
   USERS = 'USERS',
 }
 
+/** Agrupa el menú en el orden en que una clínica nueva la va configurando. */
+export enum SettingsGroup {
+  PRACTICE = 'PRACTICE',
+  CARE = 'CARE',
+}
+
+/** Los grupos en el orden en que se muestran. */
+export const SETTINGS_GROUPS: SettingsGroup[] = [SettingsGroup.PRACTICE, SettingsGroup.CARE];
+
 export interface SettingsSectionItem {
   section: SettingsSection;
+  group: SettingsGroup;
   href: string;
   icon: LucideIcon;
   permission: Permission;
 }
 
-/** Secciones de Configuración en el orden en que se muestran; se agrupan por tarea, no por tabla. */
+/** Secciones de Configuración en el orden en que se muestran, ya agrupadas por tarea. */
 export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
   {
-    section: SettingsSection.APPOINTMENT_TYPES,
-    href: routesPrivate.settings.appointmentTypes,
-    icon: CalendarClock,
-    permission: Permission.EDIT_APPOINTMENT_TYPES,
-  },
-  {
-    section: SettingsSection.QUESTIONS,
-    href: routesPrivate.settings.questions,
-    icon: MessageSquareText,
-    permission: Permission.EDIT_CLINICAL_TEMPLATE,
-  },
-  {
-    section: SettingsSection.TEMPLATES,
-    href: routesPrivate.settings.templates,
-    icon: FileText,
-    permission: Permission.EDIT_CLINICAL_TEMPLATE,
-  },
-  {
     section: SettingsSection.CLINIC,
+    group: SettingsGroup.PRACTICE,
     href: routesPrivate.settings.clinic,
     icon: Building2,
     permission: Permission.VIEW_CLINIC,
   },
   {
     section: SettingsSection.USERS,
+    group: SettingsGroup.PRACTICE,
     href: routesPrivate.settings.users,
     icon: Users,
     permission: Permission.MANAGE_USERS,
   },
+  {
+    section: SettingsSection.APPOINTMENT_TYPES,
+    group: SettingsGroup.CARE,
+    href: routesPrivate.settings.appointmentTypes,
+    icon: CalendarClock,
+    permission: Permission.EDIT_APPOINTMENT_TYPES,
+  },
+  {
+    section: SettingsSection.QUESTIONS,
+    group: SettingsGroup.CARE,
+    href: routesPrivate.settings.questions,
+    icon: MessageSquareText,
+    permission: Permission.EDIT_CLINICAL_TEMPLATE,
+  },
+  {
+    section: SettingsSection.TEMPLATES,
+    group: SettingsGroup.CARE,
+    href: routesPrivate.settings.templates,
+    icon: FileText,
+    permission: Permission.EDIT_CLINICAL_TEMPLATE,
+  },
 ];
+
+export interface SettingsSectionGroup {
+  group: SettingsGroup;
+  sections: SettingsSectionItem[];
+}
+
+/** Agrupa las secciones visibles; un grupo sin secciones no aparece. */
+export const groupSettingsSections = (sections: SettingsSectionItem[]): SettingsSectionGroup[] =>
+  SETTINGS_GROUPS.map((group) => ({
+    group,
+    sections: sections.filter((item) => item.group === group),
+  })).filter((entry) => entry.sections.length > 0);
 
 export const sectionTitleKey = (section: SettingsSection) =>
   `${TEXT.SETTINGS.SECTIONS_PREFIX}.${section}.title`;
+
+export const sectionDescriptionKey = (section: SettingsSection) =>
+  `${TEXT.SETTINGS.SECTIONS_PREFIX}.${section}.description`;
+
+export const groupTitleKey = (group: SettingsGroup) => `${TEXT.SETTINGS.GROUPS_PREFIX}.${group}`;

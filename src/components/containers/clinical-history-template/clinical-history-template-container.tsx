@@ -54,7 +54,7 @@ export const ClinicalHistoryTemplateContainer: React.FC<ClinicalHistoryTemplateC
       enableReinitialize
     >
       {({ errors, dirty }) => (
-        <Form className="flex w-full flex-col gap-4">
+        <Form className="flex w-full flex-col gap-4 pb-2">
           <FormDirtyReporter onDirtyChange={onDirtyChange} />
           {/* Con el dedo no se arrastra: la indicación solo desde `sm`. */}
           <Typography variant={TypographyVariant.HELPER} className="hidden sm:block">
@@ -66,7 +66,7 @@ export const ClinicalHistoryTemplateContainer: React.FC<ClinicalHistoryTemplateC
           />
 
           {/* Fija abajo: con muchas preguntas, guardar no obliga a bajar hasta el final. */}
-          <div className="sticky bottom-0 z-10 flex justify-end border-t border-ink-100 bg-white py-3">
+          <div className="sticky bottom-0 z-10 flex justify-end border-t border-ink-100 bg-white py-3 shadow-[0_-6px_8px_-6px] shadow-ink-900/10">
             <Button
               type="submit"
               variant={ButtonVariant.PRIMARY}

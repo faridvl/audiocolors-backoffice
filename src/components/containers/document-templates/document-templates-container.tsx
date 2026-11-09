@@ -30,24 +30,26 @@ export const DocumentTemplatesContainer: React.FC = () => {
     return <DocumentTemplateEditor templateUuid={editingUuid} onBack={handleBack} />;
   }
 
-  if (isLoading) {
-    return <SettingsSectionLoading message={t(TEXT.DOCUMENT_TEMPLATES.LOADING)} />;
-  }
-
-  if (isError) {
-    return (
-      <SettingsSectionError
-        message={t(TEXT.DOCUMENT_TEMPLATES.LOAD_ERROR)}
-        onRetry={() => refetch()}
-      />
-    );
-  }
-
   return (
     <div className="flex w-full flex-col gap-4">
-      <SettingsAddButton label={t(TEXT.DOCUMENT_TEMPLATES.NEW)} onClick={handleCreate} />
+      <SettingsAddButton
+        label={t(TEXT.DOCUMENT_TEMPLATES.NEW)}
+        onClick={handleCreate}
+        disabled={isLoading || isError}
+      />
 
-      {templates.length === 0 ? (
+      {isLoading ? (
+        <SettingsCard>
+          <SettingsSectionLoading message={t(TEXT.DOCUMENT_TEMPLATES.LOADING)} />
+        </SettingsCard>
+      ) : isError ? (
+        <SettingsCard>
+          <SettingsSectionError
+            message={t(TEXT.DOCUMENT_TEMPLATES.LOAD_ERROR)}
+            onRetry={() => refetch()}
+          />
+        </SettingsCard>
+      ) : templates.length === 0 ? (
         <Typography variant={TypographyVariant.BODY} className="max-w-md py-2 text-ink-500">
           {t(TEXT.DOCUMENT_TEMPLATES.EMPTY)}
         </Typography>

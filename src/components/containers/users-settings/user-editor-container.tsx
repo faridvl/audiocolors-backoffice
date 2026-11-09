@@ -237,7 +237,7 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
           {isCreatingWithoutOwnerLevel && (
             <Typography variant={TypographyVariant.HELPER}>{t(FORM.OWNER_CREATE_ONLY)}</Typography>
           )}
-          <PhoneField name="phone" label={t(FORM.PHONE)} disabled={isLocked} />
+          <PhoneField name="phone" label={t(FORM.PHONE)} disabled={isLocked} className="max-w-xs" />
           {isNew && (
             <FormField
               name="password"

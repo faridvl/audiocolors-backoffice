@@ -14,6 +14,7 @@ import type { PhoneCountry } from "@/shared/utils/phone-countries";
 interface PhoneFieldProps {
   name: string;
   label: string;
+  labelClassName?: string;
   required?: boolean;
   disabled?: boolean;
   /** Ayuda bajo el campo; sin ella no se muestra ninguna. */
@@ -31,6 +32,7 @@ interface PhoneFieldProps {
 export const PhoneField: React.FC<PhoneFieldProps> = ({
   name,
   label,
+  labelClassName,
   required = false,
   disabled = false,
   hint,
@@ -52,6 +54,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
     <FormField
       name={name}
       label={label}
+      labelClassName={labelClassName}
       hint={hint}
       isHintAlwaysVisible={isHintAlwaysVisible}
       inputMode="tel"

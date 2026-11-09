@@ -1175,3 +1175,12 @@ independientes:
 - Piezas compartidas en `containers/settings/`: `SettingsCard` (`rounded-card border border-ink-200 bg-white`), `SettingsAddButton` (arriba a la derecha desde sm, ancho completo en móvil) y `SettingsSectionLoading`/`SettingsSectionError` (mismo `py`, icono y Reintentar).
 - Clínica va dentro de una `SettingsCard` con cuadrícula de 2 columnas desde `lg` (Nombre y Logo, Teléfono y Correo; Dirección y Guardar a ancho completo); una columna en móvil.
 - Bloques con `gap-4` en todas. Formularios conserva su botón punteado "Nueva sección" bajo la lista y Usuarios su `ResponsiveTable`, que ya trae la misma superficie.
+
+## D75 · Configuración: grupos, ancho por dato y estados (2026-11-09)
+
+- El menú de Configuración tiene dos grupos con título pequeño, modelados con el enum `SettingsGroup`: "Tu clínica" (Clínica, Usuarios) y "Atención" (Tipos de cita, Formularios, Plantillas). Un grupo sin secciones visibles no muestra su título. En celular, el inicio usa los mismos grupos y cada sección lleva su descripción de una línea; escritorio y celular comparten las mismas piezas (`SettingsNav`).
+- Un solo estado fuerte en el menú: el activo es `bg-brand-50 text-brand-700` con una barra a la izquierda. El hover cambia solo el color del texto y nunca compite con el activo; el foco es visible.
+- Regla de ancho por dato (`SettingsFieldRow`): desde `lg`, etiqueta y ayuda a la izquierda (un tercio) y campo a la derecha; en celular, apilado. El campo mide lo que mide su dato: teléfono y duración `max-w-xs`, correo y nombre `max-w-md`, dirección `max-w-xl`, logo a su ancho natural. Los modales siguen la misma regla (duración en Tipos de cita, teléfono en Usuarios). Se quitó la cuadrícula de 2 columnas de Clínica; sustituye esa parte de D74.
+- Ancho máximo común `max-w-6xl` en el layout de Configuración.
+- Regla de estados de las listas (Tipos de cita, Plantillas, Usuarios, Formularios): el botón principal siempre se ve y queda deshabilitado mientras carga o falla; el estado de carga o error va dentro de una `SettingsCard`. Formularios tiene un solo bloque de error y un solo "Reintentar" que recarga las dos consultas; el verbo del botón es el mismo en todas ("Nuevo tipo de cita", "Nueva plantilla", "Nuevo usuario").
+- La barra fija de Guardar de los formularios lleva fondo, sombra superior suave y espacio abajo; las filas de las listas tienen la misma altura mínima y el dato secundario el mismo color.

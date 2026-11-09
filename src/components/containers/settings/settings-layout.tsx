@@ -31,7 +31,7 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ section, childre
       subtitle={t(TEXT.SETTINGS.TITLE)}
       backHref={isDesktop ? undefined : routesPrivate.settings.index}
     >
-      <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:items-start lg:gap-6">
+      <div className="mx-auto w-full max-w-6xl lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:items-start lg:gap-8">
         <aside className="hidden lg:sticky lg:top-0 lg:block">
           <SettingsNav sections={sections} activeSection={section} />
         </aside>

@@ -12,6 +12,11 @@ import {
   TENANT_NAME_MAX_LENGTH,
 } from '@/types/tenant/tenant';
 import { SettingsCard } from '../settings/settings-card';
+import {
+  SETTINGS_FIELD_LABEL_HIDDEN,
+  SettingsFieldRow,
+  SettingsFieldWidth,
+} from '../settings/settings-field-row';
 import { SettingsSectionError, SettingsSectionLoading } from '../settings/settings-section-state';
 import { ClinicFormValues } from './clinic-form';
 import { ClinicLogoField } from './clinic-logo-field';
@@ -54,14 +59,20 @@ export const ClinicSettingsContainer: React.FC = () => {
     >
       {({ dirty }) => (
         <Form className="w-full">
-          <SettingsCard className="grid gap-4 lg:grid-cols-2">
-            <FormField
-              name="name"
+          <SettingsCard>
+            <SettingsFieldRow
               label={t(TEXT.SETTINGS.CLINIC.NAME)}
               hint={t(TEXT.SETTINGS.CLINIC.NAME_HINT)}
-              maxLength={TENANT_NAME_MAX_LENGTH}
-              disabled={!canEdit}
-            />
+            >
+              <FormField
+                name="name"
+                label={t(TEXT.SETTINGS.CLINIC.NAME)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                maxLength={TENANT_NAME_MAX_LENGTH}
+                disabled={!canEdit}
+              />
+            </SettingsFieldRow>
+
             <ClinicLogoField
               logoUrl={tenant.logoUrl}
               clinicName={tenant.businessName}
@@ -69,41 +80,63 @@ export const ClinicSettingsContainer: React.FC = () => {
               logo={logo}
             />
 
-            <PhoneField name="phone" label={t(TEXT.SETTINGS.CLINIC.PHONE)} disabled={!canEdit} />
-            <FormField
-              name="email"
-              type="email"
-              label={t(TEXT.SETTINGS.CLINIC.EMAIL)}
-              placeholder={t(TEXT.SETTINGS.CLINIC.EMAIL_PLACEHOLDER)}
-              maxLength={TENANT_EMAIL_MAX_LENGTH}
-              disabled={!canEdit}
-            />
-            <FormField
-              name="address"
-              as="textarea"
+            <SettingsFieldRow
+              label={t(TEXT.SETTINGS.CLINIC.PHONE)}
+              width={SettingsFieldWidth.SHORT}
+            >
+              <PhoneField
+                name="phone"
+                label={t(TEXT.SETTINGS.CLINIC.PHONE)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                disabled={!canEdit}
+              />
+            </SettingsFieldRow>
+
+            <SettingsFieldRow label={t(TEXT.SETTINGS.CLINIC.EMAIL)}>
+              <FormField
+                name="email"
+                type="email"
+                label={t(TEXT.SETTINGS.CLINIC.EMAIL)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                placeholder={t(TEXT.SETTINGS.CLINIC.EMAIL_PLACEHOLDER)}
+                maxLength={TENANT_EMAIL_MAX_LENGTH}
+                disabled={!canEdit}
+              />
+            </SettingsFieldRow>
+
+            <SettingsFieldRow
               label={t(TEXT.SETTINGS.CLINIC.ADDRESS)}
               hint={t(TEXT.SETTINGS.CLINIC.ADDRESS_HINT)}
-              maxLength={TENANT_ADDRESS_MAX_LENGTH}
-              showCount
-              disabled={!canEdit}
-              className="lg:col-span-2"
-            />
+              width={SettingsFieldWidth.LONG}
+            >
+              <FormField
+                name="address"
+                as="textarea"
+                label={t(TEXT.SETTINGS.CLINIC.ADDRESS)}
+                labelClassName={SETTINGS_FIELD_LABEL_HIDDEN}
+                maxLength={TENANT_ADDRESS_MAX_LENGTH}
+                showCount
+                disabled={!canEdit}
+              />
+            </SettingsFieldRow>
 
-            {canEdit ? (
-              <Button
-                type="submit"
-                variant={ButtonVariant.PRIMARY}
-                isLoading={isSaving}
-                disabled={!dirty}
-                className="w-full sm:w-auto sm:justify-self-end lg:col-span-2"
-              >
-                {t(TEXT.GENERAL.BUTTONS.SAVE)}
-              </Button>
-            ) : (
-              <Typography variant={TypographyVariant.HELPER} className="lg:col-span-2">
-                {t(TEXT.SETTINGS.CLINIC.READ_ONLY)}
-              </Typography>
-            )}
+            <div className="flex justify-end border-t border-ink-100 pt-4">
+              {canEdit ? (
+                <Button
+                  type="submit"
+                  variant={ButtonVariant.PRIMARY}
+                  isLoading={isSaving}
+                  disabled={!dirty}
+                  className="w-full sm:w-auto"
+                >
+                  {t(TEXT.GENERAL.BUTTONS.SAVE)}
+                </Button>
+              ) : (
+                <Typography variant={TypographyVariant.HELPER}>
+                  {t(TEXT.SETTINGS.CLINIC.READ_ONLY)}
+                </Typography>
+              )}
+            </div>
           </SettingsCard>
         </Form>
       )}

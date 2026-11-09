@@ -228,21 +228,30 @@
     "pageTitle": "Configuración · AudioColors Gestión Clínica",
     "title": "Configuración",
     "nav": "Configuración",
+    "groups": {
+      "PRACTICE": "Tu clínica",
+      "CARE": "Atención"
+    },
     "sections": {
       "APPOINTMENT_TYPES": {
-        "title": "Tipos de cita"
+        "title": "Tipos de cita",
+        "description": "Duración de cada tipo de cita"
       },
       "QUESTIONS": {
-        "title": "Formularios"
+        "title": "Formularios",
+        "description": "Preguntas de la historia clínica y secciones propias"
       },
       "TEMPLATES": {
-        "title": "Plantillas"
+        "title": "Plantillas",
+        "description": "Documentos con los datos del paciente"
       },
       "CLINIC": {
-        "title": "Clínica"
+        "title": "Clínica",
+        "description": "Nombre, logo y datos de contacto"
       },
       "USERS": {
-        "title": "Usuarios"
+        "title": "Usuarios",
+        "description": "Quién entra y qué puede hacer"
       }
     },
     "clinic": {
@@ -274,7 +283,7 @@
       "email": "Correo",
       "emailPlaceholder": "correo@clinica.com",
       "address": "Dirección",
-      "addressHint": "Como quieres que aparezca en los documentos.",
+      "addressHint": "Así aparecerá en tus documentos.",
       "readOnly": "Solo el dueño y administración pueden cambiar estos datos.",
       "saved": "Datos de la clínica guardados",
       "errors": {
@@ -288,6 +297,7 @@
     },
     "users": {
       "pageTitle": "Usuarios · AudioColors Gestión Clínica",
+      "loading": "Cargando usuarios...",
       "loadError": "No se pudieron cargar los usuarios",
       "emptyTitle": "Aún no hay usuarios",
       "add": "Nuevo usuario",
@@ -428,7 +438,7 @@
       "minutes": "{{count}} minutos",
       "saved": "Tipo de cita guardado",
       "created": "Tipo de cita agregado",
-      "add": "Agregar tipo de cita",
+      "add": "Nuevo tipo de cita",
       "newTitle": "Nuevo tipo de cita",
       "duplicateName": "Ya existe un tipo de cita con ese nombre.",
       "isControl": "Cuenta como control",

@@ -16,6 +16,8 @@ import { TEXT } from '@/static/texts/i18n';
 import { ManagedUser, UserStatus } from '@/types/users/user';
 import { tailwind } from '@/utils/tailwind-utils';
 import { SettingsAddButton } from '../settings/settings-add-button';
+import { SettingsCard } from '../settings/settings-card';
+import { SettingsSectionError, SettingsSectionLoading } from '../settings/settings-section-state';
 import { UserPasswordModal } from './user-password-modal';
 import { USER_STATUS_CLASSES } from './users-styles';
 import { useUsersSettings } from './use-users-settings';
@@ -187,22 +189,28 @@ export const UsersSettingsContainer: React.FC = () => {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <SettingsAddButton label={t(TEXTS.ADD)} onClick={openNew} />
+      <SettingsAddButton label={t(TEXTS.ADD)} onClick={openNew} disabled={isLoading || isError} />
 
-      <ResponsiveTable
-        columns={columns}
-        rows={users}
-        getRowKey={(user) => user.uuid}
-        isLoading={isLoading}
-        isError={isError}
-        onRetry={() => refetch()}
-        emptyTitle={t(TEXTS.EMPTY_TITLE)}
-        errorTitle={t(TEXTS.LOAD_ERROR)}
-        breakpoint={TableBreakpoint.XL}
-        cardTitleClassName="pr-12"
-        onRowClick={openEditor}
-        rowActions={renderRowActions}
-      />
+      {isLoading ? (
+        <SettingsCard>
+          <SettingsSectionLoading message={t(TEXTS.LOADING)} />
+        </SettingsCard>
+      ) : isError ? (
+        <SettingsCard>
+          <SettingsSectionError message={t(TEXTS.LOAD_ERROR)} onRetry={() => refetch()} />
+        </SettingsCard>
+      ) : (
+        <ResponsiveTable
+          columns={columns}
+          rows={users}
+          getRowKey={(user) => user.uuid}
+          emptyTitle={t(TEXTS.EMPTY_TITLE)}
+          breakpoint={TableBreakpoint.XL}
+          cardTitleClassName="pr-12"
+          onRowClick={openEditor}
+          rowActions={renderRowActions}
+        />
+      )}
 
       {password.user && (
         <UserPasswordModal

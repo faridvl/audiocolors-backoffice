@@ -99,6 +99,8 @@ export const TEXT = {
     NAV: 'settings.nav',
     /** `${SECTIONS_PREFIX}.${SettingsSection}.title` */
     SECTIONS_PREFIX: 'settings.sections',
+    /** `${GROUPS_PREFIX}.${SettingsGroup}` */
+    GROUPS_PREFIX: 'settings.groups',
     CLINIC: {
       PAGE_TITLE: 'settings.clinic.pageTitle',
       LOADING: 'settings.clinic.loading',
@@ -142,6 +144,7 @@ export const TEXT = {
     },
     USERS: {
       PAGE_TITLE: 'settings.users.pageTitle',
+      LOADING: 'settings.users.loading',
       LOAD_ERROR: 'settings.users.loadError',
       EMPTY_TITLE: 'settings.users.emptyTitle',
       ADD: 'settings.users.add',

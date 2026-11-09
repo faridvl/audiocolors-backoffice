@@ -29,24 +29,26 @@ export const AppointmentTypesSettingsContainer: React.FC = () => {
     handleAdd,
   } = useAppointmentTypesSettings();
 
-  if (isLoading) {
-    return <SettingsSectionLoading message={t(TEXT.SETTINGS.APPOINTMENT_TYPES.LOADING)} />;
-  }
-
-  if (isError) {
-    return (
-      <SettingsSectionError
-        message={t(TEXT.SETTINGS.APPOINTMENT_TYPES.LOAD_ERROR)}
-        onRetry={() => refetch()}
-      />
-    );
-  }
-
   return (
     <div className="flex w-full flex-col gap-4">
-      <SettingsAddButton label={t(TEXT.SETTINGS.APPOINTMENT_TYPES.ADD)} onClick={handleAdd} />
+      <SettingsAddButton
+        label={t(TEXT.SETTINGS.APPOINTMENT_TYPES.ADD)}
+        onClick={handleAdd}
+        disabled={isLoading || isError}
+      />
 
-      {appointmentTypes.length === 0 ? (
+      {isLoading ? (
+        <SettingsCard>
+          <SettingsSectionLoading message={t(TEXT.SETTINGS.APPOINTMENT_TYPES.LOADING)} />
+        </SettingsCard>
+      ) : isError ? (
+        <SettingsCard>
+          <SettingsSectionError
+            message={t(TEXT.SETTINGS.APPOINTMENT_TYPES.LOAD_ERROR)}
+            onRetry={() => refetch()}
+          />
+        </SettingsCard>
+      ) : appointmentTypes.length === 0 ? (
         <Typography variant={TypographyVariant.BODY} className="py-2 text-ink-500">
           {t(TEXT.SETTINGS.APPOINTMENT_TYPES.EMPTY)}
         </Typography>

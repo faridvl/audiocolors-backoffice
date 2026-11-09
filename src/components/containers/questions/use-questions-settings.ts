@@ -1,6 +1,7 @@
 import { createElement, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClinicalHistoryTemplateContainer } from '@/components/containers/clinical-history-template/clinical-history-template-container';
+import { useClinicalHistoryTemplateQuery } from '@/shared/api/querys/clinical-history-template-query';
 import { useQuestionnaireTemplatesQuery } from '@/shared/api/querys/questionnaire-templates-query';
 import { TEXT } from '@/static/texts/i18n';
 import { ClinicalTemplate } from '@/types/clinical-templates/clinical-template';
@@ -18,6 +19,8 @@ interface PendingSection {
 export function useQuestionsSettings() {
   const { t } = useTranslation();
   const templatesQuery = useQuestionnaireTemplatesQuery();
+  // Se lee aquí para tener una sola puerta de carga y de error; el editor reusa el mismo caché.
+  const historyQuery = useClinicalHistoryTemplateQuery();
   // Solo lo que la persona abrió o cerró a mano; el resto se decide por la lista actual.
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
   const [dirtyByKey, setDirtyByKey] = useState<Record<string, boolean>>({});
@@ -26,7 +29,9 @@ export function useQuestionsSettings() {
 
   // Estable y sin cambio si el valor es igual: el reporte de cambios corre en un efecto.
   const handleDirtyChange = useCallback((key: string, isDirty: boolean) => {
-    setDirtyByKey((current) => (!!current[key] === isDirty ? current : { ...current, [key]: isDirty }));
+    setDirtyByKey((current) =>
+      !!current[key] === isDirty ? current : { ...current, [key]: isDirty },
+    );
   }, []);
   const handleHistoryDirtyChange = useCallback(
     (isDirty: boolean) => handleDirtyChange(HISTORY_KEY, isDirty),
@@ -43,21 +48,21 @@ export function useQuestionsSettings() {
       title: t(TEXT.QUESTIONS.CLINICAL_HISTORY),
       state: stateOf(HISTORY_KEY),
       render: () =>
-        createElement(ClinicalHistoryTemplateContainer, { onDirtyChange: handleHistoryDirtyChange }),
+        createElement(ClinicalHistoryTemplateContainer, {
+          onDirtyChange: handleHistoryDirtyChange,
+        }),
     },
-    ...templates.map(
-      (template): SettingsQuestionSection => ({
-        key: template.uuid,
-        title: template.name,
-        state: stateOf(template.uuid),
-        render: () =>
-          createElement(QuestionnaireTemplateContainer, {
-            sectionKey: template.uuid,
-            template,
-            onDirtyChange: handleDirtyChange,
-          }),
-      }),
-    ),
+    ...templates.map((template): SettingsQuestionSection => ({
+      key: template.uuid,
+      title: template.name,
+      state: stateOf(template.uuid),
+      render: () =>
+        createElement(QuestionnaireTemplateContainer, {
+          sectionKey: template.uuid,
+          template,
+          onDirtyChange: handleDirtyChange,
+        }),
+    })),
   ];
   if (pending) {
     sections.push({
@@ -102,9 +107,12 @@ export function useQuestionsSettings() {
     isSectionExpanded,
     handleToggleSection: (key: string) =>
       setToggled((current) => ({ ...current, [key]: !isSectionExpanded(key) })),
-    isLoadingTemplates: templatesQuery.isLoading,
-    hasTemplatesError: templatesQuery.isError,
-    refetchTemplates: () => templatesQuery.refetch(),
+    isLoading: templatesQuery.isLoading || historyQuery.isLoading,
+    isError: templatesQuery.isError || historyQuery.isError,
+    refetch: () => {
+      if (templatesQuery.isError) void templatesQuery.refetch();
+      if (historyQuery.isError) void historyQuery.refetch();
+    },
     canAddSection: !pending,
     isNameModalOpen,
     handleOpenNameModal: () => setIsNameModalOpen(true),
