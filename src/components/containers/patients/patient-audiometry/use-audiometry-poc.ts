@@ -45,6 +45,8 @@ import {
 } from './audiometry-constants';
 import { WordListType } from './speech-word-lists';
 import { buildEarSummaries, presentedWordsOf } from './audiometry-report-data';
+import { buildEntryDateLabels } from './audiometry-entry-date-labels';
+import { buildEntryWithPtaLabel } from './audiometry-labels';
 import {
   AudiometryFormState,
   hasAudiometryData,
@@ -341,12 +343,14 @@ export function useAudiometryPoc(patientUuid: string) {
     executeCreateEntry({ patientUuid, payload: stateToPayload(formState, summaries) });
   };
 
+  const entryLabels = buildEntryDateLabels(entries, formatDateTime, buildEntryWithPtaLabel(t));
+  // Una lista vieja o en caché puede no traer la marca: `!= null` cubre null y undefined.
   const entryOptions = entries.map((entry) => ({
     value: entry.uuid,
-    label: formatDateTime(entry.createdAt),
-    isMuted: entry.invalidatedAt !== null,
+    label: entryLabels.get(entry.uuid) ?? formatDateTime(entry.createdAt),
+    isMuted: entry.invalidatedAt != null,
     badge:
-      entry.invalidatedAt !== null ? t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.INVALIDATE.TAG) : undefined,
+      entry.invalidatedAt != null ? t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.INVALIDATE.TAG) : undefined,
   }));
   const selectedEntry = entries.find((entry) => entry.uuid === selectedEntryUuid);
   const invalidationNotice: AudiometryInvalidationNotice | null = selectedEntry?.invalidatedAt
@@ -360,7 +364,7 @@ export function useAudiometryPoc(patientUuid: string) {
       }
     : null;
   // Solo se marca una audiometría guardada que aún no está marcada.
-  const canInvalidate = selectedEntry !== undefined && selectedEntry.invalidatedAt === null;
+  const canInvalidate = selectedEntry !== undefined && selectedEntry.invalidatedAt == null;
   const selectedEntryAuthor = selectedEntry
     ? resolveAuthorLabel(selectedEntry.createdByUuid ?? '', selectedEntry.createdByName)
     : null;

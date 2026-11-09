@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { TEXT } from '@/static/texts/i18n';
 import {
   AudiometryTool,
@@ -67,3 +68,15 @@ export const PTA_TYPE_LABEL_KEYS: Record<PtaType, string> = {
   [PtaType.PTA_124]: AUDIOMETRY_TEXT.PTA_TYPES.PTA_124,
   [PtaType.PTA_251]: AUDIOMETRY_TEXT.PTA_TYPES.PTA_251,
 };
+
+const MISSING_PTA_DASH = '–';
+
+/** Fecha de la audiometría con el PTA de cada oído, para distinguir dos de la misma hora. */
+export const buildEntryWithPtaLabel =
+  (t: TFunction): ((date: string, ptaRight: number | null, ptaLeft: number | null) => string) =>
+  (date, ptaRight, ptaLeft) =>
+    t(AUDIOMETRY_TEXT.ENTRY_WITH_PTA, {
+      date,
+      right: ptaRight ?? MISSING_PTA_DASH,
+      left: ptaLeft ?? MISSING_PTA_DASH,
+    });

@@ -1118,7 +1118,8 @@
         "newEntry": "Audiometría nueva",
         "newEntryButton": "Nueva audiometría",
         "savedBanner": "Audiometría guardada. Registrada por {{author}} · {{date}}",
-        "readOnlyNotice": "Esta audiometría está guardada y es de solo lectura. Para registrar otra, usa Nueva audiometría.",
+        "readOnlyNotice": "Guardada, solo lectura.",
+        "entryWithPta": "{{date}} · PTA OD {{right}} / OI {{left}}",
         "saveHint": "Marca al menos un punto para guardar",
         "entryAuthorDate": "Registrada por {{author}} · {{date}}",
         "entryLoading": "Cargando la audiometría…",
@@ -1126,6 +1127,7 @@
         "invalidate": {
           "button": "Marcar como mal hecha",
           "tag": "Mal hecha",
+          "menuAria": "Más acciones de la audiometría",
           "title": "Marcar como mal hecha",
           "warning": "Esto no se puede deshacer. La audiometría se queda en el historial y se puede imprimir, pero ya no entra en los resúmenes.",
           "reasonLabel": "Motivo",
@@ -1227,7 +1229,7 @@
         },
         "ptaTypes": {
           "pta512": "PTA 512",
-          "pta5124": "PTA 4 frecuencias (5124)",
+          "pta5124": "PTA 4 frec.",
           "pta124": "PTA alta frecuencia (124)",
           "pta251": "PTA baja frecuencia (251)"
         },
@@ -1246,7 +1248,7 @@
           "gradeInfoItem": "{{name}}: {{from}} a {{to}} dB",
           "gradeInfoItemOpen": "{{name}}: {{from}} dB o más",
           "gradeInfoSourceAsha": "Según ASHA (Clark, 1981), calculado con el PTA 512.",
-          "gradeInfoSourceBiap": "Según BIAP (recomendación 02/1), calculado con el PTA 4 frecuencias (5124).",
+          "gradeInfoSourceBiap": "Según BIAP (recomendación 02/1), calculado con el PTA de 4 frecuencias (500, 1000, 2000 y 4000 Hz).",
           "gradeScaleAria": "Escala para clasificar el grado de pérdida",
           "gradeScaleAsha": "ASHA",
           "gradeScaleBiap": "BIAP",

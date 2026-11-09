@@ -30,7 +30,7 @@ import {
 import { GradeLabelsCenter } from './grade-labels-column';
 import { SpeechAudiogramChart } from './speech-audiogram-chart';
 import { WordListType } from './speech-word-lists';
-import { PrintReportHeader } from './use-audiometry-poc';
+import { AudiometryInvalidationNotice, PrintReportHeader } from './use-audiometry-poc';
 import { WEBER_ICONS } from './weber-icons';
 import { ReadOnlyValue } from './audiometry-read-only-value';
 
@@ -74,6 +74,8 @@ export interface AudiometryPrintReportProps {
    * sola vez) y sin salto de hoja forzado.
    */
   isEmbedded?: boolean;
+  /** Informe suelto de una audiometría marcada como mal hecha: se avisa arriba, bien visible. */
+  invalidation?: AudiometryInvalidationNotice | null;
 }
 
 /** Solo se ve al imprimir: informe clínico de la audiometría guardada, hecho para una hoja A4. */
@@ -90,6 +92,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   speechFieldValues,
   notes,
   isEmbedded = false,
+  invalidation = null,
 }) => {
   const { t } = useTranslation();
   const empty = t(SUMMARY_TEXT.EMPTY);
@@ -186,6 +189,21 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
           </div>
           <h1 className="text-right text-xl font-semibold text-ink-900">{t(REPORT_TEXT.TITLE)}</h1>
         </header>
+      )}
+
+      {!isEmbedded && invalidation && (
+        <div
+          role="note"
+          className="rounded border-2 border-danger bg-danger/10 px-3 py-1.5 text-danger-700"
+        >
+          <p className="text-sm font-semibold">
+            {t(AUDIOMETRY_TEXT.INVALIDATE.BANNER, {
+              author: invalidation.author,
+              date: invalidation.date,
+            })}
+          </p>
+          <p>{t(AUDIOMETRY_TEXT.INVALIDATE.BANNER_REASON, { reason: invalidation.reason })}</p>
+        </div>
       )}
 
       {!isEmbedded && (
@@ -295,8 +313,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         </div>
       </div>
 
-      {/* Diagnóstico y observaciones siempre arrancan en la segunda hoja. */}
-      <div className={tailwind('flex flex-col gap-2', !isEmbedded && 'break-before-page')}>
+      {/* Diagnóstico, observaciones y firma pasan juntos a la hoja siguiente si no caben. */}
+      <div className="flex break-inside-avoid flex-col gap-2">
         {textSections.map((section) => (
           <section key={section.key} className="flex break-inside-avoid flex-col gap-1">
             <h2 className={SECTION_TITLE_CLASSES}>{section.title}</h2>
@@ -307,21 +325,21 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
             />
           </section>
         ))}
-      </div>
 
-      {!isEmbedded && (
-        <footer className="mt-1 flex break-inside-avoid items-end justify-between gap-6 pt-2">
-          <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
-            <p className="text-sm font-medium text-ink-800">{professional}</p>
-            <p className="text-[10px] uppercase tracking-wide text-ink-500">
-              {t(REPORT_TEXT.SIGNATURE)}
+        {!isEmbedded && (
+          <footer className="mt-1 flex items-end justify-between gap-6 pt-2">
+            <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
+              <p className="text-sm font-medium text-ink-800">{professional}</p>
+              <p className="text-[10px] uppercase tracking-wide text-ink-500">
+                {t(REPORT_TEXT.SIGNATURE)}
+              </p>
+            </div>
+            <p className="text-[10px] text-ink-500">
+              {t(REPORT_TEXT.PRINTED_ON, { date: formatDate(new Date().toISOString()) })}
             </p>
-          </div>
-          <p className="text-[10px] text-ink-500">
-            {t(REPORT_TEXT.PRINTED_ON, { date: formatDate(new Date().toISOString()) })}
-          </p>
-        </footer>
-      )}
+          </footer>
+        )}
+      </div>
     </article>
   );
 };

@@ -787,6 +787,7 @@ export const TEXT = {
         NEW_ENTRY_BUTTON: 'patients.detail.audiometry.newEntryButton',
         SAVED_BANNER: 'patients.detail.audiometry.savedBanner',
         READ_ONLY_NOTICE: 'patients.detail.audiometry.readOnlyNotice',
+        ENTRY_WITH_PTA: 'patients.detail.audiometry.entryWithPta',
         SAVE_HINT: 'patients.detail.audiometry.saveHint',
         ENTRY_AUTHOR_DATE: 'patients.detail.audiometry.entryAuthorDate',
         ENTRY_LOADING: 'patients.detail.audiometry.entryLoading',
@@ -794,6 +795,7 @@ export const TEXT = {
         INVALIDATE: {
           BUTTON: 'patients.detail.audiometry.invalidate.button',
           TAG: 'patients.detail.audiometry.invalidate.tag',
+          MENU_ARIA: 'patients.detail.audiometry.invalidate.menuAria',
           TITLE: 'patients.detail.audiometry.invalidate.title',
           WARNING: 'patients.detail.audiometry.invalidate.warning',
           REASON_LABEL: 'patients.detail.audiometry.invalidate.reasonLabel',

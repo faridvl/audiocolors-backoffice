@@ -1,6 +1,7 @@
 import React from 'react';
 import { Ban, Plus, Printer } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ActionMenu } from '@/components/common/action-menu/action-menu';
 import { Accordion, AccordionVariant } from '@/components/common/accordion/accordion';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
@@ -132,7 +133,8 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   options={historyOptions}
                   onChange={handleSelectEntry}
                   isSheetOnMobile
-                  className="min-w-0 flex-1 lg:w-64 lg:flex-none"
+                  isLabelFull
+                  className="min-w-0 lg:w-auto lg:min-w-64"
                 />
                 {selectedEntry && (
                   <Button
@@ -150,14 +152,17 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   </Button>
                 )}
                 {selectedEntry && canInvalidate && (
-                  <Button
-                    variant={ButtonVariant.SECONDARY}
-                    onClick={handleOpenInvalidateModal}
-                    className="border-danger/40 text-danger hover:bg-danger/10"
-                  >
-                    <Ban className="h-4 w-4" aria-hidden />
-                    {t(AUDIOMETRY_TEXT.INVALIDATE.BUTTON)}
-                  </Button>
+                  <ActionMenu
+                    ariaLabel={t(AUDIOMETRY_TEXT.INVALIDATE.MENU_ARIA)}
+                    items={[
+                      {
+                        label: t(AUDIOMETRY_TEXT.INVALIDATE.BUTTON),
+                        icon: <Ban className="h-4 w-4" aria-hidden />,
+                        isDanger: true,
+                        onClick: handleOpenInvalidateModal,
+                      },
+                    ]}
+                  />
                 )}
               </div>
               {selectedEntry && (
@@ -376,6 +381,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
           failedWords={failedWords}
           presentedWords={presentedWords}
           notes={notes}
+          invalidation={invalidationNotice}
         />
       )}
     </>

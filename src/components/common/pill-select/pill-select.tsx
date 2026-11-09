@@ -63,6 +63,8 @@ interface PillSelectProps {
   isSheetOnMobile?: boolean;
   /** Sin interacción y con aspecto atenuado (p. ej. mientras falta un dato previo). */
   isDisabled?: boolean;
+  /** El texto elegido se muestra completo (sin "…") y la etiqueta corta queda pegada a la derecha. */
+  isLabelFull?: boolean;
   className?: string;
 }
 
@@ -91,6 +93,7 @@ export const PillSelect: React.FC<PillSelectProps> = ({
   placeholder,
   isSheetOnMobile = false,
   isDisabled = false,
+  isLabelFull = false,
   className,
 }) => {
   const isSheet = useIsMobile() && isSheetOnMobile;
@@ -133,7 +136,7 @@ export const PillSelect: React.FC<PillSelectProps> = ({
             )}
             <span
               className={tailwind(
-                'truncate',
+                isLabelFull ? 'min-w-0 whitespace-normal' : 'truncate',
                 !selectedLabel && !buttonLabel && 'text-ink-400',
                 !buttonLabel && selectedOption?.isLabelHidden && 'sr-only',
                 !buttonLabel && selectedOption?.isMuted && 'text-ink-400 line-through',
@@ -142,7 +145,7 @@ export const PillSelect: React.FC<PillSelectProps> = ({
               {buttonLabel ?? (selectedLabel || placeholder)}
             </span>
             {!buttonLabel && selectedOption?.badge && (
-              <span className="ml-2 flex shrink-0">
+              <span className={tailwind('ml-2 flex shrink-0', isLabelFull && 'ml-auto pl-2')}>
                 <PillSelectBadge label={selectedOption.badge} />
               </span>
             )}
@@ -205,7 +208,7 @@ export const PillSelect: React.FC<PillSelectProps> = ({
                       )}
                       <span
                         className={tailwind(
-                          'truncate',
+                          isLabelFull ? 'whitespace-normal' : 'truncate',
                           option.isLabelHidden && 'sr-only',
                           option.isMuted && 'text-ink-400 line-through',
                         )}

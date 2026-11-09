@@ -33,7 +33,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
       <QueryClientProvider client={queryClient}>
         <Component {...pageProps} />
-        <Toaster position="top-right" richColors closeButton duration={4000} />
+        <Toaster position="bottom-right" richColors closeButton duration={4000} />
       </QueryClientProvider>
     </>
   );

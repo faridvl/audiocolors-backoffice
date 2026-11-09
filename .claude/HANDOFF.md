@@ -96,7 +96,39 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   sola, "Audiometría - AudioColors - …" (hoy sale solo con el nombre de la clínica). Sin cédula,
   se omite ese tramo.
 
+- Ajustes al resumen y a la audiometría (2026-11-08, pedidos del usuario):
+  - Informe impreso de audiometría (suelto y en el resumen): una sola columna de grados
+    (Normal, Leve…) entre los dos gráficos, ninguna a la derecha. En la tabla Resumen se quitan
+    "Palabras falladas", "Método del PTA" y "Escala del grado"; la fila del PTA dice el método
+    elegido ("PTA 512", etc.) en lugar de "PTA (dB)". La pantalla del acordeón no cambia.
+  - Una audiometría guardada se puede marcar como mal hecha: motivo obligatorio, queda quién y
+    cuándo, y no se deshace. En el selector de fechas se distingue, y la franja azul de solo lectura
+    dice que está marcada como mal hecha (con el motivo). Necesita API (campo y endpoint).
+  - Generar resumen: la ficha técnica también es una tarjeta que se marca o no; de audiometría se
+    eligen una o varias (las mal hechas ni aparecen); otoscopía sigue siendo la última. Al generar,
+    primero se ve una vista previa de todo el documento y se puede editar el texto antes de
+    imprimir; lo editado sale solo en ese PDF, no se guarda.
+  - Variables de plantilla: grupos nuevos "Pruebas" (otoscopía OD y OI de la última otoscopía;
+    diagnóstico y observaciones de la última audiometría que no esté mal hecha) y "Clínica" (nombre,
+    teléfono, correo y dirección). Teléfono, correo y dirección son campos nuevos de la clínica
+    (Tenant, API identity), opcionales, y se editan en Configuración → Clínica con los mismos
+    permisos que el resto de Configuración; el nombre se ve ahí pero no se edita. Orden de los grupos:
+    Paciente, Pruebas, Clínica, Documento. Chips más pequeños y en cuadrícula pareja, no sueltos.
+    Sin el dato, la variable sale vacía.
+
+- Mantenimiento (2026-11-08): el botón "Vino" pasa a decir "Recepción" (mismo estado, solo el
+  texto). "Lo perdió" no se guarda sin una nota: al tocarlo se abre el campo de nota y el estado
+  se guarda junto con la nota; sin texto no deja guardar. Las marcas que ya existen no cambian.
+
 ## En qué estamos
+
+- **Ajustes del 2026-11-08 (misma rama `feature/resumen-paciente` + API `feature/audiometria-mal-hecha`
+  y `feature/plantilla-variables-clinica`):** hechos el informe impreso, marcar como mal hecha,
+  selección múltiple, vista previa editable, variables Pruebas/Clínica, Configuración → Clínica y
+  Mantenimiento; revisados por cuestionador y revisor-ux (solo Audiometría y Resumen) y corregidos
+  (D66). El usuario pidió subirlo sin qa: sin probar en navegador las pantallas de plantillas, Clínica
+  y Mantenimiento, el flujo nuevo de "Lo perdió" ni la impresión real (posible informe suelto en 2
+  hojas: los gráficos no se compactaron). Publicar API + migraciones antes que el front.
 
 - **Resumen del paciente (2026-11-08, rama `feature/resumen-paciente`, local, sin push ni PR):**
   botón "Generar resumen", modal por tarjetas y hoja de impresión (D64); nombre de archivo
