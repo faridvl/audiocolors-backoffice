@@ -24,13 +24,23 @@ export interface UserFormValues {
   role: UserRole | '';
   phone: string;
   password: string;
+  attendsPatients: boolean;
+  specialties: string[];
 }
 
 export interface UserPasswordFormValues {
   password: string;
 }
 
-export const USER_FORM_FIELDS = ['fullName', 'email', 'role', 'phone', 'password'];
+export const USER_FORM_FIELDS = [
+  'fullName',
+  'email',
+  'role',
+  'phone',
+  'password',
+  'attendsPatients',
+  'specialties',
+];
 
 /** El API nombra el teléfono `phoneNumber`; el formulario lo llama `phone`. */
 export const API_FIELD_TO_FORM_FIELD: Record<string, string> = {
@@ -42,13 +52,18 @@ const PHONE_ERROR_KEYS: Record<PhoneError, string> = {
   [PhoneError.INTERNATIONAL_FORMAT]: ERRORS.PHONE_INTERNATIONAL,
 };
 
-export function buildUserFormInitialValues(user: ManagedUser | null): UserFormValues {
+export function buildUserFormInitialValues(
+  user: ManagedUser | null,
+  assignableRoles: UserRole[] = ASSIGNABLE_USER_ROLES,
+): UserFormValues {
   return {
     fullName: user?.fullName ?? '',
     email: user?.email ?? '',
-    role: getInitialRoleSelection(user?.role ?? null),
+    role: getInitialRoleSelection(user?.role ?? null, assignableRoles),
     phone: user?.phoneNumber ?? '',
     password: '',
+    attendsPatients: user?.attendsPatients ?? false,
+    specialties: user?.specialties ?? [],
   };
 }
 
@@ -64,7 +79,11 @@ export const buildUserPasswordSchema = (t: TFunction) =>
   Yup.object({ password: buildPasswordSchema(t) });
 
 /** En una edición el correo y la contraseña no se tocan, y el rol es opcional: sin elegir, no cambia. */
-export const buildUserSchema = (t: TFunction, isNew: boolean) =>
+export const buildUserSchema = (
+  t: TFunction,
+  isNew: boolean,
+  assignableRoles: UserRole[] = ASSIGNABLE_USER_ROLES,
+) =>
   Yup.object({
     fullName: Yup.string()
       .trim()
@@ -80,11 +99,16 @@ export const buildUserSchema = (t: TFunction, isNew: boolean) =>
     role: isNew
       ? Yup.string()
           .required(t(ERRORS.ROLE_REQUIRED))
-          .oneOf([...ASSIGNABLE_USER_ROLES], t(ERRORS.ROLE_REQUIRED))
-      : Yup.string().oneOf([...ASSIGNABLE_USER_ROLES, '']),
+          .oneOf([...assignableRoles], t(ERRORS.ROLE_REQUIRED))
+      : Yup.string().oneOf([...assignableRoles, '']),
     phone: Yup.string().test('valid-phone', (value, context) => {
       const error = validatePhone(value ?? '');
       return error === null ? true : context.createError({ message: t(PHONE_ERROR_KEYS[error]) });
     }),
     password: isNew ? buildPasswordSchema(t) : Yup.string(),
+    attendsPatients: Yup.boolean(),
+    specialties: Yup.array(Yup.string().required()).when('attendsPatients', {
+      is: true,
+      then: (schema) => schema.min(1, t(ERRORS.SPECIALTIES_REQUIRED)),
+    }),
   });

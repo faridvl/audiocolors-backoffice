@@ -18,6 +18,11 @@ export const routesPrivate = {
     templates: '/configuracion/plantillas',
     clinic: '/configuracion/clinica',
     users: '/configuracion/usuarios',
+    usersNew: '/configuracion/usuarios/nuevo',
+    userDetail: (uuid: string) => `/configuracion/usuarios/${uuid}`,
+  },
+  profile: {
+    index: '/perfil',
   },
 };
 

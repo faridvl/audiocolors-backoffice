@@ -301,7 +301,8 @@
       "columns": {
         "name": "Nombre",
         "email": "Correo",
-        "role": "Rol",
+        "role": "Nivel de acceso",
+        "attendsPatients": "Atiende pacientes",
         "status": "Estado"
       },
       "status": {
@@ -318,6 +319,11 @@
         "ENT": "Otorrinolaringología",
         "SPEECH_THERAPY": "Terapia del lenguaje",
         "GENERAL_MEDICINE": "Medicina general"
+      },
+      "roleDescriptions": {
+        "RECEPTION": "Atiende la agenda y registra pacientes.",
+        "ADMIN": "Además administra usuarios y la configuración de la clínica.",
+        "OWNER": "Además define quién atiende pacientes y administra a otros propietarios."
       },
       "titles": {
         "LIC": "Lic.",
@@ -339,14 +345,39 @@
         "fullName": "Nombre completo",
         "email": "Correo",
         "emailReadOnly": "El correo no se puede cambiar.",
-        "role": "Rol",
-        "roleSelfHint": "No puedes cambiar tu propio rol.",
-        "rolePlaceholder": "Elige un rol",
-        "roleLegacyHint": "Tiene un rol anterior. Si no eliges uno nuevo, se queda como está.",
+        "role": "Nivel de acceso",
+        "roleSelfHint": "No puedes cambiar tu propio nivel de acceso.",
+        "rolePlaceholder": "Elige un nivel",
+        "roleLegacyHint": "Tiene un nivel anterior. Si no eliges uno nuevo, se queda como está.",
         "phone": "Teléfono",
         "password": "Contraseña temporal",
         "passwordHint": "Mínimo 8 caracteres, con una mayúscula y un número. Compártela con la persona para su primer ingreso.",
-        "create": "Crear usuario"
+        "create": "Crear usuario",
+        "back": "Volver a usuarios",
+        "notFound": "No encontramos a este usuario.",
+        "ownerReadOnly": "Solo otro propietario puede editar a un propietario.",
+        "roleLevelsTitle": "Qué puede hacer cada nivel",
+        "clinicalAccessTitle": "Acceso clínico",
+        "attendsPatients": "Atiende pacientes",
+        "attendsDescription": "Atiende consultas y firma los documentos clínicos.",
+        "attendsOwnerOnly": "Solo el propietario cambia si atiende pacientes y sus especialidades.",
+        "specialties": "Especialidades",
+        "specialtiesPlaceholder": "Elige al menos una",
+        "noSpecialties": "Sin especialidades",
+        "licensePending": "Pendiente de completar por el profesional"
+      },
+      "audit": {
+        "title": "Cambios de acceso",
+        "empty": "Todavía no hay cambios de acceso.",
+        "loadError": "No pudimos cargar los cambios de acceso.",
+        "none": "Ninguna",
+        "summary": "{{actor}} · {{date}}",
+        "change": "{{field}}: {{before}} → {{after}}",
+        "fields": {
+          "ROLE": "Nivel de acceso",
+          "ATTENDS_PATIENTS": "Atiende pacientes",
+          "SPECIALTIES": "Especialidades"
+        }
       },
       "passwordModal": {
         "title": "Poner contraseña nueva",
@@ -383,6 +414,7 @@
         "passwordMin": "Usa al menos 8 caracteres",
         "passwordMax": "La contraseña es demasiado larga",
         "passwordUppercase": "Incluye al menos una mayúscula",
+        "specialtiesRequired": "Elige al menos una especialidad.",
         "passwordDigit": "Incluye al menos un número"
       }
     },
@@ -1590,6 +1622,23 @@
       "remove": "Quitar contacto",
       "add": "Agregar contacto",
       "saved": "Contactos guardados"
+    }
+  },
+  "profile": {
+    "menu": "Mi perfil",
+    "pageTitle": "Mi perfil",
+    "title": "Mi perfil",
+    "account": "Tu cuenta",
+    "professional": "Datos profesionales",
+    "professionalTitle": "Título",
+    "titlePlaceholder": "Elige tu título",
+    "licenseNumber": "Número de colegiado",
+    "licenseHint": "Aparece junto a tu nombre en los documentos que firmas.",
+    "licenseMissing": "Falta tu número de colegiado. Complétalo para que salga en tus documentos.",
+    "notProfessional": "Tu cuenta no atiende pacientes, así que no necesitas datos profesionales.",
+    "saved": "Perfil actualizado",
+    "errors": {
+      "licenseMax": "El número de colegiado es demasiado largo."
     }
   }
 }

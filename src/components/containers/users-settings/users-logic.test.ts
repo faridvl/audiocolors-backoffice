@@ -17,6 +17,10 @@ const buildUser = (overrides: Partial<ManagedUser>): ManagedUser => ({
   role: UserRole.RECEPTION,
   status: UserStatus.ACTIVE,
   phoneNumber: null,
+  attendsPatients: false,
+  specialties: [],
+  professionalTitle: null,
+  licenseNumber: null,
   createdAt: '2026-01-01T00:00:00.000Z',
   ...overrides,
 });

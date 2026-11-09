@@ -2,6 +2,7 @@ import React from 'react';
 import { KeyRound, Pencil, Plus, UserCheck, UserX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenu, ActionMenuItem } from '@/components/common/action-menu/action-menu';
+import { Badge } from '@/components/common/badge/badge';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ConfirmDialog } from '@/components/common/confirm-dialog/confirm-dialog';
 import {
@@ -13,11 +14,10 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { TEXT } from '@/static/texts/i18n';
 import { ManagedUser, UserStatus } from '@/types/users/user';
 import { tailwind } from '@/utils/tailwind-utils';
-import { UserFormModal } from './user-form-modal';
 import { UserPasswordModal } from './user-password-modal';
 import { USER_STATUS_CLASSES } from './users-styles';
 import { useUsersSettings } from './use-users-settings';
-import { isKnownRole, isLegacyRole } from './users-logic';
+import { isKnownRole } from './users-logic';
 
 const TEXTS = TEXT.SETTINGS.USERS;
 const ICON_CLASSES = 'h-4 w-4';
@@ -39,7 +39,8 @@ export const UsersSettingsContainer: React.FC = () => {
     refetch,
     getActions,
     isCurrentUser,
-    editor,
+    openNew,
+    openEditor,
     password,
     status,
   } = useUsersSettings();
@@ -88,6 +89,20 @@ export const UsersSettingsContainer: React.FC = () => {
       render: (user) => (isKnownRole(user.role) ? t(TEXTS.ROLES[user.role]) : t(TEXTS.LEGACY_ROLE)),
     },
     {
+      key: 'attendsPatients',
+      header: t(TEXTS.COLUMNS.ATTENDS_PATIENTS),
+      render: (user) =>
+        user.attendsPatients ? (
+          <span className="flex flex-wrap gap-1">
+            {user.specialties.map((specialty) => (
+              <Badge key={specialty}>{t(TEXTS.SPECIALTIES[specialty])}</Badge>
+            ))}
+          </span>
+        ) : (
+          <span className="text-ink-500">{t(TEXT.GENERAL.NO)}</span>
+        ),
+    },
+    {
       key: 'status',
       header: t(TEXTS.COLUMNS.STATUS),
       render: (user) => (
@@ -110,7 +125,7 @@ export const UsersSettingsContainer: React.FC = () => {
       items.push({
         label: t(TEXTS.ACTIONS.EDIT),
         icon: <Pencil className={ICON_CLASSES} aria-hidden />,
-        onClick: () => editor.openFor(user),
+        onClick: () => openEditor(user),
       });
     }
     if (canSetPassword) {
@@ -142,15 +157,6 @@ export const UsersSettingsContainer: React.FC = () => {
     return <ActionMenu ariaLabel={t(TEXTS.ACTIONS_LABEL, { name: user.fullName })} items={items} />;
   };
 
-  const getRoleLockReason = (user: ManagedUser | null): string | null =>
-    user && !getActions(user).canChangeRole ? t(TEXTS.FORM.ROLE_SELF_HINT) : null;
-
-  const getLockedRoleLabel = (user: ManagedUser | null): string | null =>
-    user && isKnownRole(user.role) ? t(TEXTS.ROLES[user.role]) : null;
-
-  const getRoleHint = (user: ManagedUser | null): string | null =>
-    user && isLegacyRole(user.role) ? t(TEXTS.FORM.ROLE_LEGACY_HINT) : null;
-
   const isDeactivating = status.user?.status === UserStatus.ACTIVE;
   const statusDialog = isDeactivating
     ? {
@@ -168,7 +174,7 @@ export const UsersSettingsContainer: React.FC = () => {
     <div className="flex w-full flex-col gap-4">
       <Button
         variant={ButtonVariant.PRIMARY}
-        onClick={editor.openNew}
+        onClick={openNew}
         icon={<Plus className={ICON_CLASSES} aria-hidden />}
         className="w-full sm:w-auto sm:self-end"
       >
@@ -188,21 +194,6 @@ export const UsersSettingsContainer: React.FC = () => {
         cardTitleClassName="pr-12"
         rowActions={renderRowActions}
       />
-
-      {editor.isOpen && (
-        <UserFormModal
-          key={editor.user?.uuid ?? 'new-user'}
-          user={editor.user}
-          initialValues={editor.initialValues}
-          validationSchema={editor.schema}
-          isSaving={editor.isSaving}
-          roleLockReason={getRoleLockReason(editor.user)}
-          lockedRoleLabel={getLockedRoleLabel(editor.user)}
-          roleHint={getRoleHint(editor.user)}
-          onSubmit={editor.submit}
-          onClose={editor.close}
-        />
-      )}
 
       {password.user && (
         <UserPasswordModal

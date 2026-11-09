@@ -1,5 +1,10 @@
-import { UserRole } from '../../../types/auth/auth';
-import { ASSIGNABLE_USER_ROLES, ManagedUser, UserStatus } from '../../../types/users/user';
+import { ClinicalSpecialty, UserRole } from '../../../types/auth/auth';
+import {
+  ASSIGNABLE_USER_ROLES,
+  ManagedUser,
+  OWNER_ASSIGNABLE_USER_ROLES,
+  UserStatus,
+} from '../../../types/users/user';
 
 const SORT_LOCALE = 'es';
 
@@ -18,9 +23,14 @@ export interface UserActions {
   canToggleStatus: boolean;
 }
 
+/** Niveles que el actor puede dar: el ADMIN, Recepción y Administración; el OWNER, además Propietario. */
+export function getAssignableRoles(actorRole: UserRole | null | undefined): UserRole[] {
+  return actorRole === UserRole.OWNER ? OWNER_ASSIGNABLE_USER_ROLES : ASSIGNABLE_USER_ROLES;
+}
+
 /**
- * Lo que el OWNER puede hacer con un usuario; el API repite estas reglas.
- * Un OWNER ajeno se ve solo de lectura; el propio OWNER edita sus datos, sin rol ni estado.
+ * Lo que el actor (OWNER o ADMIN) puede hacer con un usuario; el API repite estas reglas.
+ * Un OWNER ajeno se ve solo de lectura; el propio usuario edita sus datos, sin nivel ni estado.
  */
 export function getUserActions(
   user: ManagedUser,
@@ -46,17 +56,53 @@ export function isLegacyRole(role: string | null): boolean {
   return !isKnownRole(role);
 }
 
-export function isAssignableRole(role: string | null): role is UserRole {
-  return ASSIGNABLE_USER_ROLES.includes(role as UserRole);
+export function isAssignableRole(
+  role: string | null,
+  assignable: UserRole[] = ASSIGNABLE_USER_ROLES,
+): role is UserRole {
+  return assignable.includes(role as UserRole);
 }
 
 /** Valor inicial del selector: solo un rol asignable se preselecciona; el resto queda sin elegir. */
-export function getInitialRoleSelection(role: string | null): UserRole | '' {
-  return isAssignableRole(role) ? role : '';
+export function getInitialRoleSelection(
+  role: string | null,
+  assignable: UserRole[] = ASSIGNABLE_USER_ROLES,
+): UserRole | '' {
+  return isAssignableRole(role, assignable) ? role : '';
 }
 
 /** El rol viaja en el PATCH solo si la persona eligió uno distinto del actual. */
-export function getRoleChange(selected: string, current: string | null): UserRole | undefined {
-  if (!isAssignableRole(selected) || selected === current) return undefined;
+export function getRoleChange(
+  selected: string,
+  current: string | null,
+  assignable: UserRole[] = ASSIGNABLE_USER_ROLES,
+): UserRole | undefined {
+  if (!isAssignableRole(selected, assignable) || selected === current) return undefined;
   return selected;
+}
+
+/** Mismas especialidades, sin importar el orden. */
+export function sameSpecialties(a: readonly string[], b: readonly string[]): boolean {
+  return a.length === b.length && [...a].sort().join(',') === [...b].sort().join(',');
+}
+
+export interface ClinicalAccessValues {
+  attendsPatients: boolean;
+  specialties: string[];
+}
+
+/** Solo el propietario cambia si atiende pacientes; sin cambios no se manda nada (el API da 403 al ADMIN). */
+export function getClinicalAccessChange(
+  values: ClinicalAccessValues,
+  current: Pick<ManagedUser, 'attendsPatients' | 'specialties'> | null,
+): { attendsPatients: boolean; specialties: ClinicalSpecialty[] } | undefined {
+  const specialties = values.attendsPatients ? (values.specialties as ClinicalSpecialty[]) : [];
+  if (
+    current &&
+    current.attendsPatients === values.attendsPatients &&
+    sameSpecialties(current.specialties, specialties)
+  ) {
+    return undefined;
+  }
+  return { attendsPatients: values.attendsPatients, specialties };
 }
