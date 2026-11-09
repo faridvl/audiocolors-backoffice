@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrandLogo } from '@/components/common/brand/brand-logo';
+import { ClinicBrand } from '@/components/common/brand/clinic-brand';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -76,6 +76,8 @@ export interface AudiometryPrintReportProps {
   isEmbedded?: boolean;
   /** Informe suelto de una audiometría marcada como mal hecha: se avisa arriba, bien visible. */
   invalidation?: AudiometryInvalidationNotice | null;
+  /** Para mostrar el informe suelto en pantalla (por ejemplo en un modal); por defecto solo sale al imprimir. */
+  isVisibleOnScreen?: boolean;
 }
 
 /** Solo se ve al imprimir: informe clínico de la audiometría guardada, hecho para una hoja A4. */
@@ -93,6 +95,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   notes,
   isEmbedded = false,
   invalidation = null,
+  isVisibleOnScreen = false,
 }) => {
   const { t } = useTranslation();
   const empty = t(SUMMARY_TEXT.EMPTY);
@@ -157,7 +160,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       {...(isEmbedded ? { 'data-print-summary-section': '' } : { 'data-print-report': '' })}
       className={tailwind(
         'flex-col gap-2 bg-white text-xs leading-snug text-ink-700',
-        isEmbedded ? 'flex' : 'hidden print:flex',
+        isEmbedded || isVisibleOnScreen ? 'flex' : 'hidden print:flex',
       )}
     >
       {isEmbedded && (
@@ -176,14 +179,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       {!isEmbedded && (
         <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
           <div className="flex flex-col gap-1">
-            {header.clinicLogoUrl ? (
-              // Logo de la clínica en un host remoto que next/image no tiene configurado.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={header.clinicLogoUrl} alt={header.clinicName} className="h-10 w-auto" />
-            ) : (
-              <BrandLogo height={40} />
-            )}
-            {header.clinicName && (
+            <ClinicBrand logoUrl={header.clinicLogoUrl} name={header.clinicName} height={40} />
+            {header.clinicLogoUrl && header.clinicName && (
               <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
             )}
           </div>
@@ -222,7 +219,9 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         <div className="grid grid-cols-[1fr_auto_1fr] gap-3">
           {AUDIOGRAM_EARS.map((ear, index) => (
             <React.Fragment key={ear}>
-              {index === CENTER_COLUMN_INDEX && <GradeLabelsCenter gradingScale={gradingScale} />}
+              {index === CENTER_COLUMN_INDEX && (
+                <GradeLabelsCenter gradingScale={gradingScale} isSheetSize />
+              )}
               <AudiogramChart
                 ear={ear}
                 marks={marks}

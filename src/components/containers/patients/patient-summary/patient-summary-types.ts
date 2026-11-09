@@ -1,5 +1,4 @@
 import { Patient } from '@/types/patients/patient';
-import { OtoscopyEntry } from '@/types/patients/otoscopy-entry';
 import { PatientBackground } from '@/types/patients/patient-background';
 import { AudiometryPrintReportProps } from '../patient-audiometry/audiometry-print-report';
 
@@ -26,8 +25,6 @@ export interface SummaryBackground {
   /** Quien la actualizó por última vez; vacío si no se conoce. */
   authorName: string;
 }
-
-export type SummaryOtoscopy = OtoscopyEntry;
 
 /** Lo mismo que recibe el informe de audiometría suelto; el resumen pone la ficha y la firma. */
 export type SummaryAudiometry = Omit<AudiometryPrintReportProps, 'isEmbedded'>;

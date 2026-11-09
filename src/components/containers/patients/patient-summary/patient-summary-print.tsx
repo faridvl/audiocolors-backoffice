@@ -3,7 +3,6 @@ import { tailwind } from '@/utils/tailwind-utils';
 import {
   SummaryAudiometry,
   SummaryBackground,
-  SummaryOtoscopy,
   SummaryPatient,
   SummaryTemplate,
   SummaryTenant,
@@ -11,7 +10,6 @@ import {
 import { SummaryAudiometrySection } from './summary-audiometry-section';
 import { SummaryClinicalHistorySection } from './summary-clinical-history-section';
 import { SummaryHeader } from './summary-header';
-import { SummaryOtoscopySection } from './summary-otoscopy-section';
 import { SummarySignature } from './summary-signature';
 import { SummaryTemplateSection } from './summary-template-section';
 
@@ -29,7 +27,6 @@ export interface PatientSummaryPrintProps {
   /** Valor de cada variable de las plantillas, con los datos del paciente. */
   templateValues: Record<string, string>;
   background: SummaryBackground | null;
-  otoscopy: SummaryOtoscopy | null;
   /** Una por cada audiometría elegida, de la más antigua a la más nueva. */
   audiometries: SummaryAudiometry[];
 }
@@ -55,7 +52,6 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = React.mem
     templates,
     templateValues,
     background,
-    otoscopy,
     audiometries,
   }) => {
     const sections: { key: string; node: React.ReactNode }[] = [
@@ -75,7 +71,6 @@ export const PatientSummaryPrint: React.FC<PatientSummaryPrintProps> = React.mem
         key: `audiometry-${index}`,
         node: <SummaryAudiometrySection audiometry={audiometry} />,
       })),
-      ...(otoscopy ? [{ key: 'otoscopy', node: <SummaryOtoscopySection entry={otoscopy} /> }] : []),
     ];
     const header = (
       <SummaryHeader

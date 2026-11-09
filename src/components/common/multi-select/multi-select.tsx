@@ -80,18 +80,17 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 
   useEffect(() => {
     if (!isOpen) return;
-    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+    // Se cierra en `click` y no al presionar: si el panel se encoge al cerrar, el botón que se
+    // tocaba no se mueve antes de soltar y su acción ocurre a la primera. composedPath aguanta
+    // que el elemento tocado se quite del DOM durante el clic.
+    const handleClick = (event: MouseEvent) => {
+      if (rootRef.current && !event.composedPath().includes(rootRef.current)) {
         setIsOpen(false);
         setQuery('');
       }
     };
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('touchstart', handlePointerDown);
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('touchstart', handlePointerDown);
-    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
   }, [isOpen]);
 
   useEffect(() => {

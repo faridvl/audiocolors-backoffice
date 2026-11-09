@@ -120,7 +120,26 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   texto). "Lo perdió" no se guarda sin una nota: al tocarlo se abre el campo de nota y el estado
   se guarda junto con la nota; sin texto no deja guardar. Las marcas que ya existen no cambian.
 
+- Audiometría en evolución y Archivos (2026-11-08, pedidos del usuario):
+  - Generar resumen ya no tiene la tarjeta "Última otoscopía" (las variables de otoscopía de las
+    plantillas siguen).
+  - Al guardar una audiometría el API deja una nota de "Pruebas" en Control de evolución, como la
+    otoscopía (D47): "Se realizó audiometría" con la fecha.
+  - Archivos muestra cada audiometría guardada como una tarjeta más; al abrirla, un modal la arma
+    completa desde la BD (no hay PDF guardado) con un botón de imprimir.
+  - Agendar cita: el botón "Registrar paciente nuevo" también se ve antes de escribir.
+  - Configuración → Clínica: el nombre ya se edita (reemplaza lo de "no se edita") y se sube el
+    logo. Cada clínica (tenant) tiene su logo y se usa en todo: menú de la app y documentos
+    impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
+
 ## En qué estamos
+- **Correcciones de logo y Archivos (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):**
+  informe de audiometría legible en celular (zoom mínimo 0.7 y desplazamiento bajo 640 px; la
+  impresión no cambia), "Quitar logo" como botón secundario de peligro con papelera, tarjetas de
+  audiometría distinguibles (detalle, chevron, icono info, PTA por oído), la nota "Se realizó
+  audiometría" aparece en Evolución sin recargar, y la subida del logo maneja sesión vencida y red
+  caída. Lint y typecheck limpios. Sin probar en navegador: el dev server de :3000 estaba roto
+  ("__webpack_require__.t is not a function"); hay que reiniciarlo y verificar a 390 y 1440.
 
 - **Ajustes del 2026-11-08 (misma rama `feature/resumen-paciente` + API `feature/audiometria-mal-hecha`
   y `feature/plantilla-variables-clinica`):** hechos el informe impreso, marcar como mal hecha,
@@ -263,3 +282,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 - Varias sedes (D35): probado en pantalla crear con dos sedes, verlas en expediente y lista, agendar eligiendo sede, quitar una sede al editar, tablero con filtro en sede secundaria (clic y arrastre), filtro que excluye, sin sedes para elegir y 375 px sin scroll horizontal. El recorrido completo sale de varias corridas, no de una sola. Sin probar: cita visible con filtro de la sede secundaria tras recargar, dos clínicas y Zynka real. En la base local quedan pacientes de prueba "PruebaSedes".
 - Búsqueda de pacientes: nombre y apellido juntos ("PruebaSedes Cuatro") dan "Sin resultados", porque el API (`patient.storage.ts`) compara cada campo por separado. No viene de este lote; falta corregirlo.
+
+- **Logo y nombre de la clínica (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):** Configuración → Clínica edita el nombre y sube/quita el logo (D68); menú y documentos usan `ClinicBrand`. Probado en navegador sin logo y con logo (1440 y 390 px, capturas en `test-results/clinica-logo-nombre/`), validación de tipo/tamaño y cambio de nombre sin recargar. Sin probar: subida y borrado reales (bucket real), usuario sin permiso, informe y resumen impresos. Requiere el API de `feature/clinica-logo-y-nombre`.

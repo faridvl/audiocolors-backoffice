@@ -126,22 +126,17 @@ export const PatientPickerModal: React.FC<PatientPickerModalProps> = ({
             </div>
 
             <div className="mt-3 flex min-h-0 flex-col gap-1 overflow-y-auto">
-              {!hasEnoughText && (
-                <Typography
-                  variant={TypographyVariant.HELPER}
-                  className="px-1 py-2"
-                >
-                  {t(TEXT.AGENDA.PICKER.HINT)}
-                </Typography>
-              )}
-
-              {hasEnoughText && !isSearching && patients.length === 0 && (
+              {(!hasEnoughText || (!isSearching && patients.length === 0)) && (
                 <>
                   <Typography
                     variant={TypographyVariant.HELPER}
                     className="px-1 py-2"
                   >
-                    {t(TEXT.AGENDA.PICKER.EMPTY)}
+                    {t(
+                      hasEnoughText
+                        ? TEXT.AGENDA.PICKER.EMPTY
+                        : TEXT.AGENDA.PICKER.HINT,
+                    )}
                   </Typography>
                   <Button
                     variant={ButtonVariant.SECONDARY}

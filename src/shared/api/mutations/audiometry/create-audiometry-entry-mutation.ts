@@ -4,7 +4,9 @@ import { toast } from 'sonner';
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
+import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
 import { FETCH_AUDIOMETRY_ENTRIES_KEY } from '@/shared/api/querys/patient-audiometry-entries-query';
+import { FETCH_PATIENT_NOTES_KEY } from '@/shared/api/querys/patient-notes-query';
 import { TEXT } from '@/static/texts/i18n';
 import type {
   AudiometryPayload,
@@ -40,6 +42,13 @@ export function useCreateAudiometryEntryMutation({ onCreated }: CreateAudiometry
       // La lista se espera para que la recién guardada ya esté en el selector al seleccionarla.
       await queryClient.invalidateQueries({
         queryKey: [FETCH_AUDIOMETRY_ENTRIES_KEY, patientUuid],
+      });
+      // El API deja una nota de "Se realizó audiometría" en Control de evolución.
+      void queryClient.invalidateQueries({
+        queryKey: [FETCH_PATIENT_NOTES_KEY, patientUuid],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: [FETCH_PATIENT_ACTIVITY_KEY],
       });
       onCreated?.(entry);
     },

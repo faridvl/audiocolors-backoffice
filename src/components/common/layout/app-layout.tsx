@@ -28,7 +28,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { useLogout } from '@/hooks/use-logout';
 import { tailwind } from '@/utils/tailwind-utils';
-import { BrandLogo } from '@/components/common/brand/brand-logo';
+import { ClinicBrand } from '@/components/common/brand/clinic-brand';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
 interface NavigationItem {
@@ -243,6 +243,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   const router = useRouter();
   const { t } = useTranslation();
   const { can } = usePermissions();
+  const { tenant } = useSession();
   const canOpenSettings = SETTINGS_SECTIONS.some((item) => can(item.permission));
   const mainNavigation = NAVIGATION.filter((item) => !item.permission || can(item.permission));
   const settingsItem: NavigationItem | null = canOpenSettings
@@ -258,7 +259,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     <div className="flex h-[100dvh] bg-ink-50">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-ink-200 bg-white px-3 py-5 md:flex">
         <div className="flex flex-col items-center border-b border-ink-100 px-2 pb-5">
-          <BrandLogo height={42} priority />
+          <ClinicBrand
+            logoUrl={tenant?.logoUrl}
+            name={tenant?.businessName}
+            height={42}
+            className="max-w-full"
+          />
           <Typography
             variant={TypographyVariant.HELPER}
             className="mt-1.5 block uppercase tracking-[0.18em] text-ink-400"
@@ -295,7 +301,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 <ArrowLeft className="h-4 w-4" aria-hidden />
               </Link>
             ) : (
-              <BrandLogo height={28} className="shrink-0 md:hidden" />
+              <ClinicBrand
+                logoUrl={tenant?.logoUrl}
+                name={tenant?.businessName}
+                height={28}
+                className="max-w-[60vw] shrink-0 md:hidden"
+              />
             )}
 
             <div className="flex min-w-0 flex-col">

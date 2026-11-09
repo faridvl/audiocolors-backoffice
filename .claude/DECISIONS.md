@@ -1050,3 +1050,16 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
 - El resumen del paciente y el informe impreso quedan solo para clínicas. La impresión del rastreo está fuera de este alcance y el botón Imprimir no se muestra en rastreo.
 - Los enums (`AudiometryTypeCode`, `ScreeningResult`) viven en `audiometry-constants.ts` para que los tests sin alias `@/` los importen.
 - Etiqueta del historial: `fecha · tipo` y, en rastreo, `fecha · tipo · resultado`. Los nombres salen del `name` que devuelve el API.
+
+## D68 · Logo y nombre de la clínica (2026-11-08)
+
+- `ClinicBrand` muestra el logo del tenant con `<img>` (nunca SVG inline) o, sin logo, el nombre en
+  texto. No cae al logo de AudioColors; `BrandLogo` queda solo para login y pantallas públicas.
+- Si el logo no carga, se muestra el nombre. Con logo y nombre juntos (resumen, informe) el nombre
+  solo se escribe cuando hay logo, para no duplicarlo.
+- Al guardar nombre o logo se actualiza la consulta del tenant y se invalida la sesión (`authMe`),
+  que es de donde el menú y los documentos leen la clínica.
+- La subida del logo usa `fetch` con `FormData`: el cliente de API fuerza JSON. El cliente valida
+  tipo y 2 MB antes de enviar; el API repite la validación.
+- El informe de audiometría espera las imágenes antes de imprimir, y su nombre de archivo usa el
+  nombre vigente de la clínica.

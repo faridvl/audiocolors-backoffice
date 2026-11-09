@@ -17,10 +17,18 @@ import {
 import { useUploadDocumentMutation } from '@/shared/api/mutations/documents/upload-document-mutation';
 import { useDeleteDocumentMutation } from '@/shared/api/mutations/documents/delete-document-mutation';
 import { useUpdateDocumentMutation } from '@/shared/api/mutations/documents/update-document-mutation';
+import { useAudiometryEntriesQuery } from '@/shared/api/querys/patient-audiometry-entries-query';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { splitFileName } from '@/shared/utils/file-name';
 import { TEXT } from '@/static/texts/i18n';
-import { mapToDocumentItem } from './document-items';
+import {
+  ArchiveItemType,
+  mapAudiometryToArchiveItem,
+  mapFileToArchiveItem,
+  sortArchiveItems,
+} from './archive-items';
 import { useDocumentPreview } from './use-document-preview';
 
 /** Solo se pagina en movil: el grid de escritorio ya muestra varias columnas a la vez. */
@@ -55,20 +63,51 @@ export function useDocuments(patientUuid: string) {
   const [editName, setEditName] = useState('');
   const [editCategory, setEditCategory] = useState<DocumentCategory>(DocumentCategory.OTHER);
   const [page, setPage] = useState(1);
+  const [audiometryToPreviewUuid, setAudiometryToPreviewUuid] = useState<string | null>(null);
 
   const isMobile = useIsMobile();
-  const { data, isLoading, isError, refetch } = usePatientDocumentsQuery(patientUuid);
+  const { can } = usePermissions();
+  const {
+    data,
+    isLoading: isLoadingFiles,
+    isError: isFilesError,
+    refetch: refetchFiles,
+  } = usePatientDocumentsQuery(patientUuid);
+  // Sin permiso clínico ni se piden las audiometrías: el uuid vacío deja la consulta apagada.
+  const canViewAudiometry = can(Permission.VIEW_CLINICAL_RECORD);
+  const audiometryQuery = useAudiometryEntriesQuery(canViewAudiometry ? patientUuid : '');
   const { executeUploadDocument, isPending: isUploading } = useUploadDocumentMutation();
   const { executeDeleteDocument, isPending: isDeleting } = useDeleteDocumentMutation();
   const { executeUpdateDocument, isPending: isUpdating } = useUpdateDocumentMutation();
 
-  const documents = useMemo(() => (data ?? []).map(mapToDocumentItem), [data]);
+  const isLoading = isLoadingFiles || audiometryQuery.isLoading;
+  const isError = isFilesError || audiometryQuery.isError;
+  const refetch = () => {
+    if (isFilesError) void refetchFiles();
+    if (audiometryQuery.isError) void audiometryQuery.refetch();
+  };
+
+  const audiometryEntries = audiometryQuery.data;
+  const audiometryName = t(TEXT.DOCUMENTS.AUDIOMETRY.NAME);
+  const documents = useMemo(
+    () =>
+      sortArchiveItems([
+        ...(data ?? []).map(mapFileToArchiveItem),
+        ...(audiometryEntries ?? []).map((entry) =>
+          mapAudiometryToArchiveItem(entry, audiometryName),
+        ),
+      ]),
+    [data, audiometryEntries, audiometryName],
+  );
 
   const filteredDocuments = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return documents.filter((document) => {
-      const matchesFilter = filter === ALL_CATEGORIES_FILTER || document.category === filter;
+      // La audiometría no tiene categoría: solo aparece en "Todos".
+      const matchesFilter =
+        filter === ALL_CATEGORIES_FILTER ||
+        (document.type === ArchiveItemType.FILE && document.document.category === filter);
       const matchesSearch =
         !normalizedSearch || document.displayName.toLowerCase().includes(normalizedSearch);
       return matchesFilter && matchesSearch;
@@ -223,6 +262,9 @@ export function useDocuments(patientUuid: string) {
 
   return {
     documents: visibleDocuments,
+    audiometryToPreviewUuid,
+    handleOpenAudiometryPreview: setAudiometryToPreviewUuid,
+    handleCloseAudiometryPreview: () => setAudiometryToPreviewUuid(null),
     filteredCount: filteredDocuments.length,
     totalCount: documents.length,
     isLoading,
