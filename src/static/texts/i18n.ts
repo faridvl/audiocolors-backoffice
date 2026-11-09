@@ -176,6 +176,7 @@ export const TEXT = {
       INTRO: 'documentTemplates.variables.intro',
       INSERT: 'documentTemplates.variables.insert',
       IN_USE: 'documentTemplates.variables.inUse',
+      NOT_CONFIGURED: 'documentTemplates.variables.notConfigured',
       /** `${GROUP_PREFIX}.${DocumentTemplateVariableGroup}` */
       GROUP_PREFIX: 'documentTemplates.variables.groups',
       /** `${ITEM_PREFIX}.${DocumentTemplateVariable}.label` y `.example` */

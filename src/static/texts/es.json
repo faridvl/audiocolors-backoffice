@@ -242,6 +242,7 @@
       "intro": "Toca una variable para insertarla en el texto",
       "insert": "Insertar {{variable}}",
       "inUse": "En uso",
+      "notConfigured": "La clínica no tiene configurado el dato «{{variable}}». Puedes agregarlo en Configuración → Clínica; mientras tanto saldrá vacío.",
       "groups": {
         "patient": "Paciente",
         "tests": "Pruebas",
