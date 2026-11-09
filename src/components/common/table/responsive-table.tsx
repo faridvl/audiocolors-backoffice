@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Inbox, AlertTriangle, Loader2, SearchX } from "lucide-react";
 import { tailwind } from "@/utils/tailwind-utils";
 import {
@@ -57,6 +57,35 @@ const CARDS_VISIBILITY: Record<TableBreakpoint, string> = {
   [TableBreakpoint.MD]: "md:hidden",
   [TableBreakpoint.XL]: "xl:hidden",
 };
+
+const TABLE_MEDIA_QUERY: Record<TableBreakpoint, string> = {
+  [TableBreakpoint.MD]: "(min-width: 768px)",
+  [TableBreakpoint.XL]: "(min-width: 1280px)",
+};
+
+/**
+ * Atributos de la versión que el CSS oculta: ambas versiones están en el DOM, y esta no debe
+ * leerla un lector de pantalla ni recibir el foco. Antes de montar no se sabe cuál se ve (undefined).
+ */
+function useHiddenVersionProps(breakpoint: TableBreakpoint) {
+  const [isTableVisible, setIsTableVisible] = useState<boolean | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia(TABLE_MEDIA_QUERY[breakpoint]);
+    const update = () => setIsTableVisible(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, [breakpoint]);
+
+  const hiddenProps = { "aria-hidden": true, inert: "" } as const;
+  return {
+    tableProps: isTableVisible === false ? hiddenProps : {},
+    cardsProps: isTableVisible === true ? hiddenProps : {},
+  };
+}
 
 export enum TableState {
   LOADING = "LOADING",
@@ -134,6 +163,8 @@ export function ResponsiveTable<T>({
   noResultsDescription = "Prueba con otros términos o cambia los filtros.",
   errorTitle = "No se pudieron cargar los datos",
 }: ResponsiveTableProps<T>) {
+  const { tableProps, cardsProps } = useHiddenVersionProps(breakpoint);
+
   const resolveState = (): TableState => {
     if (isLoading) return TableState.LOADING;
     if (isError) return TableState.ERROR;
@@ -208,6 +239,7 @@ export function ResponsiveTable<T>({
     <>
       {/* Desktop: tabla */}
       <div
+        {...tableProps}
         className={tailwind(
           "overflow-hidden rounded-card border border-ink-200 bg-white",
           TABLE_VISIBILITY[breakpoint],
@@ -283,6 +315,7 @@ export function ResponsiveTable<T>({
 
       {/* Movil: una tarjeta por registro */}
       <div
+        {...cardsProps}
         className={tailwind(
           "flex flex-col gap-2",
           CARDS_VISIBILITY[breakpoint],

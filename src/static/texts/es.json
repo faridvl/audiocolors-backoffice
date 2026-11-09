@@ -49,13 +49,13 @@
       "errorBeforeMin": "La fecha no puede ser anterior al {{date}}.",
       "errorAfterMax": "La fecha no puede ser posterior al {{date}}."
     },
-    "phoneHint": "¿Otro país? Elige su código en la lista.",
+    "phoneHint": "¿Otro país? Elige el código en la lista.",
     "phoneCountry": {
       "label": "País del teléfono",
       "search": "Buscar país o código",
       "empty": "No encontramos ese país."
     },
-    "forbidden": "Tu usuario no tiene acceso a esta sección.",
+    "forbidden": "No tienes acceso a esta sección.",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
     "no": "No",
@@ -247,7 +247,7 @@
       },
       "USERS": {
         "title": "Usuarios",
-        "description": "Quién entra a la clínica y con qué rol. Solo el propietario puede administrarlo."
+        "description": "Quién entra a la clínica y con qué nivel. Lo administran el propietario y administración."
       }
     },
     "clinic": {
@@ -297,7 +297,7 @@
       "emptyTitle": "Aún no hay usuarios",
       "add": "Nuevo usuario",
       "you": "Tú",
-      "legacyRole": "Rol anterior",
+      "legacyRole": "Nivel anterior",
       "columns": {
         "name": "Nombre",
         "email": "Correo",
@@ -352,7 +352,7 @@
         "roleLegacyHint": "Tiene un nivel anterior. Si no eliges uno nuevo, se queda como está.",
         "phone": "Teléfono",
         "password": "Contraseña temporal",
-        "passwordHint": "Mínimo 8 caracteres, con una mayúscula y un número. Compártela con la persona para su primer ingreso.",
+        "passwordHint": "Mínimo 8 caracteres, con una mayúscula y un número.",
         "create": "Crear usuario",
         "back": "Volver a usuarios",
         "notFound": "No encontramos a este usuario.",
@@ -370,9 +370,12 @@
       },
       "audit": {
         "title": "Cambios de acceso",
-        "empty": "Todavía no hay cambios de acceso.",
+        "empty": "Aún no hay cambios de acceso.",
         "loadError": "No pudimos cargar los cambios de acceso.",
-        "none": "Ninguna",
+        "noRole": "Sin nivel",
+        "noSpecialties": "Sin especialidades",
+        "created": "Usuario creado con nivel {{role}}.",
+        "createdAttends": "Usuario creado con nivel {{role}}, atiende pacientes: {{specialties}}.",
         "summary": "{{actor}} · {{date}}",
         "change": "{{field}}: {{before}} → {{after}}",
         "fields": {
@@ -389,7 +392,7 @@
       },
       "statusDialog": {
         "deactivateTitle": "¿Desactivar a {{name}}?",
-        "deactivateMessage": "{{name}} no podrá iniciar sesión mientras esté inactivo. Sus datos y su historial se conservan, y puedes reactivarlo cuando quieras.",
+        "deactivateMessage": "{{name}} no podrá iniciar sesión mientras esté inactivo. Sus datos se conservan.",
         "deactivateConfirm": "Desactivar",
         "reactivateTitle": "¿Reactivar a {{name}}?",
         "reactivateMessage": "{{name}} volverá a poder iniciar sesión con su contraseña actual.",
@@ -405,7 +408,7 @@
       },
       "errors": {
         "fullNameRequired": "Escribe el nombre completo",
-        "roleRequired": "Elige un rol",
+        "roleRequired": "Elige un nivel",
         "fullNameMax": "El nombre es demasiado largo",
         "emailRequired": "Escribe el correo",
         "emailInvalid": "Revisa el correo: no parece válido",
@@ -416,7 +419,7 @@
         "passwordMin": "Usa al menos 8 caracteres",
         "passwordMax": "La contraseña es demasiado larga",
         "passwordUppercase": "Incluye al menos una mayúscula",
-        "specialtiesRequired": "Elige al menos una especialidad.",
+        "specialtiesRequired": "Elige al menos una especialidad",
         "passwordDigit": "Incluye al menos un número"
       }
     },
@@ -1641,7 +1644,7 @@
     "notProfessional": "Tu cuenta no atiende pacientes, así que no necesitas datos profesionales.",
     "saved": "Perfil actualizado",
     "errors": {
-      "licenseMax": "El número de colegiado es demasiado largo."
+      "licenseMax": "El número de colegiado es demasiado largo"
     }
   }
 }

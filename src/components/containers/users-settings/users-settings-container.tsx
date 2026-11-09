@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Eye, KeyRound, Pencil, Plus, UserCheck, UserX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenu, ActionMenuItem } from '@/components/common/action-menu/action-menu';
@@ -11,6 +12,7 @@ import {
   TableColumn,
 } from '@/components/common/table/responsive-table';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
 import { ManagedUser, UserStatus } from '@/types/users/user';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -53,14 +55,20 @@ export const UsersSettingsContainer: React.FC = () => {
       render: (user) => (
         <span className={tailwind('flex flex-col', USER_COLUMN_MAX_WIDTH)}>
           <span className="flex min-w-0 items-center gap-2">
-            <Typography
-              variant={TypographyVariant.ACCENT}
-              as="span"
-              className="truncate"
-              title={user.fullName}
+            <Link
+              href={routesPrivate.settings.userDetail(user.uuid)}
+              onClick={(event) => event.stopPropagation()}
+              className="min-w-0 rounded hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
             >
-              {user.fullName}
-            </Typography>
+              <Typography
+                variant={TypographyVariant.ACCENT}
+                as="span"
+                className="block truncate"
+                title={user.fullName}
+              >
+                {user.fullName}
+              </Typography>
+            </Link>
             {isCurrentUser(user) && <YouPill label={t(TEXTS.YOU)} />}
           </span>
           <span className="truncate text-ink-500" title={user.email}>
@@ -199,6 +207,7 @@ export const UsersSettingsContainer: React.FC = () => {
         errorTitle={t(TEXTS.LOAD_ERROR)}
         breakpoint={TableBreakpoint.XL}
         cardTitleClassName="pr-12"
+        onRowClick={openEditor}
         rowActions={renderRowActions}
       />
 

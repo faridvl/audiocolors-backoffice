@@ -4,7 +4,7 @@ import { Typography, TypographyVariant } from '@/components/common/typography/ty
 import { useUserAuditQuery } from '@/shared/api/querys/user-audit-query';
 import { formatDateTime } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
-import { formatAuditChange } from './user-audit-presenter';
+import { buildAuditItems } from './user-audit-presenter';
 
 const TEXTS = TEXT.SETTINGS.USERS.AUDIT;
 
@@ -16,7 +16,7 @@ interface UserAuditListProps {
 export const UserAuditList: React.FC<UserAuditListProps> = ({ targetUuid }) => {
   const { t } = useTranslation();
   const { data, isLoading, isError } = useUserAuditQuery(targetUuid);
-  const entries = data ?? [];
+  const entries = buildAuditItems(data ?? [], t);
 
   return (
     <section className="flex flex-col gap-3" aria-labelledby="user-audit-title">
@@ -37,12 +37,9 @@ export const UserAuditList: React.FC<UserAuditListProps> = ({ targetUuid }) => {
       {entries.length > 0 && (
         <ul className="flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-100">
           {entries.map((entry) => (
-            <li
-              key={`${entry.createdAt}-${entry.field}`}
-              className="flex flex-col gap-0.5 px-3 py-2.5"
-            >
+            <li key={entry.key} className="flex flex-col gap-0.5 px-3 py-2.5">
               <Typography variant={TypographyVariant.BODY} className="break-words">
-                {formatAuditChange(entry, t)}
+                {entry.text}
               </Typography>
               <Typography variant={TypographyVariant.HELPER}>
                 {t(TEXTS.SUMMARY, {

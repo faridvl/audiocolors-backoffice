@@ -243,7 +243,10 @@ export const TEXT = {
         TITLE: 'settings.users.audit.title',
         EMPTY: 'settings.users.audit.empty',
         LOAD_ERROR: 'settings.users.audit.loadError',
-        NONE: 'settings.users.audit.none',
+        NO_ROLE: 'settings.users.audit.noRole',
+        NO_SPECIALTIES: 'settings.users.audit.noSpecialties',
+        CREATED: 'settings.users.audit.created',
+        CREATED_ATTENDS: 'settings.users.audit.createdAttends',
         SUMMARY: 'settings.users.audit.summary',
         CHANGE: 'settings.users.audit.change',
         FIELDS: {
