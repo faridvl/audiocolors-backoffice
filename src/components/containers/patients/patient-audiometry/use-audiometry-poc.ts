@@ -12,7 +12,7 @@ import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { useSession } from '@/hooks/use-session';
-import { printWithFileName } from '@/shared/utils/print-document';
+import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
 import {
@@ -380,7 +380,9 @@ export function useAudiometryPoc(patientUuid: string) {
     patientAge: calculateAge(patient?.birthDate),
     patientBirthDate: formatCalendarDate(patient?.birthDate),
   };
-  const handlePrint = () =>
+  const handlePrint = async () => {
+    // El logo de la clínica debe estar cargado antes de abrir la impresión.
+    await waitForImages(document);
     printWithFileName(
       buildPrintFileName({
         type: t(TEXT.PATIENTS.CLINICAL_SUMMARY.FILE_TYPE.AUDIOMETRY),
@@ -389,6 +391,7 @@ export function useAudiometryPoc(patientUuid: string) {
         documentId: printReportHeader.patientDocumentId,
       }),
     );
+  };
 
   return {
     accordionRef,

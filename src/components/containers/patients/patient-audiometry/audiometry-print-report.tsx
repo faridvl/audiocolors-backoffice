@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrandLogo } from '@/components/common/brand/brand-logo';
+import { ClinicBrand } from '@/components/common/brand/clinic-brand';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -179,14 +179,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       {!isEmbedded && (
         <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
           <div className="flex flex-col gap-1">
-            {header.clinicLogoUrl ? (
-              // Logo de la clínica en un host remoto que next/image no tiene configurado.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={header.clinicLogoUrl} alt={header.clinicName} className="h-10 w-auto" />
-            ) : (
-              <BrandLogo height={40} />
-            )}
-            {header.clinicName && (
+            <ClinicBrand logoUrl={header.clinicLogoUrl} name={header.clinicName} height={40} />
+            {header.clinicLogoUrl && header.clinicName && (
               <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
             )}
           </div>

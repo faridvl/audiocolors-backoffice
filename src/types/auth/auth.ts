@@ -32,7 +32,7 @@ export interface SessionTenant {
   uuid: string;
   businessName: string;
   businessType?: string;
-  logoUrl?: string;
+  logoUrl?: string | null;
 }
 
 export interface UserSessionResponse {

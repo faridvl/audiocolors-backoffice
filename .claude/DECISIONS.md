@@ -1042,3 +1042,16 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
   encadenan, un cambio de estado nunca se descarta por haber otro en curso, y mientras se guarda no
   se puede cancelar ni plegar la fila. Si falla solo el estado, la nota ya está guardada y se
   reintenta únicamente el estado.
+
+## D67 · Logo y nombre de la clínica (2026-11-08)
+
+- `ClinicBrand` muestra el logo del tenant con `<img>` (nunca SVG inline) o, sin logo, el nombre en
+  texto. No cae al logo de AudioColors; `BrandLogo` queda solo para login y pantallas públicas.
+- Si el logo no carga, se muestra el nombre. Con logo y nombre juntos (resumen, informe) el nombre
+  solo se escribe cuando hay logo, para no duplicarlo.
+- Al guardar nombre o logo se actualiza la consulta del tenant y se invalida la sesión (`authMe`),
+  que es de donde el menú y los documentos leen la clínica.
+- La subida del logo usa `fetch` con `FormData`: el cliente de API fuerza JSON. El cliente valida
+  tipo y 2 MB antes de enviar; el API repite la validación.
+- El informe de audiometría espera las imágenes antes de imprimir, y su nombre de archivo usa el
+  nombre vigente de la clínica.

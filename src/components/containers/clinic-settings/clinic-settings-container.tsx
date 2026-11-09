@@ -7,8 +7,13 @@ import { FormField } from '@/components/common/input/input';
 import { PhoneField } from '@/components/common/phone-field/phone-field';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
-import { TENANT_ADDRESS_MAX_LENGTH, TENANT_EMAIL_MAX_LENGTH } from '@/types/tenant/tenant';
+import {
+  TENANT_ADDRESS_MAX_LENGTH,
+  TENANT_EMAIL_MAX_LENGTH,
+  TENANT_NAME_MAX_LENGTH,
+} from '@/types/tenant/tenant';
 import { ClinicFormValues } from './clinic-form';
+import { ClinicLogoField } from './clinic-logo-field';
 import { useClinicSettings } from './use-clinic-settings';
 
 export const ClinicSettingsContainer: React.FC = () => {
@@ -23,6 +28,7 @@ export const ClinicSettingsContainer: React.FC = () => {
     isSaving,
     canEdit,
     handleSubmit,
+    logo,
   } = useClinicSettings();
 
   if (isLoading) {
@@ -57,17 +63,20 @@ export const ClinicSettingsContainer: React.FC = () => {
     >
       {({ dirty }) => (
         <Form className="flex w-full flex-col gap-4 rounded-lg border border-ink-200 bg-white p-4 sm:p-5">
-          <div className="flex flex-col gap-1">
-            <Typography variant={TypographyVariant.HELPER}>
-              {t(TEXT.SETTINGS.CLINIC.NAME)}
-            </Typography>
-            <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="break-words">
-              {tenant.businessName}
-            </Typography>
-            <Typography variant={TypographyVariant.HELPER}>
-              {t(TEXT.SETTINGS.CLINIC.NAME_HINT)}
-            </Typography>
-          </div>
+          <FormField
+            name="name"
+            label={t(TEXT.SETTINGS.CLINIC.NAME)}
+            hint={t(TEXT.SETTINGS.CLINIC.NAME_HINT)}
+            maxLength={TENANT_NAME_MAX_LENGTH}
+            disabled={!canEdit}
+            className="sm:max-w-sm"
+          />
+          <ClinicLogoField
+            logoUrl={tenant.logoUrl}
+            clinicName={tenant.businessName}
+            canEdit={canEdit}
+            logo={logo}
+          />
 
           <PhoneField
             name="phone"

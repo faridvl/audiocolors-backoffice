@@ -6,9 +6,6 @@ import { fillVariables } from '@/shared/utils/document-template-text';
 import { TEXT } from '@/static/texts/i18n';
 import { DOCUMENT_TEMPLATE_VARIABLES } from '@/types/document-templates/document-template';
 
-/** Logo que se usa en el pie cuando la clínica no subió el suyo. */
-const FALLBACK_LOGO_URL = '/logo-audiocolors.png';
-
 /** Arma el PDF de ejemplo de `content` con datos inventados. */
 export function useDocumentTemplateExample(content: string) {
   const { t } = useTranslation();
@@ -17,7 +14,7 @@ export function useDocumentTemplateExample(content: string) {
   const [isError, setIsError] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const clinicName = tenant?.businessName ?? '';
-  const logoUrl = tenant?.logoUrl ?? FALLBACK_LOGO_URL;
+  const logoUrl = tenant?.logoUrl ?? null;
 
   useEffect(() => {
     let isCancelled = false;
@@ -30,7 +27,7 @@ export function useDocumentTemplateExample(content: string) {
 
     const build = async () => {
       try {
-        const logo = await loadDocumentLogo(logoUrl);
+        const logo = logoUrl ? await loadDocumentLogo(logoUrl) : null;
         const blob = await buildDocumentTemplatePdf({
           content: fillVariables(content, examples),
           clinicName,
