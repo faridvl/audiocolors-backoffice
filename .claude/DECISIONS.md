@@ -1072,3 +1072,14 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
 - La vista previa se arma desde los datos de la audiometría (`buildSummaryAudiometry`), sin generar ni subir un PDF.
 - Control de evolución: la nota con `audiometryEntryUuid` abre esa audiometría en el expediente por el parámetro de URL `audiometria=<uuid>`. Un uuid que no existe se ignora.
 
+
+## D70 · Configuración → Usuarios (2026-11-08)
+
+- Solo el `OWNER` administra usuarios de su clínica (nuevo permiso, no comparar el rol). El API lo
+  exige en crear, editar a otro, cambiar rol, activar/desactivar y poner contraseña; hoy `/users` no
+  revisaba el rol y cualquier sesión podía crear un OWNER.
+- Alta con contraseña temporal que pone el OWNER (no hay envío de correos). El OWNER también puede
+  poner una contraseña nueva a cualquier usuario de su clínica.
+- No se borra: se desactiva y se reactiva. Un usuario inactivo no puede iniciar sesión.
+- Nadie se desactiva ni se cambia el rol a sí mismo, y la clínica nunca queda sin un OWNER activo.
+- Los roles siguen fijos (D20); los permisos configurables quedan para después.

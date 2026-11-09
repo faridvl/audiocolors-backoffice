@@ -133,6 +133,9 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Usuarios (2026-11-08, en curso):** Configuración → Usuarios para que el OWNER administre los
+  usuarios de su clínica (D70). Ramas `feature/usuarios` en el front y en el API.
+
 - **Versión 2.0.0 (2026-11-08, rama `release/2.0.0` del front y del API, con PR a `develop` abierto en cada repo):**
   changelog de 20 cambios aprobado por el usuario y cargado en `releases.ts`/`es.json`; el API
   sube a 2.0.0 en sus cuatro `package.json`. Cubre todo lo que hay en `develop` (no incluye
