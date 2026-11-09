@@ -7,6 +7,22 @@ export enum Ear {
 
 export const EARS: Ear[] = [Ear.RIGHT, Ear.LEFT];
 
+/** Tipo de audiometría; los códigos son los del API. */
+export enum AudiometryTypeCode {
+  CLINICAL = 'CLINICAL',
+  SCREENING = 'SCREENING',
+}
+
+export const DEFAULT_AUDIOMETRY_TYPE = AudiometryTypeCode.CLINICAL;
+
+/** Resultado de un rastreo. */
+export enum ScreeningResult {
+  PASS = 'PASS',
+  REFER = 'REFER',
+}
+
+export const SCREENING_RESULTS: ScreeningResult[] = [ScreeningResult.PASS, ScreeningResult.REFER];
+
 /** Qué se marca en el audiograma. */
 export enum AudiometryTool {
   AIR = 'AIR',

@@ -6,6 +6,7 @@ import {
   GradingScale,
   HearingGrade,
   PtaType,
+  ScreeningResult,
   WeberResult,
 } from './audiometry-constants';
 
@@ -67,6 +68,11 @@ export const PTA_TYPE_LABEL_KEYS: Record<PtaType, string> = {
   [PtaType.PTA_5124]: AUDIOMETRY_TEXT.PTA_TYPES.PTA_5124,
   [PtaType.PTA_124]: AUDIOMETRY_TEXT.PTA_TYPES.PTA_124,
   [PtaType.PTA_251]: AUDIOMETRY_TEXT.PTA_TYPES.PTA_251,
+};
+
+export const SCREENING_RESULT_LABEL_KEYS: Record<ScreeningResult, string> = {
+  [ScreeningResult.PASS]: AUDIOMETRY_TEXT.SCREENING.PASS,
+  [ScreeningResult.REFER]: AUDIOMETRY_TEXT.SCREENING.REFER,
 };
 
 const MISSING_PTA_DASH = '–';

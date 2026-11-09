@@ -7,6 +7,7 @@ import {
   DEFAULT_PTA_TYPE,
   EARS,
   Ear,
+  ScreeningResult,
   SpeechField,
   WeberResult,
   buildDefaultWeber,
@@ -21,7 +22,10 @@ import {
 import {
   AudiometryFormState,
   hasAudiometryData,
+  ScreeningFormState,
   payloadToState,
+  screeningPayloadToState,
+  screeningStateToPayload,
   stateToPayload,
 } from './audiometry-payload-mapper';
 import { WordListType } from './speech-word-lists';
@@ -187,5 +191,57 @@ describe('hasAudiometryData', () => {
     const withNotes = buildEmptyState();
     withNotes.notes.observations = 'Control en 6 meses';
     assert.equal(hasAudiometryData(withNotes), true);
+  });
+});
+
+const buildScreeningState = (): ScreeningFormState => {
+  const marks = buildEmptyMarks();
+  marks[AudiometryTool.AIR][Ear.RIGHT][1000] = { thresholdDb: 20, isMasked: true, hasNoResponse: false };
+  marks[AudiometryTool.AIR][Ear.RIGHT][3000] = { thresholdDb: 25, isMasked: false, hasNoResponse: false };
+  marks[AudiometryTool.AIR][Ear.LEFT][500] = { thresholdDb: 120, isMasked: false, hasNoResponse: true };
+  // Una marca ajena a rastreo no debe viajar.
+  marks[AudiometryTool.BONE][Ear.LEFT][500] = { thresholdDb: 30, isMasked: false, hasNoResponse: false };
+  return {
+    marks,
+    result: ScreeningResult.REFER,
+    notes: { diagnosis: '', observations: '  Control en un mes  ' },
+  };
+};
+
+describe('screeningStateToPayload', () => {
+  it('manda solo vía aérea sin enmascarar, el resultado y solo observaciones', () => {
+    const payload = screeningStateToPayload(buildScreeningState());
+
+    assert.ok(payload);
+    assert.deepEqual(Object.keys(payload.marks), ['AIR']);
+    assert.deepEqual(payload.marks.AIR.RIGHT, {
+      '1000': { thresholdDb: 20, isMasked: false, hasNoResponse: false },
+      '3000': { thresholdDb: 25, isMasked: false, hasNoResponse: false },
+    });
+    assert.deepEqual(payload.marks.AIR.LEFT, {
+      '500': { thresholdDb: 120, isMasked: false, hasNoResponse: true },
+    });
+    assert.equal(payload.result, 'REFER');
+    assert.deepEqual(payload.notes, { observations: 'Control en un mes' });
+  });
+
+  it('no arma el cuerpo si falta el resultado', () => {
+    const state = buildScreeningState();
+    state.result = null;
+    assert.equal(screeningStateToPayload(state), null);
+  });
+});
+
+describe('screeningPayloadToState', () => {
+  it('devuelve las marcas aéreas, el resultado y las observaciones guardadas', () => {
+    const payload = screeningStateToPayload(buildScreeningState());
+    assert.ok(payload);
+    const restored = screeningPayloadToState(JSON.parse(JSON.stringify(payload)));
+
+    assert.equal(restored.result, ScreeningResult.REFER);
+    assert.deepEqual(restored.notes, { diagnosis: '', observations: 'Control en un mes' });
+    assert.equal(restored.marks[AudiometryTool.AIR][Ear.RIGHT][3000]?.thresholdDb, 25);
+    assert.equal(restored.marks[AudiometryTool.AIR][Ear.LEFT][500]?.hasNoResponse, true);
+    assert.deepEqual(restored.marks[AudiometryTool.BONE][Ear.LEFT], {});
   });
 });

@@ -41,6 +41,8 @@ interface AudiometryToolbarProps {
   isMasked: boolean;
   canMask: boolean;
   hasNoResponse: boolean;
+  /** El rastreo solo marca vía aérea, sin enmascarado: no hay herramientas que elegir. */
+  isScreening?: boolean;
   onSelectTool: (tool: AudiometryTool) => void;
   onToggleMasked: () => void;
   onToggleNoResponse: () => void;
@@ -51,6 +53,7 @@ export const AudiometryToolbar: React.FC<AudiometryToolbarProps> = ({
   isMasked,
   canMask,
   hasNoResponse,
+  isScreening = false,
   onSelectTool,
   onToggleMasked,
   onToggleNoResponse,
@@ -60,43 +63,47 @@ export const AudiometryToolbar: React.FC<AudiometryToolbarProps> = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <div
-        role="group"
-        aria-label={t(audiometryText.TOOLBAR_LABEL)}
-        className="flex flex-wrap gap-2"
-      >
-        {AUDIOMETRY_TOOLS.map((tool) => {
-          const isActive = tool === activeTool;
-          return (
-            <button
-              key={tool}
-              type="button"
-              aria-pressed={isActive}
-              onClick={() => onSelectTool(tool)}
-              className={tailwind(
-                'flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors',
-                isActive
-                  ? 'border-brand bg-brand-50 text-brand-700'
-                  : 'border-ink-200 bg-white text-ink-700 hover:bg-ink-50',
-              )}
-            >
-              {tool === AudiometryTool.FREE_FIELD ? (
-                <ToolIcon tool={tool} ear={Ear.RIGHT} />
-              ) : (
-                EARS.map((ear) => <ToolIcon key={ear} tool={tool} ear={ear} />)
-              )}
-              {t(TOOL_LABEL_KEYS[tool])}
-            </button>
-          );
-        })}
-      </div>
+      {!isScreening && (
+        <div
+          role="group"
+          aria-label={t(audiometryText.TOOLBAR_LABEL)}
+          className="flex flex-wrap gap-2"
+        >
+          {AUDIOMETRY_TOOLS.map((tool) => {
+            const isActive = tool === activeTool;
+            return (
+              <button
+                key={tool}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => onSelectTool(tool)}
+                className={tailwind(
+                  'flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'border-brand bg-brand-50 text-brand-700'
+                    : 'border-ink-200 bg-white text-ink-700 hover:bg-ink-50',
+                )}
+              >
+                {tool === AudiometryTool.FREE_FIELD ? (
+                  <ToolIcon tool={tool} ear={Ear.RIGHT} />
+                ) : (
+                  EARS.map((ear) => <ToolIcon key={ear} tool={tool} ear={ear} />)
+                )}
+                {t(TOOL_LABEL_KEYS[tool])}
+              </button>
+            );
+          })}
+        </div>
+      )}
       <div className="flex flex-wrap gap-x-6">
-        <Switch
-          isChecked={canMask && isMasked}
-          onChange={() => canMask && onToggleMasked()}
-          label={t(audiometryText.MASKED)}
-          className={canMask ? undefined : 'opacity-50'}
-        />
+        {!isScreening && (
+          <Switch
+            isChecked={canMask && isMasked}
+            onChange={() => canMask && onToggleMasked()}
+            label={t(audiometryText.MASKED)}
+            className={canMask ? undefined : 'opacity-50'}
+          />
+        )}
         <Switch
           isChecked={hasNoResponse}
           onChange={onToggleNoResponse}

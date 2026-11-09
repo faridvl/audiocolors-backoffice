@@ -793,6 +793,22 @@ export const TEXT = {
         ENTRY_AUTHOR_DATE: 'patients.detail.audiometry.entryAuthorDate',
         ENTRY_LOADING: 'patients.detail.audiometry.entryLoading',
         PRINT: 'patients.detail.audiometry.print',
+        ENTRY_TYPED: 'patients.detail.audiometry.entryTyped',
+        ENTRY_SCREENING: 'patients.detail.audiometry.entryScreening',
+        TYPE: {
+          LABEL: 'patients.detail.audiometry.type.label',
+          CURRENT: 'patients.detail.audiometry.type.current',
+          CHANGE_TITLE: 'patients.detail.audiometry.type.changeTitle',
+          CHANGE_MESSAGE: 'patients.detail.audiometry.type.changeMessage',
+          CHANGE_CONFIRM: 'patients.detail.audiometry.type.changeConfirm',
+          CHANGE_CANCEL: 'patients.detail.audiometry.type.changeCancel',
+        },
+        SCREENING: {
+          RESULT_LABEL: 'patients.detail.audiometry.screening.resultLabel',
+          PASS: 'patients.detail.audiometry.screening.pass',
+          REFER: 'patients.detail.audiometry.screening.refer',
+          RESULT_REQUIRED: 'patients.detail.audiometry.screening.resultRequired',
+        },
         INVALIDATE: {
           BUTTON: 'patients.detail.audiometry.invalidate.button',
           TAG: 'patients.detail.audiometry.invalidate.tag',

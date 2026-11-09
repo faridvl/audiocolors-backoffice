@@ -1,14 +1,21 @@
 import { formatCalendarDate, formatDateTime, formatLongDate } from '@/shared/utils/formatters';
-import { AudiometryEntry } from '@/types/patients/audiometry-entry';
+import { AudiometryEntry, ClinicalAudiometryEntry } from '@/types/patients/audiometry-entry';
 import { DocumentTemplateVariable } from '@/types/document-templates/document-template';
 import { formatPhoneForDisplay } from '@/shared/utils/phone';
 import { OtoscopyEntry } from '@/types/patients/otoscopy-entry';
 import { GENDER_LABELS, Patient, PatientGender } from '@/types/patients/patient';
 import { Tenant } from '@/types/tenant/tenant';
 import { buildAudiometryReportData } from '../patient-audiometry/audiometry-report-data';
+import { AudiometryTypeCode } from '../patient-audiometry/audiometry-constants';
 import { payloadToState } from '../patient-audiometry/audiometry-payload-mapper';
 import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
 import { SummaryAudiometry } from './patient-summary-types';
+
+/** El informe impreso aún no soporta el rastreo: el resumen trabaja solo con clínicas. */
+export const isClinicalEntry = (
+  entry: AudiometryEntry | undefined,
+): entry is ClinicalAudiometryEntry =>
+  entry !== undefined && entry.typeCode !== AudiometryTypeCode.SCREENING;
 
 interface TemplateValuesInput {
   patient: Patient;
@@ -20,7 +27,7 @@ interface TemplateValuesInput {
   /** Última otoscopía del paciente; sin ella, las variables salen vacías. */
   latestOtoscopy: OtoscopyEntry | null;
   /** Diagnóstico y observaciones de la última audiometría válida. */
-  latestAudiometryNotes: AudiometryEntry['payload']['notes'] | null;
+  latestAudiometryNotes: ClinicalAudiometryEntry['payload']['notes'] | null;
   clinic: Tenant | null;
 }
 
@@ -66,7 +73,7 @@ export function buildTemplateValues({
 
 /** Lo que recibe el informe de audiometría suelto, a partir de la audiometría guardada. */
 export function buildSummaryAudiometry(
-  entry: AudiometryEntry,
+  entry: ClinicalAudiometryEntry,
   header: PrintReportHeader,
   professional: string,
 ): SummaryAudiometry {

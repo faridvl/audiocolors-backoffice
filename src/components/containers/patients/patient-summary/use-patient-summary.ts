@@ -26,7 +26,8 @@ import { buildEntryWithPtaLabel } from '../patient-audiometry/audiometry-labels'
 import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
 import { PatientSummaryPrintProps } from './patient-summary-print';
 import { resolveKnownAuthor } from './summary-authorship';
-import { buildSummaryAudiometry, buildTemplateValues } from './summary-print-data';
+import { AudiometryTypeCode } from '../patient-audiometry/audiometry-constants';
+import { buildSummaryAudiometry, buildTemplateValues, isClinicalEntry } from './summary-print-data';
 import {
   filterValidAudiometries,
   resolveDefaultAudiometryUuids,
@@ -97,7 +98,10 @@ export function usePatientSummary(patient: Patient) {
   const templates = templatesQuery.data ?? [];
   const background = backgroundQuery.data ?? null;
   const latestOtoscopy = [...(otoscopyQuery.data ?? [])].sort(byNewest)[0] ?? null;
-  const audiometryList = audiometryListQuery.data ?? [];
+  // El informe impreso aún no soporta el rastreo: el resumen trabaja solo con clínicas.
+  const audiometryList = (audiometryListQuery.data ?? []).filter(
+    (entry) => entry.typeCode !== AudiometryTypeCode.SCREENING,
+  );
   const validAudiometries = filterValidAudiometries(audiometryList);
   // Lo elegido se contrasta con las válidas actuales: una marcada como mal hecha en otra pestaña
   // sale de la selección apenas se refresca la lista.
@@ -261,7 +265,9 @@ export function usePatientSummary(patient: Patient) {
       ageText: age !== null ? t(TEXT.PATIENTS.DETAIL.AGE, { count: age }) : '',
       issuedAt,
       latestOtoscopy,
-      latestAudiometryNotes: latestAudiometryQuery.data?.payload.notes ?? null,
+      latestAudiometryNotes: isClinicalEntry(latestAudiometryQuery.data)
+        ? latestAudiometryQuery.data.payload.notes
+        : null,
       clinic: clinicQuery.data ?? null,
     });
     const chosenTemplates = hasTemplatesChosen
@@ -288,7 +294,9 @@ export function usePatientSummary(patient: Patient) {
     };
     const chosenAudiometries = checked[SummaryCard.AUDIOMETRY]
       ? resolveSelectedAudiometries(
-          audiometryDetailQueries.flatMap((query) => (query.data ? [query.data] : [])),
+          audiometryDetailQueries.flatMap((query) =>
+            isClinicalEntry(query.data) ? [query.data] : [],
+          ),
           audiometryUuids,
         )
       : [];

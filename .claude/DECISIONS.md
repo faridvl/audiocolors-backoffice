@@ -1042,3 +1042,11 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
   encadenan, un cambio de estado nunca se descarta por haber otro en curso, y mientras se guarda no
   se puede cancelar ni plegar la fila. Si falla solo el estado, la nota ya está guardada y se
   reintenta únicamente el estado.
+
+## D67 · Tipos de audiometría: clínica y rastreo (2026-11-08)
+
+- El tipo se elige solo al crear. Cambiarlo con algo ya puesto abre un `ConfirmDialog` que, si se acepta, descarta lo marcado y escrito; si no hay nada, cambia sin preguntar.
+- Rastreo: solo vía aérea sin enmascarado, resultado Pasa/Refiere obligatorio y solo observaciones. Se puede intentar guardar sin marcas; lo que se exige es el resultado.
+- El resumen del paciente y el informe impreso quedan solo para clínicas. La impresión del rastreo está fuera de este alcance y el botón Imprimir no se muestra en rastreo.
+- Los enums (`AudiometryTypeCode`, `ScreeningResult`) viven en `audiometry-constants.ts` para que los tests sin alias `@/` los importen.
+- Etiqueta del historial: `fecha · tipo` y, en rastreo, `fecha · tipo · resultado`. Los nombres salen del `name` que devuelve el API.

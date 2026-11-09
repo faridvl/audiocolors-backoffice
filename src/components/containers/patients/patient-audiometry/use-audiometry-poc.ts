@@ -6,6 +6,7 @@ import { useInvalidateAudiometryEntryMutation } from '@/shared/api/mutations/aud
 import {
   FETCH_AUDIOMETRY_ENTRY_KEY,
   useAudiometryEntriesQuery,
+  useAudiometryTypesQuery,
   useAudiometryEntryQuery,
 } from '@/shared/api/querys/patient-audiometry-entries-query';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
@@ -19,6 +20,8 @@ import {
   AudiogramMarks,
   AudiometryNotes,
   AudiometryTool,
+  AudiometryTypeCode,
+  DEFAULT_AUDIOMETRY_TYPE,
   DEFAULT_GRADING_SCALE,
   DEFAULT_PRESENTED_WORDS_TYPE,
   DEFAULT_PTA_TYPE,
@@ -29,6 +32,7 @@ import {
   MASKABLE_TOOLS,
   PRESENTED_WORDS_BY_LIST_TYPE,
   PtaType,
+  ScreeningResult,
   SPEECH_FAILED_WORDS_MIN,
   SPEECH_FIELD_RANGES,
   SpeechField,
@@ -46,14 +50,18 @@ import {
 import { WordListType } from './speech-word-lists';
 import { buildEarSummaries, presentedWordsOf } from './audiometry-report-data';
 import { buildEntryDateLabels } from './audiometry-entry-date-labels';
-import { buildEntryWithPtaLabel } from './audiometry-labels';
+import { SCREENING_RESULT_LABEL_KEYS, buildEntryWithPtaLabel } from './audiometry-labels';
 import {
   AudiometryFormState,
   hasAudiometryData,
   payloadToState,
   resolveListTypeFromPresentedWords,
+  screeningPayloadToState,
+  screeningStateToPayload,
   stateToPayload,
 } from './audiometry-payload-mapper';
+
+const AUDIOMETRY_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY;
 
 export const NEW_ENTRY_OPTION_VALUE = 'new';
 
@@ -112,6 +120,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const queryClient = useQueryClient();
   const resolveAuthorLabel = useResolveAuthorLabel();
   const entriesQuery = useAudiometryEntriesQuery(patientUuid);
+  const typesQuery = useAudiometryTypesQuery();
   // undefined: el usuario aún no eligió; se abre la más reciente si hay historial.
   const [chosenEntryUuid, setChosenEntryUuid] = useState<string | null | undefined>(undefined);
   // La recién guardada: mientras siga seleccionada se muestra la franja de confirmación.
@@ -138,10 +147,12 @@ export function useAudiometryPoc(patientUuid: string) {
   // No se borra al ocultar el panel: define cuántas palabras se presentaron por oído.
   const [lastWordListType, setLastWordListType] = useState<WordListType | null>(null);
   const [notes, setNotes] = useState<AudiometryNotes>(buildEmptyAudiometryNotes);
+  const [chosenType, setChosenType] = useState<AudiometryTypeCode>(DEFAULT_AUDIOMETRY_TYPE);
+  const [screeningResult, setScreeningResult] = useState<ScreeningResult | null>(null);
+  const [isResultMissing, setIsResultMissing] = useState(false);
+  const [pendingType, setPendingType] = useState<AudiometryTypeCode | null>(null);
 
   const presentedWords = presentedWordsOf(lastWordListType);
-
-  const canMask = MASKABLE_TOOLS.includes(activeTool);
 
   const entries = entriesQuery.data ?? [];
   const selectedEntryUuid =
@@ -149,6 +160,13 @@ export function useAudiometryPoc(patientUuid: string) {
   const isReadOnly = selectedEntryUuid !== null;
   const entryQuery = useAudiometryEntryQuery(patientUuid, selectedEntryUuid);
   const loadedEntry = entryQuery.data;
+  const selectedEntry = entries.find((entry) => entry.uuid === selectedEntryUuid);
+  // Guardada: manda el tipo de la audiometría; nueva: el que se eligió en el selector.
+  const activeType = isReadOnly
+    ? (loadedEntry?.typeCode ?? selectedEntry?.typeCode ?? DEFAULT_AUDIOMETRY_TYPE)
+    : chosenType;
+  const isScreening = activeType === AudiometryTypeCode.SCREENING;
+  const canMask = !isScreening && MASKABLE_TOOLS.includes(activeTool);
 
   const applyFormState = useCallback((state: AudiometryFormState) => {
     setMarks(state.marks);
@@ -169,8 +187,25 @@ export function useAudiometryPoc(patientUuid: string) {
   }, []);
 
   useEffect(() => {
-    if (loadedEntry) applyFormState(payloadToState(loadedEntry.payload));
+    if (!loadedEntry) return;
+    if (loadedEntry.typeCode === AudiometryTypeCode.SCREENING) {
+      const state = screeningPayloadToState(loadedEntry.payload);
+      applyFormState({ ...buildEmptyFormState(), marks: state.marks, notes: state.notes });
+      setScreeningResult(state.result);
+      return;
+    }
+    applyFormState(payloadToState(loadedEntry.payload));
   }, [loadedEntry, applyFormState]);
+
+  const resetForm = (type: AudiometryTypeCode) => {
+    setChosenType(type);
+    applyFormState(buildEmptyFormState());
+    setScreeningResult(null);
+    setIsResultMissing(false);
+    setActiveTool(AudiometryTool.AIR);
+    setIsMasked(false);
+    setHasNoResponse(false);
+  };
 
   const handleSelectEntry = (value: string) => {
     setSavedEntryUuid(null);
@@ -179,16 +214,17 @@ export function useAudiometryPoc(patientUuid: string) {
       return;
     }
     setChosenEntryUuid(null);
-    applyFormState(buildEmptyFormState());
+    resetForm(DEFAULT_AUDIOMETRY_TYPE);
   };
 
   const handlePlaceMark = (ear: Ear, frequencyHz: number, thresholdDb: number) => {
+    const tool = isScreening ? AudiometryTool.AIR : activeTool;
     setMarks((current) => ({
       ...current,
-      [activeTool]: {
-        ...current[activeTool],
+      [tool]: {
+        ...current[tool],
         [ear]: {
-          ...current[activeTool][ear],
+          ...current[tool][ear],
           [frequencyHz]: {
             thresholdDb,
             isMasked: canMask && isMasked,
@@ -318,7 +354,31 @@ export function useAudiometryPoc(patientUuid: string) {
     gradingScale,
     notes,
   };
-  const canSave = !isReadOnly && !isSaving && hasAudiometryData(formState);
+  // El rastreo se puede intentar guardar sin marcas: lo que falta se avisa, es el resultado.
+  const canSave = !isReadOnly && !isSaving && (isScreening || hasAudiometryData(formState));
+
+  const hasDataToLose = isScreening
+    ? screeningResult !== null ||
+      notes.observations.trim() !== '' ||
+      Object.values(marks[AudiometryTool.AIR]).some((points) => Object.keys(points).length > 0)
+    : hasAudiometryData(formState);
+  const handleTypeChange = (type: AudiometryTypeCode) => {
+    if (type === activeType) return;
+    if (hasDataToLose) {
+      setPendingType(type);
+      return;
+    }
+    resetForm(type);
+  };
+  const handleConfirmTypeChange = () => {
+    if (pendingType) resetForm(pendingType);
+    setPendingType(null);
+  };
+  const handleCancelTypeChange = () => setPendingType(null);
+  const handleScreeningResultChange = (result: ScreeningResult) => {
+    setScreeningResult(result);
+    setIsResultMissing(false);
+  };
 
   const [isInvalidateModalOpen, setIsInvalidateModalOpen] = useState(false);
   const { executeInvalidateEntry, isPending: isInvalidating } =
@@ -340,19 +400,50 @@ export function useAudiometryPoc(patientUuid: string) {
 
   const handleSave = () => {
     if (!canSave) return;
-    executeCreateEntry({ patientUuid, payload: stateToPayload(formState, summaries) });
+    if (isScreening) {
+      const screeningPayload = screeningStateToPayload({ marks, result: screeningResult, notes });
+      if (!screeningPayload) {
+        setIsResultMissing(true);
+        return;
+      }
+      executeCreateEntry({
+        patientUuid,
+        typeCode: AudiometryTypeCode.SCREENING,
+        payload: screeningPayload,
+      });
+      return;
+    }
+    executeCreateEntry({
+      patientUuid,
+      typeCode: AudiometryTypeCode.CLINICAL,
+      payload: stateToPayload(formState, summaries),
+    });
   };
 
   const entryLabels = buildEntryDateLabels(entries, formatDateTime, buildEntryWithPtaLabel(t));
+  const typeOptions = (typesQuery.data ?? []).map((type) => ({
+    value: type.code,
+    label: type.name,
+  }));
+  const buildEntryLabel = (entry: (typeof entries)[number]) => {
+    const date = entryLabels.get(entry.uuid) ?? formatDateTime(entry.createdAt);
+    if (entry.typeCode !== AudiometryTypeCode.SCREENING) {
+      return t(AUDIOMETRY_TEXT.ENTRY_TYPED, { date, type: entry.typeName });
+    }
+    return t(AUDIOMETRY_TEXT.ENTRY_SCREENING, {
+      date,
+      type: entry.typeName,
+      result: entry.screeningResult ? t(SCREENING_RESULT_LABEL_KEYS[entry.screeningResult]) : '',
+    });
+  };
   // Una lista vieja o en caché puede no traer la marca: `!= null` cubre null y undefined.
   const entryOptions = entries.map((entry) => ({
     value: entry.uuid,
-    label: entryLabels.get(entry.uuid) ?? formatDateTime(entry.createdAt),
+    label: buildEntryLabel(entry),
     isMuted: entry.invalidatedAt != null,
     badge:
       entry.invalidatedAt != null ? t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.INVALIDATE.TAG) : undefined,
   }));
-  const selectedEntry = entries.find((entry) => entry.uuid === selectedEntryUuid);
   const invalidationNotice: AudiometryInvalidationNotice | null = selectedEntry?.invalidatedAt
     ? {
         author: resolveAuthorLabel(
@@ -394,6 +485,16 @@ export function useAudiometryPoc(patientUuid: string) {
     accordionRef,
     isJustSaved: savedEntryUuid !== null && savedEntryUuid === selectedEntryUuid,
     isReadOnly,
+    activeType,
+    typeOptions,
+    isScreening,
+    screeningResult,
+    isResultMissing,
+    handleScreeningResultChange,
+    pendingType,
+    handleTypeChange,
+    handleConfirmTypeChange,
+    handleCancelTypeChange,
     printReportHeader,
     handlePrint,
     isSaving,

@@ -5,6 +5,7 @@ import {
   GradingScale,
   HearingGrade,
   PtaType,
+  ScreeningResult,
   WeberResult,
 } from './audiometry-constants';
 import { WordListType } from './speech-word-lists';
@@ -38,4 +39,11 @@ export interface AudiometryPayload {
     ears: Record<Ear, AudiometryEarSummaryPayload>;
   };
   notes: { diagnosis: string; observations: string };
+}
+
+/** Rastreo: solo vía aérea, sin enmascarar, con el resultado y las observaciones. */
+export interface ScreeningPayload {
+  marks: { [AudiometryTool.AIR]: Record<Ear, Partial<Record<string, AudiometryPoint>>> };
+  result: ScreeningResult;
+  notes: { observations: string };
 }

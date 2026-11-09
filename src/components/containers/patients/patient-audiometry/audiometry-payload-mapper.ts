@@ -1,6 +1,7 @@
 import {
   AUDIOMETRY_TOOLS,
   AudiogramMarks,
+  AudiometryTool,
   AudiometryNotes,
   AudiometryPoint,
   DEFAULT_PRESENTED_WORDS_TYPE,
@@ -12,6 +13,7 @@ import {
   PRESENTED_WORDS_BY_LIST_TYPE,
   PtaType,
   SPEECH_FIELD_RANGES,
+  ScreeningResult,
   SPEECH_FAILED_WORDS_MIN,
   SPEECH_FIELDS,
   SpeechField,
@@ -31,6 +33,7 @@ import {
   AudiometryEarSummaryPayload,
   AudiometryPayload,
   AudiometryToneMarksPayload,
+  ScreeningPayload,
 } from './audiometry-payload';
 
 /** Lo que se guarda de una audiometría: todo el estado menos lo transitorio de la pantalla. */
@@ -45,6 +48,13 @@ export interface AudiometryFormState {
   presentedWords: number;
   ptaType: PtaType;
   gradingScale: GradingScale;
+  notes: AudiometryNotes;
+}
+
+/** Lo que se guarda de un rastreo; el resultado es null mientras no se elija. */
+export interface ScreeningFormState {
+  marks: AudiogramMarks;
+  result: ScreeningResult | null;
   notes: AudiometryNotes;
 }
 
@@ -234,3 +244,34 @@ export function hasAudiometryData(state: AudiometryFormState): boolean {
     hasToneMarks || hasSpeechMarks || hasSummaryData || hasNotes || state.wordListType !== null
   );
 }
+
+/** Estado del rastreo -> cuerpo del API; null mientras falte el resultado, que es obligatorio. */
+export function screeningStateToPayload(state: ScreeningFormState): ScreeningPayload | null {
+  if (!state.result) return null;
+  const airMarks = marksToPayload(state.marks)[AudiometryTool.AIR];
+  const marks = {} as ScreeningPayload['marks'][AudiometryTool.AIR];
+  EARS.forEach((ear) => {
+    const points: Partial<Record<string, AudiometryPoint>> = {};
+    Object.entries(airMarks[ear]).forEach(([frequency, point]) => {
+      if (point) points[frequency] = { ...point, isMasked: false };
+    });
+    marks[ear] = points;
+  });
+  return {
+    marks: { [AudiometryTool.AIR]: marks },
+    result: state.result,
+    notes: { observations: state.notes.observations.trim() },
+  };
+}
+
+/** Cuerpo guardado de un rastreo -> estado de la pantalla. */
+export function screeningPayloadToState(payload: ScreeningPayload): ScreeningFormState {
+  return {
+    marks: marksFromPayload(payload.marks as AudiometryToneMarksPayload),
+    result: payload.result,
+    notes: { diagnosis: '', observations: payload.notes.observations },
+  };
+}
+
+/** Hay algo que guardar en el rastreo: el resultado es lo único obligatorio. */
+export const hasScreeningResult = (state: ScreeningFormState): boolean => state.result !== null;

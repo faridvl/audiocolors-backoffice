@@ -6,13 +6,17 @@ import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { FETCH_AUDIOMETRY_ENTRIES_KEY } from '@/shared/api/querys/patient-audiometry-entries-query';
 import { TEXT } from '@/static/texts/i18n';
-import type { AudiometryPayload } from '@/components/containers/patients/patient-audiometry/audiometry-payload';
+import type {
+  AudiometryPayload,
+  ScreeningPayload,
+} from '@/components/containers/patients/patient-audiometry/audiometry-payload';
+import { AudiometryTypeCode } from '@/components/containers/patients/patient-audiometry/audiometry-constants';
 import { AUDIOMETRY_SCHEMA_VERSION, AudiometryEntry } from '@/types/patients/audiometry-entry';
 
-interface CreateAudiometryEntryVariables {
-  patientUuid: string;
-  payload: AudiometryPayload;
-}
+type CreateAudiometryEntryVariables = { patientUuid: string } & (
+  | { typeCode: AudiometryTypeCode.CLINICAL; payload: AudiometryPayload }
+  | { typeCode: AudiometryTypeCode.SCREENING; payload: ScreeningPayload }
+);
 
 interface CreateAudiometryEntryOptions {
   onCreated?: (entry: AudiometryEntry) => void;
@@ -26,10 +30,10 @@ export function useCreateAudiometryEntryMutation({ onCreated }: CreateAudiometry
     CreateAudiometryEntryVariables
   >({
     mutationKey: ['createAudiometryEntry'],
-    mutationFn: ({ patientUuid, payload }) =>
+    mutationFn: ({ patientUuid, typeCode, payload }) =>
       ApiServiceClient(env.API.MEDICAL_RECORDS_URL).post<AudiometryEntry>(
         `/patients/${patientUuid}/audiometry-entries`,
-        { schemaVersion: AUDIOMETRY_SCHEMA_VERSION, payload },
+        { typeCode, schemaVersion: AUDIOMETRY_SCHEMA_VERSION, payload },
       ),
     onSuccess: async (entry, { patientUuid }) => {
       toast.success(t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.SAVED));

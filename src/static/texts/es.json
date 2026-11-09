@@ -1125,6 +1125,22 @@
         "entryAuthorDate": "Registrada por {{author}} · {{date}}",
         "entryLoading": "Cargando la audiometría…",
         "print": "Imprimir",
+        "entryTyped": "{{date}} · {{type}}",
+        "entryScreening": "{{date}} · {{type}} · {{result}}",
+        "type": {
+          "label": "Tipo de audiometría",
+          "current": "Tipo: {{type}}",
+          "changeTitle": "¿Cambiar de tipo?",
+          "changeMessage": "Se pierde lo que ya marcaste o escribiste.",
+          "changeConfirm": "Cambiar de tipo",
+          "changeCancel": "Seguir aquí"
+        },
+        "screening": {
+          "resultLabel": "Resultado",
+          "pass": "Pasa",
+          "refer": "Refiere",
+          "resultRequired": "Elige Pasa o Refiere para guardar"
+        },
         "invalidate": {
           "button": "Marcar como mal hecha",
           "tag": "Mal hecha",
