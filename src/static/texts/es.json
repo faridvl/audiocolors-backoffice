@@ -244,6 +244,10 @@
       "CLINIC": {
         "title": "Clínica",
         "description": "Los datos de contacto de la clínica. Salen en los documentos que generas."
+      },
+      "USERS": {
+        "title": "Usuarios",
+        "description": "Quién entra a la clínica y con qué rol. Solo el propietario puede administrarlo."
       }
     },
     "clinic": {
@@ -285,6 +289,89 @@
         "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
         "emailInvalid": "Correo inválido",
         "addressMax": "Máximo 300 caracteres"
+      }
+    },
+    "users": {
+      "pageTitle": "Usuarios · AudioColors Gestión Clínica",
+      "loadError": "No se pudieron cargar los usuarios",
+      "emptyTitle": "Aún no hay usuarios",
+      "add": "Nuevo usuario",
+      "you": "Tú",
+      "noValue": "—",
+      "columns": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "status": "Estado",
+        "specialty": "Especialidad"
+      },
+      "status": {
+        "ACTIVE": "Activo",
+        "INACTIVE": "Inactivo"
+      },
+      "roles": {
+        "OWNER": "Propietario",
+        "ADMIN": "Administrador",
+        "DOCTOR": "Médico",
+        "STAFF": "Personal"
+      },
+      "actionsLabel": "Acciones de {{name}}",
+      "actions": {
+        "edit": "Editar",
+        "setPassword": "Poner contraseña nueva",
+        "deactivate": "Desactivar",
+        "reactivate": "Reactivar"
+      },
+      "form": {
+        "newTitle": "Nuevo usuario",
+        "editTitle": "Editar usuario",
+        "fullName": "Nombre completo",
+        "email": "Correo",
+        "emailReadOnly": "El correo no se puede cambiar.",
+        "role": "Rol",
+        "roleSelfHint": "No puedes cambiar tu propio rol.",
+        "roleLastOwnerHint": "Es el único propietario activo de la clínica, así que su rol no se puede cambiar.",
+        "specialty": "Especialidad",
+        "phone": "Teléfono",
+        "password": "Contraseña temporal",
+        "passwordHint": "Mínimo 8 caracteres, con una mayúscula y un número. Compártela con la persona para su primer ingreso.",
+        "create": "Crear usuario"
+      },
+      "passwordModal": {
+        "title": "Poner contraseña nueva",
+        "description": "Escribe la contraseña nueva de {{name}}. La anterior deja de servir.",
+        "label": "Contraseña nueva",
+        "submit": "Guardar contraseña"
+      },
+      "statusDialog": {
+        "deactivateTitle": "¿Desactivar a {{name}}?",
+        "deactivateMessage": "{{name}} no podrá iniciar sesión mientras esté inactivo. Sus datos y su historial se conservan, y puedes reactivarlo cuando quieras.",
+        "deactivateConfirm": "Desactivar",
+        "reactivateTitle": "¿Reactivar a {{name}}?",
+        "reactivateMessage": "{{name}} volverá a poder iniciar sesión con su contraseña actual.",
+        "reactivateConfirm": "Reactivar"
+      },
+      "toasts": {
+        "created": "Usuario creado",
+        "saved": "Cambios guardados",
+        "passwordSet": "Contraseña nueva guardada",
+        "deactivated": "Usuario desactivado",
+        "reactivated": "Usuario reactivado"
+      },
+      "errors": {
+        "fullNameRequired": "Escribe el nombre completo",
+        "fullNameMax": "El nombre es demasiado largo",
+        "emailRequired": "Escribe el correo",
+        "emailInvalid": "Revisa el correo: no parece válido",
+        "emailTaken": "Ya existe un usuario con este correo",
+        "specialtyMax": "La especialidad es demasiado larga",
+        "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
+        "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
+        "passwordRequired": "Escribe la contraseña",
+        "passwordMin": "Usa al menos 8 caracteres",
+        "passwordMax": "La contraseña es demasiado larga",
+        "passwordUppercase": "Incluye al menos una mayúscula",
+        "passwordDigit": "Incluye al menos un número"
       }
     },
     "appointmentTypes": {

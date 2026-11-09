@@ -17,6 +17,7 @@ export const routesPrivate = {
     appointmentTypes: '/configuracion/tipos-de-cita',
     templates: '/configuracion/plantillas',
     clinic: '/configuracion/clinica',
+    users: '/configuracion/usuarios',
   },
 };
 

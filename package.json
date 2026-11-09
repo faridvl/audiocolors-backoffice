@@ -20,6 +20,7 @@
     "test:audiometry": "tsc src/components/containers/patients/patient-audiometry/audiometry-payload-mapper.test.ts --outDir node_modules/.cache/audiometry-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/audiometry-test/audiometry-payload-mapper.test.js",
     "test:archive-sort": "tsc src/components/containers/documents/archive-sort.test.ts --outDir node_modules/.cache/archive-sort-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/archive-sort-test/documents/archive-sort.test.js",
     "test:audiometry-labels": "tsc src/components/containers/patients/patient-audiometry/audiometry-entry-date-labels.test.ts --outDir node_modules/.cache/audiometry-labels-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/audiometry-labels-test/audiometry-entry-date-labels.test.js",
+    "test:users": "tsc src/components/containers/users-settings/users-logic.test.ts --outDir node_modules/.cache/users-test --module commonjs --moduleResolution node10 --target es2020 --esModuleInterop --skipLibCheck --strict && node --test node_modules/.cache/users-test/components/containers/users-settings/users-logic.test.js",
     "e2e:login": "playwright test e2e/login.spec.ts",
     "release:bump": "node scripts/release.mjs bump",
     "release:check": "node scripts/release.mjs check --base origin/main"
