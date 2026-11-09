@@ -1,9 +1,12 @@
 import React from 'react';
 import { Form, useFormikContext } from 'formik';
 import { Save, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { FormDateField } from '@/components/common/date-field/form-date-field';
 import { FormField } from '@/components/common/input/input';
-import { FormSelectField } from '@/components/common/form/form-select-field';
+import { FocusFirstError } from '@/components/common/form/focus-first-error';
+import { FormMultiSelectField } from '@/components/common/form/form-multi-select-field';
 import { FormViewSection } from '@/components/common/form/form-view-section';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import { PatientContactsFields } from '@/components/containers/patients/patient-contacts/patient-contacts-fields';
@@ -14,10 +17,13 @@ import {
   PatientGender,
 } from '@/types/patients/patient';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { TEXT } from '@/static/texts/i18n';
 import { getBranchStripeColor } from '@/shared/design/tokens';
+import { toDayKey } from '@/shared/utils/dates';
 import { DOCUMENT_MASKS, formatNationalId, PatientFormValues } from './patient-validation';
 
 interface PatientFormProps {
+  isBirthDateRequired?: boolean;
   submitLabel: string;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -26,8 +32,11 @@ interface PatientFormProps {
 export const PatientFormFields: React.FC<PatientFormProps> = ({
   submitLabel,
   isSubmitting,
+  isBirthDateRequired = true,
   onCancel,
 }) => {
+  const { t } = useTranslation();
+  const todayKey = toDayKey(new Date());
   const { values, setFieldValue } = useFormikContext<PatientFormValues>();
   const patientFullName = buildPatientFullName(values.firstName, values.lastName);
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
@@ -42,6 +51,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 
   return (
     <Form className="flex flex-col gap-6">
+      <FocusFirstError />
       <FormViewSection title="Datos personales">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <FormField name="firstName" label="Nombre" required maxLength={60} />
@@ -65,7 +75,13 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             required
           />
 
-          <FormField name="birthDate" label="Fecha de nacimiento" type="date" required />
+          <FormDateField
+            name="birthDate"
+            label="Fecha de nacimiento"
+            max={todayKey}
+            required={isBirthDateRequired}
+            optional={!isBirthDateRequired}
+          />
 
           <FormField name="gender" label="Género" as="select" optional>
             <option value="">Sin especificar</option>
@@ -76,16 +92,17 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             ))}
           </FormField>
 
-          <FormSelectField
-            name="branchUuid"
-            label="Sede"
-            placeholder="Sin especificar"
+          <FormMultiSelectField
+            name="branchUuids"
+            label={t(TEXT.PATIENTS.FORM.BRANCHES_LABEL)}
+            placeholder={t(TEXT.PATIENTS.FORM.BRANCHES_PLACEHOLDER)}
+            hint={t(TEXT.PATIENTS.FORM.BRANCHES_HINT)}
             options={(branches ?? []).map((branch) => ({
               value: branch.uuid,
               label: branch.name,
               accentColor: getBranchStripeColor(branch.name),
             }))}
-            optional
+            required
           />
         </div>
       </FormViewSection>

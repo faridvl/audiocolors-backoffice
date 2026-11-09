@@ -36,6 +36,29 @@ El azul oscuro de fondo de la variante dark del logo (token `midnight`) es
 
 `success` es teal `#0d9488`, deliberadamente distinto del verde de marca.
 
+Si hace falta un color nuevo, se mide del archivo de marca; no se inventa.
+
+### Un solo acento
+
+`brand` (azul `#1f6fb1`, la R del logo) es el **único** color de acento: acción
+primaria, estado activo y foco. Los grises son `ink`, **neutros sin tinte azul**:
+un chrome azulado compite con un logo multicolor.
+
+---
+
+## Reglas de uso del logo
+
+- **El logo sale de los vectores, no de un JPEG.** Un JPEG reescalado se ve
+  blando; el vector no (ver "Fuente de verdad" y "Regenerar los assets").
+- **Dos archivos, no un filtro CSS.** Fondo claro → `logo-audiocolors.png`
+  ("audio" gris); fondo oscuro → `logo-audiocolors-dark.png` ("audio" blanco).
+  Nunca `brightness-0 invert`: aplana también las letras de color y mata la marca.
+- **El favicon es un símbolo, no el logo entero:** solo la oreja, sin los puntos
+  y con fondo transparente (ver "El isotipo").
+- **Al logo se le pasa la altura, nunca el ancho.** `<BrandLogo height={40} />`
+  calcula el ancho con la proporción 2.49:1; `<BrandLogo className="h-11 w-32" />`
+  deforma o recorta (fijar ambos a mano cortó la "S" del logo en el sidebar).
+
 ---
 
 ## Tipografía

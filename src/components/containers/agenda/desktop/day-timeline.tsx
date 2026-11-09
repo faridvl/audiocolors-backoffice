@@ -14,8 +14,7 @@ import {
   DayTiming,
   resolveSection,
   snapToTimelineStep,
-  TIMELINE_END_MINUTE,
-  TIMELINE_START_MINUTE,
+  TimelineRange,
   TIMELINE_STEP_MINUTES,
 } from '../agenda-presenter';
 import {
@@ -30,30 +29,29 @@ import { AgendaBoardState } from './use-agenda-board';
 /** Cada cuánto se mueve la línea de "ahora". */
 const NOW_REFRESH_MS = 60_000;
 
-const STEP_MINUTES = Array.from(
-  { length: (TIMELINE_END_MINUTE - TIMELINE_START_MINUTE) / TIMELINE_STEP_MINUTES },
-  (_, index) => TIMELINE_START_MINUTE + index * TIMELINE_STEP_MINUTES,
-);
+const buildStepMinutes = ({ startMinute, endMinute }: TimelineRange) =>
+  Array.from(
+    { length: (endMinute - startMinute) / TIMELINE_STEP_MINUTES },
+    (_, index) => startMinute + index * TIMELINE_STEP_MINUTES,
+  );
 
-const toTop = (minute: number) => (minute - TIMELINE_START_MINUTE) * TIMELINE_PIXELS_PER_MINUTE;
 const toHeight = (minutes: number) =>
   Math.max(TIMELINE_MIN_BLOCK_PX, minutes * TIMELINE_PIXELS_PER_MINUTE - TIMELINE_BLOCK_GAP_PX);
-const TIMELINE_HEIGHT_PX = toTop(TIMELINE_END_MINUTE);
-
 /** Ubicación de un bloque: su fila por la hora y su columna si se cruza con otros. */
 const blockStyle = (
+  range: TimelineRange,
   startMinute: number,
   endMinute: number,
   lane = 0,
   laneCount = 1,
 ): React.CSSProperties => ({
-  top: toTop(startMinute) + TIMELINE_BLOCK_GAP_PX / 2,
+  top: (startMinute - range.startMinute) * TIMELINE_PIXELS_PER_MINUTE + TIMELINE_BLOCK_GAP_PX / 2,
   height: toHeight(endMinute - startMinute),
   left: `calc(${(lane / laneCount) * 100}% + ${TIMELINE_BLOCK_GAP_PX}px)`,
   width: `calc(${100 / laneCount}% - ${TIMELINE_BLOCK_GAP_PX * 2}px)`,
 });
 
-function useNowMinute(isToday: boolean): number | null {
+function useNowMinute(isToday: boolean, range: TimelineRange): number | null {
   const [now, setNow] = useState(() => toMinuteOfDay(new Date().toISOString()));
   useEffect(() => {
     if (!isToday) return undefined;
@@ -63,7 +61,7 @@ function useNowMinute(isToday: boolean): number | null {
     );
     return () => window.clearInterval(timer);
   }, [isToday]);
-  return isToday && now >= TIMELINE_START_MINUTE && now <= TIMELINE_END_MINUTE ? now : null;
+  return isToday && now >= range.startMinute && now <= range.endMinute ? now : null;
 }
 
 interface DayTimelineProps {
@@ -80,12 +78,16 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
   const { t } = useTranslation();
   const surfaceRef = useRef<HTMLDivElement>(null);
   const [hoverMinute, setHoverMinute] = useState<number | null>(null);
-  const nowMinute = useNowMinute(agenda.selectedTiming === DayTiming.TODAY);
+  const range = board.timelineRange;
+  const nowMinute = useNowMinute(agenda.selectedTiming === DayTiming.TODAY, range);
+  const stepMinutes = buildStepMinutes(range);
+  const toTop = (minute: number) => (minute - range.startMinute) * TIMELINE_PIXELS_PER_MINUTE;
+  const timelineHeightPx = toTop(range.endMinute);
   const canTapToSchedule = Boolean(board.selectedPending) && board.isDayOpen;
 
   const minuteAt = (clientY: number) => {
     const top = surfaceRef.current?.getBoundingClientRect().top ?? 0;
-    return snapToTimelineStep((clientY - top) / TIMELINE_PIXELS_PER_MINUTE);
+    return snapToTimelineStep((clientY - top) / TIMELINE_PIXELS_PER_MINUTE, range);
   };
 
   const accepts = (event: React.DragEvent) => board.acceptsOnTimeline(event);
@@ -93,25 +95,27 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
 
   return (
     <div className="flex">
-      <div className="relative w-12 shrink-0" style={{ height: TIMELINE_HEIGHT_PX }} aria-hidden>
-        {STEP_MINUTES.filter((minute) => minute % MINUTES_IN_HOUR === 0).map((minute) => (
-          <div
-            key={minute}
-            className="absolute right-2 -translate-y-1/2 whitespace-nowrap first:translate-y-0"
-            style={{ top: toTop(minute) }}
-          >
-            <Typography variant={TypographyVariant.HELPER} inline>
-              {formatShortHour(minute / MINUTES_IN_HOUR)}
-            </Typography>
-          </div>
-        ))}
+      <div className="relative w-12 shrink-0" style={{ height: timelineHeightPx }} aria-hidden>
+        {stepMinutes
+          .filter((minute) => minute % MINUTES_IN_HOUR === 0)
+          .map((minute) => (
+            <div
+              key={minute}
+              className="absolute right-2 -translate-y-1/2 whitespace-nowrap first:translate-y-0"
+              style={{ top: toTop(minute) }}
+            >
+              <Typography variant={TypographyVariant.HELPER} inline>
+                {formatShortHour(minute / MINUTES_IN_HOUR)}
+              </Typography>
+            </div>
+          ))}
       </div>
 
       <div
         ref={surfaceRef}
         role="group"
         aria-label={t(TEXT.AGENDA.BOARD.TIMELINE_ARIA)}
-        style={{ height: TIMELINE_HEIGHT_PX }}
+        style={{ height: timelineHeightPx }}
         className={tailwind(
           'relative min-w-0 flex-1 border-l border-ink-200',
           canTapToSchedule && 'cursor-pointer',
@@ -138,7 +142,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
         onMouseLeave={() => canTapToSchedule && setHoverMinute(null)}
         onClick={(event) => canTapToSchedule && board.handleTapAt(minuteAt(event.clientY))}
       >
-        {STEP_MINUTES.map((minute) => (
+        {stepMinutes.map((minute) => (
           <div
             key={minute}
             aria-hidden
@@ -167,7 +171,13 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
             section={resolveSection(block.appointment, agenda.selectedTiming)}
             typeColor={agenda.resolveTypeColor(block.appointment.typeUUID)}
             branchName={agenda.resolveBranchName(block.appointment.branchUUID)}
-            style={blockStyle(block.startMinute, block.endMinute, block.lane, block.laneCount)}
+            style={blockStyle(
+              range,
+              block.startMinute,
+              block.endMinute,
+              block.lane,
+              block.laneCount,
+            )}
             heightPx={toHeight(block.endMinute - block.startMinute)}
             drag={board.dragAppointment(block.appointment)}
             isDragSource={board.isDragSource(block.appointment.id)}
@@ -180,7 +190,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
           <div
             key={item.id}
             className="absolute z-10 flex items-center gap-1.5 overflow-hidden rounded-md border border-dashed border-brand/50 bg-brand-50 px-2"
-            style={blockStyle(item.startMinute, item.startMinute + TIMELINE_STEP_MINUTES)}
+            style={blockStyle(range, item.startMinute, item.startMinute + TIMELINE_STEP_MINUTES)}
           >
             <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand" aria-hidden />
             <Typography
@@ -198,8 +208,9 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
             aria-hidden
             className="pointer-events-none absolute z-30 flex flex-col justify-start overflow-hidden rounded-md border-2 border-dashed border-brand bg-brand-50/90 px-2 py-0.5"
             style={blockStyle(
+              range,
               hoverMinute,
-              Math.min(TIMELINE_END_MINUTE, hoverMinute + previewDuration),
+              Math.min(range.endMinute, hoverMinute + previewDuration),
             )}
           >
             <Typography

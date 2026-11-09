@@ -6,12 +6,14 @@ import { routesPublic } from '@/shared/navigation/routes';
 const NETWORK_ERROR_MESSAGE =
   process.env.NODE_ENV === 'development'
     ? 'No se pudo conectar con el API. En local, la app tiene que correr en http://localhost:3000: el API rechaza otros puertos.'
-    : 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
+    : 'No hay conexión. Revisa tu internet e inténtalo de nuevo.';
 const GENERIC_ERROR_MESSAGE = 'Ocurrió un error inesperado. Intenta de nuevo.';
 
 export enum HttpStatus {
+  BAD_REQUEST = 400,
   FORBIDDEN = 403,
   NOT_FOUND = 404,
+  CONFLICT = 409,
 }
 
 /** Error del API con su status, para distinguir p. ej. un 403 de rol de una falla real. */
@@ -19,17 +21,28 @@ export class ApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    /** Errores 400 por campo, cuando el API los detalla. */
+    readonly details: ApiFieldError[] = [],
   ) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
-interface ApiErrorBody {
-  message?: string | string[];
+export interface ApiFieldError {
+  field: string;
+  message: string;
 }
 
-const handleSessionExpired = (): void => {
+interface ApiErrorBody {
+  message?: string | string[];
+  details?: ApiFieldError[];
+}
+
+const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
+  Array.isArray(body?.details) ? body.details : [];
+
+export const handleSessionExpired = (): void => {
   CookiesManager.clearAll();
   if (typeof window !== 'undefined') {
     window.location.href = `${routesPublic.login}?expired=true`;
@@ -98,6 +111,7 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError(
       resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE),
       response.status,
+      resolveFieldErrors(data as ApiErrorBody | null),
     );
   }
 

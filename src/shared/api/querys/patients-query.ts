@@ -1,16 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import { ApiServiceClient } from '@/shared/api/api-service-client';
-import { env } from '@/shared/api/config';
-import { Patient, PatientStatus } from '@/types/patients/patient';
-import { PaginatedResponse } from '@/types/system/paginate.types';
+import { useQuery } from "@tanstack/react-query";
+import { ApiServiceClient } from "@/shared/api/api-service-client";
+import { env } from "@/shared/api/config";
+import { Patient, PatientStatus } from "@/types/patients/patient";
+import { PaginatedResponse } from "@/types/system/paginate.types";
 
 export enum PatientStatusFilter {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  ALL = 'all',
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  ALL = "all",
 }
 
-export const FETCH_PATIENTS_KEY = 'fetchPatients';
+export const FETCH_PATIENTS_KEY = "fetchPatients";
 
 /** Filtros del listado que viajan tal cual al API; ausentes = sin filtrar. */
 export interface PatientListFilters {
@@ -24,18 +24,21 @@ export interface PatientListFilters {
   isVideoCandidate?: boolean;
   warrantyExpired?: boolean;
   renewPrescription?: boolean;
+  isPriority?: boolean;
+  /** Día de envío (YYYY-MM-DD, Costa Rica); el API solo lo toma junto con `hearingAidsInLab`. */
+  hearingAidsInLabDate?: string;
   /** Próxima cita confirmada o tentativa; ambas o ninguna = todas. */
   nextAppointmentKinds?: NextAppointmentKind[];
 }
 
 export enum NextAppointmentKind {
-  CONFIRMED = 'confirmed',
-  TENTATIVE = 'tentative',
+  CONFIRMED = "confirmed",
+  TENTATIVE = "tentative",
 }
 
 /** Los filtros de varios valores viajan separados por coma. */
 const setList = (params: URLSearchParams, key: string, values?: string[]) => {
-  if (values?.length) params.set(key, values.join(','));
+  if (values?.length) params.set(key, values.join(","));
 };
 
 const PatientsService = {
@@ -47,29 +50,37 @@ const PatientsService = {
     nextAppointmentMonths?: string[],
     filters: PatientListFilters = {},
   ) => {
-    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-    if (search.trim()) params.set('search', search.trim());
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (search.trim()) params.set("search", search.trim());
 
     // El API solo distingue activos de "activos + inactivos". Para ver los
     // inactivos hay que pedirlos todos y filtrarlos del lado del cliente.
-    if (status !== PatientStatusFilter.ACTIVE) params.set('includeInactive', 'true');
+    if (status !== PatientStatusFilter.ACTIVE)
+      params.set("includeInactive", "true");
 
     // Filtro por próxima cita (YYYY-MM). Cuando se manda, el API ignora la
     // paginación y devuelve todos los pacientes que coincidan en una sola página.
-    setList(params, 'nextAppointmentMonth', nextAppointmentMonths);
-    setList(params, 'status', filters.statuses);
-    setList(params, 'branchUuid', filters.branchUuids);
-    setList(params, 'appointmentTypeUuid', filters.appointmentTypeUuids);
-    if (filters.hearingAidsInLab) params.set('hearingAidsInLab', 'true');
-    if (filters.hasActiveWarranty) params.set('hasActiveWarranty', 'true');
-    if (filters.isVideoCandidate) params.set('isVideoCandidate', 'true');
-    if (filters.warrantyExpired) params.set('warrantyExpired', 'true');
-    if (filters.renewPrescription) params.set('renewPrescription', 'true');
-    setList(params, 'nextAppointmentKind', filters.nextAppointmentKinds);
+    setList(params, "nextAppointmentMonth", nextAppointmentMonths);
+    setList(params, "status", filters.statuses);
+    setList(params, "branchUuid", filters.branchUuids);
+    setList(params, "appointmentTypeUuid", filters.appointmentTypeUuids);
+    if (filters.hearingAidsInLab) params.set("hearingAidsInLab", "true");
+    if (filters.hasActiveWarranty) params.set("hasActiveWarranty", "true");
+    if (filters.isVideoCandidate) params.set("isVideoCandidate", "true");
+    if (filters.warrantyExpired) params.set("warrantyExpired", "true");
+    if (filters.renewPrescription) params.set("renewPrescription", "true");
+    if (filters.isPriority) params.set("isPriority", "true");
+    if (filters.hearingAidsInLab && filters.hearingAidsInLabDate) {
+      params.set("hearingAidsInLabDate", filters.hearingAidsInLabDate);
+    }
+    setList(params, "nextAppointmentKind", filters.nextAppointmentKinds);
 
-    return ApiServiceClient(env.API.MEDICAL_RECORDS_URL).get<PaginatedResponse<Patient>>(
-      `/patients?${params.toString()}`,
-    );
+    return ApiServiceClient(env.API.MEDICAL_RECORDS_URL).get<
+      PaginatedResponse<Patient>
+    >(`/patients?${params.toString()}`);
   },
 };
 
@@ -84,7 +95,15 @@ export function usePatientsQuery(
 ) {
   return useQuery({
     enabled: isEnabled,
-    queryKey: [FETCH_PATIENTS_KEY, page, limit, search, status, nextAppointmentMonths, filters],
+    queryKey: [
+      FETCH_PATIENTS_KEY,
+      page,
+      limit,
+      search,
+      status,
+      nextAppointmentMonths,
+      filters,
+    ],
     queryFn: async () => {
       const response = await PatientsService.fetchAll(
         page,
@@ -98,7 +117,10 @@ export function usePatientsQuery(
       if (status !== PatientStatusFilter.INACTIVE) return response;
 
       // Filtro local: el conteo de `meta` deja de ser exacto para esta vista.
-      return { ...response, data: response.data.filter((patient) => !patient.isActive) };
+      return {
+        ...response,
+        data: response.data.filter((patient) => !patient.isActive),
+      };
     },
     placeholderData: (previousData) => previousData,
   });

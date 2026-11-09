@@ -5,7 +5,7 @@ import { TEXT } from '@/static/texts/i18n';
 import { ClinicalAnswer, ClinicalField } from '@/types/clinical-templates/clinical-template';
 import { tailwind } from '@/utils/tailwind-utils';
 import { BackgroundAnswerRow } from './background-answer-row';
-import { detailOf, groupFields, isYes, textOf } from './clinical-history';
+import { detailOf, groupFields, textOf, yesNoOf } from './clinical-history';
 import {
   CLINICAL_SECTIONS_COLUMNS,
   CLINICAL_SHEET_WIDTH,
@@ -13,17 +13,22 @@ import {
 } from './clinical-history-styles';
 import { ClinicalSectionCard } from './clinical-section-card';
 
-const TextAnswer: React.FC<{ label: string; value: string }> = ({ label, value }) => {
-  const { t } = useTranslation();
-
+const TextAnswer: React.FC<{ label: string; value: string; isMuted: boolean }> = ({
+  label,
+  value,
+  isMuted,
+}) => {
   return (
-    <div className="flex flex-col gap-0.5 rounded-lg bg-ink-50 px-3 py-2">
+    <div className="flex flex-col gap-0.5 py-2">
       <Typography variant={TypographyVariant.HELPER}>{label}</Typography>
       <Typography
         variant={TypographyVariant.BODY}
-        className={value ? 'whitespace-pre-wrap text-ink-800' : 'text-ink-400'}
+        className={tailwind(
+          value ? 'whitespace-pre-wrap [overflow-wrap:anywhere]' : 'text-ink-400',
+          value && (isMuted ? 'text-ink-600' : 'text-ink-800'),
+        )}
       >
-        {value || t(TEXT.GENERAL.NOT_REGISTERED)}
+        {value}
       </Typography>
     </div>
   );
@@ -33,14 +38,21 @@ interface PatientBackgroundSummaryProps {
   /** Las preguntas tal como estaban al llenarla. */
   fields: ClinicalField[];
   answers: Record<string, ClinicalAnswer>;
-  authorship: string[];
+  /** Líneas de autoría al pie; sin ellas no se pinta el pie. */
+  authorship?: string[];
+  /** Con `false` las preguntas Sí/No van sin el título "Antecedentes" (otras secciones de Preguntas). */
+  showsHistoryTitle?: boolean;
+  /** Registros anteriores: las respuestas se leen más apagadas que las del último. */
+  isMuted?: boolean;
 }
 
 /** La hoja ya llena, con la misma grilla que el formulario: todas las preguntas a la vista. */
 export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> = ({
   fields,
   answers,
-  authorship,
+  authorship = [],
+  showsHistoryTitle = true,
+  isMuted = false,
 }) => {
   const { t } = useTranslation();
   const groups = groupFields(fields);
@@ -51,9 +63,11 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
     <div className={tailwind('flex flex-col gap-5', CLINICAL_SHEET_WIDTH)}>
       {booleanGroups.length > 0 && (
         <section className="flex flex-col gap-2">
-          <Typography variant={TypographyVariant.SUBTITLE}>
-            {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
-          </Typography>
+          {showsHistoryTitle && (
+            <Typography variant={TypographyVariant.SUBTITLE}>
+              {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
+            </Typography>
+          )}
           <div className={CLINICAL_SECTIONS_COLUMNS}>
             {booleanGroups.map((group) => (
               <ClinicalSectionCard key={group.key} title={group.title}>
@@ -61,8 +75,10 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
                   <BackgroundAnswerRow
                     key={field.id}
                     label={field.label}
-                    isChecked={isYes(answers[field.id])}
+                    answer={yesNoOf(answers[field.id])}
                     detail={detailOf(answers[field.id]) || null}
+                    detailLabel={field.detailLabel}
+                    isMuted={isMuted}
                   />
                 ))}
               </ClinicalSectionCard>
@@ -78,19 +94,26 @@ export const PatientBackgroundSummary: React.FC<PatientBackgroundSummaryProps> =
           )}
           <div className={CLINICAL_TEXTS_GRID}>
             {group.texts.map((field) => (
-              <TextAnswer key={field.id} label={field.label} value={textOf(answers[field.id])} />
+              <TextAnswer
+                key={field.id}
+                label={field.label}
+                value={textOf(answers[field.id])}
+                isMuted={isMuted}
+              />
             ))}
           </div>
         </section>
       ))}
 
-      <div className="flex flex-col border-t border-ink-100 pt-3">
-        {authorship.map((line) => (
-          <Typography key={line} variant={TypographyVariant.HELPER}>
-            {line}
-          </Typography>
-        ))}
-      </div>
+      {authorship.length > 0 && (
+        <div className="flex flex-col border-t border-ink-100 pt-3">
+          {authorship.map((line) => (
+            <Typography key={line} variant={TypographyVariant.HELPER}>
+              {line}
+            </Typography>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

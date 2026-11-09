@@ -15,6 +15,7 @@ interface FormSelectFieldProps {
   placeholder?: string;
   required?: boolean;
   optional?: boolean;
+  isSheetOnMobile?: boolean;
   className?: string;
 }
 
@@ -26,6 +27,7 @@ export const FormSelectField: React.FC<FormSelectFieldProps> = ({
   placeholder,
   required = false,
   optional = false,
+  isSheetOnMobile = false,
   className,
 }) => {
   const [field, meta, helpers] = useField<string>(name);
@@ -45,6 +47,7 @@ export const FormSelectField: React.FC<FormSelectFieldProps> = ({
         ariaLabel={label}
         variant={PillSelectVariant.FIELD}
         placeholder={placeholder}
+        isSheetOnMobile={isSheetOnMobile}
       />
 
       {meta.touched && meta.error && (

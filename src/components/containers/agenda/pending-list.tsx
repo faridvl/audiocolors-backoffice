@@ -29,7 +29,7 @@ export const PendingList: React.FC<{ agenda: AgendaState }> = ({ agenda }) => {
               key={patient.uuid}
               title={getFullName(patient.firstName, patient.lastName)}
               subtitle={patient.tentativeAppointmentTypeName ?? t(TEXT.AGENDA.ROW.NO_TYPE)}
-              branchName={agenda.resolveBranchName(patient.branchUuid)}
+              branchName={agenda.resolvePatientBranchName(patient)}
               onClick={() => agenda.handleOpenPending(patient.uuid)}
             />
           ))}

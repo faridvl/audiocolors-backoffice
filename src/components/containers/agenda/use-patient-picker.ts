@@ -9,6 +9,7 @@ const RESULT_LIMIT = 8;
 export function usePatientPicker() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
@@ -33,6 +34,9 @@ export function usePatientPicker() {
     setSearchTerm,
     hasEnoughText,
     isSearching: isFetching,
+    isCreating,
+    startCreating: () => setIsCreating(true),
+    stopCreating: () => setIsCreating(false),
     patients: hasEnoughText ? (data?.data ?? []) : [],
   };
 }

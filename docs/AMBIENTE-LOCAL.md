@@ -26,6 +26,17 @@ Clínica "AudioColors (prueba local)", usuario OWNER `prueba@audiocolors.test`.
 La contraseña está en `.env.prueba.local` (ignorado por git). Solo existe en
 esta base local.
 
+## Iniciar sesión con Playwright
+
+`yarn e2e:login` entra con la cuenta OWNER `farid@audiocolors.com` y deja la sesión en
+`e2e/.auth/session.json`, reutilizable como `storageState`. El correo y la contraseña
+se leen de `.env.e2e.local` (`E2E_EMAIL`, `E2E_PASSWORD`, ignorado por git) y la URL de
+`E2E_BASE_URL` (por defecto `http://localhost:3000`). La cuenta existe en esta base y en
+la de desarrollo.
+
+El API solo acepta peticiones desde los orígenes de `ALLOWED_ORIGINS` (`http://localhost:3000`):
+un front en `127.0.0.1` o en otro puerto se queda en `/login` sin mostrar el motivo.
+
 ## Levantar
 
 1. Abrir Docker Desktop (el contenedor arranca solo).
@@ -42,6 +53,19 @@ esta base local.
    ```bash
    NEXT_PUBLIC_IDENTITY_API_URL=http://localhost:7170 NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=http://localhost:7071 yarn dev
    ```
+
+### Sin cerrar el front de desarrollo
+
+Si `localhost:3000` ya corre contra el API de desarrollo (con su sesión abierta),
+se levanta un segundo front en `127.0.0.1:3001`. Otro host para que las cookies de
+sesión no se pisen, y otra carpeta de compilación para no chocar con la de `:3000`:
+
+```bash
+NEXT_DIST_DIR=.next-prueba NEXT_PUBLIC_IDENTITY_API_URL=http://localhost:7170 NEXT_PUBLIC_MEDICAL_RECORDS_API_URL=http://localhost:7071 npx next dev -H 127.0.0.1 -p 3001
+```
+
+Los dos `.env` del API local necesitan
+`ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3001`.
 
 ## Si Docker Desktop no arranca
 

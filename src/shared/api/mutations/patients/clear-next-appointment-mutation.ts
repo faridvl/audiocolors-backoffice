@@ -1,6 +1,7 @@
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
+import { toClinicDayKey } from '@/shared/utils/dates';
 import { PaginatedResponse } from '@/types/system/paginate.types';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
 
@@ -18,8 +19,8 @@ interface ClearNextAppointmentVariables {
 /**
  * Deja al paciente sin próxima cita: limpia el mes tentativo y cancela la cita
  * agendada. El API no tiene un endpoint para esto, y limpiar el mes no cancela
- * la cita, así que la cita se busca en su día (el API filtra por día UTC) y se
- * cancela como desde la agenda.
+ * la cita, así que la cita se busca en su día de la clínica (el API filtra por el día de Costa
+ * Rica) y se cancela como desde la agenda.
  */
 export function useClearNextAppointmentMutation() {
   const { mutate: executeClearNextAppointment, isPending } = useApiMutation<
@@ -32,7 +33,7 @@ export function useClearNextAppointmentMutation() {
 
       if (nextAppointmentAt) {
         const params = new URLSearchParams({
-          date: nextAppointmentAt.slice(0, 10),
+          date: toClinicDayKey(nextAppointmentAt),
           limit: String(DAY_LIMIT),
         });
         const response = await client.get<PaginatedResponse<Appointment>>(

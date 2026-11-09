@@ -18,6 +18,23 @@ enum KeyLength {
 
 const pad = (value: number) => String(value).padStart(2, '0');
 
+/** Zona horaria de la clínica (UTC-6, sin horario de verano): el API filtra las citas por su día. */
+export const CLINIC_TIME_ZONE = 'America/Costa_Rica';
+
+const clinicDayFormatter = new Intl.DateTimeFormat('en-US', {
+  timeZone: CLINIC_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/** Instante ISO (UTC) -> "YYYY-MM-DD" del día en que cae en la clínica. */
+export function toClinicDayKey(isoDate: string): string {
+  const parts = clinicDayFormatter.formatToParts(new Date(isoDate));
+  const part = (type: string) => parts.find((item) => item.type === type)?.value ?? '';
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+
 /** Fecha local -> "YYYY-MM-DD". */
 export function toDayKey(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

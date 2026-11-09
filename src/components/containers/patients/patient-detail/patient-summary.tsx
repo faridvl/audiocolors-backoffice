@@ -1,15 +1,24 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PatientStatusPill } from '@/components/containers/patients/patient-status-pill';
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
+import { PatientMaintenancePills } from '@/components/containers/patients/patient-flags/patient-maintenance-pills';
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
+import { PatientPriorityButton } from '@/components/containers/patients/patients-list/patient-priority-button';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { calculateAge, formatDate, getFullName } from '@/shared/utils/formatters';
+import {
+  calculateAge,
+  formatCalendarDate,
+  formatDate,
+  getFullName,
+} from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import {
   GENDER_LABELS,
+  getPatientBranchUuids,
   Patient,
   PatientFlag,
   PatientGender,
@@ -32,8 +41,10 @@ interface PatientSummaryProps {
   onScheduleAppointment: () => void;
   onChangeStatus: () => void;
   onEditFlags: () => void;
+  onEditMaintenance: () => void;
   onEditContacts: () => void;
   onEdit: () => void;
+  onGenerateSummary: () => void;
 }
 
 /**
@@ -46,8 +57,10 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
   onScheduleAppointment,
   onChangeStatus,
   onEditFlags,
+  onEditMaintenance,
   onEditContacts,
   onEdit,
+  onGenerateSummary,
 }) => {
   const { t } = useTranslation();
   const { data: branches } = useBranchesQuery();
@@ -64,9 +77,9 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
     .filter(Boolean)
     .join(' · ');
 
-  const branchName = patient.branchUuid
-    ? (branches?.find((branch) => branch.uuid === patient.branchUuid)?.name ?? null)
-    : null;
+  const branchNames = getPatientBranchUuids(patient)
+    .map((branchUuid) => branches?.find((branch) => branch.uuid === branchUuid)?.name)
+    .filter((name): name is string => Boolean(name));
 
   // A un paciente fallecido no se le agendan citas (el API lo rechaza).
   const isDeceased = patient.status === PatientStatus.DECEASED;
@@ -85,6 +98,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <Typography variant={TypographyVariant.SUBTITLE} as="p" className="break-words">
               {getFullName(patient.firstName, patient.lastName)}
             </Typography>
+            <PatientPriorityButton patient={patient} className="-my-2" />
             <PatientStatusPill status={patient.status} />
           </div>
           {identity && (
@@ -98,11 +112,12 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <PatientFlagPills patient={patient} flags={MODAL_FLAGS} onClick={onEditFlags} />
+          <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
+          <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
           <VideoCandidateCheck patient={patient} />
         </div>
 
-        <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 lg:grid-cols-2">
           <NextAppointmentBlock
             patient={patient}
             onSchedule={isDeceased ? undefined : onScheduleAppointment}
@@ -119,16 +134,27 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
           </div>
         </div>
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-ink-100 pt-4 sm:grid-cols-4">
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-ink-100 pt-4">
           <PatientDatum
             label={t(TEXT.PATIENTS.DETAIL.FIELDS.BIRTH_DATE)}
-            value={patient.birthDate ? formatDate(patient.birthDate) : null}
+            value={patient.birthDate ? formatCalendarDate(patient.birthDate) : null}
           />
-          <PatientDatum label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH)} value={branchName} />
+          <PatientDatum
+            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, { count: branchNames.length })}
+          >
+            {branchNames.map((name) => (
+              <BranchBadge key={name} name={name} />
+            ))}
+          </PatientDatum>
         </dl>
       </div>
 
-      <PatientActions onEdit={onEdit} onChangeStatus={onChangeStatus} onEditFlags={onEditFlags} />
+      <PatientActions
+        onEdit={onEdit}
+        onChangeStatus={onChangeStatus}
+        onEditFlags={onEditFlags}
+        onGenerateSummary={onGenerateSummary}
+      />
     </section>
   );
 };

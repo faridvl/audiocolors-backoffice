@@ -1,11 +1,13 @@
-import { CalendarClock, ClipboardList, type LucideIcon } from 'lucide-react';
+import { Building2, CalendarClock, FileText, MessageSquareText, type LucideIcon } from 'lucide-react';
 import { Permission } from '@/shared/auth/permissions';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
 
 export enum SettingsSection {
   APPOINTMENT_TYPES = 'APPOINTMENT_TYPES',
-  CLINICAL_HISTORY = 'CLINICAL_HISTORY',
+  QUESTIONS = 'QUESTIONS',
+  TEMPLATES = 'TEMPLATES',
+  CLINIC = 'CLINIC',
 }
 
 export interface SettingsSectionItem {
@@ -14,6 +16,8 @@ export interface SettingsSectionItem {
   icon: LucideIcon;
   /** `${TEXT.SETTINGS.SECTIONS_PREFIX}.${section}.title` y `.description`. */
   permission: Permission;
+  /** Pantallas con dos columnas (editor y panel): usan más ancho que el resto. */
+  isWide?: boolean;
 }
 
 /** Secciones de Configuración en el orden en que se muestran; se agrupan por tarea, no por tabla. */
@@ -25,10 +29,23 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
     permission: Permission.EDIT_APPOINTMENT_TYPES,
   },
   {
-    section: SettingsSection.CLINICAL_HISTORY,
-    href: routesPrivate.settings.clinicalHistory,
-    icon: ClipboardList,
+    section: SettingsSection.QUESTIONS,
+    href: routesPrivate.settings.questions,
+    icon: MessageSquareText,
     permission: Permission.EDIT_CLINICAL_TEMPLATE,
+  },
+  {
+    section: SettingsSection.TEMPLATES,
+    href: routesPrivate.settings.templates,
+    icon: FileText,
+    permission: Permission.EDIT_CLINICAL_TEMPLATE,
+    isWide: true,
+  },
+  {
+    section: SettingsSection.CLINIC,
+    href: routesPrivate.settings.clinic,
+    icon: Building2,
+    permission: Permission.VIEW_CLINIC,
   },
 ];
 

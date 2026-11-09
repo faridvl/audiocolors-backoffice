@@ -1,8 +1,17 @@
 import * as Yup from 'yup';
+import { TEXT } from '@/static/texts/i18n';
 import { DocumentType, PatientGender } from '@/types/patients/patient';
 import { PatientContact } from '@/types/patients/patient-contact';
+import {
+  formatPhoneForDisplay,
+  isSamePhone,
+  normalizePhoneUnlessUnchanged,
+  PhoneError,
+  toPatientPhone,
+  validatePhoneUnlessUnchanged,
+} from '@/shared/utils/phone';
 
-const NAME_REGEX = /^[a-zA-ZaeiouAEIOUuUnN\u00C0-\u017F\s]+$/;
+export const NAME_REGEX = /^[a-zA-ZaeiouAEIOUuUnN\u00C0-\u017F\s]+$/;
 
 export const DOCUMENT_MASKS: Record<DocumentType, { maxLength: number; placeholder: string }> = {
   [DocumentType.NATIONAL]: { maxLength: 11, placeholder: '1-2345-6789' },
@@ -18,14 +27,13 @@ export function formatNationalId(value: string): string {
   return `${digits.slice(0, 1)}-${digits.slice(1, 5)}-${digits.slice(5)}`;
 }
 
-/** Formatea un telefono local como XXXX-XXXX. */
-export function formatPhone(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 8);
-  if (digits.length <= 4) return digits;
-  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+function isPastOrPresentDate(value: string | undefined): boolean {
+  if (!value) return false;
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
 }
 
-const baseFields = {
+const buildBaseFields = (isBranchRequired: boolean) => ({
   firstName: Yup.string()
     .matches(NAME_REGEX, 'Solo letras y espacios')
     .max(60, 'Máximo 60 caracteres')
@@ -38,52 +46,80 @@ const baseFields = {
   email: Yup.string().email('Correo inválido'),
   birthDate: Yup.string()
     .required('La fecha de nacimiento es obligatoria')
-    .test('not-future', 'La fecha no puede ser futura', (value) => {
-      if (!value) return false;
-      const parsed = new Date(value);
-      return !Number.isNaN(parsed.getTime()) && parsed <= new Date();
-    }),
+    .test('not-future', 'La fecha no puede ser futura', isPastOrPresentDate),
   address: Yup.string().max(240, 'Máximo 240 caracteres'),
   gender: Yup.string().oneOf(Object.values(PatientGender), 'Selecciona una opción'),
-};
+  // Sin sedes que elegir (clínica sin sedes o consulta fallida) no se puede exigir una.
+  branchUuids: isBranchRequired
+    ? Yup.array().of(Yup.string().required()).min(1, TEXT.PATIENTS.FORM.BRANCHES_REQUIRED)
+    : Yup.array().of(Yup.string().required()),
+});
 
 const CONTACT_NAME_MAX_LENGTH = 80;
-const LOCAL_PHONE_PATTERN = /^\d{4}-\d{4}$/;
-const COUNTRY_PREFIX = '+506 ';
 
-const buildContactsField = (phoneField: Yup.StringSchema) =>
+const PHONE_ERROR_MESSAGES: Record<PhoneError, string> = {
+  [PhoneError.LOCAL_FORMAT]: 'Formato: 8888-8888. Si es de otro país, elígelo en la lista.',
+  [PhoneError.INTERNATIONAL_FORMAT]:
+    'Revisa el número: con el código del país, de 8 a 15 dígitos.',
+};
+
+/** `unchangedPhones`: teléfonos que vienen de la base; si no se tocan, no se validan. */
+const buildContactsField = (unchangedPhones: ReadonlySet<string>) =>
   Yup.array()
     .of(
       Yup.object({
         name: Yup.string().max(CONTACT_NAME_MAX_LENGTH, 'Máximo 80 caracteres'),
-        phone: phoneField.required('El teléfono es obligatorio'),
+        phone: Yup.string()
+          .test('valid-phone', (value, context) => {
+            const error = validatePhoneUnlessUnchanged(value ?? '', unchangedPhones);
+            return error === null
+              ? true
+              : context.createError({ message: PHONE_ERROR_MESSAGES[error] });
+          })
+          .required('El teléfono es obligatorio'),
       }),
     )
     .min(1, 'Agrega al menos un contacto');
 
-export const patientCreateValidationSchema = Yup.object({
-  ...baseFields,
-  contacts: buildContactsField(Yup.string().matches(LOCAL_PHONE_PATTERN, 'Formato: XXXX-XXXX')),
-});
+const NO_UNCHANGED_PHONES: ReadonlySet<string> = new Set();
 
-// Pacientes viejos pueden tener un teléfono extranjero o sin el formato local.
-const editContactsField = buildContactsField(
-  Yup.string().matches(/^\+?[\d\s-]{7,20}$/, 'Teléfono inválido'),
-);
+const toUnchangedPhones = (contacts: PatientContactFormValues[]): ReadonlySet<string> =>
+  new Set(contacts.map((contact) => contact.phone).filter(Boolean));
 
-export const patientEditValidationSchema = Yup.object({
-  ...baseFields,
-  contacts: editContactsField,
-});
+export const buildPatientCreateValidationSchema = (isBranchRequired: boolean) =>
+  Yup.object({
+    ...buildBaseFields(isBranchRequired),
+    contacts: buildContactsField(NO_UNCHANGED_PHONES),
+  });
+
+export const buildPatientEditValidationSchema = (
+  initialContacts: PatientContactFormValues[],
+  isBranchRequired: boolean,
+) =>
+  Yup.object({
+    ...buildBaseFields(isBranchRequired),
+    // Al editar es opcional: obligarla empujaría a inventar fechas en un expediente clínico.
+    birthDate: Yup.string().test(
+      'not-future',
+      'La fecha no puede ser futura',
+      (value) => !value || isPastOrPresentDate(value),
+    ),
+    contacts: buildContactsField(toUnchangedPhones(initialContacts)),
+  });
 
 /** Solo los contactos, para editarlos desde el expediente sin abrir el formulario entero. */
-export const patientContactsValidationSchema = Yup.object({ contacts: editContactsField });
+export const buildPatientContactsValidationSchema = (initialContacts: PatientContactFormValues[]) =>
+  Yup.object({
+    contacts: buildContactsField(toUnchangedPhones(initialContacts)),
+  });
 
 export interface PatientContactFormValues {
   /** Presente solo si el contacto ya existía al abrir el formulario. */
   uuid?: string;
   name: string;
   phone: string;
+  /** Teléfono como está en la base: si el campo no cambió, se guarda sin reescribirlo. */
+  storedPhone?: string;
 }
 
 export interface PatientFormValues {
@@ -95,7 +131,7 @@ export interface PatientFormValues {
   gender: string;
   email: string;
   address: string;
-  branchUuid: string;
+  branchUuids: string[];
   contacts: PatientContactFormValues[];
 }
 
@@ -110,32 +146,23 @@ export function resolveContactsForSave(
 ): { phone: string | undefined; contacts: PatientContactFormValues[] } {
   const filled = contacts
     .filter((contact) => contact.phone.trim())
-    .map((contact) => ({
-      ...(contact.uuid && { uuid: contact.uuid }),
-      name: (contact.name.trim() || patientFullName).slice(0, CONTACT_NAME_MAX_LENGTH),
-      phone: contact.phone.trim(),
-    }));
-  const primaryPhone = filled[0]?.phone;
+    .map((contact) => {
+      const phone = normalizePhoneUnlessUnchanged(contact.phone, contact.storedPhone);
+      return {
+        contact: {
+          ...(contact.uuid && { uuid: contact.uuid }),
+          name: (contact.name.trim() || patientFullName).slice(0, CONTACT_NAME_MAX_LENGTH),
+          phone,
+        },
+        isStored: phone === contact.storedPhone,
+      };
+    });
+  const primary = filled[0];
 
   return {
-    phone:
-      primaryPhone && LOCAL_PHONE_PATTERN.test(primaryPhone)
-        ? `${COUNTRY_PREFIX}${primaryPhone}`
-        : primaryPhone,
-    contacts: filled,
+    phone: primary ? toPatientPhone(primary.contact.phone, primary.isStored) : undefined,
+    contacts: filled.map(({ contact }) => contact),
   };
-}
-
-/** Teléfono del paciente como se escribe en un contacto: sin el prefijo del país. */
-export function toContactPhone(patientPhone: string): string {
-  return patientPhone.startsWith(COUNTRY_PREFIX)
-    ? patientPhone.slice(COUNTRY_PREFIX.length)
-    : patientPhone;
-}
-
-export function isSamePhone(first: string, second: string): boolean {
-  const lastDigits = (phone: string) => phone.replace(/\D/g, '').slice(-8);
-  return lastDigits(first) !== '' && lastDigits(first) === lastDigits(second);
 }
 
 /**
@@ -148,14 +175,26 @@ export function buildInitialContacts(
   patientPhone: string | undefined,
   patientFullName: string,
 ): PatientContactFormValues[] {
-  const formContacts = contacts.map(({ uuid, name, phone }) => ({ uuid, name, phone }));
+  const formContacts = contacts.map(({ uuid, name, phone }) => ({
+    uuid,
+    name,
+    phone: formatPhoneForDisplay(phone),
+    storedPhone: phone,
+  }));
   if (!patientPhone) {
     return formContacts.length > 0 ? formContacts : [{ name: '', phone: '' }];
   }
 
   const primary = formContacts.find((contact) => isSamePhone(contact.phone, patientPhone));
   if (!primary) {
-    return [{ name: patientFullName, phone: toContactPhone(patientPhone) }, ...formContacts];
+    return [
+      {
+        name: patientFullName,
+        phone: formatPhoneForDisplay(patientPhone),
+        storedPhone: patientPhone,
+      },
+      ...formContacts,
+    ];
   }
   return [primary, ...formContacts.filter((contact) => contact !== primary)];
 }

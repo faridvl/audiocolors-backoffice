@@ -1,8 +1,11 @@
-import { NextAppointmentKind, PatientListFilters } from '@/shared/api/querys/patients-query';
-import { PatientFlag, PatientStatus } from '@/types/patients/patient';
+import {
+  NextAppointmentKind,
+  PatientListFilters,
+} from "@/shared/api/querys/patients-query";
+import { PatientFlag, PatientStatus } from "@/types/patients/patient";
 
 /** Opción "Sin cita" (de meses y de próxima cita): ni cita ni mes anotado. El API la reconoce así. */
-export const NO_APPOINTMENT_VALUE = 'none';
+export const NO_APPOINTMENT_VALUE = "none";
 
 /** Filtros que aplica cada tarjeta del resumen. */
 export interface PatientListPreset {
@@ -21,10 +24,13 @@ export interface PatientListSelection {
   kinds: string[];
   types: string[];
   flags: string[];
+  /** Día de envío a laboratorio (YYYY-MM-DD); vacío = cualquier día. */
+  labDate: string;
 }
 
 const isSameList = (first: string[], second: string[]) =>
-  first.length === second.length && first.every((value) => second.includes(value));
+  first.length === second.length &&
+  first.every((value) => second.includes(value));
 
 /**
  * Lo que la tarjeta define reemplaza al filtro manual (no tiene sentido contar
@@ -58,7 +64,10 @@ export function removePresetFrom(
   };
 }
 
-export function isPresetApplied(selection: PatientListSelection, preset: PatientListPreset) {
+export function isPresetApplied(
+  selection: PatientListSelection,
+  preset: PatientListPreset,
+) {
   return (
     (!preset.months || isSameList(selection.months, preset.months)) &&
     (!preset.kinds || isSameList(selection.kinds, preset.kinds)) &&
@@ -71,12 +80,16 @@ export function isPresetApplied(selection: PatientListSelection, preset: Patient
  * El API no acepta "Sin cita" como tipo de próxima cita, solo como mes: elegida
  * en "Próxima cita" se manda junto a los meses.
  */
-export function toNextAppointmentMonths(selection: PatientListSelection): string[] {
+export function toNextAppointmentMonths(
+  selection: PatientListSelection,
+): string[] {
   if (!selection.kinds.includes(NO_APPOINTMENT_VALUE)) return selection.months;
   return Array.from(new Set([...selection.months, NO_APPOINTMENT_VALUE]));
 }
 
-export function toPatientListFilters(selection: PatientListSelection): PatientListFilters {
+export function toPatientListFilters(
+  selection: PatientListSelection,
+): PatientListFilters {
   return {
     statuses: selection.statuses as PatientStatus[],
     branchUuids: selection.branches,
@@ -86,6 +99,8 @@ export function toPatientListFilters(selection: PatientListSelection): PatientLi
     isVideoCandidate: selection.flags.includes(PatientFlag.VIDEO_CANDIDATE),
     warrantyExpired: selection.flags.includes(PatientFlag.WARRANTY_EXPIRED),
     renewPrescription: selection.flags.includes(PatientFlag.RENEW_PRESCRIPTION),
+    isPriority: selection.flags.includes(PatientFlag.PRIORITY),
+    hearingAidsInLabDate: selection.labDate || undefined,
     nextAppointmentKinds: selection.kinds.filter(
       (kind) => kind !== NO_APPOINTMENT_VALUE,
     ) as NextAppointmentKind[],

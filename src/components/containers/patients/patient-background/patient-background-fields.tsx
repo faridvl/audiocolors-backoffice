@@ -20,34 +20,57 @@ import {
 import { ClinicalSectionCard } from './clinical-section-card';
 
 /** La hoja de la historia clínica armada con las preguntas de la clínica. Va dentro de un Formik. */
-export const PatientBackgroundFields: React.FC<{ fields: ClinicalField[] }> = ({ fields }) => {
+export const PatientBackgroundFields: React.FC<{
+  fields: ClinicalField[];
+  /** Con `false` va sin el título "Antecedentes" (otras secciones de Preguntas). */
+  showsHistoryTitle?: boolean;
+  /** Con `false` las tarjetas de preguntas van sin borde (el formulario ya está dentro de una caja). */
+  hasCardBorder?: boolean;
+}> = ({ fields, showsHistoryTitle = true, hasCardBorder = true }) => {
   const { t } = useTranslation();
   const { values, setFieldValue } = useFormikContext<ClinicalHistoryFormValues>();
   const groups = groupFields(fields);
   const booleanGroups = groups.filter((group) => group.booleans.length > 0);
   const textGroups = groups.filter((group) => group.texts.length > 0);
+  const booleanFields = booleanGroups.flatMap((group) => group.booleans);
+  const missingCount = booleanFields.filter((field) => values.checks[field.id] == null).length;
+  const totalCount = booleanFields.length;
 
   return (
     <div className={tailwind('flex flex-col gap-5', CLINICAL_SHEET_WIDTH)}>
       {booleanGroups.length > 0 && (
         <div className="flex flex-col gap-2">
-          <Typography variant={TypographyVariant.SUBTITLE}>
-            {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
-          </Typography>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            {showsHistoryTitle && (
+              <Typography variant={TypographyVariant.SUBTITLE}>
+                {t(TEXT.PATIENTS.BACKGROUND.HISTORY_TITLE)}
+              </Typography>
+            )}
+            <div role="status" className="ml-auto">
+              <Typography variant={TypographyVariant.HELPER} className="text-ink-600">
+                {missingCount > 0
+                  ? t(TEXT.PATIENTS.BACKGROUND.PROGRESS_MISSING, {
+                      count: missingCount,
+                      total: totalCount,
+                    })
+                  : t(TEXT.PATIENTS.BACKGROUND.PROGRESS_DONE, { total: totalCount })}
+              </Typography>
+            </div>
+          </div>
           <div className={CLINICAL_SECTIONS_COLUMNS}>
             {booleanGroups.map((group) => (
-              <ClinicalSectionCard key={group.key} title={group.title}>
+              <ClinicalSectionCard key={group.key} title={group.title} isBordered={hasCardBorder}>
                 {group.booleans.map((field) => {
-                  const isChecked = Boolean(values.checks[field.id]);
+                  const answer = values.checks[field.id] ?? null;
                   return (
                     <React.Fragment key={field.id}>
                       <BackgroundConditionRow
                         label={field.label}
-                        isChecked={isChecked}
+                        answer={answer}
                         onChange={(value) => setFieldValue(`checks.${field.id}`, value)}
                       />
                       {/* El detalle va pegado a su pregunta, no al pie de la hoja. */}
-                      {field.detailLabel && isChecked && (
+                      {field.detailLabel && answer === true && (
                         <FormField
                           className="pb-2"
                           name={`details.${field.id}`}

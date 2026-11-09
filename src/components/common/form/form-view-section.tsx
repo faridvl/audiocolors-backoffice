@@ -69,13 +69,9 @@ export const FormViewLabel: React.FC<FormViewLabelProps> = ({
     {Icon && <Icon className="mt-0.5 h-4 w-4 shrink-0 text-ink-400" aria-hidden />}
     <div className="flex min-w-0 flex-col gap-0.5">
       <Typography variant={TypographyVariant.HELPER}>{label}</Typography>
-      {value ? (
+      {value && (
         <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="break-words">
           {value}
-        </Typography>
-      ) : (
-        <Typography variant={TypographyVariant.BODY} className="text-ink-400">
-          Sin registrar
         </Typography>
       )}
     </div>

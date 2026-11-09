@@ -36,7 +36,7 @@ interface ListRowProps {
   onClick: () => void;
 }
 
-/** Fila de lista: toda la fila es el único control (RULES §3.1). */
+/** Fila de lista: toda la fila es el único control (RULES §5). */
 export const ListRow: React.FC<ListRowProps> = ({
   title,
   subtitle,

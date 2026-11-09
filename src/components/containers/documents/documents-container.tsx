@@ -26,6 +26,9 @@ import { inputBaseClasses } from '@/components/common/input/input';
 import { Pagination } from '@/components/common/table/pagination';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
+import { ArchiveItemType } from './archive-items';
+import { AudiometryCard } from './audiometry-card';
+import { AudiometryPreviewModal } from './audiometry-preview-modal';
 import { useDocuments } from './use-documents';
 import { DocumentPreviewModal } from './document-preview-modal';
 import { ConfirmDeleteModal } from './confirm-delete-modal';
@@ -125,6 +128,9 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
   const { t } = useTranslation();
   const {
     documents,
+    audiometryToPreviewUuid,
+    handleOpenAudiometryPreview,
+    handleCloseAudiometryPreview,
     filteredCount,
     totalCount,
     isLoading,
@@ -330,16 +336,27 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
 
       {!isLoading && !isError && filteredCount > 0 && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {documents.map((document) => (
-            <DocumentCard
-              key={document.uuid}
-              document={document}
-              authorLabel={resolveAuthorLabel(document.uploadedByUuid, document.uploadedByName)}
-              onPreview={() => handleOpenPreview(document)}
-              onEdit={() => handleStartEdit(document)}
-              onDelete={() => setDocumentToDelete(document)}
-            />
-          ))}
+          {documents.map((item) =>
+            item.type === ArchiveItemType.AUDIOMETRY ? (
+              <AudiometryCard
+                key={item.uuid}
+                item={item}
+                onOpen={() => handleOpenAudiometryPreview(item.uuid)}
+              />
+            ) : (
+              <DocumentCard
+                key={item.uuid}
+                document={item.document}
+                authorLabel={resolveAuthorLabel(
+                  item.document.uploadedByUuid,
+                  item.document.uploadedByName,
+                )}
+                onPreview={() => handleOpenPreview(item.document)}
+                onEdit={() => handleStartEdit(item.document)}
+                onDelete={() => setDocumentToDelete(item.document)}
+              />
+            ),
+          )}
         </div>
       )}
 
@@ -356,6 +373,14 @@ export const DocumentsContainer: React.FC<DocumentsContainerProps> = ({ patientU
         onRotate={handleRotatePreview}
         onClose={handleClosePreview}
       />
+
+      {audiometryToPreviewUuid && (
+        <AudiometryPreviewModal
+          patientUuid={patientUuid}
+          entryUuid={audiometryToPreviewUuid}
+          onClose={handleCloseAudiometryPreview}
+        />
+      )}
 
       <ConfirmDeleteModal
         fileName={documentToDelete?.displayName ?? null}

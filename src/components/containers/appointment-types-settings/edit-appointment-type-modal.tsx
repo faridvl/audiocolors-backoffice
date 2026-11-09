@@ -10,26 +10,34 @@ import { TEXT } from '@/static/texts/i18n';
 import {
   APPOINTMENT_TYPE_NAME_MAX_LENGTH,
   AppointmentType,
+  CreateAppointmentTypePayload,
   UpdateAppointmentTypePayload,
 } from '@/types/appointments/appointment-type';
 import { ControlChange, useEditAppointmentType } from './use-edit-appointment-type';
 
 interface EditAppointmentTypeModalProps {
-  appointmentType: AppointmentType;
+  /** Sin tipo, la ventana crea uno nuevo. */
+  appointmentType: AppointmentType | null;
   currentControl: AppointmentType | null;
+  /** Nombres de los demás tipos, para avisar de un duplicado. */
+  existingNames: string[];
   isSaving: boolean;
   onSave: (typeUuid: string, changes: UpdateAppointmentTypePayload) => void;
+  onCreate: (payload: CreateAppointmentTypePayload) => void;
   onClose: () => void;
 }
 
 const NAME_ID = 'appointment-type-name';
 const DURATION_ID = 'appointment-type-duration';
+const DUPLICATE_ID = 'appointment-type-duplicate';
 
 export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> = ({
   appointmentType,
   currentControl,
+  existingNames,
   isSaving,
   onSave,
+  onCreate,
   onClose,
 }) => {
   const { t } = useTranslation();
@@ -42,19 +50,24 @@ export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> =
     controlChange,
     isDirty,
     isNameMissing,
+    isDuplicateName,
+    isNew,
     handleNameChange,
     handleDurationChange,
     handleControlChange,
     handleSave,
-  } = useEditAppointmentType(appointmentType, currentControl, onSave);
+  } = useEditAppointmentType(appointmentType, currentControl, existingNames, onSave, onCreate);
+  const title = t(
+    isNew ? TEXT.SETTINGS.APPOINTMENT_TYPES.NEW_TITLE : TEXT.SETTINGS.APPOINTMENT_TYPES.EDIT_TITLE,
+  );
 
   const controlNotice = {
     [ControlChange.NONE]: null,
     [ControlChange.SET]: t(TEXT.SETTINGS.APPOINTMENT_TYPES.CONTROL_SET, {
-      name: name.trim() || appointmentType.name,
+      name: name.trim() || (appointmentType?.name ?? ''),
     }),
     [ControlChange.REPLACE]: t(TEXT.SETTINGS.APPOINTMENT_TYPES.CONTROL_REPLACE, {
-      name: name.trim() || appointmentType.name,
+      name: name.trim() || (appointmentType?.name ?? ''),
       previous: currentControl?.name ?? '',
     }),
     [ControlChange.REMOVE]: t(TEXT.SETTINGS.APPOINTMENT_TYPES.CONTROL_REMOVE),
@@ -64,7 +77,7 @@ export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> =
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={t(TEXT.SETTINGS.APPOINTMENT_TYPES.EDIT_TITLE)}
+      aria-label={title}
       // En el celular sube desde abajo, como las demás ventanas.
       className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/70 sm:items-center sm:p-4"
       onClick={onClose}
@@ -78,9 +91,7 @@ export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> =
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10">
             <CalendarClock className="h-5 w-5 text-brand-700" aria-hidden />
           </span>
-          <Typography variant={TypographyVariant.ACCENT}>
-            {t(TEXT.SETTINGS.APPOINTMENT_TYPES.EDIT_TITLE)}
-          </Typography>
+          <Typography variant={TypographyVariant.ACCENT}>{title}</Typography>
         </div>
 
         <div className="mt-5 flex flex-col gap-4">
@@ -93,8 +104,19 @@ export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> =
               value={name}
               onChange={(event) => handleNameChange(event.target.value)}
               maxLength={APPOINTMENT_TYPE_NAME_MAX_LENGTH}
+              aria-invalid={isDuplicateName}
+              aria-describedby={isDuplicateName ? DUPLICATE_ID : undefined}
               className={inputBaseClasses}
             />
+            {isDuplicateName && (
+              <Typography
+                id={DUPLICATE_ID}
+                variant={TypographyVariant.HELPER}
+                className="text-danger-700"
+              >
+                {t(TEXT.SETTINGS.APPOINTMENT_TYPES.DUPLICATE_NAME)}
+              </Typography>
+            )}
           </label>
 
           <label htmlFor={DURATION_ID} className="flex flex-col gap-1.5">
@@ -149,7 +171,7 @@ export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> =
             type="button"
             variant={ButtonVariant.PRIMARY}
             onClick={handleSave}
-            disabled={!isDirty || isNameMissing}
+            disabled={!isDirty || isNameMissing || isDuplicateName}
             isLoading={isSaving}
           >
             {t(TEXT.GENERAL.BUTTONS.SAVE)}

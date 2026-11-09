@@ -1,5 +1,5 @@
 import { usePatientContactsQuery } from '@/shared/api/querys/patient-contacts-query';
-import { isSamePhone } from '@/components/containers/patients/patient-validation';
+import { isSamePhone } from '@/shared/utils/phone';
 
 /**
  * Contactos con el principal (el que coincide con el teléfono del paciente)

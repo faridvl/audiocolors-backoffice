@@ -20,7 +20,9 @@ import { buildClinicalHistoryPdf } from './clinical-history-pdf';
 import {
   buildFormValues,
   buildPayload,
+  buildStandardFields,
   ClinicalHistoryFormValues,
+  collectRemovedQuestions,
   resolveAnswers,
 } from './clinical-history';
 
@@ -64,11 +66,36 @@ export function usePatientBackgroundForm({
     [fields, originalAnswers],
   );
 
+  // Las respuestas de preguntas que la clínica quitó después no se pierden al editar.
+  const removedQuestions = useMemo(
+    () =>
+      collectRemovedQuestions(
+        fields,
+        originalAnswers,
+        background?.templateSnapshot ?? buildStandardFields(t),
+      ),
+    [fields, originalAnswers, background, t],
+  );
+
+  const legacyOtoscopy = useMemo(
+    () =>
+      background
+        ? { otoscopyRight: background.otoscopyRight, otoscopyLeft: background.otoscopyLeft }
+        : undefined,
+    [background],
+  );
+
   const saveFirstTime = (values: ClinicalHistoryFormValues) => {
     executeSavePatientBackground(
       {
         patientUuid,
-        background: buildPayload(fields, values, background?.notes ?? null),
+        background: buildPayload(
+          fields,
+          values,
+          background?.notes ?? null,
+          removedQuestions,
+          legacyOtoscopy,
+        ),
       },
       {
         onSuccess: () => {
@@ -124,7 +151,16 @@ export function usePatientBackgroundForm({
 
     // La historia queda con lo último; el PDF en Archivos es el registro de qué cambió y quién.
     executeSavePatientBackground(
-      { patientUuid, background: buildPayload(fields, values, background?.notes ?? null) },
+      {
+        patientUuid,
+        background: buildPayload(
+          fields,
+          values,
+          background?.notes ?? null,
+          removedQuestions,
+          legacyOtoscopy,
+        ),
+      },
       {
         onSuccess: () =>
           executeUploadDocument(
@@ -140,7 +176,7 @@ export function usePatientBackgroundForm({
                 refreshAfterUpdate();
               },
               onError: () => {
-                toast.error(t(TEXT.PATIENTS.BACKGROUND.UPDATE.PDF_UPLOAD_ERROR));
+                toast.warning(t(TEXT.PATIENTS.BACKGROUND.UPDATE.PDF_UPLOAD_ERROR));
                 refreshAfterUpdate();
               },
             },

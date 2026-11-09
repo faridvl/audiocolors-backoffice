@@ -20,12 +20,24 @@ export enum PatientActivityAction {
   APPOINTMENT_COMPLETED = 'APPOINTMENT_COMPLETED',
   STATUS_CHANGED = 'STATUS_CHANGED',
   HEARING_AIDS_LAB_CHANGED = 'HEARING_AIDS_LAB_CHANGED',
+  HEARING_AIDS_DELIVERED = 'HEARING_AIDS_DELIVERED',
   WARRANTY_CHANGED = 'WARRANTY_CHANGED',
   VIDEO_CANDIDATE_CHANGED = 'VIDEO_CANDIDATE_CHANGED',
   WARRANTY_EXPIRED_CHANGED = 'WARRANTY_EXPIRED_CHANGED',
   RENEW_PRESCRIPTION_CHANGED = 'RENEW_PRESCRIPTION_CHANGED',
+  PRIORITY_CHANGED = 'PRIORITY_CHANGED',
+  MAINTENANCE_CHANGED = 'MAINTENANCE_CHANGED',
+  CONTACT_ATTEMPTS_CHANGED = 'CONTACT_ATTEMPTS_CHANGED',
+  MAINTENANCE_CHECK_CHANGED = 'MAINTENANCE_CHECK_CHANGED',
+  MAINTENANCE_NOTE_CHANGED = 'MAINTENANCE_NOTE_CHANGED',
+  MAINTENANCE_NOTE_ADDED = 'MAINTENANCE_NOTE_ADDED',
   CLINICAL_HISTORY_CREATED = 'CLINICAL_HISTORY_CREATED',
   CLINICAL_HISTORY_UPDATED = 'CLINICAL_HISTORY_UPDATED',
+  PHYSICAL_EXAM_UPDATED = 'PHYSICAL_EXAM_UPDATED',
+  /** Se llenó una sección propia de Preguntas; el detalle trae solo el nombre, nunca las respuestas. */
+  QUESTIONNAIRE_FILLED = 'QUESTIONNAIRE_FILLED',
+  /** Se corrigió un registro de una sección propia el mismo día; el detalle trae solo el nombre. */
+  QUESTIONNAIRE_CORRECTED = 'QUESTIONNAIRE_CORRECTED',
 }
 
 export const APPOINTMENT_ACTIONS = [
@@ -44,7 +56,7 @@ export interface PatientFieldChange {
 /**
  * `detail` llega como JSON libre según la acción (ver ENDPOINTS.md del API).
  * Todas las claves son opcionales aquí: se lee lo que haya y lo que falte
- * se muestra como "—".
+ * queda en blanco.
  */
 export interface PatientActivityDetail {
   changes?: PatientFieldChange[];
@@ -65,6 +77,21 @@ export interface PatientActivityDetail {
   reason?: string | null;
   /** Indicadores (audífonos, garantía): true al prenderlo, false al apagarlo. */
   isOn?: boolean;
+  /** Audífonos en laboratorio: día de envío (`date`) y el anterior si se corrigió (`previousDate`). */
+  previousDate?: string;
+  /** HEARING_AIDS_DELIVERED: true si la entrega trajo nota (el texto no se guarda en la bitácora). */
+  hasNote?: boolean;
+  /** Mantenimientos: cuál es (1 a 4). */
+  number?: number;
+  /** MAINTENANCE_CHECK_CHANGED: true al marcarlo, false al desmarcarlo. */
+  done?: boolean;
+  /** MAINTENANCE_CHANGED: cómo quedó, null = sin marcar. */
+  status?: string | null;
+  /** CONTACT_ATTEMPTS_CHANGED (registros viejos): intentos de contacto ahora y antes. */
+  count?: number;
+  previousCount?: number;
+  /** QUESTIONNAIRE_FILLED y QUESTIONNAIRE_CORRECTED: la sección. */
+  templateName?: string;
 }
 
 export interface PatientActivity {

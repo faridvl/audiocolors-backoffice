@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { usePatientQuery, FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
@@ -9,11 +9,17 @@ import {
   FETCH_PATIENT_CONTACTS_KEY,
 } from '@/shared/api/querys/patient-contacts-query';
 import { useSyncPatientContactsMutation } from '@/shared/api/mutations/patients/sync-patient-contacts-mutation';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useNavigation } from '@/hooks/use-navigation';
-import { DocumentType, UpdatePatientPayload } from '@/types/patients/patient';
+import {
+  DocumentType,
+  getPatientBranchUuids,
+  UpdatePatientPayload,
+} from '@/types/patients/patient';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import {
   buildInitialContacts,
+  buildPatientEditValidationSchema,
   PatientFormValues,
   resolveContactsForSave,
 } from '../patient-validation';
@@ -40,26 +46,36 @@ export function usePatientEdit(uuid: string) {
   const isLoading = isLoadingPatient || isLoadingContacts;
   const isPending = isUpdatingPatient || isSyncingContacts;
 
-  const initialValues: PatientFormValues | null =
-    patient && existingContacts
-      ? {
-          firstName: patient.firstName ?? '',
-          lastName: patient.lastName ?? '',
-          documentType: inferDocumentType(patient.documentId),
-          documentId: patient.documentId ?? '',
-          // <input type="date"> exige exactamente YYYY-MM-DD.
-          birthDate: patient.birthDate ? patient.birthDate.slice(0, 10) : '',
-          gender: patient.gender ?? '',
-          email: patient.email ?? '',
-          address: patient.address ?? '',
-          branchUuid: patient.branchUuid ?? '',
-          contacts: buildInitialContacts(
-            existingContacts,
-            patient.phone,
-            buildPatientFullName(patient.firstName, patient.lastName),
-          ),
-        }
-      : null;
+  const initialValues = useMemo<PatientFormValues | null>(
+    () =>
+      patient && existingContacts
+        ? {
+            firstName: patient.firstName ?? '',
+            lastName: patient.lastName ?? '',
+            documentType: inferDocumentType(patient.documentId),
+            documentId: patient.documentId ?? '',
+            // La API devuelve un ISO completo; el campo de fecha trabaja con YYYY-MM-DD.
+            birthDate: patient.birthDate ? patient.birthDate.slice(0, 10) : '',
+            gender: patient.gender ?? '',
+            email: patient.email ?? '',
+            address: patient.address ?? '',
+            branchUuids: getPatientBranchUuids(patient),
+            contacts: buildInitialContacts(
+              existingContacts,
+              patient.phone,
+              buildPatientFullName(patient.firstName, patient.lastName),
+            ),
+          }
+        : null,
+    [patient, existingContacts],
+  );
+
+  const { data: branches, isLoading: isLoadingBranches } = useBranchesQuery();
+  const isBranchRequired = isLoadingBranches || (branches?.length ?? 0) > 0;
+  const validationSchema = useMemo(
+    () => buildPatientEditValidationSchema(initialValues?.contacts ?? [], isBranchRequired),
+    [initialValues, isBranchRequired],
+  );
 
   const handleSubmit = (values: PatientFormValues) => {
     setErrorMessage(null);
@@ -72,12 +88,12 @@ export function usePatientEdit(uuid: string) {
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
       phone,
-      birthDate: values.birthDate,
+      ...(values.birthDate && { birthDate: values.birthDate }),
       documentId: values.documentId.trim(),
       email: values.email.trim().toLowerCase(),
       gender: values.gender,
       address: values.address.trim(),
-      branchUuid: values.branchUuid || null,
+      branchUuids: values.branchUuids,
     };
 
     executeUpdatePatient(
@@ -108,6 +124,7 @@ export function usePatientEdit(uuid: string) {
   return {
     patient,
     initialValues,
+    validationSchema,
     isLoading,
     isError,
     isPending,

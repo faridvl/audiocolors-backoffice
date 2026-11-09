@@ -1,19 +1,20 @@
-import { useMemo, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useMemo, useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   NextAppointmentKind,
   usePatientsQuery,
   PatientStatusFilter,
-} from '@/shared/api/querys/patients-query';
-import { useAppointmentMonthsQuery } from '@/shared/api/querys/appointment-months-query';
-import { useBranchesQuery } from '@/shared/api/querys/branches-query';
-import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
-import { useNavigation } from '@/hooks/use-navigation';
-import { useRememberedState } from '@/hooks/use-remembered-state';
-import { getBranchStripeColor } from '@/shared/design/tokens';
-import { buildMonthOption } from '@/shared/utils/formatters';
-import { TEXT } from '@/static/texts/i18n';
-import { PatientFlag, PatientStatus } from '@/types/patients/patient';
+} from "@/shared/api/querys/patients-query";
+import { useAppointmentMonthsQuery } from "@/shared/api/querys/appointment-months-query";
+import { useBranchesQuery } from "@/shared/api/querys/branches-query";
+import { useAppointmentTypesQuery } from "@/shared/api/querys/appointment-types-query";
+import { useNavigation } from "@/hooks/use-navigation";
+import { useRememberedState } from "@/hooks/use-remembered-state";
+import { getBranchStripeColor } from "@/shared/design/tokens";
+import { toClinicDayKey } from "@/shared/utils/dates";
+import { buildMonthOption } from "@/shared/utils/formatters";
+import { TEXT } from "@/static/texts/i18n";
+import { PatientFlag, PatientStatus } from "@/types/patients/patient";
 import {
   NO_APPOINTMENT_VALUE,
   PatientListPreset,
@@ -23,39 +24,45 @@ import {
   removePresetFrom,
   toNextAppointmentMonths,
   toPatientListFilters,
-} from './patient-list-selection';
+} from "./patient-list-selection";
 
 const PAGE_SIZE_DEFAULT = 7;
 const PAGE_SIZE_FILTERED = 10;
 const SEARCH_DEBOUNCE_MS = 300;
-export const ALL_VALUE = 'all';
+export const ALL_VALUE = "all";
 
 /** El listado arranca mostrando solo pacientes activos. */
 export const DEFAULT_STATUS_FILTER = [PatientStatus.ACTIVE];
 
 /** Prefijo de las claves con que la lista recuerda sus filtros al volver. */
-const MEMORY_KEY = 'patient-list';
+const MEMORY_KEY = "patient-list";
 
 const KIND_LABELS: Record<NextAppointmentKind, string> = {
-  [NextAppointmentKind.CONFIRMED]: 'Confirmada',
-  [NextAppointmentKind.TENTATIVE]: 'Tentativa',
+  [NextAppointmentKind.CONFIRMED]: "Confirmada",
+  [NextAppointmentKind.TENTATIVE]: "Tentativa",
 };
 
 /** Etiquetas del filtro, en plural: se filtran grupos de pacientes. */
 const STATUS_FILTER_LABELS: Record<PatientStatus, string> = {
-  [PatientStatus.ACTIVE]: 'Activos',
-  [PatientStatus.INACTIVE]: 'Inactivos',
-  [PatientStatus.DECEASED]: 'Fallecidos',
+  [PatientStatus.ACTIVE]: "Activos",
+  [PatientStatus.INACTIVE]: "Inactivos",
+  [PatientStatus.DECEASED]: "Fallecidos",
 };
 
 export function usePatientList() {
   const { t } = useTranslation();
   const navigation = useNavigation();
   // Los filtros se recuerdan al ir al expediente o a otra pantalla y volver.
-  const [searchTerm, setSearchTerm] = useRememberedState(`${MEMORY_KEY}.search`, '');
+  const [searchTerm, setSearchTerm] = useRememberedState(
+    `${MEMORY_KEY}.search`,
+    "",
+  );
   const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [page, setPage] = useRememberedState(`${MEMORY_KEY}.page`, 1);
-  const [monthFilter, setMonthFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.months`, []);
+  const [monthFilter, setMonthFilter] = useRememberedState<string[]>(
+    `${MEMORY_KEY}.months`,
+    [],
+  );
   const [statusFilter, setStatusFilter] = useRememberedState<string[]>(
     `${MEMORY_KEY}.statuses`,
     DEFAULT_STATUS_FILTER,
@@ -64,12 +71,19 @@ export function usePatientList() {
     `${MEMORY_KEY}.branches`,
     [],
   );
-  const [appointmentTypeFilter, setAppointmentTypeFilter] = useRememberedState<string[]>(
-    `${MEMORY_KEY}.types`,
+  const [appointmentTypeFilter, setAppointmentTypeFilter] = useRememberedState<
+    string[]
+  >(`${MEMORY_KEY}.types`, []);
+  const [flagFilter, setFlagFilter] = useRememberedState<string[]>(
+    `${MEMORY_KEY}.flags`,
     [],
   );
-  const [flagFilter, setFlagFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.flags`, []);
-  const [kindFilter, setKindFilter] = useRememberedState<string[]>(`${MEMORY_KEY}.kinds`, []);
+  // Día de envío: solo vale con "Audífonos en laboratorio" prendido.
+  const [labDate, setLabDate] = useRememberedState(`${MEMORY_KEY}.labDate`, "");
+  const [kindFilter, setKindFilter] = useRememberedState<string[]>(
+    `${MEMORY_KEY}.kinds`,
+    [],
+  );
   const { data: scheduledMonths } = useAppointmentMonthsQuery();
   const { data: branches } = useBranchesQuery();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
@@ -80,14 +94,17 @@ export function usePatientList() {
       // Del más cercano al más lejano: lo que la clínica busca casi siempre es
       // lo de este mes y el siguiente.
       ...[...(scheduledMonths?.months ?? [])].sort().map(buildMonthOption),
-      { label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT), value: NO_APPOINTMENT_VALUE },
+      {
+        label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT),
+        value: NO_APPOINTMENT_VALUE,
+      },
     ],
     [scheduledMonths, t],
   );
 
   const statusOptions = useMemo(
     () => [
-      { label: 'Todos', value: ALL_VALUE },
+      { label: "Todos", value: ALL_VALUE },
       ...Object.values(PatientStatus).map((status) => ({
         label: STATUS_FILTER_LABELS[status],
         value: status,
@@ -98,7 +115,7 @@ export function usePatientList() {
 
   const branchOptions = useMemo(
     () => [
-      { label: 'Todas', value: ALL_VALUE },
+      { label: "Todas", value: ALL_VALUE },
       ...(branches ?? []).map((branch) => ({
         label: branch.name,
         value: branch.uuid,
@@ -110,15 +127,18 @@ export function usePatientList() {
 
   const appointmentTypeOptions = useMemo(
     () => [
-      { label: 'Todos', value: ALL_VALUE },
-      ...(appointmentTypes ?? []).map((type) => ({ label: type.name, value: type.uuid })),
+      { label: "Todos", value: ALL_VALUE },
+      ...(appointmentTypes ?? []).map((type) => ({
+        label: type.name,
+        value: type.uuid,
+      })),
     ],
     [appointmentTypes],
   );
 
   const flagOptions = useMemo(
     () => [
-      { label: 'Todos', value: ALL_VALUE },
+      { label: "Todos", value: ALL_VALUE },
       ...Object.values(PatientFlag).map((flag) => ({
         label: t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`),
         value: flag,
@@ -129,12 +149,15 @@ export function usePatientList() {
 
   const kindOptions = useMemo(
     () => [
-      { label: 'Todas', value: ALL_VALUE },
+      { label: "Todas", value: ALL_VALUE },
       ...Object.values(NextAppointmentKind).map((kind) => ({
         label: KIND_LABELS[kind],
         value: kind,
       })),
-      { label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT), value: NO_APPOINTMENT_VALUE },
+      {
+        label: t(TEXT.PATIENTS.DETAIL.NO_APPOINTMENT),
+        value: NO_APPOINTMENT_VALUE,
+      },
     ],
     [t],
   );
@@ -158,6 +181,7 @@ export function usePatientList() {
       kinds: kindFilter,
       types: appointmentTypeFilter,
       flags: flagFilter,
+      labDate,
     }),
     [
       debouncedSearch,
@@ -167,6 +191,7 @@ export function usePatientList() {
       kindFilter,
       appointmentTypeFilter,
       flagFilter,
+      labDate,
     ],
   );
 
@@ -197,10 +222,11 @@ export function usePatientList() {
     filters,
   );
 
-  const withPageReset = (setter: (values: string[]) => void) => (values: string[]) => {
-    setter(values);
-    setPage(1);
-  };
+  const withPageReset =
+    (setter: (values: string[]) => void) => (values: string[]) => {
+      setter(values);
+      setPage(1);
+    };
 
   // "Sin cita" contradice a confirmada y tentativa: elegir una quita la otra.
   const handleKindFilter = (values: string[]) => {
@@ -214,7 +240,19 @@ export function usePatientList() {
     setPage(1);
   };
 
-  const isPresetActive = (preset: PatientListPreset) => isPresetApplied(selection, preset);
+  const handleFlagFilter = (values: string[]) => {
+    setFlagFilter(values);
+    if (!values.includes(PatientFlag.HEARING_AIDS_IN_LAB)) setLabDate("");
+    setPage(1);
+  };
+
+  const handleLabDate = (value: string) => {
+    setLabDate(value);
+    setPage(1);
+  };
+
+  const isPresetActive = (preset: PatientListPreset) =>
+    isPresetApplied(selection, preset);
 
   /** La tarjeta se suma a los filtros que ya hay; tocarla de nuevo quita solo lo suyo. */
   const togglePreset = (preset: PatientListPreset) => {
@@ -225,6 +263,7 @@ export function usePatientList() {
     setKindFilter(next.kinds);
     setAppointmentTypeFilter(next.types);
     setFlagFilter(next.flags);
+    if (!next.flags.includes(PatientFlag.HEARING_AIDS_IN_LAB)) setLabDate("");
     setPage(1);
   };
 
@@ -255,7 +294,11 @@ export function usePatientList() {
     handleStatusFilter: withPageReset(setStatusFilter),
     handleBranchFilter: withPageReset(setBranchFilter),
     handleAppointmentTypeFilter: withPageReset(setAppointmentTypeFilter),
-    handleFlagFilter: withPageReset(setFlagFilter),
+    handleFlagFilter,
+    labDate,
+    isLabFilterOn: flagFilter.includes(PatientFlag.HEARING_AIDS_IN_LAB),
+    todayKey: toClinicDayKey(new Date().toISOString()),
+    handleLabDate,
     handleKindFilter,
     selection,
     isPresetActive,

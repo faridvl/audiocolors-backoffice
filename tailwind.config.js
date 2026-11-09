@@ -55,7 +55,11 @@ module.exports = {
         },
         success: '#0d9488',
         warning: '#f59e0b',
-        danger: '#ef4444',
+        danger: {
+          DEFAULT: '#ef4444',
+          /** Texto y relleno rojo sobre blanco con contraste de 4.5:1 o más (el 500 no llega). */
+          700: '#b91c1c',
+        },
         info: '#3b82f6',
         /** Azul oscuro de marca: fondo de la variante dark del logo (BRAND.md). */
         midnight: '#181d37',
@@ -73,6 +77,10 @@ module.exports = {
       },
       borderRadius: {
         card: '0.75rem',
+      },
+      boxShadow: {
+        /** Sombra hacia arriba de una barra de acciones pegada al borde de abajo. */
+        'sticky-bar': '0 -4px 12px -6px rgb(0 0 0 / 0.12)',
       },
       keyframes: {
         'fade-in': {

@@ -13,3 +13,87 @@
     @apply bg-ink-50 text-ink-700 font-sans antialiased;
   }
 }
+
+/* Al imprimir solo sale el informe (data-print-report): el resto de la página se oculta y los
+   contenedores que lo envuelven pierden la altura fija y el scroll, que si no lo cortarían. */
+@media print {
+  @page {
+    size: A4 portrait;
+    /* Sin margen de hoja el navegador no pone fecha, título, URL ni número de página; el margen
+       pasa a ser padding del body, que se repite en cada hoja con box-decoration-break. */
+    margin: 0;
+  }
+
+  /* Informe suelto de audiometría. Con el resumen montado manda el resumen (reglas de abajo),
+     aunque el informe de la audiometría también esté en la página. */
+  body:has([data-print-report]):not(:has([data-print-summary])) {
+    background: white;
+    padding: 12mm;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  body:has([data-print-report]):not(:has([data-print-summary]))
+    *:not(:has([data-print-report])):not([data-print-report]):not([data-print-report] *) {
+    display: none !important;
+  }
+
+  body:has([data-print-report]):not(:has([data-print-summary])) *:has([data-print-report]) {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Sin esto el navegador quita los colores de fondo y los símbolos del audiograma salen en gris. */
+  [data-print-report],
+  [data-print-report] * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Resumen del paciente: lo único que sale al imprimir. */
+  body:has([data-print-summary]) {
+    background: white;
+    padding: 12mm;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  body:has([data-print-summary])
+    *:not(:has([data-print-summary])):not([data-print-summary]):not([data-print-summary] *) {
+    display: none !important;
+  }
+
+  body:has([data-print-summary]) *:has([data-print-summary]) {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  [data-print-summary],
+  [data-print-summary] * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Los textos corregibles de la vista previa se resaltan en pantalla, nunca en el papel. */
+  [data-summary-editable] {
+    background: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+}

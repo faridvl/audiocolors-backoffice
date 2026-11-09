@@ -13,6 +13,7 @@ import {
   Pencil,
   Phone,
   PhoneOff,
+  Stethoscope,
   UserCog,
   UserPlus,
   type LucideIcon,
@@ -20,7 +21,10 @@ import {
   ShieldAlert,
   ShieldCheck,
   FileClock,
+  Flag,
   Video,
+  Wrench,
+  PhoneCall,
 } from 'lucide-react';
 import { TEXT } from '@/static/texts/i18n';
 import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
@@ -30,7 +34,7 @@ import {
   PatientActivityAction,
   PatientFieldChange,
 } from '@/types/patient-activity/patient-activity';
-import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
+import { formatDate, formatMonthLabel, formatShortDate } from '@/shared/utils/formatters';
 import { repairFileName, stripFileExtension } from '@/shared/utils/file-name';
 
 enum ActionTone {
@@ -47,6 +51,14 @@ enum ActionTone {
  */
 export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; tone: ActionTone }> =
   {
+    [PatientActivityAction.QUESTIONNAIRE_FILLED]: {
+      icon: ClipboardList,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.QUESTIONNAIRE_CORRECTED]: {
+      icon: ClipboardList,
+      tone: ActionTone.NEUTRAL,
+    },
     [PatientActivityAction.APPOINTMENT_CONFIRMED]: { icon: CalendarCheck, tone: ActionTone.ACCENT },
     [PatientActivityAction.APPOINTMENT_TENTATIVE]: {
       icon: CalendarClock,
@@ -69,6 +81,7 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
     [PatientActivityAction.DOCUMENT_DELETED]: { icon: FileX, tone: ActionTone.DANGER },
     [PatientActivityAction.STATUS_CHANGED]: { icon: UserCog, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.HEARING_AIDS_LAB_CHANGED]: { icon: Ear, tone: ActionTone.NEUTRAL },
+    [PatientActivityAction.HEARING_AIDS_DELIVERED]: { icon: Ear, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.WARRANTY_CHANGED]: { icon: ShieldCheck, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.VIDEO_CANDIDATE_CHANGED]: { icon: Video, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.WARRANTY_EXPIRED_CHANGED]: {
@@ -79,6 +92,7 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: FileClock,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.PRIORITY_CHANGED]: { icon: Flag, tone: ActionTone.NEUTRAL },
     [PatientActivityAction.CLINICAL_HISTORY_CREATED]: {
       icon: ClipboardList,
       tone: ActionTone.NEUTRAL,
@@ -87,10 +101,46 @@ export const ACTION_STYLES: Record<PatientActivityAction, { icon: LucideIcon; to
       icon: ClipboardList,
       tone: ActionTone.NEUTRAL,
     },
+    [PatientActivityAction.PHYSICAL_EXAM_UPDATED]: {
+      icon: Stethoscope,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_CHANGED]: {
+      icon: Wrench,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.CONTACT_ATTEMPTS_CHANGED]: {
+      icon: PhoneCall,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_CHECK_CHANGED]: {
+      icon: Wrench,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_NOTE_CHANGED]: {
+      icon: Wrench,
+      tone: ActionTone.NEUTRAL,
+    },
+    [PatientActivityAction.MAINTENANCE_NOTE_ADDED]: {
+      icon: Wrench,
+      tone: ActionTone.NEUTRAL,
+    },
   };
 
+/** Una acción que el API agregue antes que este front no debe tumbar la página. */
+const FALLBACK_ACTION_STYLE = { icon: ClipboardList, tone: ActionTone.NEUTRAL };
+
+export function getActionStyle(action: PatientActivityAction): {
+  icon: LucideIcon;
+  tone: ActionTone;
+} {
+  return ACTION_STYLES[action] ?? FALLBACK_ACTION_STYLE;
+}
+
 export function getActionLabel(t: TFunction, action: PatientActivityAction): string {
-  return t(`${TEXT.ACTIVITY.ACTION_PREFIX}.${action}`);
+  return t(`${TEXT.ACTIVITY.ACTION_PREFIX}.${action}`, {
+    defaultValue: t(TEXT.ACTIVITY.UNKNOWN_ACTION),
+  });
 }
 
 /** Cuántos campos cambiados se listan antes de resumir con "+N más". */
@@ -137,16 +187,28 @@ export function groupConsecutiveUploads(activities: PatientActivity[]): Activity
   return rows;
 }
 
+/** "2026-10-02" -> fecha local a medianoche, o null si no es un día. */
+function parseDayKey(dayKey?: string): Date | null {
+  if (!dayKey) return null;
+  const [year, month, day] = dayKey.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
 /** "2026-10-02" -> "02 oct 2026", leído como día local (no UTC). */
 function formatDayKey(dayKey?: string): string {
-  if (!dayKey) return '—';
-  const [year, month, day] = dayKey.split('-').map(Number);
-  if (!year || !month || !day) return '—';
-  return formatDate(new Date(year, month - 1, day).toISOString());
+  const date = parseDayKey(dayKey);
+  return date ? formatDate(date.toISOString()) : '';
+}
+
+/** "2026-10-02" -> "2 oct", sin año. */
+function formatDayKeyShort(dayKey?: string): string {
+  const date = parseDayKey(dayKey);
+  return date ? formatShortDate(date.toISOString()) : '';
 }
 
 function joinParts(...parts: (string | null | undefined)[]): string {
-  return parts.filter(Boolean).join(' · ') || '—';
+  return parts.filter(Boolean).join(' · ');
 }
 
 interface DetailContext {
@@ -154,26 +216,45 @@ interface DetailContext {
   resolveBranchName: (branchUuid: string) => string | undefined;
 }
 
+/** Campos de texto libre de la exploración física: vacío no muestra nada y el texto se acorta. */
+const PHYSICAL_EXAM_FIELDS = ['otoscopyRight', 'otoscopyLeft'];
+const MAX_FREE_TEXT_LENGTH = 80;
+
 function formatFieldValue(
   change: PatientFieldChange,
   value: string | null,
   context: DetailContext,
 ): string {
+  if (PHYSICAL_EXAM_FIELDS.includes(change.field)) {
+    if (!value) return '';
+    return value.length > MAX_FREE_TEXT_LENGTH
+      ? `${value.slice(0, MAX_FREE_TEXT_LENGTH).trimEnd()}…`
+      : value;
+  }
   if (!value) return context.t(TEXT.ACTIVITY.DETAIL.EMPTY_VALUE);
   if (change.field === 'branchUuid') return context.resolveBranchName(value) ?? value;
+  if (change.field === 'branchUuids') {
+    return value
+      .split(',')
+      .map((branchUuid) => context.resolveBranchName(branchUuid) ?? branchUuid)
+      .join(', ');
+  }
   if (change.field === 'gender') return GENDER_LABELS[value as PatientGender] ?? value;
   return value;
 }
 
 function formatChanges(changes: PatientFieldChange[], context: DetailContext): string {
-  const visible = changes.slice(0, MAX_VISIBLE_CHANGES).map((change) => {
+  // El API anota la sede principal y la lista completa: con la lista, la principal sobra.
+  const hasBranchList = changes.some((change) => change.field === 'branchUuids');
+  const shown = hasBranchList ? changes.filter((change) => change.field !== 'branchUuid') : changes;
+  const visible = shown.slice(0, MAX_VISIBLE_CHANGES).map((change) => {
     const label = context.t(`${TEXT.ACTIVITY.DETAIL.FIELD_PREFIX}.${change.field}`);
     const before = formatFieldValue(change, change.before, context);
     const after = formatFieldValue(change, change.after, context);
     return `${label}: ${before} → ${after}`;
   });
 
-  const hidden = changes.length - visible.length;
+  const hidden = shown.length - visible.length;
   if (hidden > 0) visible.push(context.t(TEXT.ACTIVITY.DETAIL.MORE, { count: hidden }));
 
   return visible.join(' · ');
@@ -187,7 +268,8 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
 
   switch (activity.action) {
     case PatientActivityAction.PATIENT_UPDATED:
-      return detail.changes?.length ? formatChanges(detail.changes, context) : '—';
+    case PatientActivityAction.PHYSICAL_EXAM_UPDATED:
+      return detail.changes?.length ? formatChanges(detail.changes, context) : '';
 
     case PatientActivityAction.CONTACT_ADDED:
     case PatientActivityAction.CONTACT_REMOVED:
@@ -227,7 +309,7 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       );
 
     case PatientActivityAction.DOCUMENT_RENAMED: {
-      if (typeof detail.before !== 'string') return '—';
+      if (typeof detail.before !== 'string') return '';
       const before = stripFileExtension(repairFileName(detail.before));
       const after = stripFileExtension(repairFileName(detail.after ?? ''));
       // El renombrado automático que corregía las tildes queda igual al reparar: solo el nombre.
@@ -238,7 +320,7 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       const sectionLabel = (category?: unknown) =>
         typeof category === 'string' && category in DOCUMENT_CATEGORY_LABELS
           ? DOCUMENT_CATEGORY_LABELS[category as DocumentCategory]
-          : '—';
+          : '';
       return `${sectionLabel(detail.before)} → ${sectionLabel(detail.after)}`;
     }
 
@@ -258,26 +340,88 @@ export function formatActivityDetail(row: ActivityRow, context: DetailContext): 
       const statusLabel = (status?: string | { name: string; phone: string }) =>
         typeof status === 'string'
           ? context.t(`${TEXT.ACTIVITY.DETAIL.STATUS_PREFIX}.${status}`)
-          : '—';
+          : '';
       return joinParts(
         `${statusLabel(detail.before)} → ${statusLabel(detail.after)}`,
-        formatDayKey(detail.date ?? undefined) === '—' ? null : formatDayKey(detail.date),
+        formatDayKey(detail.date ?? undefined),
         detail.reason,
       );
     }
 
     case PatientActivityAction.HEARING_AIDS_LAB_CHANGED:
-    case PatientActivityAction.WARRANTY_CHANGED:
-    case PatientActivityAction.VIDEO_CANDIDATE_CHANGED:
-    case PatientActivityAction.WARRANTY_EXPIRED_CHANGED:
-    case PatientActivityAction.RENEW_PRESCRIPTION_CHANGED:
+      if (detail.isOn && detail.date) {
+        // Un cambio solo de fecha trae `previousDate`; un envío nuevo, solo `date`.
+        return detail.previousDate
+          ? context.t(TEXT.ACTIVITY.DETAIL.LAB_DATE_CHANGED, {
+              before: formatDayKeyShort(detail.previousDate),
+              after: formatDayKeyShort(detail.date),
+            })
+          : context.t(TEXT.ACTIVITY.DETAIL.LAB_SENT, {
+              date: formatDayKey(detail.date),
+            });
+      }
       return context.t(
         `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
       );
 
+    case PatientActivityAction.HEARING_AIDS_DELIVERED:
+      return context.t(
+        detail.hasNote
+          ? TEXT.ACTIVITY.DETAIL.LAB_DELIVERED_WITH_NOTE
+          : TEXT.ACTIVITY.DETAIL.LAB_DELIVERED,
+        { date: formatDayKey(detail.date) },
+      );
+
+    case PatientActivityAction.WARRANTY_CHANGED:
+    case PatientActivityAction.VIDEO_CANDIDATE_CHANGED:
+    case PatientActivityAction.WARRANTY_EXPIRED_CHANGED:
+    case PatientActivityAction.RENEW_PRESCRIPTION_CHANGED:
+    case PatientActivityAction.PRIORITY_CHANGED:
+      return context.t(
+        `${detail.isOn ? TEXT.ACTIVITY.DETAIL.FLAG_ON_PREFIX : TEXT.ACTIVITY.DETAIL.FLAG_OFF_PREFIX}.${activity.action}`,
+      );
+
+    // Asistido, perdido o sin marcar.
+    case PatientActivityAction.MAINTENANCE_CHANGED:
+      return context.t(
+        `${TEXT.ACTIVITY.DETAIL.MAINTENANCE_PREFIX}.${detail.status ?? 'UNMARKED'}`,
+        { number: detail.number },
+      );
+
+    case PatientActivityAction.MAINTENANCE_CHECK_CHANGED:
+      return context.t(
+        detail.done
+          ? TEXT.ACTIVITY.DETAIL.MAINTENANCE_DONE
+          : TEXT.ACTIVITY.DETAIL.MAINTENANCE_UNDONE,
+        { number: detail.number },
+      );
+
+    // La bitácora no copia el texto de las notas.
+    case PatientActivityAction.MAINTENANCE_NOTE_ADDED:
+      return context.t(TEXT.ACTIVITY.DETAIL.MAINTENANCE_NOTE_ADDED, { number: detail.number });
+
+    case PatientActivityAction.MAINTENANCE_NOTE_CHANGED:
+      return context.t(TEXT.ACTIVITY.DETAIL.MAINTENANCE_NOTE_CHANGED, { number: detail.number });
+
+    case PatientActivityAction.QUESTIONNAIRE_FILLED:
+      return detail.templateName
+        ? context.t(TEXT.ACTIVITY.DETAIL.QUESTIONNAIRE_FILLED, { name: detail.templateName })
+        : '';
+
+    case PatientActivityAction.QUESTIONNAIRE_CORRECTED:
+      return detail.templateName
+        ? context.t(TEXT.ACTIVITY.DETAIL.QUESTIONNAIRE_CORRECTED, { name: detail.templateName })
+        : '';
+
+    case PatientActivityAction.CONTACT_ATTEMPTS_CHANGED:
+      return context.t(TEXT.ACTIVITY.DETAIL.CONTACT_ATTEMPTS, {
+        before: detail.previousCount ?? 0,
+        after: detail.count ?? 0,
+      });
+
     case PatientActivityAction.PATIENT_CREATED:
     default:
-      return '—';
+      return '';
   }
 }
 

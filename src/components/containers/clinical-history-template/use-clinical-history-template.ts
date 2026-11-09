@@ -12,6 +12,7 @@ import { CLINICAL_HISTORY_SPECIALITY } from '@/types/clinical-templates/clinical
 import {
   buildStandardFields,
   sortFields,
+  withoutPhysicalExam,
 } from '@/components/containers/patients/patient-background/clinical-history';
 import {
   buildClinicalTemplateSchema,
@@ -28,7 +29,7 @@ export function useClinicalHistoryTemplate() {
 
   // Mientras el administrador no la cambie, se parte de la hoja estándar de la clínica.
   const initialValues = useMemo(
-    () => toFormValues(sortFields(template?.fields ?? buildStandardFields(t))),
+    () => toFormValues(withoutPhysicalExam(sortFields(template?.fields ?? buildStandardFields(t)))),
     [template, t],
   );
   const validationSchema = useMemo(() => buildClinicalTemplateSchema(t), [t]);

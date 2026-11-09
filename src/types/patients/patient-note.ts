@@ -11,6 +11,8 @@ export interface PatientNote {
   category: DocumentCategory;
   text: string;
   createdAt: string;
+  /** Audiometría que originó la nota; el API aún puede no enviarlo. */
+  audiometryEntryUuid?: string | null;
 }
 
 export interface CreatePatientNotePayload {

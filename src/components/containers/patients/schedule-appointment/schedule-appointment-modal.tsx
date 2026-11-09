@@ -3,7 +3,7 @@ import { CalendarClock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { inputBaseClasses } from '@/components/common/input/input';
+import { DateField } from '@/components/common/date-field/date-field';
 import { MonthGrid } from '@/components/common/month-grid/month-grid';
 import { PillSelect, PillSelectVariant } from '@/components/common/pill-select/pill-select';
 import { formatMonthLabel } from '@/shared/utils/formatters';
@@ -22,8 +22,8 @@ import {
  *    volver y de que seria, sin dia. El paciente todavia no confirma nada.
  * 2. **Dia confirmado** — recepcion llama; si el paciente acepta se fija el
  *    dia y, si se sabe, la hora, con el tipo ya precargado del apunte
- *    tentativo (se puede cambiar), y el apunte se limpia. La sede es siempre
- *    la habitual del paciente, no se elige aqui.
+ *    tentativo (se puede cambiar), y el apunte se limpia. La sede se elige
+ *    solo si el paciente tiene más de una.
  *
  * Los dos modos son excluyentes a proposito: un paciente no puede estar a la
  * vez con cita agendada y pendiente de confirmar.
@@ -37,6 +37,9 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
     hour,
     hourOptions,
     selectedTypeUuid,
+    selectedBranchUuid,
+    branchOptions,
+    hasBranchChoice,
     appointmentTypes,
     hasNoAppointmentTypes,
     hasNextAppointment,
@@ -50,6 +53,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
     handleDateChange,
     handleHourChange,
     handleTypeChange,
+    handleBranchChange,
     handleBack,
     handleSubmit,
   } = useScheduleAppointment(props);
@@ -153,6 +157,23 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
             </div>
           )}
 
+          {mode === ScheduleMode.DAY && hasBranchChoice && (
+            <div className="flex flex-col gap-1.5">
+              <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
+                {t(TEXT.PATIENTS.SCHEDULE.BRANCH_LABEL)}
+                <span className="ml-0.5 text-danger">*</span>
+              </Typography>
+              <PillSelect
+                variant={PillSelectVariant.FIELD}
+                ariaLabel={t(TEXT.PATIENTS.SCHEDULE.BRANCH_LABEL)}
+                value={selectedBranchUuid}
+                onChange={handleBranchChange}
+                placeholder={t(TEXT.PATIENTS.SCHEDULE.BRANCH_PLACEHOLDER)}
+                options={branchOptions}
+              />
+            </div>
+          )}
+
           {mode === ScheduleMode.MONTH && (
             <div className="flex flex-col gap-1.5">
               <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
@@ -181,21 +202,11 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
                     <span className="ml-0.5 text-danger">*</span>
                   </Typography>
                 </label>
-                <input
+                <DateField
                   id="appointment-date"
-                  type="date"
                   min={minDate}
                   value={date}
-                  onChange={(event) => handleDateChange(event.target.value)}
-                  // Safari de iOS dibuja el input de fecha con su propio estilo:
-                  // más alto que los demás, más ancho que el modal y centrado.
-                  // Sin apariencia nativa y con la misma altura fija que los
-                  // selectores del modal, quedan alineados.
-                  className={tailwind(
-                    inputBaseClasses,
-                    'block h-[46px] min-w-0 appearance-none text-left',
-                    '[&::-webkit-date-and-time-value]:text-left',
-                  )}
+                  onChange={handleDateChange}
                 />
               </div>
 

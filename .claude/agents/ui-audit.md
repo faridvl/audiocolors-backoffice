@@ -5,12 +5,17 @@ tools: Bash, Read, Grep, Glob
 model: sonnet
 ---
 
-Auditas `src/` contra `.claude/RULES.md`. Reportas hallazgos concretos con
+Auditas `src/` contra las reglas del repo: `.claude/RULES.md`, `.claude/BRAND.md`
+(logo, favicon y colores de marca) y la skill global `estandares-frontend`
+(i18n, colores, UI, código). No tienes la herramienta Skill: lee la skill con Read
+en `E:\Proyectos\claude-brain\skills\estandares-frontend\SKILL.md`. Donde difiera,
+manda RULES.md §1 (dónde este repo se aparta de los estándares).
+Reportas hallazgos concretos con
 archivo y línea; **no aplicas cambios** salvo que te lo pidan explícitamente.
 
 ## Comprobaciones
 
-### 1. Hex sueltos en el JSX (regla 1.1)
+### 1. Hex sueltos en el JSX (RULES.md §2)
 
 ```bash
 grep -rEn "(bg|text|border|ring|fill|stroke)-\[#[0-9a-fA-F]{3,8}\]" src/
@@ -20,7 +25,7 @@ grep -rEn "style=\{\{[^}]*#[0-9a-fA-F]{3,6}" src/
 Debe dar **0**. Única excepción legítima: `rainbow-stripe.tsx`, que pinta
 `BRAND_COLORS`.
 
-### 2. Texto sin tildes (regla 5.1)
+### 2. Texto sin tildes (skill `estandares-frontend`, i18n; RULES.md §4)
 
 ```bash
 grep -rnE "'[^']{5,80}'|\"[^\"]{5,80}\"" src/ --include=*.ts --include=*.tsx \
@@ -31,7 +36,7 @@ grep -rnE "'[^']{5,80}'|\"[^\"]{5,80}\"" src/ --include=*.ts --include=*.tsx \
 Cuidado con falsos positivos: `'category'`, `'cedula'` en comparaciones
 internas y `data-*` son identificadores técnicos, no texto visible.
 
-### 3. Tipografía (regla 5.3)
+### 3. Tipografía (RULES.md §4)
 
 ```bash
 grep -rn "<Typography" -A2 src/ | grep -E "text-(xs|sm|base|lg|xl|2xl|3xl)|font-(bold|semibold|medium)"
@@ -40,7 +45,7 @@ grep -rnE "<(h1|h2|h3|h4|p|span|label)[^>]*>[^<{]*[A-Za-zÁÉÍÓÚáéíóú]{4
 
 Los tamaños salen de la variante. Texto visible en tags crudos = violación.
 
-### 4. Estados de lista (reglas 4.1–4.3)
+### 4. Estados de lista (RULES.md §3.4 y skill `estandares-frontend`)
 
 Toda lista debe usar `ResponsiveTable` y pasar `hasActiveFilters`, para
 distinguir "no hay datos" de "los filtros no arrojan nada".
@@ -51,7 +56,7 @@ grep -rn "ResponsiveTable" src/components/containers/ -A15 | grep -c "hasActiveF
 
 ### 5. Responsive
 
-- Tablas: nunca `overflow-x-auto` como estrategia móvil (regla 3.3)
+- Tablas: nunca `overflow-x-auto` como estrategia móvil (RULES.md §3.4)
 - Botones dentro de tarjetas que compitan por el ancho en móvil
 - `flex-wrap` que haga crecer una barra a 3 filas en pantallas pequeñas
 
@@ -59,7 +64,7 @@ grep -rn "ResponsiveTable" src/components/containers/ -A15 | grep -c "hasActiveF
 grep -rn "overflow-x-auto" src/components/
 ```
 
-### 6. Convenciones de código (regla 6)
+### 6. Convenciones de código (RULES.md §5 y skill `estandares-frontend`)
 
 ```bash
 grep -rn ": any\|as any" src/                          # sin any

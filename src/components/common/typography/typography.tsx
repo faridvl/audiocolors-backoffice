@@ -58,6 +58,7 @@ interface TypographyProps {
   /** Fuerza <span> para texto dentro de una linea. */
   inline?: boolean;
   title?: string;
+  id?: string;
 }
 
 export const Typography: React.FC<TypographyProps> = ({
@@ -67,12 +68,13 @@ export const Typography: React.FC<TypographyProps> = ({
   as,
   inline = false,
   title,
+  id,
 }) => {
   const Tag = as ?? (inline ? 'span' : VARIANT_TAGS[variant]);
 
   return React.createElement(
     Tag,
-    { className: tailwind(VARIANT_STYLES[variant], className), title },
+    { className: tailwind(VARIANT_STYLES[variant], className), title, id },
     children,
   );
 };

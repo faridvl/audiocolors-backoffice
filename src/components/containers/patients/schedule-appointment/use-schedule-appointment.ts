@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
@@ -25,6 +27,8 @@ import {
   toDayKey,
   toMonthKey,
 } from '@/shared/utils/dates';
+import { getBranchStripeColor } from '@/shared/design/tokens';
+import { getPatientBranchUuids } from '@/types/patients/patient';
 import { TEXT } from '@/static/texts/i18n';
 
 /** Los dos momentos del flujo: primero se anota el mes, despues el dia. */
@@ -39,7 +43,10 @@ export interface ScheduleAppointmentOptions {
   patientUuid: string;
   tentativeMonth?: string | null;
   tentativeTypeUuid?: string | null;
+  /** Sede preferida (el filtro de la agenda): solo cuenta si el paciente la tiene. */
   branchUuid?: string | null;
+  /** Sede de la cita vigente: al reagendar es la inicial y se ofrece aunque el paciente ya no la tenga. */
+  nextAppointmentBranchUuid?: string | null;
   nextAppointmentAt?: string | null;
   nextAppointmentTypeName?: string | null;
   initialMode?: ScheduleMode;
@@ -51,6 +58,7 @@ export function useScheduleAppointment({
   tentativeMonth,
   tentativeTypeUuid,
   branchUuid,
+  nextAppointmentBranchUuid,
   nextAppointmentAt,
   nextAppointmentTypeName,
   initialMode,
@@ -91,6 +99,28 @@ export function useScheduleAppointment({
   // propone al confirmar el dia, donde todavia se puede cambiar.
   const [typeUuid, setTypeUuid] = useState(tentativeTypeUuid ?? '');
   const [error, setError] = useState<string | null>(null);
+
+  // La cita solo puede ir en una sede del paciente. La sede que ya traía la cita
+  // se conserva en la lista aunque el paciente la haya perdido, para no cambiarla sin avisar.
+  const { data: patient } = usePatientQuery(patientUuid);
+  const { data: branches } = useBranchesQuery();
+  // Solo lo que el usuario elige: la sede inicial se deriva, así llega bien aunque el paciente cargue después.
+  const [pickedBranchUuid, setPickedBranchUuid] = useState('');
+  const patientBranchUuids = patient ? getPatientBranchUuids(patient) : [];
+  const branchOptionUuids =
+    nextAppointmentBranchUuid && !patientBranchUuids.includes(nextAppointmentBranchUuid)
+      ? [...patientBranchUuids, nextAppointmentBranchUuid]
+      : patientBranchUuids;
+  const initialBranchUuid =
+    nextAppointmentBranchUuid ||
+    (branchUuid && patientBranchUuids.includes(branchUuid) ? branchUuid : '') ||
+    (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
+  const selectedBranchUuid = pickedBranchUuid || initialBranchUuid;
+  const branchOptions = branchOptionUuids.map((uuid) => {
+    const name = branches?.find((branch) => branch.uuid === uuid)?.name ?? '';
+    return { value: uuid, label: name, accentColor: getBranchStripeColor(name) };
+  });
+  const hasBranchChoice = branchOptions.length > 1;
 
   // Al reagendar una cita confirmada el API da el tipo solo por nombre.
   const selectedTypeUuid =
@@ -154,6 +184,11 @@ export function useScheduleAppointment({
 
   const handleTypeChange = (nextTypeUuid: string) => {
     setTypeUuid(nextTypeUuid);
+    setError(null);
+  };
+
+  const handleBranchChange = (nextBranchUuid: string) => {
+    setPickedBranchUuid(nextBranchUuid);
     setError(null);
   };
 
@@ -221,6 +256,10 @@ export function useScheduleAppointment({
       setError(t(TEXT.PATIENTS.SCHEDULE.VALIDATION.TYPE_REQUIRED));
       return;
     }
+    if (hasBranchChoice && !selectedBranchUuid) {
+      setError(t(TEXT.PATIENTS.SCHEDULE.VALIDATION.BRANCH_REQUIRED));
+      return;
+    }
     setError(null);
     setIsSchedulingDay(true);
 
@@ -229,7 +268,7 @@ export function useScheduleAppointment({
         patientUuid,
         date,
         typeUUID: selectedTypeUuid,
-        ...(branchUuid ? { branchUUID: branchUuid } : {}),
+        ...(selectedBranchUuid ? { branchUUID: selectedBranchUuid } : {}),
       });
 
       if (hour === null) {
@@ -282,6 +321,9 @@ export function useScheduleAppointment({
       label: formatHour(slotHour),
     })),
     selectedTypeUuid,
+    selectedBranchUuid,
+    branchOptions,
+    hasBranchChoice,
     appointmentTypes: appointmentTypes ?? [],
     hasNoAppointmentTypes,
     hasNextAppointment,
@@ -295,6 +337,7 @@ export function useScheduleAppointment({
     handleDateChange,
     handleHourChange,
     handleTypeChange,
+    handleBranchChange,
     handleBack,
     handleSubmit,
   };

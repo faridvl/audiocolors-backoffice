@@ -26,8 +26,8 @@ Back-office de la clínica auditiva **AudioColors**, para gestión de pacientes 
 - **Los cambios llegan a `main` por Pull Request.** `develop` es la rama de trabajo activo.
 - **Commits claros y descriptivos**, en español. Ejemplo: `fix(pacientes): agendar próxima cita como ícono`.
 - **Antes de cada commit:** `yarn lint && yarn typecheck` limpios. No se corre `next build` para validar cambios.
-- **El API no se toca** (`standard-saas-api`) — es compartido con Zynka; un cambio incompatible rompe el otro sitio. Si hace falta, se discute antes.
-- **Colores por token, nunca hex suelto.** `bg-brand`, no `bg-[#66ae36]`.
+- **El API sí se cambia cuando hace falta** (`standard-saas-api`), con rama propia y PR a `develop` del API; es compartido con Zynka, así que el cambio no debe romperle nada (D24).
+- **Colores por token, nunca hex suelto.** `bg-brand`, no `bg-[#1f6fb1]`.
 
 ---
 
@@ -115,7 +115,7 @@ Convención: cada feature es `{feature}-container.tsx` (solo JSX) + `use-{featur
 
 ### Colores
 
-Definidos como tokens en `tailwind.config.js`: `brand` (verde `#66ae36`, la O del logo) como único acento, e `ink` como escala de grises neutros. **Nunca usar hex sueltos en el JSX** — Zynka acabó con dos paletas rivales y ~60 valores arbitrarios por saltarse esta regla.
+Definidos como tokens en `tailwind.config.js`: `brand` (azul `#1f6fb1`, la R del logo) como único acento, e `ink` como escala de grises neutros. **Nunca usar hex sueltos en el JSX** — Zynka acabó con dos paletas rivales y ~60 valores arbitrarios por saltarse esta regla.
 
 Los colores de marca están **medidos** del logo original, no estimados: ver [.claude/BRAND.md](.claude/BRAND.md).
 
@@ -125,12 +125,13 @@ Los colores de marca están **medidos** del logo original, no estimados: ver [.c
 
 - Antes de un Pull Request, correr `yarn lint && yarn typecheck` limpios.
 - Seguir las convenciones de nombres y estructura de carpetas ya existentes.
-- Consultar la documentación del proyecto en caso de dudas sobre decisiones, estado o alcance:
-    - [CLAUDE.md](CLAUDE.md) — índice general y las reglas que más se rompen.
-    - [.claude/RULES.md](.claude/RULES.md) — reglas duras del proyecto.
-    - [.claude/STATUS.md](.claude/STATUS.md) — estado actual y próximos pasos.
-    - [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) — estructura, auth y endpoints.
+- Documentación del proyecto. Claude Code carga siempre `CLAUDE.md` (índice y reglas que más se rompen) y, vía imports:
+    - [.claude/HANDOFF.md](.claude/HANDOFF.md) — qué quiere el usuario, en qué estamos y qué sigue.
+    - [.claude/RULES.md](.claude/RULES.md) — reglas duras de este repo y dónde difiere de los estándares.
+    - [.claude/ARCHITECTURE.md](.claude/ARCHITECTURE.md) — alcance, estructura, auth y endpoints.
+- Se leen a pedido:
     - [.claude/DECISIONS.md](.claude/DECISIONS.md) — decisiones tomadas y su porqué.
+    - [.claude/STATUS.md](.claude/STATUS.md) — fases, avance y pendientes.
     - [.claude/BRAND.md](.claude/BRAND.md) — identidad visual y regeneración de assets.
     - [docs/ALTA-TENANT.md](docs/ALTA-TENANT.md) — alta de la clínica y de usuarios.
 

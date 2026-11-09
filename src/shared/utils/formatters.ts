@@ -1,17 +1,94 @@
-/** Lo que se muestra cuando un dato no existe (un nombre o una sede que no llegó). */
-export const EMPTY_VALUE = '—';
+import { CLINIC_TIME_ZONE, fromDayKey } from '@/shared/utils/dates';
 
-/** Formatea una fecha ISO como "12 mar 2026". Devuelve '—' si no es valida. */
+/** Lo que se muestra cuando un dato no existe (un nombre o una sede que no llegó). */
+export const EMPTY_VALUE = '';
+
+/** Formatea una fecha ISO como "12 mar 2026". Devuelve vacío si no es valida. */
 export function formatDate(isoDate?: string): string {
-  if (!isoDate) return '—';
+  if (!isoDate) return '';
   const parsed = new Date(isoDate);
-  if (Number.isNaN(parsed.getTime())) return '—';
+  if (Number.isNaN(parsed.getTime())) return '';
 
   return parsed.toLocaleDateString('es-CR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
   });
+}
+
+/** Formatea una fecha ISO en formato largo: "8 de noviembre de 2026". Devuelve vacío si no es válida. */
+export function formatLongDate(isoDate?: string): string {
+  if (!isoDate) return '';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleDateString('es-CR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: CLINIC_TIME_ZONE,
+  });
+}
+
+/** Formatea un día "YYYY-MM-DD" como "12 mar 2026", leído como día local (no UTC). */
+export function formatDayKeyWithYear(dayKey?: string): string {
+  if (!dayKey) return '';
+  return formatDate(fromDayKey(dayKey).toISOString());
+}
+
+/** Formatea una fecha ISO con su hora local: "12 mar 2026, 16:42". Devuelve vacío si no es valida. */
+export function formatDateTime(isoDate?: string): string {
+  if (!isoDate) return '';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleString('es-CR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
+/** Solo la hora local: "14:32". Devuelve vacío si no es valida. */
+export function formatTime(isoDate?: string | null): string {
+  if (!isoDate) return '';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleTimeString('es-CR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
+/**
+ * Fecha de calendario sin hora (nacimiento): el API la guarda a medianoche UTC, así que se
+ * muestra en UTC para que no retroceda un día en Costa Rica.
+ */
+export function formatCalendarDate(isoDate?: string | null): string {
+  if (!isoDate) return '';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleDateString('es-CR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
+/** Formatea una fecha ISO como "12 mar", sin año. Devuelve vacío si no es valida. */
+export function formatShortDate(isoDate?: string): string {
+  if (!isoDate) return '';
+  const parsed = new Date(isoDate);
+  if (Number.isNaN(parsed.getTime())) return '';
+
+  return parsed.toLocaleDateString('es-CR', { day: 'numeric', month: 'short' });
 }
 
 const MONTH_LABELS = [
@@ -29,7 +106,7 @@ const MONTH_LABELS = [
   'diciembre',
 ];
 
-/** "2026-11" -> "Noviembre 2026". Devuelve '—' si el mes no es valido. */
+/** "2026-11" -> "Noviembre 2026". Devuelve vacío si el mes no es valido. */
 /** Mes abreviado y con mayúscula para cuadrículas ("Ene", "Feb"…); `monthIndex` de 0 a 11. */
 export function formatShortMonth(monthIndex: number): string {
   const label = MONTH_LABELS[monthIndex] ?? '';
@@ -37,10 +114,10 @@ export function formatShortMonth(monthIndex: number): string {
 }
 
 export function formatMonthLabel(monthKey?: string | null): string {
-  if (!monthKey) return '—';
+  if (!monthKey) return '';
   const [year, month] = monthKey.split('-');
   const label = MONTH_LABELS[Number(month) - 1];
-  if (!label || !year) return '—';
+  if (!label || !year) return '';
 
   return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
 }
@@ -61,16 +138,16 @@ export function buildMonthOption(monthKey: string): {
 }
 
 /** Edad en anios cumplidos a partir de la fecha de nacimiento. */
-export function calculateAge(birthDate?: string): number | null {
+export function calculateAge(birthDate?: string | null): number | null {
   if (!birthDate) return null;
   const birth = new Date(birthDate);
   if (Number.isNaN(birth.getTime())) return null;
 
   const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDelta = today.getMonth() - birth.getMonth();
+  let age = today.getFullYear() - birth.getUTCFullYear();
+  const monthDelta = today.getMonth() - birth.getUTCMonth();
 
-  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birth.getDate())) age -= 1;
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < birth.getUTCDate())) age -= 1;
 
   return age >= 0 ? age : null;
 }
@@ -82,5 +159,5 @@ export function formatFileSize(bytes: number): string {
 }
 
 export function getFullName(firstName?: string, lastName?: string): string {
-  return [firstName, lastName].filter(Boolean).join(' ').trim() || '—';
+  return [firstName, lastName].filter(Boolean).join(' ').trim() || '';
 }

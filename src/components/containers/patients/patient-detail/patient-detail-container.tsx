@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { PatientStatus } from '@/types/patients/patient';
 import { TEXT } from '@/static/texts/i18n';
 import { PatientFlagsModal } from '@/components/containers/patients/patient-flags/patient-flags-modal';
+import { PatientFlagSection } from '@/components/containers/patients/patient-flags/use-patient-flags';
 import { ChangePatientStatusModal } from '@/components/containers/patients/patient-status/change-patient-status-modal';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { DocumentsContainer } from '@/components/containers/documents/documents-container';
-import { PatientBackgroundContainer } from '@/components/containers/patients/patient-background/patient-background-container';
+import { PatientPhysicalExamContainer } from '@/components/containers/patients/patient-physical-exam/patient-physical-exam-container';
+import { PatientQuestionsContainer } from '@/components/containers/patients/patient-questions/patient-questions-container';
+import { PatientAudiometryContainer } from '@/components/containers/patients/patient-audiometry/patient-audiometry-container';
 import { PatientNotesContainer } from '@/components/containers/patients/patient-notes/patient-notes-container';
 import { ScheduleAppointmentModal } from '@/components/containers/patients/schedule-appointment/schedule-appointment-modal';
 import { useNavigation } from '@/hooks/use-navigation';
@@ -17,6 +20,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { EditContactsModal } from '@/components/containers/patients/patient-contacts/edit-contacts-modal';
 import { PatientSummary } from './patient-summary';
+import { PatientSummaryModal } from '@/components/containers/patients/patient-summary/patient-summary-modal';
 
 interface PatientDetailContainerProps {
   uuid: string;
@@ -29,8 +33,15 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
   const { data: patient, isLoading, isError, refetch } = usePatientQuery(uuid);
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
-  const [isEditingFlags, setIsEditingFlags] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  // Pestaña con la que abre el modal de indicadores; null = cerrado.
+  const [flagsSection, setFlagsSection] = useState<PatientFlagSection | null>(null);
   const [isEditingContacts, setIsEditingContacts] = useState(false);
+
+  // El resumen es de un paciente: al pasar a otro se cierra para no imprimir los datos del anterior.
+  useEffect(() => {
+    setIsGeneratingSummary(false);
+  }, [uuid]);
 
   if (isLoading) {
     return (
@@ -61,15 +72,19 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         patient={patient}
         onScheduleAppointment={() => setIsSchedulingAppointment(true)}
         onChangeStatus={() => setIsChangingStatus(true)}
-        onEditFlags={() => setIsEditingFlags(true)}
+        onEditFlags={() => setFlagsSection(PatientFlagSection.LAB)}
+        onEditMaintenance={() => setFlagsSection(PatientFlagSection.MAINTENANCE)}
         onEditContacts={() => setIsEditingContacts(true)}
         onEdit={() => navigation.patients.edit(patient.uuid)}
+        onGenerateSummary={() => setIsGeneratingSummary(true)}
       />
 
       {/* El empleado ve los datos generales y los archivos, nada clínico. */}
       {can(Permission.VIEW_CLINICAL_RECORD) && (
         <>
-          <PatientBackgroundContainer patientUuid={patient.uuid} />
+          <PatientPhysicalExamContainer patientUuid={patient.uuid} />
+          <PatientQuestionsContainer patientUuid={patient.uuid} />
+          <PatientAudiometryContainer patientUuid={patient.uuid} />
           <PatientNotesContainer patientUuid={patient.uuid} />
         </>
       )}
@@ -86,20 +101,29 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         />
       )}
 
+      {isGeneratingSummary && (
+        <PatientSummaryModal patient={patient} onClose={() => setIsGeneratingSummary(false)} />
+      )}
+
       {isEditingContacts && (
         <EditContactsModal patient={patient} onClose={() => setIsEditingContacts(false)} />
       )}
 
-      {isEditingFlags && (
-        <PatientFlagsModal patient={patient} onClose={() => setIsEditingFlags(false)} />
+      {flagsSection && (
+        <PatientFlagsModal
+          patient={patient}
+          initialSection={flagsSection}
+          onClose={() => setFlagsSection(null)}
+        />
       )}
 
       {isSchedulingAppointment && (
         <ScheduleAppointmentModal
+          key={patient.uuid}
           patientUuid={patient.uuid}
           tentativeMonth={patient.tentativeAppointmentMonth}
           tentativeTypeUuid={patient.tentativeAppointmentTypeUuid}
-          branchUuid={patient.branchUuid}
+          nextAppointmentBranchUuid={patient.nextAppointmentBranchUuid}
           nextAppointmentAt={patient.nextAppointmentAt}
           nextAppointmentTypeName={patient.nextAppointmentType}
           onClose={() => setIsSchedulingAppointment(false)}

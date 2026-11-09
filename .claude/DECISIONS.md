@@ -65,6 +65,10 @@ existe para un SaaS multi-tenant que algún día será multi-idioma.
 **Cuándo deja de valer:** si AudioColors pide inglés, o si este repo se
 generaliza a más clínicas.
 
+**Actualización (2026-09-16):** revertida. Los textos pasan a `i18next` +
+`react-i18next` con el patrón de Zynka (`TEXT` en `src/static/texts/i18n.ts` y
+`es.json`), migrando cada pantalla que se toca. Implementado el 2026-09-24.
+
 ---
 
 ## D6 · Detalle de paciente nuevo, no portado
@@ -85,6 +89,11 @@ inventario, citas. Reutilizarlo arrastraba medio sistema.
 
 **Por qué:** el logo de AudioColors es multicolor sobre blanco. Un chrome
 oscuro o azulado compite con él. El naranja saturaba como acento general.
+
+**Actualización:** el acento hoy es azul `#1f6fb1` (`tailwind.config.js`), la R
+del logo. Pasó de verde a azul `#1e6cae` en `561b488` (2026-09-15) y se ajustó al
+`#1f6fb1` del manual en `50c99cf` (2026-09-18). Porqué no registrado: ningún doc
+ni mensaje de commit explica el cambio.
 
 ---
 
@@ -119,7 +128,7 @@ Ambas requieren cambio en el API (ver D24).
 
 ## Pendientes antes de producción
 
-1. **Cambiar las contraseñas temporales** (`Password1` para ambos usuarios).
+1. **Cambiar las contraseñas temporales** (la tiene el usuario; P0-1 cambiarla antes de entregar).
 2. **Desplegar** en Vercel con el subdominio `backoffice.audiocolorscr.com`
    (proyecto aparte del landing; las variables `NEXT_PUBLIC_*` se inyectan en
    build, así que hay que redeployar si se añaden después).
@@ -368,6 +377,9 @@ todo en No.
 - **Editar va en el menú "⋯"** de la tarjeta (`ActionMenu`): es una acción
   poco frecuente.
 
+**Actualización:** D19 da también a `DOCTOR` el permiso de cambiar las preguntas
+(`permissions.ts`).
+
 ---
 
 ## D19 · Permisos por rol: el empleado no ve lo clínico
@@ -376,7 +388,7 @@ todo en No.
 empleado). El empleado (recepción, secretaría) ve pacientes, contactos, citas,
 agenda y archivos; no ve historia clínica, Control de evolución, Bitácora ni
 las preguntas de la historia clínica. El médico sí puede cambiar las preguntas.
-Ver RULES.md §9.
+Ver RULES.md §7.
 
 **Por qué:** pedido de la clínica, pensando en más clínicas y más personal. Los
 datos de salud son sensibles (Ley 8968), así que el API también lo bloquea
@@ -395,7 +407,7 @@ desarrollo que toque roles o pantallas nuevas.
 
 **Decisión:**
 - **Roles fijos, definidos por nosotros:** `OWNER`, `ADMIN`, `DOCTOR`, `STAFF`.
-  Cada rol trae permisos por defecto (los de RULES.md §9).
+  Cada rol trae permisos por defecto (los de RULES.md §7).
 - **El administrador de cada clínica ajusta los permisos de cada rol**, solo
   para su clínica, desde Configuración → Usuarios y permisos.
 - **Por rol, no por persona**, al principio. Excepciones por usuario solo si un
@@ -474,7 +486,7 @@ dispositivo se vuelven a ver una vez. Si hace falta que se sincronice entre
 dispositivos, guardarlo en el API.
 
 **Versiones:** `package.json` es la fuente; `yarn release:bump` y
-`yarn release:check` (RULES.md §10). El historial vive en `src/static/releases.ts`
+`yarn release:check` (RULES.md §8). El historial vive en `src/static/releases.ts`
 (nunca se borra una versión) y en las etiquetas `vX.Y.Z` de git.
 
 **D18 · Actualización (2026-10-23):** editar **sí actualiza** la historia: la tarjeta
@@ -493,3 +505,570 @@ API (agenda, garantía, historia clínica, permisos, tipos de cita) salieron por
 ramas con PR a `develop` y dejaron el sistema mejor. Desde ahora el API se
 cambia como el front: rama propia, PR a `develop` y, al pasar a `main`, la
 acción `[Release] Production` aplica las migraciones.
+
+---
+
+## D25 · Contexto a pedido y sin contraseñas en los docs
+
+**Decisión (2026-10-24):** `CLAUDE.md` importa solo `HANDOFF.md`, `RULES.md` y
+`ARCHITECTURE.md`; `DECISIONS.md`, `STATUS.md`, `BRAND.md` y los docs de `docs/`
+se leen a pedido (tabla "Leer a pedido" de `CLAUDE.md`). `RULES.md` queda con las
+reglas propias de este repo y remite a las skills `estandares-*` donde coinciden.
+La contraseña temporal de los usuarios ya no se escribe en ningún doc. Es
+urgente: ya está en el historial de git de un repo público; la única solución es
+cambiarla cuanto antes (P0-1), no reescribir el historial.
+
+**Por qué:** cada mensaje cargaba unas 1.570 líneas de contexto fijo. Con una
+sesión coordinadora y varios agentes, ese costo se paga en cada uno; el contexto
+fijo tiene que ser poco y lo demás se lee cuando se necesita.
+
+---
+
+## D26 · Sí/No sin respuesta por defecto (2026-10-28)
+
+**Decisión:** las preguntas Sí/No de la historia clínica arrancan sin marcar y
+tienen tres estados: Sí, No y sin responder. Sin responder no se guarda: la
+clave se omite en `answers` (el API no acepta null ahí). Tocar la opción ya
+elegida la desmarca. Resumen, PDF y cambios dicen "Sin responder". Las 14
+columnas booleanas viejas de `PatientBackground` se siguen mandando (false si no
+es Sí): son legado y solo `answers` distingue lo no respondido.
+
+**Por qué:** un "No" que nadie marcó se leía como dato clínico. Las historias
+guardadas antes de este cambio tienen "No" explícito en lo que nadie tocó; no
+se pueden recuperar y se siguen mostrando como "No".
+
+**También:** al editar, las respuestas de preguntas que la clínica quitó de la
+plantilla se conservan (con su definición en `templateSnapshot`), y el API ya no
+borra `answers` ni `templateSnapshot` si un PUT no los trae (Zynka manda solo
+las columnas): lo que no viene no se toca, un null explícito limpia.
+
+---
+
+## D27 · Ambiente local con un segundo front (2026-10-28)
+
+**Decisión:** para probar contra el API local sin cerrar el `next dev` de
+`localhost:3000` (con la sesión del usuario contra el API de desarrollo), se
+levanta otro en `127.0.0.1:3001` con `NEXT_DIST_DIR=.next-prueba`
+(`next.config.js` lee la variable; sin ella sigue en `.next`). Otro host para que
+las cookies no se pisen. Detalle en `docs/AMBIENTE-LOCAL.md`.
+
+---
+
+## D28 · Exploración física fuera de la historia clínica (2026-10-28)
+
+**Decisión:** la otoscopía (OD/OI) vive en una tabla propia del API,
+`PatientPhysicalExam` (una por paciente, la última anotada), con
+`GET/PUT /patients/:uuid/physical-exam` solo para `CLINICAL_ACCESS_ROLES`
+(guard de roles, no "todos menos STAFF"). En el expediente es una tarjeta entre
+la ficha y la historia clínica, editable cuando se quiera y sin PDF; cada cambio
+queda en la bitácora con antes y después. La migración copia lo que había en la
+historia (`answers` si es texto, si no la columna). La historia filtra los ids
+`otoscopyRight/otoscopyLeft` de plantillas, snapshots, PDF y cambios.
+
+**Por qué:** es un hallazgo que se actualiza en cada revisión, no un antecedente
+que se llena una vez. Las columnas viejas de `PatientBackground` se quedan (el
+front las reenvía sin cambios) y el API copia a la tabla nueva si un front viejo
+manda la otoscopía en `answers`: así ningún orden de despliegue borra el dato.
+
+**Despliegue:** publicar primero el API (con su migración) y después el front.
+
+**Actualización (2026-10-28):** el usuario confirmó un historial de otoscopías
+por paciente (regla en HANDOFF): cada otoscopía es un registro nuevo con fecha y
+autor, corregible solo el mismo día; la tabla actual pasa a ser el primer registro
+de cada paciente. Etapa aparte, después del lote.
+
+---
+
+## D29 · Acordeón "Preguntas" (2026-10-28)
+
+**Decisión:** la historia clínica vive dentro de una tarjeta "Preguntas"
+(nombre provisional, `questions.title` en es.json), cerrada por defecto, en el
+expediente y en Configuración (`/configuracion/preguntas`; la ruta vieja
+`/configuracion/historia-clinica` redirige). Acordeón genérico en
+`components/common/accordion` (variantes tarjeta, anidada y sin borde; monta el
+contenido la primera vez que se abre y lo deja montado). Las secciones son una
+lista que arma cada hook (`{ key, title, subtitle, render }`), lista para sumar
+las secciones propias de la clínica. Dentro de Preguntas se abre una sección a la
+vez; el subtítulo cerrado dice lo pendiente (sin llenar, borrador sin guardar).
+
+**Por qué:** la clínica va a sumar cuestionarios propios junto a la historia; un
+solo lugar para todos evita una tarjeta más por cuestionario en el expediente.
+
+---
+
+## D30 · Teléfonos extranjeros (2026-10-28)
+
+**Decisión:** un solo campo de teléfono, sin selector de país. Si lo escrito empieza
+con `+` (o `00`), es de otro país y no lleva máscara; si no, es de Costa Rica
+(`XXXX-XXXX`) y el campo muestra un "+506" gris como adorno, que no es parte del
+valor. Un extranjero lleva de 8 a 15 dígitos; un `+` con 8 dígitos que parecen de
+Costa Rica da error. Se guarda compacto, `+` y solo dígitos (`+13055551234`), en
+paciente y contacto; Costa Rica sigue como `+506 XXXX-XXXX` (paciente) y
+`XXXX-XXXX` (contacto). Un dato viejo de la base que no se toca no se valida, para
+poder editar lo demás; si se toca, se valida normal. La máscara nunca corta un
+número. Todo vive en `shared/utils/phone.ts`.
+
+**Por qué:** compacto porque Zynka limita el teléfono a 15 caracteres, porque la
+búsqueda del API busca el texto literal (así se encuentra por dígitos) y porque
+la comparación entre contactos queda estable. Un número de 15 dígitos no cabe en
+Zynka, pero es rarísimo.
+
+**Pendiente del usuario:** si quiere un selector de país. Con un solo campo, otro
+país de 8 dígitos como Nicaragua (+505) solo se distingue por el `+`.
+
+## D31 · Fecha de envío al laboratorio (2026-10-30)
+
+**Decisión:** al encender "Audífonos en laboratorio" se pide la fecha de envío: un
+solo día, por defecto hoy y nunca posterior a hoy en hora de Costa Rica (el API
+también lo rechaza). Se puede cambiar después, y la bitácora registra el envío y
+cada cambio de fecha. El día se guarda en `hearingAidsInLabSince` a mediodía UTC.
+Mientras se edita la fecha, el modal oculta "Listo" y solo ofrece Cancelar y Guardar.
+
+**Por qué:** a mediodía UTC cae en el mismo día en cualquier zona de América, sin
+correrse como con medianoche UTC. "Listo" descartaba la fecha tocada y parecía
+guardarla.
+
+**Fuera de alcance:** lo que pasa al apagarlo (punto 9 del lote, sin definir).
+
+## D32 · Pre-registro rápido desde "Agendar cita" (2026-10-30)
+
+**Decisión:** si la búsqueda del selector no encuentra al paciente, se ofrece "Registrar
+paciente nuevo" con nombre, apellidos (mínimo 2 letras), cédula, teléfono y sede. Al guardar, el
+paciente queda elegido y sigue el modal de la cita. Lo escrito en la búsqueda se
+prellena: un nombre va a nombre y apellidos, un número va a la cédula. El teléfono es el
+contacto principal (D12) y acepta extranjeros (D30). Una cédula repetida se avisa en el
+campo. La sede es obligatoria; solo si la clínica no tiene ninguna se sigue sin ella. La cédula se
+normaliza como en el formulario completo (9 dígitos quedan X-XXXX-XXXX; si no, sin espacios ni
+guiones) para no duplicar expedientes. Mientras guarda no se puede cerrar ni volver. La sede usa
+el `branchUuid` único de hoy; el punto 6 la cambiará.
+
+**API:** `birthDate` pasó a opcional en el API (migración `20261030120000_patient_birth_date_optional`,
+aplicada solo en la base local). Hay que aplicarla en cada ambiente antes de publicar el front.
+`PATCH /patients/:uuid` ahora la guarda (fecha real y no futura, si no 400; omitida no cambia lo
+guardado) y `POST /patients` aplica la misma validación.
+
+**Fecha de nacimiento opcional al editar:** un pre-registrado queda sin ella (el expediente
+muestra "Sin registrar") y obligarla al editar empujaría a inventar fechas en un expediente
+clínico. El formulario completo de crear paciente la sigue exigiendo. Si se edita sin fecha, no se
+envía. Consecuencia: `POST /patients` y `POST /patients/bulk` aceptan pacientes sin fecha por API
+directa, aunque las pantallas la siguen pidiendo.
+
+## D33 · Mantenimientos 1 a 4 marcados a mano (2026-10-30)
+
+**Decisión:** el modal "Indicadores del paciente" suma la pestaña Mantenimiento, con cuatro filas:
+sin marcar, asistido (azul) o perdido (rojo). Cada toque se guarda solo y el expediente muestra una
+píldora "Mant. N" por cada uno marcado. Tocar la píldora abre esa pestaña; el botón Indicadores
+sigue abriendo en Laboratorio. Son cuatro columnas en `patient` y
+`PUT /patients/:uuid/maintenances/:number`; cada cambio real deja `MAINTENANCE_CHANGED` en la bitácora.
+
+**Sin validar a propósito:** STAFF puede marcar (no es dato clínico, aunque no ve la bitácora), se
+puede marcar un paciente inactivo o fallecido y marcar el 3 sin el 1 y el 2. No se guarda la fecha del
+mantenimiento: solo queda la del cambio en la bitácora.
+
+**Por qué:** la clínica lo pidió como una marca manual que no se calcula desde las citas. Una
+validación de orden o de estado impediría registrar lo que ya pasó.
+
+---
+
+## D34 · Intentos de contacto: contador con control de cambios (2026-10-31)
+
+**Decisión:** el modal "Indicadores del paciente" suma la pestaña Contacto, con un contador de 0 a 3,
+"Registrar intento" y "Reiniciar"; el expediente muestra la píldora "Contacto: N" si es mayor que 0.
+`PUT /patients/:uuid/contact-attempts` recibe el valor absoluto (`count`) y el que muestra la pantalla
+(`expectedCount`), los dos obligatorios. Si el guardado no coincide responde 409 y la pantalla avisa y
+refresca. Cada cambio real deja `CONTACT_ATTEMPTS_CHANGED` en la bitácora.
+
+**Sin validar a propósito:** STAFF puede registrar, porque llamar es tarea de recepción y no es dato
+clínico, y se puede registrar en un paciente inactivo o fallecido. Un paciente borrado da 404.
+
+**Por qué:** con un simple "sumar uno" o un valor sin comparar, dos personas con la pantalla abierta
+podían pisar el contador con un dato viejo. La comparación ocurre dentro de la misma actualización, así
+que de dos guardados simultáneos solo uno gana y queda un solo registro en la bitácora.
+
+## D35 · Varias sedes por paciente (2026-10-31)
+
+- Un paciente tiene una o más sedes (`branchUuids`). `branchUuid` sigue como la sede principal porque Zynka lo lee así.
+- Editar un paciente sin sedes exige elegir al menos una. Un paciente que ya no tiene sedes se agenda sin mandar sede.
+- Al agendar solo se ofrecen las sedes del paciente; si tiene una sola, ya va elegida y no se muestra el selector.
+- La sede que ya traía una cita se conserva como opción aunque el paciente la haya perdido, para no cambiarla en silencio.
+  El API la entrega como `nextAppointmentBranchUuid` (lista y detalle) y el modal de reagendar, desde el expediente y desde la agenda, arranca con esa sede.
+- Sin cita previa y con dos o más sedes, la sede arranca vacía y es obligatoria, salvo que el filtro de sede de la agenda sea una sede del paciente. Con una sola va elegida.
+- Desde el tablero, la cita queda en la sede del filtro activo; con "Todas las sedes" cae en la principal del paciente.
+- Los pendientes sin sede aparecen con "Todas las sedes".
+- El formulario de paciente exige sede solo si hay sedes para elegir: con la consulta de sedes fallida o una clínica sin sedes se puede guardar.
+
+## D36 · Mantenimientos con check y nota (2026-11-01)
+
+**Decisión:** al entregar audífonos el paciente tiene 4 mantenimientos gratis, uno cada 6 meses. Cada
+Mantenimiento 1 a 4 tiene un check marcado a mano y una nota opcional (máx. 500 caracteres). Reemplaza a
+D33 (estado asistido/perdido) y a D34 (intentos de contacto): ya no hay contador y lo de "se llamó" va en
+la nota. `PUT /patients/:uuid/maintenances/:number` recibe `{ done?, note? }` (al menos uno; nota vacía
+se guarda como `null`); se retiró `PUT /patients/:uuid/contact-attempts`. Son ocho columnas en `patient`
+(`maintenanceNDone`, `maintenanceNNote`). La bitácora deja `MAINTENANCE_CHECK_CHANGED` y
+`MAINTENANCE_NOTE_CHANGED`; los eventos viejos `MAINTENANCE_CHANGED` y `CONTACT_ATTEMPTS_CHANGED` se
+siguen leyendo.
+
+**Migración de datos:** asistido pasa a check marcado; perdido queda sin check y con la nota "Perdido",
+para no perder ese dato; los contadores de intentos de contacto se descartan.
+
+**Sin validar a propósito:** igual que en D33, STAFF puede marcar, se puede marcar un paciente inactivo o
+fallecido y marcar el 3 sin el 1 y el 2.
+
+**Por qué:** la clínica pidió un seguimiento más simple: una marca por mantenimiento y un espacio libre
+para anotar llamadas o lo que haga falta.
+
+**Diseño del modal y la ficha:**
+
+- La ficha del paciente muestra una sola píldora "Mantenimientos 2 de 4" (también con 0) en lugar de una por mantenimiento; al tocarla se abre el modal en esa pestaña.
+- El modal tiene el mismo ancho en las tres pestañas (el que necesita Mantenimiento) para que no salte al cambiar. Los mantenimientos van en una fila en pantallas anchas, 2x2 en tableta y apilados en celular.
+- No hay toasts de éxito al guardar un check o una nota: se confirma con "Guardado" junto al campo. El toast queda solo para errores.
+- El check y la nota se guardan con mutaciones separadas, para que guardar uno no pise el estado ni los avisos del otro. Cerrar el modal (Escape, fondo o "Listo") guarda la nota pendiente igual que al salir del campo; si falla con el modal ya cerrado, el toast cita el texto de la nota.
+
+## D37 · La duración de un tipo alcanza a sus citas futuras (2026-11-01)
+
+**Decisión:** al cambiar la duración de un tipo de cita en Configuración, sus citas de hoy en adelante
+(hoy en hora de Costa Rica) pasan a fin = inicio + nueva duración; el inicio no cambia. Lo hace el API
+en el mismo `PATCH /appointment-types/:uuid`, dentro de la transacción del tipo
+(`appointment-type.storage.ts`), filtrando por tipo y tenant. El front invalida la consulta de citas al
+guardar para que la agenda se vea al día.
+
+**No se tocan:** las citas pasadas; las "sin hora" (08:00 UTC en punto, que la agenda pinta con la
+duración del tipo); las cerradas (CANCELLED, COMPLETED, EXPIRED), porque reescribir su `updatedAt` haría
+reaparecer las COMPLETED que el front oculta como reemplazadas al reagendar; y nada si la duración nueva
+es igual a la anterior o se limpia (`null`).
+
+**Sin cambio a propósito:** `schedule-next-appointment` sigue guardando 30 min fijos: crea citas sin
+hora y la agenda no usa ese fin.
+
+**Por qué:** cada cita guarda su `endTime` y la agenda lo respeta (D10), así que cambiar solo el tipo no
+se veía en las citas ya agendadas.
+
+## D38 · Secciones propias de Preguntas (2026-11-01)
+
+**Decisión:** la clínica crea secciones propias dentro de "Preguntas" (plantillas `ClinicalTemplate`
+con `speciality: 'QUESTIONNAIRE'`). Se crean y editan en Configuración > Preguntas, un acordeón por
+sección debajo de "Historia clínica"; "Nueva sección" pide el nombre (obligatorio, máx. 60) y la
+sección queda como borrador local hasta guardar con al menos una pregunta (POST); las existentes se
+editan con PATCH. No se borran. En el expediente cada sección se llena varias veces: cada registro
+guarda fecha, autor y una copia de las preguntas que tenía (`templateSnapshot`), se muestra el último y
+"Ver anteriores" despliega el resto; los registros no se editan ni se borran. El último lleva "Último registro" y
+"Ver anteriores (n)" muestra el resto, atenuados, bajo "Registros anteriores"; cada sección muestra
+"Sin registros" o "N registros · último 12 mar". Un registro sin respuestas no se guarda, y si el API
+rechaza por preguntas que cambiaron se muestra su mensaje y se recargan las plantillas. La historia
+clínica no cambia (se llena una vez).
+
+**Migración de datos:** no hay; las secciones y los registros son nuevos.
+
+**Sin validar a propósito:** el front no limita cuántas secciones ni cuántos registros hay.
+
+**Por qué:** la clínica necesita seguimientos que se repiten (cada visita un registro) sin tocar la
+historia clínica, y que lo ya registrado no cambie si después editan las preguntas.
+
+**Diseño:**
+
+- Permisos: Configuración usa `EDIT_CLINICAL_TEMPLATE`; el expediente `VIEW_CLINICAL_RECORD`. STAFF no ve nada (el API responde 403 y el bloque se omite).
+- En el expediente solo salen secciones con al menos una pregunta. Sin registros quedan como sin llenar; con el formulario con cambios, como borrador.
+- "Nuevo registro" abre el formulario con las preguntas de hoy (Sí/No sin marcar), reutilizando los campos de la historia; al guardar se invalida la consulta, se cierra el formulario y el nuevo queda arriba.
+- La lista de registros con fecha y autor (`EntryHistoryList`) es genérica para reutilizarla en las otoscopías.
+
+**Actualización (2026-11-01) · corrección de registros:** un registro se corrige solo el mismo día
+calendario (`America/Costa_Rica`) en que se creó; después queda fijo (el de las 23:50 ya no se corrige
+a las 00:05). `PATCH /patients/:patientUuid/questionnaire-entries/:entryUuid` con `{ answers }`, mismos
+permisos que el POST; si el registro no es del paciente o de la clínica responde 404, y fuera del día
+409 con "Este registro ya no se puede corregir: solo se corrige el mismo día en que se llenó."
+Corrige cualquier rol clínico, no solo el autor, y queda anotado quién (`updatedAt`, `updatedByUuid`;
+`createdAt` y `createdByUuid` no cambian). Las respuestas se validan contra las preguntas guardadas en
+el propio registro (`templateSnapshot`), con las mismas reglas del POST (al menos una con contenido,
+tipos y topes). El GET trae además `updatedAt`, `updatedByName` y `canEdit`; el front usa `canEdit` y
+no recalcula la fecha. La bitácora registra `QUESTIONNAIRE_CORRECTED`, sin copiar las respuestas.
+
+**Actualización (2026-11-01) · front de corrección e historial en modal:**
+
+- El último registro muestra "Editar" solo si `canEdit` es true. Abre el mismo formulario con las respuestas cargadas, usando las preguntas guardadas en el registro (`templateSnapshot`), y guarda con PATCH. Cancelar con cambios pide confirmación, igual que "Nuevo registro". Al guardar se recargan los registros y la bitácora.
+- Si el registro se corrigió, bajo la fecha dice "Corregido por Ana · 14:32" (hora de Costa Rica con `formatTime`).
+- 404 (registro no encontrado) muestra el mensaje, cierra la edición y recarga los registros; 400 igual que en el POST.
+- 409 (ya no se puede corregir, por ejemplo se abrió "Editar" a las 23:58 y se guardó a las 00:01): el formulario sigue abierto con lo escrito, muestra el mensaje del API y ofrece "Guardar como nuevo registro" (POST con esas respuestas). Se recargan los registros para que "Editar" desaparezca; "Guardar cambios" se oculta porque volvería a dar 409.
+- "Ver anteriores (n)" ya no despliega nada en la tarjeta: abre un modal (`SheetDialog` de agenda, hoja inferior en móvil) con una fecha colapsable por registro anterior. El último registro NO sale en el modal: ya está a la vista en la tarjeta y el contador `n` cuenta solo los anteriores.
+- `EntryHistoryList` sigue genérico: recibe `renderEntry`, `getAuthor`, `getCorrection` y `renderLatestAction`, para reutilizarlo en otoscopías.
+- La bitácora muestra `QUESTIONNAIRE_CORRECTED` como "Preguntas corregidas" con detalle "Corrigió «nombre»".
+
+**Corregir no borra (API `056f004`):** al corregir, el API guarda las respuestas anteriores en `PatientQuestionnaireEntryRevision` (respuestas, quién corrigió y cuándo), en la misma transacción que el cambio. Todavía no hay endpoint para leerlas y la bitácora no copia respuestas.
+
+## D39 · El día de una cita es el de Costa Rica, no el UTC (2026-11-01)
+
+`GET /appointments?date=YYYY-MM-DD` filtra de las 06:00 UTC del día (incluida) a las 06:00 UTC del siguiente (excluida), es decir, de 00:00 a 24:00 en Costa Rica (UTC-6, sin horario de verano). Antes iba de 00:00 a 23:59:59.999 UTC y una cita desde las 18:00 de Costa Rica salía en el día siguiente. Las citas "sin hora" se siguen guardando a las 08:00 UTC (02:00 de Costa Rica del mismo día), así que caen en su día. El rango sale de `clinicDayRange` en `clinic-day.util.ts` del API. También van por el mes de Costa Rica (`toClinicMonthKey`) `scheduled-months`, el filtro `nextAppointmentMonth` y el detalle de la bitácora de citas: una cita del 31 de octubre a las 19:00 cuenta en octubre.
+
+**No aplica a `GET /maintenance/upcoming?month=`**, que sigue en el mes UTC: lo usa `next-audiology-files`, que guarda las fechas de solo día a las 00:00 UTC, y con el mes de Costa Rica un mantenimiento del 1 de diciembre caía en noviembre. Esa app también llama a `GET /appointments?date=`: si alguna vez guarda citas de solo día a las 00:00 UTC, caerían en el día anterior.
+
+**Pendiente en el front:** la agenda agrupa y ubica por hora con la zona del navegador (`toDayKey`, `toSlotHour`, `toMinuteOfDay`); es correcta solo con el navegador en hora de Costa Rica.
+
+## D40 · Mantenimientos con tres estados e historial de notas (2026-11-01)
+
+Cada Mantenimiento 1 a 4 tiene un estado (`UNMARKED`, `ATTENDED`, `MISSED`) y un historial de notas; reemplaza a D36 en estado y notas. Las notas se agregan con autor y fecha y no se editan ni se borran. `PUT /patients/:uuid/maintenances/:number` con `{ status }`, `POST .../:number/notes` (1 a 500 caracteres) y `GET /patients/:uuid/maintenances` (los 4, la nota más nueva primero). La bitácora registra `MAINTENANCE_CHANGED` solo si el estado cambia y `MAINTENANCE_NOTE_ADDED` sin copiar el texto; los eventos viejos de nota se muestran como "cambió la nota". La migración pasó `done = true` a `ATTENDED` y cada nota vieja a la primera del historial; los "Perdido" de D36 (check apagado con la nota "Perdido") quedaron en `UNMARKED` con esa nota. Las columnas `maintenanceNDone` y `maintenanceNNote` siguen en la base sin uso, para limpiarlas después. Cualquier usuario de la clínica cambia el estado y agrega notas; que solo el profesional médico agregue notas queda para el desarrollo futuro de roles.
+
+**Diseño en el front:** el modal "Indicadores del paciente", pestaña Mantenimiento, muestra una fila por mantenimiento con un control de tres opciones (Sin marcar, Asistido, Perdido) que guarda al tocar, las dos notas más nuevas con autor y hora, "Ver todas (n)" y "Agregar nota" (campo con contador, Guardar y Cancelar; el texto se conserva si falla). En la ficha del paciente hay una píldora "Mant. N" por mantenimiento marcado: azul si asistió y roja si lo perdió. Las notas se leen con su propia consulta, aparte del paciente.
+
+## D41 · Un dato vacío no muestra nada (2026-11-01)
+
+Un campo sin valor no muestra "Sin registrar" ni `—`: queda en blanco. `EMPTY_VALUE = ''` en `formatters.ts`, y los formateadores devuelven vacío. Una etiqueta sin valor muestra la etiqueta y el valor en blanco; una celda o un renglón sin nada que mostrar (por ejemplo el detalle de la bitácora) queda vacío o no se dibuja. Se conserva "vacío" en la bitácora para un campo que se vacía ("X: valor → vacío"), porque ahí es un cambio. Reemplaza lo que decía la tabla de RULES §1.
+
+## D42 · Preguntas: guardar lleva a "Último registro" y las filas del historial se distinguen (2026-11-01)
+
+Tras guardar (corrección o registro nuevo) la vista vuelve al inicio de "Último registro", para ver "Corregido por X". En el 409 solo se muestra la línea roja del API (sin toast ni ayuda gris). La ayuda "Lo puedes corregir hoy; después queda fijo." es la misma al crear y al editar. Las filas cerradas del historial traen la primera respuesta con valor en una línea recortada y la etiqueta "Corregido" si aplica; la fecha corta ("1 nov, 22:01") solo va en la tarjeta compacta.
+
+## D43 · La agenda de escritorio muestra las citas fuera de 8:00 a 18:00 (2026-11-01)
+
+"Sin hora asignada" es solo para las citas confirmadas con el día y sin hora: las que guardan su inicio a las 08:00:00.000 UTC exactas (2:00 en Costa Rica). Toda otra cita tiene hora real, aunque sea de las 7:00 o de las 18:30 (creada por Zynka o por el API); antes salía como "sin hora" por caer fuera de 8 a 18. `resolveSlotHour` ya no recorta por rango y la regla vive en `isDayOnlyAppointment`.
+
+La línea de tiempo del día en escritorio va como mínimo de 8:00 a 18:00 y se amplía a horas completas para que entren la cita más temprana y la más tardía (`resolveTimelineRange`): una de 18:30 a 19:00 lleva el fin a las 19:00, una de las 7:15 lleva el inicio a las 7:00. Si todo cae entre 8 y 18, queda igual que antes. La línea de "ahora", la sombra al pasar o arrastrar y el redondeo a la media hora (`snapToTimelineStep`) usan el tramo del día, así que soltar en la parte ampliada es posible.
+
+**No cambia:** las horas que ofrece el modal de agendar y la lista de "poner hora" (`buildSlotHours`, `toSlotHour`) siguen de 8:00 a 17:00, el horario de atención de la clínica; una próxima cita fuera de ese horario queda sin hora preseleccionada. Los textos de `docs/novedades` ("de 8:00 a 17:00") describen esas listas y no se tocan.
+
+
+## D44 · La otoscopía pasa a ser un historial por paciente (2026-11-02)
+
+La otoscopía única de la exploración física (`PatientPhysicalExam`) se convierte en un historial, igual que Preguntas: cada "nueva" crea un registro y nunca pisa el anterior; solo se corrige el mismo día de creación en hora de Costa Rica, y la versión anterior queda guardada (D38, D39). Tabla nueva `PatientOtoscopyEntry` con OD, OI, autor, creación y corrección, más `PatientOtoscopyEntryRevision`.
+
+**Backfill:** la migración copia la otoscopía única de cada paciente como su primer registro del historial, solo si algún oído tiene texto (los vacíos o solo espacios no generan registro). Fecha del registro = última modificación de la exploración (no se inventa una fecha de hoy) y autor = quien la modificó por última vez, o quien la creó si no hay otro; puede quedar sin autor. En la base de pruebas, 5 de 6 exploraciones tenían texto y dieron 5 registros.
+
+**Pendiente:** las columnas `otoscopyRight`/`otoscopyLeft` de `PatientPhysicalExam` y las rutas `physical-exam` no se borran todavía ni se mantienen en paralelo (no hay doble escritura): se eliminan en una migración posterior, cuando el front ya lea solo el historial.
+
+**Front:** la tarjeta "Exploración física" usa el historial de Preguntas (`EntryHistoryList`) y sus textos de corrección; "Editar" solo aparece si el API manda `canEdit`. El autor que viene sin dato se muestra como en Preguntas ("el equipo médico"). Si el API responde 409 al corregir, se avisa y se ofrece guardar como registro nuevo. El front ya no lee ni escribe las rutas `physical-exam`.
+
+**Qué se decidió no hacer:** (1) El backfill no lleva `NOT EXISTS`: Prisma registra cada migración y no la vuelve a correr, así que no puede duplicar. (2) Los pacientes con borrado lógico conservan su historial, a propósito. (3) Las otoscopias guardadas dentro de un control médico siguen siendo parte del control y no se copian al historial. (4) La bitácora usa `PHYSICAL_EXAM_UPDATED` tanto al crear como al corregir una otoscopia. Además, mientras las rutas `physical-exam` sigan vivas, `PUT /patients/:uuid/physical-exam` (y la compatibilidad de antecedentes) también agrega un registro al historial en la misma transacción, para que la forma vieja no deje el historial desactualizado.
+
+## D45 · Los audífonos en laboratorio llevan un historial de envíos (2026-11-02)
+
+Hasta ahora el switch "Audífonos en laboratorio" guardaba solo una fecha (`hearingAidsInLabSince`): al entregar se perdía el rastro. Tabla nueva `PatientLabShipment` (día de envío, día de entrega, nota, quién envió y quién entregó). Prender el switch abre un envío con ese día; cambiar la fecha mientras está en laboratorio corrige el día del envío abierto; apagarlo es la **entrega**: pide el día (por defecto hoy; nunca posterior a hoy en hora de Costa Rica ni anterior al día de envío, con 400 y mensaje claro) y una nota opcional de hasta 1000. Máximo un envío abierto por paciente: el use case bloquea la fila del paciente dentro de la transacción y la migración agrega un índice parcial único (`WHERE "deliveredAt" IS NULL`). `GET /patients/:patientUuid/lab-shipments` devuelve el historial del más reciente al más viejo.
+
+**Backfill:** cada paciente con el switch prendido y `hearingAidsInLabSince` recibe un envío abierto con ese día y sin autor. Quien tenía el switch apagado no genera registros (no hay dato de envíos pasados). Un paciente con el switch prendido pero sin envío abierto (dato inconsistente) al entregar queda con un envío ya cerrado con `sentAt` = `deliveredAt`.
+
+**La nota va también a Control de evolución:** la clínica hoy escribe lo que pasó con el laboratorio como nota de evolución, y el usuario dijo que es la misma nota. Por eso, al entregar con nota, el API guarda el texto en el envío y crea además una nota de Control de evolución (mismo texto, mismo autor, fecha de hoy) por la vía normal, todo en la misma transacción: si falla una, no queda la otra. Así no hay que escribirla dos veces ni queda una nota que solo se ve en un lado. La bitácora anota `HEARING_AIDS_DELIVERED` con el día y si trajo nota (sin el texto), más el `NOTE_ADDED` de la nota de evolución.
+
+**Qué se decidió no hacer:** una entrega no se corrige por ahora (ni el día ni la nota); si hace falta, se agrega después con la misma regla de "solo el mismo día" de D38/D39. Tampoco se editan ni se borran envíos desde la pantalla.
+
+**Corrección con uuid y pestañas viejas:** al corregir la fecha del envío abierto, el front manda el `shipmentUuid` de ese envío. Si otra pestaña ya lo entregó, el API responde 409 ("Este envío ya fue entregado. Recarga la página."); lo mismo si se entrega dos veces ("Los audífonos ya se marcaron como entregados."). En ambos casos el front muestra el texto del API en un aviso, cierra el formulario y refresca indicadores e historial. La entrega y la corrección de fecha cierran su 409 en la mutation, así que funciona aunque el modal se haya cerrado.
+
+**Nota solo para roles clínicos:** el campo de nota de la entrega se muestra solo con `VIEW_CLINICAL_RECORD` (OWNER, ADMIN, DOCTOR); STAFF puede entregar sin nota (el API responde 403 si manda `note` y devuelve la nota en null en el historial). Con una entrega guardándose o con nota escrita, Esc y el clic en el fondo no cierran el modal; la X del encabezado sí.
+
+## D46 · Mantenimiento es una casilla: en pantalla ya no existe "Perdido" (2026-11-05)
+
+En el modal "Indicadores del paciente", pestaña Mantenimiento, cada Mantenimiento 1 a 4 es una casilla con su título ("Mantenimiento N"): marcada es asistido y desmarcada es no asistido. La nota se relaciona con cada mantenimiento. Reemplaza los tres estados de D40 solo en la UI: el API, la base y el enum (`UNMARKED`, `ATTENDED`, `MISSED`) no cambian, y la pantalla solo escribe `ATTENDED` (marcar) o `UNMARKED` (desmarcar). Un registro viejo en `MISSED` se ve desmarcado y, al marcarlo, pasa a `ATTENDED`. Las píldoras del expediente no se tocan y siguen mostrando `MISSED` en rojo si el dato existe. Se descartaron los chips de la ronda anterior.
+
+**Diseño:** lista con divisores finos, casilla nativa con la etiqueta asociada (tocar el texto también marca, 44 px de alto) y, a la derecha, un texto gris "Agregar nota" o "N notas" que abre las notas debajo de la fila, con sangría tras la casilla: las 2 más recientes, "Ver todas (N)" y una línea con el campo y "Guardar". Una sola fila abierta a la vez.
+
+## D47 · La tarjeta de otoscopia siempre crea; el historial vive en Control de evolución (2026-11-07)
+
+La tarjeta "Exploración física (Otoscopia)" muestra siempre el formulario de una otoscopia nueva (OD, OI, contador 0/1000 y "Guardar otoscopia"). Al guardar sale el aviso "Otoscopia guardada" y los campos se vacían para registrar otra. Ya no hay "Último registro", "Ver anteriores", "Nueva otoscopia" ni corrección desde la tarjeta, y se quitó la nota "Lo puedes corregir hoy; después queda fijo." Reemplaza el comportamiento de otoscopías de 2026-10-28.
+
+El historial se consulta solo en Control de evolución: el API crea una nota de categoría EXTERNAL_TEST ("Pruebas") al guardar, y el front solo refresca la lista de notas del paciente (no crea la nota). Depende de la rama `feature/otoscopia-en-evolucion` del API.
+
+"Cancelar" pasa a "Limpiar" (texto genérico `common.buttons.clear`): aparece solo cuando hay texto y vacía los campos sin guardar. "Guardar otoscopia" está deshabilitado mientras ambos campos estén vacíos. Se borraron la query del historial, la mutation de corrección y los componentes de la vista del último registro.
+
+## D48 · Mantenimiento vuelve a tres estados, con dos botones "Vino" y "Lo perdió" (2026-11-07)
+
+Reemplaza la casilla de D46. Cada Mantenimiento 1 a 4 muestra su título y dos botones: "Vino" (azul al activarse, `ATTENDED`) y "Lo perdió" (rojo, `MISSED`). Tocar uno lo marca; tocar el que ya está activo vuelve a pendiente (`UNMARKED`, sin color). Se guarda al tocar, con la misma mutation; el API no cambia y lo ya marcado como hecho (`ATTENDED`) se ve azul sin migración. Los botones llevan `aria-pressed` y nombre "Mantenimiento N: vino / lo perdió". En celular el acceso a las notas baja a una segunda línea si no cabe. Colores con tokens `brand` y `danger`; las píldoras del expediente ya pintaban `MISSED` en rojo.
+
+Textos: "asistido" pasa a "vino", "perdido" a "lo perdió" y "sin marcar" a "pendiente" en avisos, píldoras y bitácora.
+
+## D49 · Tipos de cita: se pueden agregar desde Configuración, no quitar (2026-11-07)
+
+Configuración, Tipos de cita, tiene el botón "Agregar tipo de cita", que abre el mismo modal de edición vacío. El nombre es obligatorio y no puede repetirse (sin distinguir mayúsculas): el API no rechaza duplicados, por eso se valida en el cliente. Un tipo nuevo nace de 30 min, igual que el resto de los valores por defecto del modal. Al guardar se refresca la lista y sale el aviso; sin tipos se ve "La clínica todavía no tiene tipos de cita." con el mismo botón. No se pueden quitar tipos: las citas viejas los referencian.
+
+## D50 · Teléfonos con selector de país; Costa Rica por defecto y mismo formato guardado (2026-11-07)
+
+`PhoneField` lleva un selector con bandera y código (+506 Costa Rica al inicio) y una lista completa de países con buscador, en `src/shared/utils/phone-countries.ts`, sin librerías (libphonenumber pesa demasiado para lo que se necesita).
+
+- Lo guardado de Costa Rica no cambia: `patient.phone` es `+506 XXXX-XXXX` (lo comparte Zynka) y el contacto `XXXX-XXXX`. Otro país se guarda `+<código> <dígitos>`; `normalizePhone` reformatea al guardar.
+- Al cargar un valor se detecta el país por su código. Con código compartido gana un dueño fijo (+1 EE. UU., +7 Rusia, +44 Reino Unido) salvo que el usuario haya elegido otro en esa sesión. Los países de +1 con código propio (Jamaica, República Dominicana, Puerto Rico y demás islas) usan el código de 4 dígitos.
+- Un valor viejo que no se reconoce (largo, sin `+`) se deja tal cual, sin máscara y sin cortarlo, y el selector muestra un globo.
+- Validación: Costa Rica 8 dígitos; otros países de 8 a 15 dígitos en total, contando el código (el API acepta hasta 20 caracteres). Se quitó la regla "Costa Rica con +": con el selector marcaba como error números extranjeros cortos.
+- Las banderas son emoji generados desde el ISO: en Windows se ven como letras del país.
+- Con un país extranjero elegido, al escribir o pegar: se quita el 0 de larga distancia inicial (`07911 123456` con Reino Unido es `+44 7911123456`) y el código repetido sin `+` (`57 300 1234567` con Colombia es `+57 3001234567`). El código solo se quita si lo que queda tiene 10 dígitos o más: con menos podría ser un número nacional que empieza igual (Brasil, `55 9…`); por eso `34 612345678` con España queda con el 34 repetido y la validación no lo atrapa. Quitar el 0 también afecta a países que lo conservan (Italia).
+- Con Costa Rica elegido, `+` seguido de exactamente 8 dígitos que empiezan en 2, 4, 5, 6, 7 u 8 (y no en 506) se toma como número tico (`+22223333` es `2222-3333`) y no como otro código (+222). Un `+` con otro código reconocible cambia el selector a ese país.
+- Al cambiar de país con un número cargado no se cortan dígitos (`switchPhoneCountry`): con Costa Rica quedan más de 8 y el campo muestra el error de formato.
+- Un valor viejo como `+13055551234` no se reescribe si el usuario no tocó el teléfono al editar otro dato: el formulario guarda el valor original (`storedPhone`) y `normalizePhoneUnlessUnchanged` lo devuelve tal cual.
+- Pruebas de `phone.ts`: `yarn test:phone` (tsc a caché y `node --test`), sin agregar un runner.
+
+## D51 · Prioridad de paciente: ícono en la fila, filtro y casilla en el expediente (2026-11-07)
+
+`PatientFlag.PRIORITY` (`isPriority` en el API, con `prioritySince`) se marca y desmarca con `PUT /patients/:uuid/flags`, con toast e invalidación de la lista.
+
+- En la lista va un botón de ícono a la par del lápiz, con `aria-pressed`, tooltip y `aria-label` "Marcar como prioridad" / "Quitar prioridad" más el nombre; marcado se pinta con el token `danger`. No reordena la lista.
+- lucide-react no trae un ícono de persona corriendo: se usa `Footprints`.
+- El filtro "Prioridad" sale solo en "Indicadores" (el filtro recorre `PatientFlag`).
+- En el expediente es una casilla "Prioridad" (como la de video), no una píldora: las píldoras abren el modal de indicadores, que no lleva prioridad. Usa un hook ligero (`usePatientPriority`) porque `usePatientFlags` consulta los envíos a laboratorio.
+- La tarjeta móvil reserva más espacio al título (`cardTitleClassName="pr-20"`) por los dos botones.
+- La bitácora registra `PRIORITY_CHANGED` (meta `{ isOn }`, como `RENEW_PRESCRIPTION_CHANGED`): "Marcado como prioridad" / "Prioridad quitada".
+
+## D52 · Filtro "Audífonos en laboratorio" con día de envío (2026-11-07)
+
+Con el filtro de laboratorio activo aparece un selector de un solo día (`LabDateField`, máximo hoy) y un botón "Quitar día". Con día elegido el API (`hearingAidsInLabDate`) devuelve solo los enviados ese día. Quitar el filtro de laboratorio limpia el día (también al usar un preset). La etiqueta de la lista no cambia.
+
+## D53 · Notificación de pacientes sin movimiento (2026-11-07)
+
+`NotificationKind.STALE_PATIENT`: una notificación por paciente de `GET /patients/stale` (React Query, 5 min), "{nombre} lleva 6 meses o más sin movimiento" y el detalle "Último movimiento: {fecha}".
+
+- Id `stale-${uuid}-${lastMovementAt}`: si el paciente vuelve a quedar inactivo tras un movimiento nuevo, el aviso reaparece como no leído aunque se hubiera limpiado el anterior.
+- Leerla no la quita; solo sale con "Limpiar". Al tocarla se marca leída, se cierra el panel y se abre la ficha. Cuentan en el contador de no leídas.
+- Orden: versiones arriba y pacientes después, del más antiguo al más reciente (el orden del API). Se descartó mezclar por fecha: los pacientes pueden ser muchos y enterrarían la versión nueva, y por fecha siempre quedarían debajo de todas formas.
+- Si la consulta falla, la bandeja muestra solo las versiones.
+- La armada de ids y orden es lógica pura en `build-notifications.ts`; `yarn test:notifications` la prueba.
+
+## D54 · Tipos de cita: el nombre repetido se detecta sin mayúsculas, tildes ni espacios (2026-11-07)
+
+Completa D49: al agregar o editar un tipo de cita, "control " (con espacio al final) y "Contról" cuentan como repetidos de "Control". La comparación (`toComparableName`) quita tildes, mayúsculas y espacios en los extremos; el nombre se guarda como lo escribió el usuario, ya sin espacios en los extremos.
+
+## D55 · Teléfonos +1 con máscara `(305) 555-1234` (2026-11-07)
+
+Completa D50: con un país de código +1 (Estados Unidos, Canadá…) el campo enmascara mientras se escribe como `(XXX) XXX-XXXX`, y al mostrarlo sale `+1 (305) 555-1234`. Se sigue guardando compacto (`+1 3055551234`), así que no cambia nada en la base ni en el API. Con más de 10 dígitos queda sin máscara para que la validación avise. Los demás países siguen con los dígitos sin máscara al escribir y en bloques al mostrarlos.
+
+## D56 · Audiograma POC: BIAP solo con grados principales, sin subgrados; con PTA 5124 (2026-11-07)
+
+El selector de escala del Resumen ofrece ASHA (por defecto, PTA 512) y BIAP (recomendación 02/1, 1996). BIAP se usa solo con sus grados principales, sin subgrados, y con el PTA de 4 frecuencias (500, 1000, 2000 y 4000 Hz, redondeado a múltiplos de 5), con límites superiores inclusivos: Normal ≤20, Leve 21–40, Moderada 41–70, Severa 71–90, Profunda 91–119 y Cofosis ≥120. Como el gráfico llega a 120 dB, Cofosis se dibuja como una franja de 1 dB (119–120) al pie y su texto dice "120 dB o más". La escala elegida gobierna el grado de la tabla, el popover de info y las franjas y etiquetas de los audiogramas; la raya gruesa de 20 dB sigue fija.
+
+## D57 · Audiograma POC: "Palabras falladas" calcula la discriminación máxima (2026-11-07)
+
+El Resumen tiene la fila "Palabras falladas" (un campo por oído). Al escribirla se llena "Discriminación máxima (%)" de ese oído con (presentadas − falladas) ÷ presentadas × 100, redondeado al entero.
+
+- Presentadas por oído según el último tipo de lista elegido: monosílabos 25 (4 % por palabra) y bisílabos Tato 10 (`TATO_DISPLAYED_WORDS`, 10 % por palabra).
+- El último tipo elegido se conserva al cerrar el panel de palabras con la X; si nunca se eligió uno, se usan monosílabos.
+- Solo enteros de 0 al total. Vaciar el campo no cambia la discriminación, y editar la discriminación a mano no toca las falladas.
+- Al cambiar el tipo de lista se recalcula la discriminación de los oídos con falladas, siempre que sigan dentro del nuevo total.
+
+## D58 · Campo de fecha común `DateField`, en lugar de `<input type="date">` (2026-11-08)
+
+El input nativo se dibuja distinto en cada navegador (en Chrome en español se ve "dd ---- aaaa"). Los cinco lugares con `type="date"` pasan a `src/components/common/date-field/`: `DateField` (controlado, `value`/`onChange` con "YYYY-MM-DD" o vacío) y `FormDateField` (wrapper de Formik con el label y el error de `FormField`).
+
+- Se escribe como dd/mm/aaaa con máscara (solo dígitos, barras automáticas; borrar una barra borra el dígito anterior) o se elige en un calendario con botón de ícono dentro del campo.
+- Hacia afuera solo sale una fecha completa, real (31/02 no vale), de 1900 en adelante y dentro de `min`/`max`; si no, sale vacío. Así validaciones y API no cambian.
+- El error de lo que se escribe (fecha inválida, fuera de rango, incompleta al salir del campo) va primero; si no hay, se muestra el `errorMessage` de fuera.
+- Calendario con semana de lunes a domingo; el título abre meses y año, y el año abre páginas de 12 años. En móvil (`useIsMobile`) es una hoja inferior con fondo oscuro; en escritorio, un popover anclado al botón.
+- Todo en hora local (`fromDayKey`, `toDayKey`, `buildMonthGrid`); nunca `new Date('YYYY-MM-DD')`. Meses y días salen de Intl `es-CR`; los demás textos, de `TEXT.GENERAL.DATE_FIELD`.
+
+## D59 · Informe de audiometría impreso desde la BD (2026-11-08)
+
+No se guarda PDF: el botón Imprimir arma `AudiometryPrintReport` con los datos guardados y usa `window.print()` en A4.
+
+- Página 1: encabezado y paciente, los dos audiogramas con la columna de grados en medio, Weber debajo con sus flechas, logoaudiometría y la tabla Resumen (PTA, grado, umbral, discriminación, falladas, método y escala).
+- Página 2, siempre (`break-before-page`): Diagnóstico y Observaciones ("Sin registrar" si están vacíos) y la firma.
+- El informe no lleva la simbología ni la lista de palabras: son ayudas de captura, no resultado clínico.
+
+## D60 · Editor visual de plantillas con TipTap, guardando markdown (2026-11-08)
+
+El mensaje de la plantilla se escribe en un editor tipo Word (TipTap sobre ProseMirror) en lugar de un `<textarea>`. Lo guardado no cambia: sigue siendo markdown con `# título`, `**negrita**`, `*cursiva*`, `~~tachado~~`, listas `- ` y `1. ` y variables `{{clave}}`, así que el API y el PDF (`document-template-pdf.ts`) siguen igual.
+
+- La conversión markdown a documento y de vuelta es código propio (`document-template-document.ts`, con pruebas de ida y vuelta); su parser inline es el mismo que usa el PDF.
+- Las variables son etiquetas inline que no se editan, con su nombre en español; se borran de una vez y se guardan como `{{clave}}`. Una clave desconocida se pinta como etiqueta de error y la validación sigue impidiendo guardar. Escribir o pegar `{{clave}}` también crea la etiqueta.
+- Solo se admiten los formatos que el markdown puede expresar (negrita, cursiva, tachado, títulos, listas de una sola línea); pegar HTML se reduce a eso. Sin saltos de línea suaves ni listas anidadas.
+- Limitaciones conocidas: no hay escape de `*`, `~~` ni `{{` literales, y una lista numerada se renumera desde su primer número.
+- El editor se crea solo en el navegador (`immediatelyRender: false`) por el render del servidor de Next.
+
+## D61 · Plantillas sin "Cuándo se usa" y panel de variables compacto (2026-11-08)
+
+El editor deja de pedir "Cuándo se usa": ya no está en el formulario, la validación, el payload ni la lista (el API no se toca; una plantilla vieja con descripción simplemente no la muestra).
+
+- El panel de variables muestra solo el nombre de cada una como chip clicable, agrupadas en Paciente y Documento (`DOCUMENT_TEMPLATE_VARIABLE_GROUPS`), con un check si está en uso. Sin `{{}}`, descripciones ni ejemplos.
+- En 1440 es una columna fija de 16rem junto a la hoja; debajo de `xl` es un plegable "Variables (14)" sobre la hoja.
+- Los ejemplos de cada variable siguen en `es.json` porque los usa "Ver ejemplo".
+
+## D62 · Vista previa de plantillas en la misma página, con pdf.js (2026-11-08)
+
+"Vista previa" (antes "Ver ejemplo") ya no abre un modal con un iframe: cambia el editor a una vista en la misma página que dibuja cada hoja del PDF de ejemplo en canvas con `pdfjs-dist` 3.11, con "Volver a editar" (también Escape, sin perder lo escrito) y "Descargar PDF".
+
+- Cada intento de carga crea su propio worker: el worker de respaldo de pdf.js guarda la promesa fallida y "Reintentar" nunca se recuperaba.
+- Por debajo de 640 px la hoja mide 720 px y solo el contenedor de páginas se desplaza de lado; a 304 px el texto no se leía.
+- El encabezado con los botones queda fijo al bajar; en celular no muestra el nombre de la plantilla.
+- Sin nombre, el archivo se descarga como "Plantilla sin nombre.pdf".
+
+## D63 · Las variables `{{clave}}` se convierten después de cada cambio, no con una regla de entrada (2026-11-08)
+
+La regla de entrada de TipTap (`nodeInputRule`) calcula mal la posición cuando el texto llega en un solo evento más largo que la variable (dictado, autocompletado, teclados predictivos): el editor lanzaba `RangeError: Position N out of range` y se perdía lo escrito. Ahora un plugin de ProseMirror (`appendTransaction`) revisa el texto tras cada cambio y convierte toda `{{clave}}` completa en etiqueta, conservando el formato (negrita, etc.).
+
+- Cubre por igual teclear, pegar y dictar; reemplaza también la regla de pegado.
+- Una `{{clave}}` partida entre dos formatos distintos (mitad en negrita) queda como texto.
+- Deshacer quita la etiqueta junto con la última tecla, no por separado.
+
+## D64 · Resumen del paciente como hoja de impresión, no con jsPDF (2026-11-08)
+
+"Generar resumen" en el expediente abre un modal con tarjetas: plantillas de documento (se marcan
+cuáles), historia clínica, última otoscopía y última audiometría. "Generar" arma una vista de
+impresión en HTML y abre el diálogo del navegador (Guardar como PDF), igual que el informe de
+audiometría (D59).
+
+- Se eligió HTML + `window.print()` y no jsPDF: así se reusan tal cual los gráficos SVG del informe
+  de audiometría; con jsPDF habría que pasarlos a imagen.
+- Siempre lleva arriba el logo y la ficha del paciente, y al final una sola firma: línea para firmar
+  a mano y el nombre del usuario con sesión (`fullName`). El título ("Msc.") sale de ese nombre; no
+  hay campo aparte.
+- La tarjeta de plantillas la ve todo el que ve al paciente; historia clínica, otoscopía y
+  audiometría solo con el permiso clínico (RULES §7). Sin registros, la tarjeta sale deshabilitada.
+
+## D65 · Vista previa editable del resumen antes de imprimir (2026-11-08)
+
+"Generar" ya no imprime de una vez: abre una vista previa a pantalla completa con las hojas A4 del
+resumen (el mismo componente de impresión), para revisar y corregir textos antes de imprimir.
+
+- Las correcciones viven solo en esa vista y solo salen en el PDF: no se guardan ni llaman a la API.
+- Se pueden corregir: el contenido de las plantillas, las respuestas de la historia clínica, los
+  textos de otoscopía, diagnóstico y observaciones de cada audiometría, los datos de la ficha y el
+  nombre bajo la firma. No se corrigen gráficos, logo, tablas numéricas ni Weber.
+- Los cambios quedan en el DOM (`contentEditable="plaintext-only"`); el componente de impresión es
+  `memo` y recibe props congeladas al generar, para que un re-render no los pise.
+- "Volver" regresa al modal con la selección intacta; si hay cambios pide confirmar. Esc hace lo
+  mismo y cerrar nunca imprime.
+- Al imprimir salen las hojas con las correcciones, sin barra, fondo gris ni resaltado. En celular
+  las hojas se escalan al ancho con `zoom` (`--summary-zoom`).
+
+## 2026-11-08 Variables de plantilla, Clínica y Mantenimiento
+
+- Variables nuevas (grupos Paciente, Pruebas, Clínica, Documento): otoscopía = la última otoscopía del paciente; diagnóstico y observaciones = la última audiometría con `invalidatedAt` null, sin importar lo elegido en las tarjetas; clínica = `GET /tenants/current`. Dato faltante sale vacío. Las consultas extra solo se piden si hay plantillas elegidas y bloquean "generar" mientras cargan.
+- Configuración → Clínica usa dos permisos: `VIEW_CLINIC` (todos los que ven Configuración, salvo STAFF) y `EDIT_CLINIC` (solo OWNER y ADMIN). Quien solo ve, ve el formulario deshabilitado con un aviso.
+- `ApiError` lleva `details` (`{field,message}`) para mostrar los 400 del API junto al campo en Formik.
+- El teléfono de la clínica se guarda con `toPatientPhone` (Costa Rica con `+506 `); vacío se envía como cadena vacía y el API lo guarda como null.
+- "Lo perdió" exige nota: guardar graba la nota y, al terminar, marca el estado perdido; cancelar o tocar fuera no cambia el estado. "Vino" pasa a "Recepción" solo en el botón.
+
+
+## D66 · Cierre de las correcciones de Resumen, Clínica y Mantenimiento (2026-11-08)
+
+- La nota de "Lo perdió" la exige solo el front: el API no la pide, así que otro cliente podría
+  marcar perdido sin nota.
+- Cualquier DOCTOR puede marcar una audiometría como mal hecha. Los roles y permisos finos quedan
+  para un desarrollo futuro.
+- El correo de la clínica admite hasta 254 caracteres, igual que el API (`TENANT_EMAIL_MAX_LENGTH`).
+- Orden de publicación: primero el API con su migración y después el front. El front ya lee
+  `invalidatedAt` y lo tolera ausente, pero la marca de mal hecha y la clínica necesitan el API.
+- "Lo perdió" guarda desde el hook de la lista, no desde el formulario: la nota y el estado se
+  encadenan, un cambio de estado nunca se descarta por haber otro en curso, y mientras se guarda no
+  se puede cancelar ni plegar la fila. Si falla solo el estado, la nota ya está guardada y se
+  reintenta únicamente el estado.
+
+## D67 · Tipos de audiometría: clínica y rastreo (2026-11-08)
+
+- El tipo se elige solo al crear. Cambiarlo con algo ya puesto abre un `ConfirmDialog` que, si se acepta, descarta lo marcado y escrito; si no hay nada, cambia sin preguntar.
+- Rastreo: solo vía aérea sin enmascarado, resultado Pasa/Refiere obligatorio y solo observaciones. Se puede intentar guardar sin marcas; lo que se exige es el resultado.
+- El resumen del paciente y el informe impreso quedan solo para clínicas. La impresión del rastreo está fuera de este alcance y el botón Imprimir no se muestra en rastreo.
+- Los enums (`AudiometryTypeCode`, `ScreeningResult`) viven en `audiometry-constants.ts` para que los tests sin alias `@/` los importen.
+- Etiqueta del historial: `fecha · tipo` y, en rastreo, `fecha · tipo · resultado`. Los nombres salen del `name` que devuelve el API.
+
+## D68 · Logo y nombre de la clínica (2026-11-08)
+
+- `ClinicBrand` muestra el logo del tenant con `<img>` (nunca SVG inline) o, sin logo, el nombre en
+  texto. No cae al logo de AudioColors; `BrandLogo` queda solo para login y pantallas públicas.
+- Si el logo no carga, se muestra el nombre. Con logo y nombre juntos (resumen, informe) el nombre
+  solo se escribe cuando hay logo, para no duplicarlo.
+- Al guardar nombre o logo se actualiza la consulta del tenant y se invalida la sesión (`authMe`),
+  que es de donde el menú y los documentos leen la clínica.
+- La subida del logo usa `fetch` con `FormData`: el cliente de API fuerza JSON. El cliente valida
+  tipo y 2 MB antes de enviar; el API repite la validación.
+- El informe de audiometría espera las imágenes antes de imprimir, y su nombre de archivo usa el
+  nombre vigente de la clínica.
+
+## D69 · Rastreo en Archivos, informe e impresión (2026-11-08)
+
+- Reemplaza lo que D67 dejó fuera: el informe y la impresión de rastreo ahora se soportan. El botón Imprimir se muestra también en rastreo. El resumen del paciente sigue solo con clínicas.
+- El informe de rastreo muestra el tipo, el audiograma de vía aérea, el resultado Pasa/Refiere y las observaciones; no lleva Weber, logoaudiometría, tabla de PTA ni diagnóstico.
+- Archivos no muestra las audiometrías mal hechas (se reutiliza `filterValidAudiometries`); siguen visibles en Audiometría con su franja. La tarjeta lleva la píldora "Pruebas" (`CategoryPill`, la misma de Control de evolución) y el tipo; en rastreo, el resultado en lugar del PTA.
+- La vista previa se arma desde los datos de la audiometría (`buildSummaryAudiometry`), sin generar ni subir un PDF.
+- Control de evolución: la nota con `audiometryEntryUuid` abre esa audiometría en el expediente por el parámetro de URL `audiometria=<uuid>`. Un uuid que no existe se ignora.
+

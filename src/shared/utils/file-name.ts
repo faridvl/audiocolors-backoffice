@@ -35,3 +35,18 @@ export function splitFileName(fileName: string): { baseName: string; extension: 
 
 /** El nombre como se muestra: sin ".pdf", ".jpg"... */
 export const stripFileExtension = (fileName: string) => splitFileName(fileName).baseName;
+
+/** Caracteres que un sistema de archivos no admite en un nombre. */
+const INVALID_FILE_NAME_CHARS = /[\/:*?"<>|\u0000-\u001f]+/g;
+const FILE_NAME_MAX_LENGTH = 80;
+
+/** Nombre de descarga `<texto>.pdf` a partir de un texto libre; `fallback` si no queda nada usable. */
+export function buildDownloadFileName(text: string, fallback: string, extension = '.pdf'): string {
+  const cleanText = text
+    .replace(INVALID_FILE_NAME_CHARS, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, FILE_NAME_MAX_LENGTH)
+    .trim();
+  return `${cleanText || fallback}${extension}`;
+}

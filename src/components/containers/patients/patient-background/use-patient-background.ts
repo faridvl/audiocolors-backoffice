@@ -8,9 +8,9 @@ import { useClinicalHistoryTemplateQuery } from '@/shared/api/querys/clinical-hi
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
-import { buildStandardFields, resolveAnswers } from './clinical-history';
+import { buildStandardFields, resolveAnswers, withoutPhysicalExam } from './clinical-history';
 
-export function usePatientBackground(patientUuid: string) {
+export function usePatientBackground(patientUuid: string, onExpand: () => void) {
   const { t } = useTranslation();
   const resolveAuthorLabel = useResolveAuthorLabel();
   const {
@@ -30,12 +30,16 @@ export function usePatientBackground(patientUuid: string) {
   // Una historia ya llena se *lee* con las preguntas que tenía al llenarse (sin copia, es de
   // antes de las preguntas configurables: la hoja estándar).
   const summaryFields = useMemo(
-    () => (background ? (background.templateSnapshot ?? buildStandardFields(t)) : []),
+    () =>
+      background ? withoutPhysicalExam(background.templateSnapshot ?? buildStandardFields(t)) : [],
     [background, t],
   );
   // Llenarla o editarla usa las preguntas actuales de la clínica: al editar aparecen las
   // agregadas después, con las respuestas que ya tenía en las demás.
-  const formFields = useMemo(() => template?.fields ?? buildStandardFields(t), [template, t]);
+  const formFields = useMemo(
+    () => withoutPhysicalExam(template?.fields ?? buildStandardFields(t)),
+    [template, t],
+  );
   const answers = useMemo(() => (background ? resolveAnswers(background) : {}), [background]);
 
   const authorship: string[] = [];
@@ -57,6 +61,7 @@ export function usePatientBackground(patientUuid: string) {
   }
 
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   return {
     background: background ?? null,
@@ -73,7 +78,12 @@ export function usePatientBackground(patientUuid: string) {
     },
     authorship,
     isUpdating,
-    handleStartUpdate: () => setIsUpdating(true),
+    isSaving,
+    handleSavingChange: setIsSaving,
+    handleStartUpdate: () => {
+      setIsUpdating(true);
+      onExpand();
+    },
     handleCloseUpdate: () => setIsUpdating(false),
   };
 }

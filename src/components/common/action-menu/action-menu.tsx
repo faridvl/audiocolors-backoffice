@@ -6,6 +6,8 @@ import { tailwind } from '@/utils/tailwind-utils';
 export interface ActionMenuItem {
   label: string;
   icon?: React.ReactNode;
+  /** Acción destructiva o de descarte: se pinta con el color de peligro. */
+  isDanger?: boolean;
   onClick: () => void;
 }
 
@@ -20,7 +22,7 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({ ariaLabel, items, classN
   <Menu as="div" className={tailwind('relative shrink-0', className)}>
     <Menu.Button
       aria-label={ariaLabel}
-      className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
+      className="flex h-11 w-11 items-center justify-center rounded-lg text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
     >
       <MoreHorizontal className="h-5 w-5" aria-hidden />
     </Menu.Button>
@@ -42,8 +44,9 @@ export const ActionMenu: React.FC<ActionMenuProps> = ({ ariaLabel, items, classN
                 type="button"
                 onClick={item.onClick}
                 className={tailwind(
-                  'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
-                  active && 'bg-ink-50',
+                  'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm',
+                  item.isDanger ? 'text-danger' : 'text-ink-700',
+                  active && (item.isDanger ? 'bg-danger/10' : 'bg-ink-50'),
                 )}
               >
                 {item.icon}

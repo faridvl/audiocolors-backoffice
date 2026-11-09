@@ -13,8 +13,10 @@ export const routesPrivate = {
   },
   settings: {
     index: '/configuracion',
-    clinicalHistory: '/configuracion/historia-clinica',
+    questions: '/configuracion/preguntas',
     appointmentTypes: '/configuracion/tipos-de-cita',
+    templates: '/configuracion/plantillas',
+    clinic: '/configuracion/clinica',
   },
 };
 

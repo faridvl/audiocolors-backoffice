@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { Field, ErrorMessage, useField } from 'formik';
-import { Eye, EyeOff } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { tailwind } from '@/utils/tailwind-utils';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
-import { TEXT } from '@/static/texts/i18n';
+import React, { useState } from "react";
+import { Field, useField } from "formik";
+import { Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { tailwind } from "@/utils/tailwind-utils";
+import {
+  Typography,
+  TypographyVariant,
+} from "@/components/common/typography/typography";
+import { TEXT } from "@/static/texts/i18n";
 
 /**
  * Estilo unico de campo. En Zynka estas clases estaban duplicadas literal
@@ -14,64 +17,90 @@ import { TEXT } from '@/static/texts/i18n';
  * automatico al enfocar el campo (se ve en cada input/select del formulario).
  */
 export const inputBaseClasses =
-  'w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-base text-ink-800 ' +
-  'placeholder:text-ink-400 transition-colors ' +
-  'focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 ' +
-  'disabled:cursor-not-allowed disabled:bg-ink-50';
+  "w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-base text-ink-800 " +
+  "placeholder:text-ink-400 transition-colors " +
+  "focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 " +
+  "disabled:cursor-not-allowed disabled:bg-ink-50";
+
+/** Etiqueta sobria (Nombre, Texto del documento) para los formularios que la piden. */
+export const FIELD_LABEL_CLASSES = "text-sm font-medium text-ink-700";
 
 interface FormFieldProps {
   name: string;
   label: string;
+  /** Cambia el estilo de la etiqueta (p. ej. `FIELD_LABEL_CLASSES`). */
+  labelClassName?: string;
   type?: string;
   placeholder?: string;
   required?: boolean;
   /** Marca el campo como "(Opcional)" junto al label, en vez de usar el placeholder para eso. */
   optional?: boolean;
   disabled?: boolean;
-  as?: 'input' | 'select' | 'textarea';
+  as?: "input" | "select" | "textarea";
   maxLength?: number;
   /** Muestra "escritos / máximo" debajo del campo. Requiere `maxLength`. */
   showCount?: boolean;
   hint?: string;
+  /** La ayuda sigue a la vista cuando hay error (el error va junto a ella, no en su lugar). */
+  isHintAlwaysVisible?: boolean;
   className?: string;
   children?: React.ReactNode;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   /** Teclado virtual correcto en iOS/Android para campos numéricos o de teléfono. */
-  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   /** Botón de ícono dentro del campo, a la derecha (posicionado `absolute`, ancho `w-11`). */
   endAdornment?: React.ReactNode;
+  /** Texto gris dentro del campo, a la izquierda; no es parte del valor (p. ej. "+506"). */
+  startAdornment?: string;
+  /** Control interactivo dentro del campo, a la izquierda (p. ej. el selector de país). */
+  startControl?: React.ReactNode;
+  /** Lo que muestra el campo en lugar del valor de Formik (p. ej. el número sin su código). */
+  displayValue?: string;
 }
 
 export const FormField: React.FC<FormFieldProps> = ({
   name,
   label,
-  type = 'text',
+  labelClassName,
+  type = "text",
   placeholder,
   required = false,
   optional = false,
   disabled = false,
-  as = 'input',
+  as = "input",
   maxLength,
   showCount = false,
   hint,
+  isHintAlwaysVisible = false,
   className,
   children,
   onChange,
   inputMode,
   endAdornment,
+  startAdornment,
+  startControl,
+  displayValue,
 }) => {
   const { t } = useTranslation();
-  const [{ value }] = useField<unknown>(name);
+  const [{ value }, { error, touched }] = useField<unknown>(name);
   const [showPassword, setShowPassword] = useState(false);
   const isCountVisible = showCount && maxLength !== undefined;
-  const length = typeof value === 'string' ? value.length : 0;
-  const isPassword = as === 'input' && type === 'password';
-  const resolvedType = isPassword && showPassword ? 'text' : type;
+  const length = typeof value === "string" ? value.length : 0;
+  const isPassword = as === "input" && type === "password";
+  const resolvedType = isPassword && showPassword ? "text" : type;
+  // El error reemplaza a la ayuda en el mismo lugar: si se apilaran, el botón de guardar bajaría.
+  const errorText = touched && typeof error === "string" ? error : undefined;
+  const isHintShown = Boolean(hint) && (isHintAlwaysVisible || !errorText);
+  const hasMessage = Boolean(errorText || isHintShown);
+  const describedBy =
+    [errorText && `${name}-error`, isHintShown && `${name}-hint`]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
-    <div className={tailwind('flex flex-col gap-1.5', className)}>
+    <div className={tailwind("flex flex-col gap-1.5", className)}>
       <label htmlFor={name}>
-        <Typography variant={TypographyVariant.BODY}>
+        <Typography variant={TypographyVariant.BODY} className={labelClassName}>
           {label}
           {required && <span className="ml-0.5 text-danger">*</span>}
           {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
@@ -82,27 +111,49 @@ export const FormField: React.FC<FormFieldProps> = ({
         <Field
           id={name}
           name={name}
-          as={as === 'input' ? undefined : as}
-          type={as === 'input' ? resolvedType : undefined}
+          as={as === "input" ? undefined : as}
+          type={as === "input" ? resolvedType : undefined}
           placeholder={placeholder}
           disabled={disabled}
           maxLength={maxLength}
           inputMode={inputMode}
+          {...(displayValue !== undefined ? { value: displayValue } : {})}
+          aria-invalid={errorText ? true : undefined}
+          aria-describedby={describedBy}
           className={tailwind(
             inputBaseClasses,
-            as === 'textarea' && 'min-h-[88px] resize-none',
-            (isPassword || endAdornment) && 'pr-11',
+            as === "textarea" && "min-h-[88px] resize-none",
+            (isPassword || endAdornment) && "pr-11",
+            startAdornment && "pl-[4.5rem]",
+            startControl && "pl-[7.5rem]",
           )}
           {...(onChange ? { onChange } : {})}
         >
           {children}
         </Field>
 
+        {startAdornment && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-2.5 left-0 flex items-center border-r border-ink-200 pl-3 pr-2 text-base font-medium text-ink-500"
+          >
+            {startAdornment}
+          </span>
+        )}
+
+        {startControl && (
+          <div className="absolute inset-y-0 left-0 flex items-stretch">
+            {startControl}
+          </div>
+        )}
+
         {isPassword && (
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            aria-label={
+              showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+            }
             className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-400 hover:text-ink-600"
           >
             {showPassword ? (
@@ -116,9 +167,26 @@ export const FormField: React.FC<FormFieldProps> = ({
         {!isPassword && endAdornment}
       </div>
 
-      {(hint || isCountVisible) && (
+      {(hasMessage || isCountVisible) && (
         <div className="flex items-start justify-between gap-3">
-          {hint && <Typography variant={TypographyVariant.HELPER}>{hint}</Typography>}
+          <div className="flex min-w-0 flex-col gap-0.5">
+            {errorText && (
+              <Typography
+                id={`${name}-error`}
+                variant={TypographyVariant.ERROR}
+              >
+                {errorText}
+              </Typography>
+            )}
+            {isHintShown && (
+              <Typography
+                id={`${name}-hint`}
+                variant={TypographyVariant.HELPER}
+              >
+                {hint}
+              </Typography>
+            )}
+          </div>
           {isCountVisible && (
             <Typography
               variant={TypographyVariant.HELPER}
@@ -133,10 +201,6 @@ export const FormField: React.FC<FormFieldProps> = ({
           )}
         </div>
       )}
-
-      <ErrorMessage name={name}>
-        {(message) => <Typography variant={TypographyVariant.ERROR}>{message}</Typography>}
-      </ErrorMessage>
     </div>
   );
 };

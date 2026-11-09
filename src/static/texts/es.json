@@ -3,6 +3,7 @@
     "buttons": {
       "save": "Guardar",
       "cancel": "Cancelar",
+      "clear": "Limpiar",
       "loading": "Cargando...",
       "retry": "Reintentar"
     },
@@ -24,11 +25,43 @@
     "errors": {
       "unexpected": "Algo salió mal. Intenta de nuevo."
     },
-    "notRegistered": "Sin registrar",
+    "discard": {
+      "title": "¿Descartar lo escrito?",
+      "message": "Si sales ahora, se pierde lo que llevas.",
+      "confirm": "Descartar",
+      "keepEditing": "Seguir editando"
+    },
+    "optional": "(Opcional)",
+    "dateField": {
+      "placeholder": "dd/mm/aaaa",
+      "openCalendar": "Abrir calendario",
+      "calendar": "Calendario",
+      "close": "Cerrar calendario",
+      "previousMonth": "Mes anterior",
+      "nextMonth": "Mes siguiente",
+      "previousYear": "Año anterior",
+      "nextYear": "Año siguiente",
+      "previousYears": "Años anteriores",
+      "nextYears": "Años siguientes",
+      "chooseMonthAndYear": "Elegir mes y año",
+      "chooseYear": "Elegir año",
+      "errorInvalid": "Escribe una fecha válida, como 15/03/2026.",
+      "errorBeforeMin": "La fecha no puede ser anterior al {{date}}.",
+      "errorAfterMax": "La fecha no puede ser posterior al {{date}}."
+    },
+    "phoneHint": "¿Otro país? Elige su código en la lista.",
+    "phoneCountry": {
+      "label": "País del teléfono",
+      "search": "Buscar país o código",
+      "empty": "No encontramos ese país."
+    },
     "forbidden": "Tu usuario no tiene acceso a esta sección.",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "notRecorded": "Sin registrar",
+    "unanswered": "Sin responder",
+    "unsavedChanges": "Tienes cambios sin guardar. ¿Descartarlos?"
   },
   "notifications": {
     "menu": "Notificaciones",
@@ -40,8 +73,10 @@
     "unreadCount_one": "{{count}} notificación sin leer",
     "unreadCount_other": "{{count}} notificaciones sin leer",
     "emptyTitle": "No hay notificaciones",
-    "emptyDescription": "Las novedades de cada versión aparecen acá.",
+    "emptyDescription": "Acá aparecen las novedades de cada versión y los pacientes sin movimiento.",
     "releaseTitle": "Versión {{version}}",
+    "stalePatientTitle": "{{name}} lleva 6 meses o más sin movimiento",
+    "stalePatientDetail": "Último movimiento: {{date}}",
     "releases": {
       "v1_0_0": {
         "clinicalHistory": {
@@ -80,6 +115,88 @@
           "title": "Agenda",
           "description": "las citas se pueden mover de hora más de una vez."
         }
+      },
+      "v2_0_0": {
+        "audiometry": {
+          "title": "Audiometría",
+          "description": "registro completo por paciente con historial e informe para imprimir; se puede marcar como mal hecha indicando el motivo."
+        },
+        "patientSummary": {
+          "title": "Resumen del paciente",
+          "description": "se genera desde el expediente eligiendo plantillas y audiometrías, con vista previa editable antes de imprimir."
+        },
+        "documentTemplates": {
+          "title": "Plantillas de documento",
+          "description": "sección en Configuración para redactar documentos con datos del paciente y de la clínica."
+        },
+        "clinic": {
+          "title": "Clínica",
+          "description": "nombre, logo, teléfono, correo y dirección editables; el logo aparece en el menú y en los documentos."
+        },
+        "questions": {
+          "title": "Preguntas",
+          "description": "la clínica crea sus propias secciones de preguntas y cada paciente las llena varias veces; la historia clínica pasa a esta sección."
+        },
+        "maintenance": {
+          "title": "Mantenimientos",
+          "description": "los mantenimientos 1 a 4 de cada paciente, con su estado y un historial de notas."
+        },
+        "laboratory": {
+          "title": "Laboratorio",
+          "description": "historial de envíos y entregas de audífonos."
+        },
+        "otoscopy": {
+          "title": "Otoscopia",
+          "description": "historial por paciente con los dos oídos; cada registro queda anotado en Control de evolución."
+        },
+        "contactAttempts": {
+          "title": "Intentos de contacto",
+          "description": "registro de los intentos de contacto con cada paciente."
+        },
+        "priority": {
+          "title": "Prioridad",
+          "description": "bandera de prioridad en la lista de pacientes y en el expediente."
+        },
+        "stalePatients": {
+          "title": "Pacientes sin movimiento",
+          "description": "aviso en Notificaciones de los pacientes con 6 meses o más sin movimiento."
+        },
+        "patients": {
+          "title": "Pacientes",
+          "description": "un paciente puede tener más de una sede, se aceptan teléfonos de otros países y se puede registrar sin fecha de nacimiento."
+        },
+        "agenda": {
+          "title": "Agenda",
+          "description": "se registra un paciente nuevo al agendar la cita; al cambiar la duración de un tipo de cita se actualizan las citas siguientes."
+        },
+        "files": {
+          "title": "Archivos",
+          "description": "las audiometrías aparecen junto con el resto de documentos."
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "la sección Preguntas queda organizada en tarjetas."
+        },
+        "mobile": {
+          "title": "Celular",
+          "description": "el informe de audiometría se lee bien en pantallas angostas."
+        },
+        "agendaHours": {
+          "title": "Agenda",
+          "description": "se muestran las citas fuera del horario de 8:00 a 18:00 y el día de cada cita se calcula con la hora de Costa Rica."
+        },
+        "maintenanceMonth": {
+          "title": "Mantenimientos",
+          "description": "el mes de próximos mantenimientos ya no incluye el primer día del mes siguiente."
+        },
+        "clinicalHistory": {
+          "title": "Historia clínica",
+          "description": "guardar sin todas las respuestas ya no borra las anteriores."
+        },
+        "security": {
+          "title": "Seguridad",
+          "description": "cada clínica accede únicamente a sus propios pacientes, citas y tipos de cita."
+        }
       }
     },
     "kinds": {
@@ -116,9 +233,58 @@
         "title": "Tipos de cita",
         "description": "Nombre y duración de cada tipo de cita."
       },
-      "CLINICAL_HISTORY": {
-        "title": "Historia clínica",
-        "description": "Preguntas de la hoja de la primera visita. Los cambios no afectan las historias ya llenas."
+      "QUESTIONS": {
+        "title": "Formularios",
+        "description": "Los formularios que la clínica llena con sus pacientes. Los cambios no afectan las respuestas ya guardadas."
+      },
+      "TEMPLATES": {
+        "title": "Plantillas",
+        "description": "Los documentos tipo de la clínica, con los datos del paciente ya puestos."
+      },
+      "CLINIC": {
+        "title": "Clínica",
+        "description": "Los datos de contacto de la clínica. Salen en los documentos que generas."
+      }
+    },
+    "clinic": {
+      "pageTitle": "Clínica · AudioColors Gestión Clínica",
+      "loading": "Cargando datos de la clínica...",
+      "loadError": "No se pudieron cargar los datos de la clínica",
+      "name": "Nombre de la clínica",
+      "nameHint": "Sale en el menú y en los documentos.",
+      "logo": {
+        "title": "Logo",
+        "hint": "PNG, JPG, WEBP o SVG de hasta 2 MB. Sale en el menú y en los documentos.",
+        "alt": "Logo de la clínica",
+        "empty": "Sin logo. En su lugar se muestra el nombre de la clínica.",
+        "upload": "Subir logo",
+        "change": "Cambiar logo",
+        "remove": "Quitar logo",
+        "uploaded": "Logo actualizado",
+        "removed": "Logo quitado",
+        "removeTitle": "¿Quitar el logo?",
+        "removeMessage": "El menú y los documentos mostrarán el nombre de la clínica en su lugar.",
+        "removeConfirm": "Quitar",
+        "errorType": "Formato no permitido. El logo debe ser PNG, JPG, WEBP o SVG.",
+        "errorSize": "El logo no puede pesar más de 2 MB.",
+        "errorUpload": "No se pudo subir el logo.",
+        "errorNetwork": "No hay conexión. Revisa tu internet e inténtalo de nuevo.",
+        "errorSessionExpired": "Tu sesión expiró. Inicia sesión de nuevo."
+      },
+      "phone": "Teléfono",
+      "email": "Correo",
+      "emailPlaceholder": "correo@clinica.com",
+      "address": "Dirección",
+      "addressHint": "Como quieres que aparezca en los documentos.",
+      "readOnly": "Solo el dueño y administración pueden cambiar estos datos.",
+      "saved": "Datos de la clínica guardados",
+      "errors": {
+        "nameRequired": "El nombre de la clínica es obligatorio",
+        "nameMax": "Máximo 100 caracteres",
+        "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
+        "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
+        "emailInvalid": "Correo inválido",
+        "addressMax": "Máximo 300 caracteres"
       }
     },
     "appointmentTypes": {
@@ -131,6 +297,10 @@
       "noDuration": "Sin definir (30 minutos)",
       "minutes": "{{count}} minutos",
       "saved": "Tipo de cita guardado",
+      "created": "Tipo de cita agregado",
+      "add": "Agregar tipo de cita",
+      "newTitle": "Nuevo tipo de cita",
+      "duplicateName": "Ya existe un tipo de cita con ese nombre.",
       "isControl": "Cuenta como control",
       "isControlHint": "Es el que se cuenta en la tarjeta \"Controles este mes\" de Pacientes.",
       "controlBadge": "Controles del mes",
@@ -139,11 +309,209 @@
       "controlRemove": "Al guardar no quedará ningún control y la tarjeta \"Controles este mes\" dejará de verse.",
       "editTitle": "Editar tipo de cita",
       "editLabel": "Editar {{name}}",
+      "updatedAt": "Actualizada el {{date}}",
       "minutesShort": "{{count}} min"
     }
   },
+  "documentTemplates": {
+    "pageTitle": "Plantillas · AudioColors Gestión Clínica",
+    "loading": "Cargando plantillas...",
+    "loadError": "No se pudieron cargar las plantillas",
+    "empty": "Aún no tienes plantillas. Crea una para armar documentos con los datos del paciente, como un consentimiento informado.",
+    "new": "Nueva plantilla",
+    "editLabel": "Editar {{name}}",
+    "updatedAt": "Actualizada el {{date}}",
+    "back": "Volver",
+    "newTitle": "Nueva plantilla",
+    "editTitle": "Editar plantilla",
+    "saved": "Plantilla guardada",
+    "name": "Nombre",
+    "namePlaceholder": "Ej. Consentimiento informado",
+    "content": "Texto del documento",
+    "contentPlaceholder": "Escribe el texto. Usa las variables de la lista para poner los datos del paciente.",
+    "viewExample": "Vista previa",
+    "toolbar": {
+      "label": "Formato del texto",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "strike": "Tachado",
+      "heading": "Título",
+      "bulletList": "Lista con viñetas",
+      "numberedList": "Lista numerada"
+    },
+    "variables": {
+      "title": "Variables",
+      "insertButton": "Insertar variable",
+      "intro": "Toca una variable para insertarla en el texto",
+      "insert": "Insertar {{variable}}",
+      "inUse": "En uso",
+      "notConfigured": "La clínica no tiene configurado el dato «{{variable}}». Puedes agregarlo en Configuración → Clínica; mientras tanto saldrá vacío.",
+      "groups": {
+        "patient": "Paciente",
+        "tests": "Pruebas",
+        "clinic": "Clínica",
+        "document": "Documento"
+      },
+      "nombre": {
+        "label": "Nombre",
+        "example": "María"
+      },
+      "apellidos": {
+        "label": "Apellidos",
+        "example": "Rodríguez Mora"
+      },
+      "nombre_completo": {
+        "label": "Nombre completo",
+        "example": "María Rodríguez Mora"
+      },
+      "tipo_documento": {
+        "label": "Tipo de documento",
+        "example": "Cédula"
+      },
+      "documento": {
+        "label": "Documento",
+        "example": "1-1234-5678"
+      },
+      "fecha_nacimiento": {
+        "label": "Fecha de nacimiento",
+        "example": "14/03/1985"
+      },
+      "edad": {
+        "label": "Edad",
+        "example": "41 años"
+      },
+      "genero": {
+        "label": "Género",
+        "example": "Femenino"
+      },
+      "telefono": {
+        "label": "Teléfono",
+        "example": "+506 8888-1234"
+      },
+      "correo": {
+        "label": "Correo",
+        "example": "maria@ejemplo.com"
+      },
+      "direccion": {
+        "label": "Dirección",
+        "example": "Escazú, San José"
+      },
+      "sedes": {
+        "label": "Sedes",
+        "example": "Sede Escazú"
+      },
+      "otoscopia_od": {
+        "label": "Otoscopía OD",
+        "example": "Conducto auditivo libre, membrana timpánica íntegra."
+      },
+      "otoscopia_oi": {
+        "label": "Otoscopía OI",
+        "example": "Leve acumulación de cerumen, membrana timpánica íntegra."
+      },
+      "diagnostico": {
+        "label": "Diagnóstico",
+        "example": "Hipoacusia neurosensorial bilateral leve a moderada."
+      },
+      "observaciones": {
+        "label": "Observaciones",
+        "example": "Se recomienda control en seis meses."
+      },
+      "clinica_nombre": {
+        "label": "Nombre",
+        "example": "Clínica Auditiva Los Ángeles"
+      },
+      "clinica_telefono": {
+        "label": "Teléfono",
+        "example": "+506 2222-3344"
+      },
+      "clinica_correo": {
+        "label": "Correo",
+        "example": "info@clinicaauditiva.example"
+      },
+      "clinica_direccion": {
+        "label": "Dirección",
+        "example": "Sabana Norte, 200 m al oeste de la Contraloría, San José"
+      },
+      "fecha_hoy": {
+        "label": "Fecha de hoy",
+        "example": "15 de noviembre de 2026"
+      },
+      "profesional": {
+        "label": "Profesional",
+        "example": "Dra. Ana Vargas"
+      }
+    },
+    "errors": {
+      "nameRequired": "Escribe el nombre de la plantilla.",
+      "nameMax": "El nombre admite hasta {{max}} caracteres.",
+      "contentRequired": "Escribe el texto del documento.",
+      "contentMax": "El texto admite hasta {{max}} caracteres.",
+      "unknownVariable_one": "La variable {{names}} no existe. Usa solo las de la lista.",
+      "unknownVariable_other": "Las variables {{names}} no existen. Usa solo las de la lista.",
+      "duplicateName": "Ya existe una plantilla con ese nombre.",
+      "loadTemplate": "No se pudo abrir la plantilla"
+    },
+    "example": {
+      "backToEdit": "Volver a editar",
+      "unnamed": "Plantilla sin nombre",
+      "download": "Descargar PDF",
+      "loading": "Preparando la vista previa...",
+      "error": "No se pudo preparar la vista previa",
+      "pageAria": "Página {{page}} de {{total}}",
+      "pageOf": "{{page}} de {{total}}"
+    }
+  },
+  "questions": {
+    "title": "Formularios",
+    "pageTitle": "Formularios · AudioColors Gestión Clínica",
+    "clinicalHistory": "Historia clínica",
+    "unfilledSection": "{{title}} sin llenar",
+    "unfilledSections_one": "{{count}} sección sin llenar",
+    "unfilledSections_other": "{{count}} secciones sin llenar",
+    "draftSection": "{{title}} · borrador sin guardar",
+    "pendingWithDraft_one": "{{count}} sección pendiente · borrador sin guardar",
+    "pendingWithDraft_other": "{{count}} secciones pendientes · borrador sin guardar",
+    "sectionsCount_one": "{{count}} sección",
+    "sectionsCount_other": "{{count}} secciones",
+    "unsavedChanges": "Hay cambios sin guardar",
+    "newSection": "Nueva sección",
+    "newSectionTitle": "Nueva sección del formulario",
+    "sectionName": "Nombre de la sección",
+    "sectionNamePlaceholder": "Ej. Seguimiento",
+    "sectionNameRequired": "Escribe el nombre de la sección",
+    "sectionContinue": "Continuar",
+    "sectionNewHint": "Agrega las preguntas y guarda para crear la sección.",
+    "sectionSaved": "Sección guardada",
+    "sectionsLoading": "Cargando secciones...",
+    "sectionsLoadError": "No se pudieron cargar las secciones",
+    "entryNew": "Nuevo registro",
+    "entryEmpty": "Todavía no hay registros en esta sección.",
+    "entryLatest": "Último registro",
+    "entryMeta": "{{date}} · {{author}}",
+    "entryShowOlder_one": "Ver anteriores ({{count}})",
+    "entryShowOlder_other": "Ver anteriores ({{count}})",
+    "entryEdit": "Editar",
+    "entryEditSave": "Guardar cambios",
+    "entryCorrected": "Corregido por {{author}} · {{time}}",
+    "entryCorrectedSaved": "Registro corregido",
+    "entrySave": "Guardar registro",
+    "entrySaved": "Registro guardado",
+    "entryHint": "Lo puedes corregir hoy; después queda fijo.",
+    "entryStaleHint": "Lo que escribiste sigue aquí. Puedes guardarlo como un registro nuevo.",
+    "entrySaveAsNew": "Guardar como nuevo",
+    "entryCorrectedTag": "Corregido",
+    "entriesLoading": "Cargando registros...",
+    "entriesLoadError": "No se pudieron cargar los registros",
+    "entryEmptyError": "Responde al menos una pregunta para guardar el registro.",
+    "entriesPrevious": "Registros anteriores",
+    "sectionStatusNone": "Sin registros",
+    "sectionStatusSummary_one": "{{count}} registro · último {{date}}",
+    "sectionStatusSummary_other": "{{count}} registros · último {{date}}",
+    "answerWithDetail": "{{label}}: {{detail}}",
+    "newSectionDisabledHint": "Guarda o descarta la sección que estás creando para empezar otra.",
+    "nameCounter": "{{count}}/{{max}}"
+  },
   "clinicalTemplate": {
-    "pageTitle": "Preguntas de la historia clínica · AudioColors Gestión Clínica",
     "templateName": "Historia clínica",
     "loading": "Cargando preguntas...",
     "loadError": "No se pudieron cargar las preguntas",
@@ -166,12 +534,12 @@
     },
     "labelPlaceholder": "Escribe la pregunta",
     "detailPlaceholder": "Si es Sí, qué se pregunta (por ejemplo: ¿Qué tonalidad?)",
-    "noSection": "Sin título",
-    "newSection": "Nombre de una sección nueva",
-    "addSection": "Agregar sección",
+    "noSection": "Sin grupo",
+    "newSection": "Nombre de un grupo nuevo",
+    "addSection": "Agregar grupo",
     "sectionName": "Nombre de la sección",
     "dragHandle": "Arrastrar para mover la pregunta",
-    "dragHint": "Para moverla, arrastra una pregunta por su asa."
+    "dragHint": "Arrastra el asa de una pregunta para cambiar su orden."
   },
   "auth": {
     "login": {
@@ -265,8 +633,7 @@
       "time": "Hora",
       "branch": "Sede",
       "phone": "Teléfono",
-      "scheduledBy": "Agendada por",
-      "scheduledByUnknown": "Sin registrar"
+      "scheduledBy": "Agendada por"
     },
     "toasts": {
       "arrived": "{{name}} está en sala",
@@ -296,7 +663,38 @@
       "searchAria": "Buscar paciente",
       "hint": "Escribe al menos 2 letras del nombre o la cédula.",
       "empty": "Ningún paciente coincide con esa búsqueda.",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "create": {
+        "action": "Registrar paciente nuevo",
+        "title": "Registrar paciente",
+        "description": "Solo lo básico para agendar. El resto se completa en la cita.",
+        "firstName": "Nombre",
+        "lastName": "Apellidos",
+        "phone": "Teléfono",
+        "documentId": "Cédula",
+        "branch": "Sedes",
+        "branchPlaceholder": "Sin especificar",
+        "branchRequiredPlaceholder": "Elige una o más sedes",
+        "submit": "Registrar y agendar",
+        "back": "Volver a la búsqueda",
+        "saved": "Paciente registrado",
+        "searchExisting": "Buscar a este paciente",
+        "errors": {
+          "firstNameRequired": "El nombre es obligatorio",
+          "lastNameRequired": "El apellido es obligatorio",
+          "firstNameMin": "El nombre debe tener al menos 2 letras",
+          "lastNameMin": "El apellido debe tener al menos 2 letras",
+          "branchRequired": "Elige al menos una sede",
+          "nameLetters": "Solo letras y espacios",
+          "nameMax": "Máximo 60 caracteres",
+          "documentRequired": "La cédula es obligatoria",
+          "documentMax": "Máximo 20 caracteres",
+          "documentDuplicate": "Esta cédula ya está registrada",
+          "phoneRequired": "El teléfono es obligatorio",
+          "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
+          "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos."
+        }
+      }
     },
     "board": {
       "count_one": "{{count}} cita",
@@ -312,8 +710,10 @@
       "toasts": {
         "confirmed": "Cita de {{name}} confirmada a las {{hour}}",
         "moved": "Cita de {{name}} movida a las {{hour}}",
+        "movedNoName": "Cita movida a las {{hour}}",
         "timeError": "La cita de {{name}} quedó confirmada sin hora. Arrástrala de nuevo a un horario.",
-        "returned": "{{name}} volvió a por confirmar"
+        "returned": "{{name}} volvió a por confirmar",
+        "returnedNoName": "La cita volvió a por confirmar"
       },
       "returnHere": "Suéltala aquí para dejarla por confirmar",
       "selection": {
@@ -402,7 +802,8 @@
       "noResultsDescription": "Prueba con otro nombre, otra persona u otro mes.",
       "errorTitle": "No se pudo cargar la bitácora"
     },
-    "unknownActor": "Sin registrar",
+    "unknownActor": "Usuario sin nombre",
+    "unknownAction": "Otra acción",
     "actions": {
       "PATIENT_CREATED": "Paciente registrado",
       "PATIENT_UPDATED": "Datos modificados",
@@ -420,12 +821,22 @@
       "APPOINTMENT_COMPLETED": "Cita atendida",
       "STATUS_CHANGED": "Estado cambiado",
       "HEARING_AIDS_LAB_CHANGED": "Audífonos en laboratorio",
+      "HEARING_AIDS_DELIVERED": "Audífonos entregados",
       "WARRANTY_CHANGED": "Garantía",
       "VIDEO_CANDIDATE_CHANGED": "Candidato a video",
       "WARRANTY_EXPIRED_CHANGED": "Garantía expirada",
       "RENEW_PRESCRIPTION_CHANGED": "Renovar receta",
+      "PRIORITY_CHANGED": "Prioridad",
       "CLINICAL_HISTORY_CREATED": "Historia clínica registrada",
-      "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada"
+      "CLINICAL_HISTORY_UPDATED": "Historia clínica modificada",
+      "PHYSICAL_EXAM_UPDATED": "Exploración física modificada",
+      "MAINTENANCE_CHANGED": "Mantenimiento",
+      "CONTACT_ATTEMPTS_CHANGED": "Intentos de contacto",
+      "MAINTENANCE_CHECK_CHANGED": "Mantenimiento",
+      "MAINTENANCE_NOTE_CHANGED": "Nota de mantenimiento",
+      "MAINTENANCE_NOTE_ADDED": "Nota de mantenimiento",
+      "QUESTIONNAIRE_FILLED": "Formulario llenado",
+      "QUESTIONNAIRE_CORRECTED": "Formulario corregido"
     },
     "detail": {
       "filesUploaded": "{{count}} archivos subidos",
@@ -443,7 +854,10 @@
         "bloodType": "Tipo de sangre",
         "occupation": "Ocupación",
         "branchUuid": "Sede",
-        "warrantyDocumentUuid": "Archivo de la garantía"
+        "branchUuids": "Sedes",
+        "warrantyDocumentUuid": "Archivo de la garantía",
+        "otoscopyRight": "OD (oído derecho)",
+        "otoscopyLeft": "OI (oído izquierdo)"
       },
       "statuses": {
         "ACTIVE": "Activo",
@@ -455,14 +869,34 @@
         "WARRANTY_CHANGED": "Garantía activada",
         "VIDEO_CANDIDATE_CHANGED": "Marcado como candidato",
         "WARRANTY_EXPIRED_CHANGED": "Garantía marcada como expirada",
-        "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta"
+        "RENEW_PRESCRIPTION_CHANGED": "Marcado para renovar la receta",
+        "PRIORITY_CHANGED": "Marcado como prioridad"
       },
+      "labShipment": {
+        "sent": "Audífonos enviados al laboratorio el {{date}}",
+        "dateChanged": "Fecha de envío cambiada: {{before}} → {{after}}",
+        "delivered": "Registró la entrega de audífonos del laboratorio ({{date}})",
+        "deliveredWithNote": "Registró la entrega de audífonos del laboratorio ({{date}}) con nota"
+      },
+      "maintenance": {
+        "UNMARKED": "Mantenimiento {{number}}: pendiente",
+        "ATTENDED": "Mantenimiento {{number}}: recepción",
+        "MISSED": "Mantenimiento {{number}}: lo perdió"
+      },
+      "contactAttempts": "Intentos: {{before}} → {{after}}",
+      "maintenanceDone": "Mantenimiento {{number}}: hecho",
+      "maintenanceUndone": "Mantenimiento {{number}}: sin marcar",
+      "maintenanceNoteAdded": "Mantenimiento {{number}}: agregó una nota",
+      "maintenanceNoteChanged": "Mantenimiento {{number}}: cambió la nota",
+      "questionnaireFilled": "Llenó «{{name}}»",
+      "questionnaireCorrected": "Corrigió «{{name}}»",
       "flagOff": {
         "HEARING_AIDS_LAB_CHANGED": "Devueltos del laboratorio",
         "WARRANTY_CHANGED": "Garantía desactivada",
         "VIDEO_CANDIDATE_CHANGED": "Ya no es candidato",
         "WARRANTY_EXPIRED_CHANGED": "Garantía ya no marcada como expirada",
-        "RENEW_PRESCRIPTION_CHANGED": "Ya no hay que renovar la receta"
+        "RENEW_PRESCRIPTION_CHANGED": "Ya no hay que renovar la receta",
+        "PRIORITY_CHANGED": "Prioridad quitada"
       }
     }
   },
@@ -490,7 +924,16 @@
       "noResultsDescription": "Prueba con otro nombre o cambia el filtro.",
       "registeredBy": "Registrado por:",
       "editLabel": "Editar {{name}}",
+      "updatedAt": "Actualizada el {{date}}",
       "deleteLabel": "Eliminar {{name}}"
+    },
+    "audiometry": {
+      "name": "Audiometría",
+      "openLabel": "Ver audiometría del {{date}}",
+      "modalLabel": "Informe de audiometría",
+      "loadError": "No se pudo cargar la audiometría.",
+      "detail": "Audiometría · Informe",
+      "ptaSummary": "PTA OD {{right}} / OI {{left}}"
     },
     "preview": {
       "label": "Vista previa de {{name}}",
@@ -518,58 +961,196 @@
     }
   },
   "patients": {
+    "form": {
+      "branchesLabel": "Sedes",
+      "branchesPlaceholder": "Elige una o más sedes",
+      "branchesRequired": "Elige al menos una sede",
+      "branchesHint": "Puedes elegir varias sedes"
+    },
     "summary": {
       "tentative": "Citas tentativas este mes",
       "confirmed": "Citas confirmadas este mes",
       "controls": "Controles este mes",
       "hearingAids": "Audífonos en laboratorio"
     },
+    "clinicalSummary": {
+      "title": "Generar resumen",
+      "description": "Elige qué va en el resumen. Antes de imprimirlo lo vas a poder revisar y corregir.",
+      "close": "Cerrar",
+      "generate": "Generar resumen",
+      "noRecords": "Sin registros",
+      "noAnswers": "Sin respuestas",
+      "loadError": "No se pudieron cargar los datos del resumen.",
+      "preview": {
+        "title": "Vista previa del resumen",
+        "help": "Toca un texto para corregirlo. Los cambios solo salen en este PDF.",
+        "back": "Volver",
+        "print": "Imprimir",
+        "discardTitle": "¿Descartar los cambios?",
+        "discardMessage": "Si vuelves, se pierden los textos que corregiste en esta vista previa.",
+        "discardConfirm": "Descartar y volver",
+        "discardCancel": "Seguir editando"
+      },
+      "cardLoadError": "No se pudo cargar",
+      "retry": "Reintentar",
+      "templatesPlaceholder": "Elige las plantillas",
+      "templatesSearch": "Buscar plantilla",
+      "templatesNoResults": "No hay plantillas con ese nombre.",
+      "templatesSelected_one": "{{count}} plantilla",
+      "templatesSelected_other": "{{count}} plantillas",
+      "templatesRemove": "Quitar {{label}}",
+      "templatesEmpty": "Todavía no hay plantillas de documento.",
+      "audiometryPlaceholder": "Elige las audiometrías",
+      "audiometrySearch": "Buscar audiometría",
+      "audiometryNoResults": "No hay audiometrías con ese dato.",
+      "audiometrySelected_one": "{{count}} audiometría",
+      "audiometrySelected_other": "{{count}} audiometrías",
+      "audiometryRemove": "Quitar {{label}}",
+      "audiometryEmpty": "Sin audiometrías válidas",
+      "audiometryOption": "{{date}} · {{author}}",
+      "fileType": {
+        "summary": "Resumen clínico",
+        "audiometry": "Audiometría"
+      },
+      "sections": {
+        "technicalSheet": "Ficha técnica",
+        "templates": "Plantillas de documento",
+        "background": "Historia clínica",
+        "audiometry": "Audiometrías"
+      },
+      "document": {
+        "title": "Resumen del expediente",
+        "phone": "Teléfono",
+        "issued": "Emitido",
+        "branch_one": "Sede",
+        "branch_other": "Sedes",
+        "authorship": "{{author}}, {{date}}"
+      }
+    },
     "flags": {
       "menu": "Indicadores",
       "title": "Indicadores del paciente",
-      "description": "Se guarda al tocar cada opción.",
+      "description": "Se guarda al tocar.",
       "done": "Listo",
+      "close": "Cerrar",
       "sections": {
         "lab": "Laboratorio",
-        "warranty": "Estado de garantía"
+        "warranty": "Garantía",
+        "maintenance": "Mantenimiento"
+      },
+      "maintenance": {
+        "rowTitle": "Mantenimiento {{number}}",
+        "choiceAttended": "Recepción",
+        "choiceMissed": "Lo perdió",
+        "choiceLabel": "Mantenimiento {{number}}: {{choice}}",
+        "toasts": {
+          "UNMARKED": "Mantenimiento {{number}} pendiente",
+          "ATTENDED": "Mantenimiento {{number}}: recepción",
+          "MISSED": "Mantenimiento {{number}}: lo perdió"
+        },
+        "pillLabels": {
+          "ATTENDED": "Mantenimiento {{number}}: recepción",
+          "MISSED": "Mantenimiento {{number}}: lo perdió"
+        },
+        "pill": "Mant. {{number}}",
+        "notesToggleLabel": "{{action}} · {{title}}",
+        "notesToggleEmpty": "Agregar nota",
+        "notesToggleUnknown": "Notas",
+        "notesToggleCount_one": "{{count}} nota",
+        "notesToggleCount_other": "{{count}} notas",
+        "notePlaceholder": "Escribe una nota",
+        "missedHint": "Escribe una nota para marcarlo como perdido",
+        "save": "Guardar",
+        "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",
+        "missedStatusError": "La nota quedó guardada, pero no se pudo marcar como perdido.",
+        "missedStatusRetry": "Reintentar",
+        "noteMeta": "{{date}} · {{author}}",
+        "showAll": "Ver todas ({{count}})",
+        "showLess": "Ver menos",
+        "notesLoading": "Cargando notas…",
+        "notesError": "No se pudieron cargar las notas.",
+        "notesRetry": "Reintentar"
       },
       "labels": {
         "hearingAidsInLab": "Audífonos en laboratorio",
         "hasActiveWarranty": "Garantía activa",
         "isVideoCandidate": "Candidato a video",
         "warrantyExpired": "Garantía expirada",
-        "renewPrescription": "Renovar receta"
+        "renewPrescription": "Renovar receta",
+        "isPriority": "Prioridad"
+      },
+      "priority": {
+        "mark": "Marcar como prioridad",
+        "unmark": "Quitar prioridad",
+        "patientAction": "{{action}}: {{name}}"
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
         "hasActiveWarranty": "Garantía activada",
         "isVideoCandidate": "Marcado como candidato a video",
         "warrantyExpired": "Garantía marcada como expirada",
-        "renewPrescription": "Marcado para renovar la receta"
+        "renewPrescription": "Marcado para renovar la receta",
+        "isPriority": "Paciente marcado como prioridad"
       },
       "toastsOff": {
         "hearingAidsInLab": "Audífonos devueltos al paciente",
         "hasActiveWarranty": "Garantía desactivada",
         "isVideoCandidate": "Ya no es candidato a video",
         "warrantyExpired": "Garantía ya no marcada como expirada",
-        "renewPrescription": "Ya no hay que renovar la receta"
+        "renewPrescription": "Ya no hay que renovar la receta",
+        "isPriority": "Prioridad quitada"
       },
       "columns": {
         "hearingAidsInLab": "Audífonos",
         "hasActiveWarranty": "Garantía",
         "isVideoCandidate": "Video",
         "warrantyExpired": "Garantía expirada",
-        "renewPrescription": "Receta"
+        "renewPrescription": "Receta",
+        "isPriority": "Prioridad"
       },
       "values": {
         "hearingAidsInLab": "En laboratorio",
         "hasActiveWarranty": "Activa",
         "isVideoCandidate": "Candidato",
         "warrantyExpired": "Expirada",
-        "renewPrescription": "Renovar"
+        "renewPrescription": "Renovar",
+        "isPriority": "Prioritario"
       },
       "offValues": {
         "hasActiveWarranty": "Sin garantía"
+      },
+      "labShipment": {
+        "dateLabel": "Fecha de envío",
+        "filterDayLabel": "Día de envío",
+        "filterDayClear": "Quitar día",
+        "shippedOn": "Enviados el {{date}}",
+        "changeDate": "Cambiar fecha",
+        "dateUpdated": "Fecha de envío actualizada",
+        "sinceValue": "En laboratorio desde el {{date}}",
+        "save": "Guardar envío",
+        "delivery": {
+          "title": "Entrega de audífonos",
+          "dateLabel": "Fecha de entrega",
+          "noteLabel": "Nota (opcional)",
+          "noteHelp": "Si escribes una nota, también queda en Control de evolución.",
+          "hint": "Al guardar, los audífonos salen del laboratorio.",
+          "save": "Guardar entrega",
+          "toast": "Entrega registrada"
+        },
+        "history": {
+          "title": "Historial de envíos",
+          "loading": "Cargando el historial de envíos…",
+          "empty": "Todavía no hay envíos registrados.",
+          "error": "No se pudo cargar el historial de envíos.",
+          "sent": "Enviado {{date}}",
+          "delivered": "Entregado {{date}}",
+          "inLab": "En laboratorio desde {{date}}",
+          "deliveredBy": "Entrega registrada por {{name}}",
+          "showAll": "Ver todos ({{count}})",
+          "showLess": "Mostrar solo los últimos {{count}}",
+          "noteMore": "Ver más",
+          "noteLess": "Ver menos"
+        }
       },
       "warrantyDocument": {
         "label": "Archivo de la garantía",
@@ -608,12 +1189,15 @@
       "hourNone": "Sin hora",
       "typeLabel": "Tipo de cita",
       "typePlaceholder": "Seleccione un tipo",
+      "branchLabel": "Sede",
+      "branchPlaceholder": "Elige la sede de la cita",
       "noTypes": "No hay tipos de cita configurados. Pide a soporte que los agregue.",
       "back": "Volver",
       "validation": {
         "monthRequired": "Elige el mes tentativo",
         "typeRequired": "El tipo de cita es obligatorio",
         "dateRequired": "La fecha es obligatoria",
+        "branchRequired": "Elige la sede de la cita",
         "datePast": "La fecha no puede ser en el pasado"
       },
       "toasts": {
@@ -637,22 +1221,213 @@
       "contacts": "Contactos",
       "patientContact": "Paciente",
       "editContacts": "Editar contactos",
+      "evolutionNote": {
+        "viewAudiometry": "Ver audiometría",
+        "openAudiometryLabel": "Ver la audiometría de esta nota"
+      },
+      "audiometry": {
+        "title": "Audiometría",
+        "save": "Guardar audiometría",
+        "saved": "Audiometría guardada",
+        "historyAria": "Historial de audiometrías",
+        "newEntry": "Audiometría nueva",
+        "newEntryButton": "Nueva audiometría",
+        "savedBanner": "Audiometría guardada. Registrada por {{author}} · {{date}}",
+        "readOnlyNotice": "Guardada, solo lectura.",
+        "entryWithPta": "{{date}} · PTA OD {{right}} / OI {{left}}",
+        "saveHint": "Marca al menos un punto para guardar",
+        "entryAuthorDate": "Registrada por {{author}} · {{date}}",
+        "entryLoading": "Cargando la audiometría…",
+        "print": "Imprimir",
+        "entryTyped": "{{date}} · {{type}}",
+        "entryScreening": "{{date}} · {{type}} · {{result}}",
+        "type": {
+          "label": "Tipo de audiometría",
+          "current": "Tipo: {{type}}",
+          "changeTitle": "¿Cambiar de tipo?",
+          "changeMessage": "Se pierde lo que ya marcaste o escribiste.",
+          "changeConfirm": "Cambiar de tipo",
+          "changeCancel": "Seguir aquí"
+        },
+        "screening": {
+          "resultLabel": "Resultado",
+          "pass": "Pasa",
+          "refer": "Refiere",
+          "resultRequired": "Elige Pasa o Refiere para guardar"
+        },
+        "invalidate": {
+          "button": "Marcar como mal hecha",
+          "tag": "Mal hecha",
+          "menuAria": "Más acciones de la audiometría",
+          "title": "Marcar como mal hecha",
+          "warning": "Esto no se puede deshacer. La audiometría se queda en el historial y se puede imprimir, pero ya no entra en los resúmenes.",
+          "reasonLabel": "Motivo",
+          "reasonPlaceholder": "Cuenta qué salió mal con esta audiometría",
+          "reasonCount": "{{current}} de {{max}}",
+          "cancel": "Cancelar",
+          "confirm": "Marcar como mal hecha",
+          "success": "Audiometría marcada como mal hecha",
+          "alreadyMarked": "Esa audiometría ya estaba marcada como mal hecha.",
+          "banner": "Mal hecha. Marcada por {{author}} · {{date}}",
+          "bannerReason": "Motivo: {{reason}}"
+        },
+        "report": {
+          "title": "Informe de audiometría",
+          "patient": "Paciente",
+          "documentId": "Identificación",
+          "age": "Edad",
+          "birthDate": "Fecha de nacimiento",
+          "date": "Fecha de la audiometría",
+          "professional": "Profesional",
+          "frequencyHz": "{{frequency}} Hz",
+          "signature": "Firma del profesional",
+          "printedOn": "Impreso el {{date}}"
+        },
+        "audiogramTitle": "Audiograma",
+        "audiogramAria": "Audiograma del {{ear}}",
+        "ears": {
+          "right": "Oído derecho",
+          "left": "Oído izquierdo"
+        },
+        "earsShort": {
+          "right": "OD",
+          "left": "OI"
+        },
+        "clearAudiogram": "Limpiar audiograma",
+        "clearSpeech": "Limpiar logoaudiometría",
+        "toolbarLabel": "Herramientas de marcado",
+        "masked": "Enmascarado",
+        "noResponse": "Sin respuesta",
+        "tools": {
+          "air": "Vía aérea",
+          "bone": "Vía ósea",
+          "ucl": "Umbral de molestia",
+          "mcl": "Nivel de confort",
+          "freeField": "Campo libre"
+        },
+        "grades": {
+          "normal": "Normal",
+          "slight": "Mínima",
+          "mild": "Leve",
+          "moderate": "Moderada",
+          "moderatelySevere": "Moderadamente severa",
+          "severe": "Severa",
+          "profound": "Profunda",
+          "totalLoss": "Cofosis"
+        },
+        "gradesShort": {
+          "moderatelySevere": "Mod. severa"
+        },
+        "legend": {
+          "title": "Simbología",
+          "air": "Vía aérea",
+          "airMasked": "Vía aérea enmascarada",
+          "bone": "Vía ósea",
+          "boneMasked": "Vía ósea enmascarada",
+          "ucl": "Umbral de molestia (UCL)",
+          "mcl": "Nivel de confort (MCL)",
+          "freeField": "Campo libre",
+          "noResponse": "Sin respuesta (flecha hacia abajo)"
+        },
+        "speech": {
+          "title": "Logoaudiometría",
+          "earLabel": "Oído de la logoaudiometría",
+          "aria": "Gráfico de logoaudiometría",
+          "normalCurve": "Curva normal"
+        },
+        "wordLists": {
+          "panelTitle": "{{type}} · Lista {{id}}",
+          "typePlaceholder": "Tipo de lista",
+          "listPlaceholder": "Lista",
+          "hideAria": "Ocultar lista de palabras",
+          "typeAria": "Tipo de lista de palabras",
+          "types": {
+            "bisyllable": "Bisílabos (Tato)",
+            "monosyllable": "Monosílabos (Rosenblüt y De Cruz)"
+          },
+          "typesShort": {
+            "bisyllable": "Bisílabos",
+            "monosyllable": "Monosílabos"
+          },
+          "column": "Columna {{number}}",
+          "selectAria": "Lista de palabras",
+          "option": "Lista {{id}}",
+          "note": "Solo de referencia para leerle las palabras al paciente. Los puntos se siguen marcando a mano en el gráfico."
+        },
+        "notes": {
+          "diagnosisTitle": "Diagnóstico",
+          "observationsTitle": "Observaciones"
+        },
+        "ptaTypes": {
+          "pta512": "PTA 512",
+          "pta5124": "PTA 4 frec.",
+          "pta124": "PTA alta frecuencia (124)",
+          "pta251": "PTA baja frecuencia (251)"
+        },
+        "summary": {
+          "title": "Resumen",
+          "metric": "Medida",
+          "pta": "PTA (dB)",
+          "ptaTypeAria": "Tipo de PTA",
+          "ptaInfoAria": "Ver las frecuencias de cada tipo de PTA",
+          "ptaInfoTitle": "Frecuencias que promedia cada PTA",
+          "ptaInfoItem": "{{name}}: {{frequencies}} Hz",
+          "ptaValue": "{{value}} dB",
+          "grade": "Grado de pérdida",
+          "gradeInfoAria": "Ver los rangos de cada grado de pérdida",
+          "gradeInfoTitle": "Grados de pérdida auditiva ({{scale}})",
+          "gradeInfoItem": "{{name}}: {{from}} a {{to}} dB",
+          "gradeInfoItemOpen": "{{name}}: {{from}} dB o más",
+          "gradeInfoSourceAsha": "Según ASHA (Clark, 1981), calculado con el PTA 512.",
+          "gradeInfoSourceBiap": "Según BIAP (recomendación 02/1), calculado con el PTA de 4 frecuencias (500, 1000, 2000 y 4000 Hz).",
+          "gradeScaleAria": "Escala para clasificar el grado de pérdida",
+          "gradeScaleAsha": "ASHA",
+          "gradeScaleBiap": "BIAP",
+          "speechThreshold": "Umbral vocal (dB)",
+          "speechThresholdAria": "Umbral vocal, {{ear}}",
+          "maxDiscrimination": "Discriminación máxima (%)",
+          "maxDiscriminationAria": "Discriminación máxima, {{ear}}",
+          "failedWords": "Palabras falladas",
+          "failedWordsAria": "Palabras falladas, {{ear}}",
+          "failedWordsInfoAria": "Ver cómo se calcula la discriminación con las palabras falladas",
+          "failedWordsInfoItem": "{{name}}: {{count}} palabras por oído, cada una vale {{value}} %",
+          "weberTitle": "Prueba de Weber",
+          "weberFrequency": "Weber {{frequency}} Hz",
+          "weberAria": "Resultado de Weber a {{frequency}} Hz",
+          "empty": "—"
+        },
+        "weber": {
+          "center": "Centro",
+          "right": "Derecha",
+          "left": "Izquierda"
+        }
+      },
       "fields": {
         "documentId": "Cédula",
         "birthDate": "Nacimiento",
-        "branch": "Sede"
+        "branch_one": "Sede",
+        "branch_other": "Sedes"
       },
       "actions": {
         "edit": "Modificar paciente",
-        "changeStatus": "Cambiar estado"
+        "changeStatus": "Cambiar estado",
+        "generateSummary": "Generar resumen"
       }
+    },
+    "physicalExam": {
+      "save": "Guardar otoscopia",
+      "saved": "Otoscopia guardada en Control de evolución",
+      "emptyError": "Escribe lo observado en al menos un oído para guardar la otoscopia."
     },
     "background": {
       "title": "Historia clínica",
       "loading": "Cargando historia clínica...",
       "loadError": "No se pudo cargar la historia clínica",
-      "empty": "Se llena una sola vez, la primera vez que viene el paciente. Marca Sí en lo que tenga o haya tenido.",
-      "finalHint": "Revísala antes de guardar: después ya no se puede modificar.",
+      "empty": "Se llena una sola vez, la primera vez que viene el paciente. Responde Sí o No en cada pregunta.",
+      "finalHint": "Revísala antes de guardar: si después la editas, queda un PDF con lo que cambió en Archivos.",
+      "progressMissing_one": "Falta {{count}} de {{total}} por responder",
+      "progressMissing_other": "Faltan {{count}} de {{total}} por responder",
+      "progressDone": "Listo: {{total}} de {{total}} respondidas",
       "historyTitle": "Antecedentes",
       "otoscopyTitle": "Exploración física (Otoscopia)",
       "rightEar": "OD (oído derecho)",
@@ -713,7 +1488,6 @@
       "contact": "Contacto",
       "nameHint": "Vacío si es del paciente. Si es de un familiar: María (hija)",
       "phone": "Teléfono",
-      "phoneHint": "Formato: 8888-8888",
       "remove": "Quitar contacto",
       "add": "Agregar contacto",
       "saved": "Contactos guardados"

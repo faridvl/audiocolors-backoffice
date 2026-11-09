@@ -34,3 +34,7 @@ export type ClinicalAnswer = boolean | string | { value: boolean; detail?: strin
 export const CLINICAL_FIELD_LABEL_MAX_LENGTH = 120;
 export const CLINICAL_SECTION_MAX_LENGTH = 60;
 export const CLINICAL_TEMPLATE_MAX_FIELDS = 100;
+
+/** Las secciones propias de "Preguntas": una plantilla por sección. */
+export const QUESTIONNAIRE_SPECIALITY = 'QUESTIONNAIRE';
+export const QUESTIONNAIRE_NAME_MAX_LENGTH = 60;

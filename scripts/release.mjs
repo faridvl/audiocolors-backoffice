@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Versiones de la app y sus notificaciones de novedades (RULES.md §10).
+// Versiones de la app y sus notificaciones de novedades (RULES.md §8).
 //   node scripts/release.mjs bump 1.1.0   sube la versión y deja lista su entrada de novedades
 //   node scripts/release.mjs check [--base origin/main]   falla si la versión no está documentada
 import { execFileSync } from 'node:child_process';

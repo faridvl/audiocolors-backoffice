@@ -5,6 +5,8 @@ import {
   APPOINTMENT_TYPE_DURATIONS,
   APPOINTMENT_TYPE_NAME_MAX_LENGTH,
   AppointmentType,
+  CreateAppointmentTypePayload,
+  NEW_APPOINTMENT_TYPE_DURATION,
   UpdateAppointmentTypePayload,
 } from '@/types/appointments/appointment-type';
 
@@ -19,18 +21,34 @@ export enum ControlChange {
   REMOVE = 'REMOVE',
 }
 
+const DIACRITICS = /[\u0300-\u036f]/g;
+
+/** Para comparar nombres: sin espacios en los extremos, sin tildes y sin mayúsculas. */
+const toComparableName = (value: string) =>
+  value.normalize('NFD').replace(DIACRITICS, '').trim().toLowerCase();
+
+/** Sin tipo, el formulario crea uno nuevo; con tipo, edita ese. */
 export function useEditAppointmentType(
-  appointmentType: AppointmentType,
+  appointmentType: AppointmentType | null,
   currentControl: AppointmentType | null,
+  existingNames: string[],
   onSave: (typeUuid: string, changes: UpdateAppointmentTypePayload) => void,
+  onCreate: (payload: CreateAppointmentTypePayload) => void,
 ) {
   const { t } = useTranslation();
-  const [name, setName] = useState(appointmentType.name);
-  const [duration, setDuration] = useState<number | null>(appointmentType.duration);
-  const [isControl, setIsControl] = useState(appointmentType.isControl);
+  const isNew = appointmentType === null;
+  const [name, setName] = useState(appointmentType?.name ?? '');
+  const [duration, setDuration] = useState<number | null>(
+    appointmentType ? appointmentType.duration : NEW_APPOINTMENT_TYPE_DURATION,
+  );
+  const [isControl, setIsControl] = useState(appointmentType?.isControl ?? false);
 
   const trimmedName = name.trim();
+  const isDuplicateName = existingNames.some(
+    (existing) => toComparableName(existing) === toComparableName(trimmedName),
+  );
   const isDirty =
+    appointmentType === null ||
     trimmedName !== appointmentType.name ||
     duration !== appointmentType.duration ||
     isControl !== appointmentType.isControl;
@@ -38,24 +56,29 @@ export function useEditAppointmentType(
   // Una duración guardada fuera de la lista (por ejemplo 20) se sigue ofreciendo.
   const durationOptions = useMemo(() => {
     const minutes = new Set(APPOINTMENT_TYPE_DURATIONS);
-    if (appointmentType.duration) minutes.add(appointmentType.duration);
+    if (appointmentType?.duration) minutes.add(appointmentType.duration);
     return [...minutes]
       .sort((first, second) => first - second)
       .map((value) => ({
         value,
         label: t(TEXT.SETTINGS.APPOINTMENT_TYPES.MINUTES, { count: value }),
       }));
-  }, [appointmentType.duration, t]);
+  }, [appointmentType?.duration, t]);
 
   let controlChange = ControlChange.NONE;
-  if (isControl && !appointmentType.isControl) {
+  const wasControl = appointmentType?.isControl ?? false;
+  if (isControl && !wasControl) {
     controlChange = currentControl ? ControlChange.REPLACE : ControlChange.SET;
-  } else if (!isControl && appointmentType.isControl) {
+  } else if (!isControl && wasControl) {
     controlChange = ControlChange.REMOVE;
   }
 
   const handleSave = () => {
-    if (!trimmedName || !isDirty) return;
+    if (!trimmedName || !isDirty || isDuplicateName) return;
+    if (!appointmentType) {
+      onCreate({ name: trimmedName, duration, isControl });
+      return;
+    }
     const changes: UpdateAppointmentTypePayload = {};
     if (trimmedName !== appointmentType.name) changes.name = trimmedName;
     if (duration !== appointmentType.duration) changes.duration = duration;
@@ -71,6 +94,8 @@ export function useEditAppointmentType(
     controlChange,
     isDirty,
     isNameMissing: !trimmedName,
+    isDuplicateName,
+    isNew,
     handleNameChange: (value: string) => setName(value.slice(0, APPOINTMENT_TYPE_NAME_MAX_LENGTH)),
     handleDurationChange: (value: string) => setDuration(value ? Number(value) : null),
     handleControlChange: setIsControl,

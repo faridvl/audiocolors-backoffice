@@ -7,10 +7,12 @@ import { TEXT } from '@/static/texts/i18n';
 import { NotificationList } from './notification-list';
 import { ReleaseDetail } from './release-detail';
 import { AppNotification } from './use-notifications';
+import { ReleaseNotification } from './build-notifications';
+import { Release } from '@/static/releases';
 
 interface NotificationsPanelProps {
   notifications: AppNotification[];
-  selected: AppNotification | null;
+  selected: ReleaseNotification<Release> | null;
   isUnread: (id: string) => boolean;
   onSelect: (id: string) => void;
   onBack: () => void;
@@ -45,7 +47,7 @@ export const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
       <div
         role="dialog"
         aria-label={t(TEXT.NOTIFICATIONS.TITLE)}
-        className="absolute right-0 top-full z-50 mt-2 flex max-h-[min(36rem,calc(100dvh-6rem))] w-[min(24rem,calc(100vw-2rem))] origin-top-right flex-col overflow-hidden rounded-lg border border-ink-200 bg-white shadow-lg"
+        className="absolute right-0 top-full z-50 mt-2 flex max-h-[min(36rem,calc(100dvh-6rem))] w-[min(30rem,calc(100vw-2rem))] origin-top-right flex-col overflow-hidden rounded-lg border border-ink-200 bg-white shadow-lg"
       >
         <div className="flex min-h-[52px] items-center gap-1 border-b border-ink-100 px-2">
           {selected && (

@@ -2,10 +2,17 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { isLabConflict } from '@/shared/api/mutations/patients/handle-lab-conflict';
 import { useUpdatePatientFlagMutation } from '@/shared/api/mutations/patients/update-patient-flag-mutation';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import {
+  FETCH_PATIENT_LAB_SHIPMENTS_KEY,
+  usePatientLabShipmentsQuery,
+} from '@/shared/api/querys/patient-lab-shipments-query';
+import { toClinicDayKey } from '@/shared/utils/dates';
+import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, PATIENT_FLAG_SINCE_FIELDS, PatientFlag } from '@/types/patients/patient';
 
@@ -14,12 +21,15 @@ export interface PatientFlagItem {
   label: string;
   isOn: boolean;
   isUpdating: boolean;
+  /** Texto bajo el label (audífonos: "Enviados el 28 oct 2026"). */
+  description?: string;
 }
 
 /** Secciones del modal de indicadores. Candidato a video va aparte, como casilla en el expediente. */
 export enum PatientFlagSection {
   LAB = 'lab',
   WARRANTY = 'warranty',
+  MAINTENANCE = 'maintenance',
 }
 
 const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
@@ -29,22 +39,46 @@ const SECTION_FLAGS: Record<PatientFlagSection, PatientFlag[]> = {
     PatientFlag.WARRANTY_EXPIRED,
     PatientFlag.RENEW_PRESCRIPTION,
   ],
+  [PatientFlagSection.MAINTENANCE]: [],
 };
 
-export function usePatientFlags(patient: Patient) {
+export function usePatientFlags(
+  patient: Patient,
+  initialSection: PatientFlagSection = PatientFlagSection.LAB,
+) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { executeUpdatePatientFlag } = useUpdatePatientFlagMutation();
   const [updatingFlag, setUpdatingFlag] = useState<PatientFlag | null>(null);
-  const [activeSection, setActiveSection] = useState(PatientFlagSection.LAB);
+  const [activeSection, setActiveSection] = useState(initialSection);
+  // Fecha de envío en edición (null = el campo está cerrado): al prender los audífonos no se
+  // guarda hasta confirmarla.
+  const [shipmentDate, setShipmentDate] = useState<string | null>(null);
+  // Formulario de entrega abierto: apagar el switch no guarda hasta confirmarlo.
+  const [isDelivering, setIsDelivering] = useState(false);
+  // La entrega con nota escrita o guardándose no debe perderse por un Esc o un clic en el fondo.
+  const [isDeliveryGuarded, setIsDeliveryGuarded] = useState(false);
+  const { data: shipments } = usePatientLabShipmentsQuery(patient.uuid);
+  const openShipmentUuid = shipments?.find((shipment) => !shipment.deliveredAt)?.uuid;
+  const today = toClinicDayKey(new Date().toISOString());
+  const isLabOn = Boolean(patient.hearingAidsInLabSince);
 
   // El API guarda desde cuándo está prendido, pero solo importa si lo está.
-  const buildItem = (flag: PatientFlag): PatientFlagItem => ({
-    flag,
-    label: t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`),
-    isOn: Boolean(patient[PATIENT_FLAG_SINCE_FIELDS[flag]]),
-    isUpdating: updatingFlag === flag,
-  });
+  const buildItem = (flag: PatientFlag): PatientFlagItem => {
+    const isLab = flag === PatientFlag.HEARING_AIDS_IN_LAB;
+    const since = patient[PATIENT_FLAG_SINCE_FIELDS[flag]];
+    return {
+      flag,
+      label: t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${flag}`),
+      // Mientras se elige la fecha el switch ya se ve prendido.
+      isOn: Boolean(since) || (isLab && shipmentDate !== null),
+      isUpdating: updatingFlag === flag,
+      description:
+        isLab && since && shipmentDate === null
+          ? t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.SHIPPED_ON, { date: formatDate(since) })
+          : undefined,
+    };
+  };
 
   const sections = Object.values(PatientFlagSection).map((section) => ({
     key: section,
@@ -54,23 +88,75 @@ export function usePatientFlags(patient: Patient) {
   const videoCandidate = buildItem(PatientFlag.VIDEO_CANDIDATE);
 
   const handleToggle = (flag: PatientFlag, isOn: boolean) => {
+    if (flag === PatientFlag.HEARING_AIDS_IN_LAB) {
+      if (isOn) {
+        setIsDelivering(false);
+        setShipmentDate(today);
+        return;
+      }
+      setShipmentDate(null);
+      // Con el indicador guardado, apagarlo es entregar; si no, era cancelar al prender.
+      if (isLabOn) setIsDelivering(true);
+      return;
+    }
+    saveFlag(flag, isOn);
+  };
+
+  const handleStartDateChange = () => {
+    setIsDelivering(false);
+    setShipmentDate(
+      patient.hearingAidsInLabSince ? toClinicDayKey(patient.hearingAidsInLabSince) : today,
+    );
+  };
+
+  // La fecha abierta es de Laboratorio: al cambiar de pestaña se descarta.
+  const handleSectionChange = (section: PatientFlagSection) => {
+    setActiveSection(section);
+    setShipmentDate(null);
+    setIsDelivering(false);
+  };
+
+  const handleSaveShipmentDate = () => {
+    if (!shipmentDate) return;
+    // El uuid solo viaja al corregir la fecha del envío abierto, no al abrir uno nuevo.
+    saveFlag(
+      PatientFlag.HEARING_AIDS_IN_LAB,
+      true,
+      shipmentDate,
+      isLabOn ? openShipmentUuid : undefined,
+    );
+  };
+
+  const saveFlag = (flag: PatientFlag, isOn: boolean, date?: string, shipmentUuid?: string) => {
     setUpdatingFlag(flag);
     executeUpdatePatientFlag(
-      { patientUuid: patient.uuid, flag, isOn },
+      { patientUuid: patient.uuid, flag, isOn, date, shipmentUuid },
       {
         onSuccess: (updated) => {
+          setShipmentDate(null);
           const field = PATIENT_FLAG_SINCE_FIELDS[flag];
           queryClient.setQueryData([FETCH_PATIENT_KEY, patient.uuid], (previous?: Patient) =>
             previous ? { ...previous, [field]: updated[field] ?? null } : previous,
           );
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENTS_KEY] });
           void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
+          void queryClient.invalidateQueries({
+            queryKey: [FETCH_PATIENT_LAB_SHIPMENTS_KEY, patient.uuid],
+          });
           const prefix = isOn
             ? TEXT.PATIENTS.FLAGS.TOAST_ON_PREFIX
             : TEXT.PATIENTS.FLAGS.TOAST_OFF_PREFIX;
-          toast.success(t(`${prefix}.${flag}`));
+          toast.success(
+            isOn && isLabOn && flag === PatientFlag.HEARING_AIDS_IN_LAB
+              ? t(TEXT.PATIENTS.FLAGS.LAB_SHIPMENT.DATE_UPDATED)
+              : t(`${prefix}.${flag}`),
+          );
         },
-        onError: (error: Error) => toast.error(error.message),
+        onError: (error: Error) => {
+          // El 409 ya salió como aviso y refrescó los datos: el formulario viejo se cierra.
+          if (isLabConflict(error)) setShipmentDate(null);
+          else toast.error(error.message);
+        },
         onSettled: () => setUpdatingFlag(null),
       },
     );
@@ -82,7 +168,26 @@ export function usePatientFlags(patient: Patient) {
     activeFlags: sections.find((section) => section.key === activeSection)?.flags ?? [],
     videoCandidate,
     handleToggle,
+    labShipment: {
+      isEditing: shipmentDate !== null,
+      isLabOn,
+      date: shipmentDate ?? today,
+      maxDate: today,
+      isSaving: updatingFlag === PatientFlag.HEARING_AIDS_IN_LAB,
+      isSaveDisabled: !shipmentDate || shipmentDate > today,
+      handleDateChange: setShipmentDate,
+      handleStartDateChange,
+      handleSave: handleSaveShipmentDate,
+      handleCancel: () => setShipmentDate(null),
+      isDelivering,
+      handleDeliveryCancel: () => setIsDelivering(false),
+      handleDelivered: () => setIsDelivering(false),
+      handleDeliveryGuardChange: setIsDeliveryGuarded,
+    },
+    isCloseBlocked: isDeliveryGuarded,
+    isLabSection: activeSection === PatientFlagSection.LAB,
     isWarrantySection: activeSection === PatientFlagSection.WARRANTY,
-    handleSectionChange: setActiveSection,
+    isMaintenanceSection: activeSection === PatientFlagSection.MAINTENANCE,
+    handleSectionChange,
   };
 }
