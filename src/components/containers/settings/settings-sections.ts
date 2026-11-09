@@ -23,8 +23,6 @@ export interface SettingsSectionItem {
   href: string;
   icon: LucideIcon;
   permission: Permission;
-  /** Formularios: mantienen un ancho de lectura cómodo; tablas y listas ocupan toda la columna. */
-  isNarrow?: boolean;
 }
 
 /** Secciones de Configuración en el orden en que se muestran; se agrupan por tarea, no por tabla. */
@@ -52,7 +50,6 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
     href: routesPrivate.settings.clinic,
     icon: Building2,
     permission: Permission.VIEW_CLINIC,
-    isNarrow: true,
   },
   {
     section: SettingsSection.USERS,

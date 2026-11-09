@@ -1168,3 +1168,10 @@ independientes:
 - Perfil: sin "Atiende pacientes" no se muestra "Datos profesionales"; una nota gris pequeña (`profile.notProfessional`) queda dentro de la tarjeta "Tu cuenta".
 - Ya estaban resueltos por permisos: menú y Configuración sin "Usuarios" para Recepción, y Mantenimiento oculto sin acceso clínico (D72). La ficha del paciente no tiene campos clínicos propios (como `bloodType`), así que no hay nada más que ocultar en el front.
 - El front ahora permite al Propietario administrar a otro Propietario (editar, contraseña, nivel y estado), como ya hacía el API; `getUserActions` recibe el nivel del actor y sin actor un Propietario ajeno queda de solo lectura. Nadie cambia su propio nivel ni estado, y el API valida que quede un Propietario activo.
+
+## D74 · Configuración estandarizada (2026-11-09)
+
+- Todas las secciones de Configuración (Tipos de cita, Formularios, Plantillas, Clínica, Usuarios) ocupan el ancho completo de la columna; se quitó `isNarrow`.
+- Piezas compartidas en `containers/settings/`: `SettingsCard` (`rounded-card border border-ink-200 bg-white`), `SettingsAddButton` (arriba a la derecha desde sm, ancho completo en móvil) y `SettingsSectionLoading`/`SettingsSectionError` (mismo `py`, icono y Reintentar).
+- Clínica va dentro de una `SettingsCard` con cuadrícula de 2 columnas desde `lg` (Nombre y Logo, Teléfono y Correo; Dirección y Guardar a ancho completo); una columna en móvil.
+- Bloques con `gap-4` en todas. Formularios conserva su botón punteado "Nueva sección" bajo la lista y Usuarios su `ResponsiveTable`, que ya trae la misma superficie.

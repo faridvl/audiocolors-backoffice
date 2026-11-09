@@ -5,13 +5,8 @@ import { RequirePermission } from '@/components/common/permission/require-permis
 import { useIsDesktop } from '@/hooks/use-is-desktop';
 import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
-import { tailwind } from '@/utils/tailwind-utils';
 import { SettingsNav } from './settings-nav';
-import {
-  sectionTitleKey,
-  SETTINGS_SECTIONS,
-  SettingsSection,
-} from './settings-sections';
+import { sectionTitleKey, SETTINGS_SECTIONS, SettingsSection } from './settings-sections';
 import { useSettingsNavigation } from './use-settings-navigation';
 
 interface SettingsLayoutProps {
@@ -23,10 +18,7 @@ interface SettingsLayoutProps {
  * Una sección de Configuración: en computadora con la lista de secciones a la
  * izquierda; en el celular sola, con "atrás" a la lista.
  */
-export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
-  section,
-  children,
-}) => {
+export const SettingsLayout: React.FC<SettingsLayoutProps> = ({ section, children }) => {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const { sections } = useSettingsNavigation();
@@ -43,13 +35,7 @@ export const SettingsLayout: React.FC<SettingsLayoutProps> = ({
         <aside className="hidden lg:sticky lg:top-0 lg:block">
           <SettingsNav sections={sections} activeSection={section} />
         </aside>
-        {/* Todas las secciones arrancan en la misma línea; solo los formularios limitan su ancho. */}
-        <div
-          className={tailwind(
-            'flex w-full min-w-0 flex-col gap-4',
-            sectionItem?.isNarrow && 'max-w-3xl',
-          )}
-        >
+        <div className="flex w-full min-w-0 flex-col gap-4">
           {permission ? (
             <RequirePermission permission={permission}>{children}</RequirePermission>
           ) : (

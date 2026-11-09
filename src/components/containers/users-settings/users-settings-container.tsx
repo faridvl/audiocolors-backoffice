@@ -1,10 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
-import { Eye, KeyRound, Pencil, Plus, UserCheck, UserX } from 'lucide-react';
+import { Eye, KeyRound, Pencil, UserCheck, UserX } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ActionMenu, ActionMenuItem } from '@/components/common/action-menu/action-menu';
 import { Badge } from '@/components/common/badge/badge';
-import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ConfirmDialog } from '@/components/common/confirm-dialog/confirm-dialog';
 import {
   ResponsiveTable,
@@ -16,6 +15,7 @@ import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
 import { ManagedUser, UserStatus } from '@/types/users/user';
 import { tailwind } from '@/utils/tailwind-utils';
+import { SettingsAddButton } from '../settings/settings-add-button';
 import { UserPasswordModal } from './user-password-modal';
 import { USER_STATUS_CLASSES } from './users-styles';
 import { useUsersSettings } from './use-users-settings';
@@ -187,14 +187,7 @@ export const UsersSettingsContainer: React.FC = () => {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <Button
-        variant={ButtonVariant.PRIMARY}
-        onClick={openNew}
-        icon={<Plus className={ICON_CLASSES} aria-hidden />}
-        className="w-full sm:w-auto sm:self-end"
-      >
-        {t(TEXTS.ADD)}
-      </Button>
+      <SettingsAddButton label={t(TEXTS.ADD)} onClick={openNew} />
 
       <ResponsiveTable
         columns={columns}
