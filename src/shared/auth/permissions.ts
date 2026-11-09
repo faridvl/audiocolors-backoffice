@@ -15,6 +15,8 @@ export enum Permission {
   EDIT_CLINIC = 'EDIT_CLINIC',
   /** Crear, desactivar y poner contraseña a los usuarios (con límites). */
   MANAGE_USERS = 'MANAGE_USERS',
+  /** Eliminar un paciente: Administración o Propietario, igual que en el API. */
+  DELETE_PATIENT = 'DELETE_PATIENT',
   /** Atiende pacientes, especialidades y nivel Propietario: solo el Propietario. */
   MANAGE_CLINICAL_ACCESS = 'MANAGE_CLINICAL_ACCESS',
 }
@@ -50,6 +52,7 @@ export function hasPermission(
     case Permission.VIEW_CLINIC:
     case Permission.EDIT_CLINIC:
     case Permission.MANAGE_USERS:
+    case Permission.DELETE_PATIENT:
       return isManagement;
     case Permission.MANAGE_CLINICAL_ACCESS:
       return subject.role === UserRole.OWNER;

@@ -32,6 +32,7 @@ export const TEXT = {
       EMPTY: 'common.phoneCountry.empty',
     },
     FORBIDDEN: 'common.forbidden',
+    BACK_HOME: 'common.backHome',
     CHARACTER_COUNT: 'common.characterCount',
     YES: 'common.yes',
     NO: 'common.no',

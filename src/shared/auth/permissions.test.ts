@@ -16,6 +16,7 @@ const MANAGEMENT_PERMISSIONS = [
   Permission.VIEW_CLINIC,
   Permission.EDIT_CLINIC,
   Permission.MANAGE_USERS,
+  Permission.DELETE_PATIENT,
 ];
 
 const ROLES = [UserRole.RECEPTION, UserRole.ADMIN, UserRole.OWNER];

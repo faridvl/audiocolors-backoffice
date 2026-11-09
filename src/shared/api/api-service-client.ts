@@ -49,7 +49,8 @@ export const ACCESS_REFRESHED_EVENT = 'access-refreshed';
 const REFRESH_ENDPOINT = '/auth/refresh';
 
 /**
- * Un 403 puede ser un acceso cambiado después de iniciar sesión (el token lleva el acceso viejo).
+ * Un 401 o un 403 puede ser un acceso cambiado después de iniciar sesión (el token lleva el
+ * acceso viejo).
  * Se pide un token nuevo; devuelve false si no se pudo.
  */
 const refreshAccessToken = async (): Promise<boolean> => {
@@ -125,8 +126,12 @@ async function fetcher<T>(url: string, options: RequestInit = {}, isRetry = fals
 
   if (response.status === 401) {
     // Sin token es un login fallido: se propaga el mensaje del API.
-    // Con token, la sesion expiro y se cierra de verdad.
+    // Con token, un 401 puede ser un token viejo (sin `attendsPatients` o con un rol legado): se
+    // intenta un refresh una sola vez y, si falla, la sesion se cierra de verdad.
     if (token) {
+      if (!isRetry && (await refreshAccessToken())) {
+        return fetcher<T>(url, options, true);
+      }
       handleSessionExpired();
       throw new Error('Tu sesión expiró. Inicia sesión de nuevo.');
     }
