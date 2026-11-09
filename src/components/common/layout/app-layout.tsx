@@ -13,6 +13,7 @@ import {
   Bell,
   ArrowLeft,
   Settings,
+  UserRound,
   type LucideIcon,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
@@ -130,6 +131,21 @@ const UserMenu: React.FC = () => {
                 )}
               </Menu.Item>
             )}
+
+            <Menu.Item>
+              {({ active }) => (
+                <Link
+                  href={routesPrivate.profile.index}
+                  className={tailwind(
+                    'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                    active && 'bg-ink-50',
+                  )}
+                >
+                  <UserRound className="h-4 w-4" aria-hidden />
+                  {t(TEXT.PROFILE.MENU)}
+                </Link>
+              )}
+            </Menu.Item>
 
             <Menu.Item>
               {({ active }) => (
