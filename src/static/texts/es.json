@@ -1139,6 +1139,10 @@
       "contacts": "Contactos",
       "patientContact": "Paciente",
       "editContacts": "Editar contactos",
+      "evolutionNote": {
+        "viewAudiometry": "Ver audiometría",
+        "openAudiometryLabel": "Ver la audiometría de esta nota"
+      },
       "audiometry": {
         "title": "Audiometría",
         "save": "Guardar audiometría",

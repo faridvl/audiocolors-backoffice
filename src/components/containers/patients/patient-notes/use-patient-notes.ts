@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { AUDIOMETRY_ENTRY_QUERY_PARAM } from '@/components/containers/patients/patient-audiometry/audiometry-entry-link';
 import { DocumentCategory } from '@/types/documents/document.types';
 import { PATIENT_NOTE_TEXT_MAX_LENGTH } from '@/types/patients/patient-note';
 import {
@@ -40,6 +42,7 @@ function formatMonthLabel(monthKey: string): string {
 
 export function usePatientNotes(patientUuid: string) {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [isAdding, setIsAdding] = useState(false);
   const [text, setText] = useState('');
@@ -112,6 +115,17 @@ export function usePatientNotes(patientUuid: string) {
     );
   };
 
+  // Shallow: el expediente no se recarga; el hook de audiometría reacciona al parámetro.
+  const handleOpenAudiometry = (audiometryEntryUuid: string) =>
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, [AUDIOMETRY_ENTRY_QUERY_PARAM]: audiometryEntryUuid },
+      },
+      undefined,
+      { shallow: true, scroll: false },
+    );
+
   return {
     notes,
     totalCount: allNotes.length,
@@ -135,5 +149,6 @@ export function usePatientNotes(patientUuid: string) {
     page: currentPage,
     totalPages,
     handlePageChange: setPage,
+    handleOpenAudiometry,
   };
 }

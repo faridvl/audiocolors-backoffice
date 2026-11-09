@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useCreateAudiometryEntryMutation } from '@/shared/api/mutations/audiometry/create-audiometry-entry-mutation';
@@ -16,6 +17,7 @@ import { useSession } from '@/hooks/use-session';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
+import { AUDIOMETRY_ENTRY_QUERY_PARAM } from './audiometry-entry-link';
 import {
   AudiogramMarks,
   AudiometryNotes,
@@ -118,6 +120,7 @@ const isSpeechFieldInputValid = (field: SpeechField, text: string): boolean => {
 export function useAudiometryPoc(patientUuid: string) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const resolveAuthorLabel = useResolveAuthorLabel();
   const entriesQuery = useAudiometryEntriesQuery(patientUuid);
   const typesQuery = useAudiometryTypesQuery();
@@ -209,6 +212,15 @@ export function useAudiometryPoc(patientUuid: string) {
 
   const handleSelectEntry = (value: string) => {
     setSavedEntryUuid(null);
+    if (requestedEntryUuid) {
+      // Sin esto el parámetro volvería a imponer la audiometría de la URL.
+      const { [AUDIOMETRY_ENTRY_QUERY_PARAM]: _removed, ...restOfQuery } = router.query;
+      lastOpenedUuidRef.current = null;
+      void router.replace({ pathname: router.pathname, query: restOfQuery }, undefined, {
+        shallow: true,
+        scroll: false,
+      });
+    }
     if (value !== NEW_ENTRY_OPTION_VALUE) {
       setChosenEntryUuid(value);
       return;
@@ -331,15 +343,55 @@ export function useAudiometryPoc(patientUuid: string) {
     },
   });
 
-  // Tras guardar el formulario pasa a solo lectura y la página queda lejos del encabezado.
-  useEffect(() => {
-    if (!savedEntryUuid) return;
+  const scrollToAccordion = useCallback(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     accordionRef.current?.scrollIntoView({
       behavior: prefersReducedMotion ? 'auto' : 'smooth',
       block: 'start',
     });
-  }, [savedEntryUuid]);
+  }, []);
+
+  // Tras guardar el formulario pasa a solo lectura y la página queda lejos del encabezado.
+  useEffect(() => {
+    if (!savedEntryUuid) return;
+    scrollToAccordion();
+  }, [savedEntryUuid, scrollToAccordion]);
+
+  // Un enlace (la nota de Evolución, una URL compartida) pide una audiometría por la URL.
+  const requestedParam = router.query[AUDIOMETRY_ENTRY_QUERY_PARAM];
+  const requestedEntryUuid = typeof requestedParam === 'string' ? requestedParam : null;
+  const historyEntries = entriesQuery.data;
+
+  const lastOpenedUuidRef = useRef<string | null>(null);
+
+  const openEntryFromLink = useCallback(
+    (entryUuid: string | null) => {
+      // Un uuid que fuera del historial se ignora: queda la vista normal.
+      if (!entryUuid || !historyEntries?.some((entry) => entry.uuid === entryUuid)) return;
+      lastOpenedUuidRef.current = entryUuid;
+      setSavedEntryUuid(null);
+      setChosenEntryUuid(entryUuid);
+      setIsExpanded(true);
+      scrollToAccordion();
+    },
+    [historyEntries, scrollToAccordion],
+  );
+
+  // Al cargar o recargar con el parámetro; no se repite cuando el historial se refresca.
+  useEffect(() => {
+    if (requestedEntryUuid === lastOpenedUuidRef.current) return;
+    openEntryFromLink(requestedEntryUuid);
+  }, [requestedEntryUuid, openEntryFromLink]);
+
+  // Tocar otra vez la misma nota no cambia la URL: el cambio de ruta la vuelve a abrir.
+  useEffect(() => {
+    const handleRouteChange = (url: string) =>
+      openEntryFromLink(
+        new URL(url, window.location.origin).searchParams.get(AUDIOMETRY_ENTRY_QUERY_PARAM),
+      );
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => router.events.off('routeChangeComplete', handleRouteChange);
+  }, [router.events, openEntryFromLink]);
 
   const formState: AudiometryFormState = {
     marks,

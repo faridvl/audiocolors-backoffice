@@ -807,6 +807,10 @@ export const TEXT = {
       CONTACTS: 'patients.detail.contacts',
       PATIENT_CONTACT: 'patients.detail.patientContact',
       EDIT_CONTACTS: 'patients.detail.editContacts',
+      EVOLUTION_NOTE: {
+        VIEW_AUDIOMETRY: 'patients.detail.evolutionNote.viewAudiometry',
+        OPEN_AUDIOMETRY_LABEL: 'patients.detail.evolutionNote.openAudiometryLabel',
+      },
       AUDIOMETRY: {
         TITLE: 'patients.detail.audiometry.title',
         SAVE: 'patients.detail.audiometry.save',
