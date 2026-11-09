@@ -1151,3 +1151,7 @@ independientes:
 - Los niveles que puede asignar cada quien se calculan en local (`getAssignableRoles`); el API es quien rechaza lo que no corresponde.
 - El ADMIN nunca envia `attendsPatients` ni `specialties` (el API responde 403).
 - La bitacora de cambios de acceso vive en la ficha del usuario (`UserAuditList`).
+
+- El profesional de las variables de documento y de la firma es quien genera el documento (sesion `/auth/me`): `formatProfessionalName` da `Lic. Ana Mora · Cod. 1234` y omite titulo o colegiado si faltan.
+- La abreviatura MSC se muestra `MSc.`; el prefijo `Cod.` vive en `documentTemplates.licensePrefix`.
+- `/perfil` guarda titulo y colegiado con `PATCH /users/:uuid` sobre uno mismo, solo si el usuario atiende pacientes, e invalida `authMe`.

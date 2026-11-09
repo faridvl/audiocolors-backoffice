@@ -317,4 +317,4 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 ## Roles y especialidades (corte en curso)
 
 - Hecho y commiteado: alta/edicion en paginas `/configuracion/usuarios/nuevo` y `/[uuid]`, lista con atiende pacientes y especialidades, bitacora en la ficha.
-- Falta: (1) perfil propio `/perfil` + entrada "Mi perfil" en `UserMenu` (textos `TEXT.PROFILE` y ruta `profile.index` ya existen; falta hook, container, pagina); (2) variable "profesional" de plantillas (titulo + nombre + Cod. N) con prueba `test:*` y ejemplo en es.json; (3) prueba en navegador contra el API local y capturas 375/1440.
+- Hecho: `/perfil` con "Mi perfil" en `UserMenu` y variable "profesional" con `formatProfessionalName` (probado en navegador contra el API local a 375 y 1440). Falta: revision de qa y entrega de la rama.
