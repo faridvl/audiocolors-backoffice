@@ -146,7 +146,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const [isMasked, setIsMasked] = useState(false);
   const [hasNoResponse, setHasNoResponse] = useState(false);
   const [speechEar, setSpeechEar] = useState<Ear>(Ear.RIGHT);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [wordListType, setWordListType] = useState<WordListType | null>(null);
   const [wordListId, setWordListId] = useState<string | null>(null);
   // No se borra al ocultar el panel: define cuántas palabras se presentaron por oído.

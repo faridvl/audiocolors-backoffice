@@ -95,9 +95,8 @@ export function useQuestionsSettings() {
     handleDirtyChange(DRAFT_KEY, false);
   }
 
-  // Con una sola sección se abre sola; el borrador también, para seguir escribiendo.
-  const isSectionExpanded = (key: string) =>
-    toggled[key] ?? (key === DRAFT_KEY || sections.length === 1);
+  // Nada se abre solo: una sección está abierta solo si la persona la abrió o la acaba de crear.
+  const isSectionExpanded = (key: string) => toggled[key] ?? false;
 
   const handleConfirmName = (name: string) => {
     setPending({ name });

@@ -123,10 +123,6 @@ export function usePatientQuestions(patientUuid: string) {
     subtitle: subtitle.text,
     hasDraft: subtitle.hasDraft,
     isExpanded,
-    handleToggleExpanded: () => {
-      // Con una sola sección no hay nada que elegir: se abre junto con "Preguntas".
-      if (!isExpanded && sections.length === 1) setOpenSectionKey(sections[0].key);
-      setIsExpanded((current) => !current);
-    },
+    handleToggleExpanded: () => setIsExpanded((current) => !current),
   };
 }

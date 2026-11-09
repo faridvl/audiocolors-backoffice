@@ -133,6 +133,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Acordeones cerrados (2026-11-09, rama `fix/configuracion-estandar`):** en el expediente y en Configuración → Formularios todo acordeón arranca cerrado y solo se abre por acción de la persona (D76).
 - **Configuración estandarizada (2026-11-09, rama `fix/configuracion-estandar`, commits locales, sin subir):** las 5 secciones comparten tarjeta, botón "Nuevo" y estados de carga/error (D74); el menú tiene grupos y un solo resaltado, y los campos de Clínica miden lo que su dato (D75). El editor de usuario usa la misma tarjeta con filas, la barra de Guardar de Formularios va fuera de la tarjeta al ancho de las demás secciones y los ítems del menú resaltan al pasar el mouse. Medido a 390, 1440 y 1920 sin scroll horizontal; carga y error de las 4 listas probados interceptando respuestas. Falta subir a develop con permiso.
 - **Ajustes de UI de Usuarios y Configuración (2026-11-09, listos en `feature/usuarios-ajustes-ui`):** Clínica con campos a ancho completo y ayudas en su lugar, Mi perfil con título en la barra móvil, Plantillas y Tipos de cita con vacío y duración alineados. Pendientes de subir a develop con permiso del usuario.
 - **Usuarios (2026-11-09, terminado y probado, en `develop`):** Configuración → Usuarios

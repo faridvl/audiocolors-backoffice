@@ -1184,3 +1184,9 @@ independientes:
 - Ancho máximo común `max-w-6xl` en el layout de Configuración.
 - Regla de estados de las listas (Tipos de cita, Plantillas, Usuarios, Formularios): el botón principal siempre se ve y queda deshabilitado mientras carga o falla; el estado de carga o error va dentro de una `SettingsCard`. Formularios tiene un solo bloque de error y un solo "Reintentar" que recarga las dos consultas; el verbo del botón es el mismo en todas ("Nuevo tipo de cita", "Nueva plantilla", "Nuevo usuario").
 - La barra fija de Guardar de los formularios lleva fondo, sombra superior suave y espacio abajo; las filas de las listas tienen la misma altura mínima y el dato secundario el mismo color.
+
+## D76 · Acordeones del expediente y de Configuración arrancan cerrados (2026-11-09)
+
+- Al entrar a la pantalla ningún acordeón está abierto: ni Audiometría, ni Preguntas y sus secciones, ni los antecedentes, ni las secciones de Configuración → Formularios. Solo se abren por una acción de la persona.
+- Acciones que sí abren: tocar el acordeón, crear una "Nueva sección", guardarla, "Actualizar" un registro y abrir una audiometría desde el enlace `?audiometria=<uuid>` de la nota de Control de evolución.
+- Se quitó la apertura automática de la única sección (Preguntas y Configuración) y el estado inicial abierto de Audiometría. Una sección con cambios sin guardar muestra su aviso en el subtítulo aunque esté cerrada.
