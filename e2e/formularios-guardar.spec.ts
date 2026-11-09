@@ -390,6 +390,8 @@ for (const viewport of [
     await settle(page);
 
     await expect(newButton, 'con borrador, el botón se deshabilita').toBeDisabled();
+    // Al crear, la página baja al borrador; la ayuda solo importa cuando el usuario sube y ve el botón deshabilitado.
+    await newButton.scrollIntoViewIfNeeded();
     const hint = page.getByText(NEW_SECTION_HINT);
     const hintRect = await box(hint, 'ayuda del botón');
     const buttonRect = await box(newButton, 'botón Nueva sección');
@@ -397,9 +399,9 @@ for (const viewport of [
     console.log(
       `CASO4 @${viewport.width} ayuda y=${hintRect.y} alto=${hintRect.height} boton y=${buttonRect.y} viewport alto=${size.height}`,
     );
-    expect
-      .soft(isInsideViewport(hintRect, size), `la ayuda está en la vista: y=${hintRect.y}`)
-      .toBe(true);
+    expect(isInsideViewport(hintRect, size), `la ayuda está junto al botón: y=${hintRect.y}`).toBe(
+      true,
+    );
     await screenshot(page, `caso4-borrador-${viewport.width}`);
 
     const panel = await panelOf(page, header);
