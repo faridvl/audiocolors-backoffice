@@ -25,6 +25,7 @@ import { splitFileName } from '@/shared/utils/file-name';
 import { TEXT } from '@/static/texts/i18n';
 import {
   ArchiveItemType,
+  AUDIOMETRY_ARCHIVE_CATEGORY,
   mapAudiometryToArchiveItem,
   mapFileToArchiveItem,
   sortArchiveItems,
@@ -105,10 +106,11 @@ export function useDocuments(patientUuid: string) {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return documents.filter((document) => {
-      // La audiometría no tiene categoría: solo aparece en "Todos".
-      const matchesFilter =
-        filter === ALL_CATEGORIES_FILTER ||
-        (document.type === ArchiveItemType.FILE && document.document.category === filter);
+      const category =
+        document.type === ArchiveItemType.FILE
+          ? document.document.category
+          : AUDIOMETRY_ARCHIVE_CATEGORY;
+      const matchesFilter = filter === ALL_CATEGORIES_FILTER || category === filter;
       const matchesSearch =
         !normalizedSearch || document.displayName.toLowerCase().includes(normalizedSearch);
       return matchesFilter && matchesSearch;

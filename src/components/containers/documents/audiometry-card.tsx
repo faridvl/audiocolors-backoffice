@@ -6,9 +6,9 @@ import { CategoryPill } from '@/components/common/badge/category-pill';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { AudiometryTypeCode } from '@/components/containers/patients/patient-audiometry/audiometry-constants';
 import { SCREENING_RESULT_LABEL_KEYS } from '@/components/containers/patients/patient-audiometry/audiometry-labels';
-import { DOCUMENT_CATEGORY_LABELS, DocumentCategory } from '@/types/documents/document.types';
+import { DOCUMENT_CATEGORY_LABELS } from '@/types/documents/document.types';
 import { TEXT } from '@/static/texts/i18n';
-import { AudiometryArchiveItem } from './archive-items';
+import { AUDIOMETRY_ARCHIVE_CATEGORY, AudiometryArchiveItem } from './archive-items';
 
 const MISSING_PTA_DASH = '–';
 
@@ -40,7 +40,7 @@ export const AudiometryCard: React.FC<AudiometryCardProps> = ({ item, onOpen }) 
         </Typography>
         <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-ink-400" aria-hidden />
       </span>
-      <CategoryPill>{DOCUMENT_CATEGORY_LABELS[DocumentCategory.EXTERNAL_TEST]}</CategoryPill>
+      <CategoryPill>{DOCUMENT_CATEGORY_LABELS[AUDIOMETRY_ARCHIVE_CATEGORY]}</CategoryPill>
       <Typography variant={TypographyVariant.HELPER} className="mt-1.5">
         {t(TEXT.DOCUMENTS.AUDIOMETRY.DETAIL)}
       </Typography>

@@ -3,10 +3,13 @@ import {
   ScreeningResult,
 } from '@/components/containers/patients/patient-audiometry/audiometry-constants';
 import { AudiometryEntryListItem } from '@/types/patients/audiometry-entry';
-import { DocumentItem, PatientDocument } from '@/types/documents/document.types';
+import { DocumentCategory, DocumentItem, PatientDocument } from '@/types/documents/document.types';
 import { formatDateTime } from '@/shared/utils/formatters';
 import { sortArchiveItems } from './archive-sort';
 import { mapToDocumentItem } from './document-items';
+
+// Las audiometrías no son archivos subidos, pero se listan y se filtran como Pruebas.
+export const AUDIOMETRY_ARCHIVE_CATEGORY = DocumentCategory.EXTERNAL_TEST;
 
 export enum ArchiveItemType {
   FILE = 'FILE',
