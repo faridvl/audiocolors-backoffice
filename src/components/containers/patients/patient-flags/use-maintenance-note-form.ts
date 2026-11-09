@@ -4,6 +4,7 @@ import {
   MAINTENANCE_NOTE_MAX_LENGTH,
   MaintenanceNumber,
 } from "@/types/patients/patient";
+import { MissedFlow, MissedSaveResult } from "./use-patient-maintenance";
 
 /** Filas máximas del campo antes de que aparezca el scroll interno. */
 const NOTE_MAX_ROWS = 8;
@@ -15,14 +16,16 @@ const NOTE_MAX_ROWS = 8;
 export function useMaintenanceNoteForm(
   patientUuid: string,
   maintenanceNumber: MaintenanceNumber,
-  isMissedPending = false,
-  onMissedSaved?: () => void,
+  missedFlow: MissedFlow | null = null,
 ) {
   const { executeCreateMaintenanceNote, isPending } =
     useCreateMaintenanceNoteMutation();
   const [draft, setDraft] = useState("");
   const [hasError, setHasError] = useState(false);
   const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const isMissedPending = missedFlow !== null;
+  const hasStatusError = missedFlow?.hasStatusError ?? false;
+  const isSaving = isPending || (missedFlow?.isSaving ?? false);
 
   // El campo crece con el texto: parte de las filas mínimas y se detiene en NOTE_MAX_ROWS.
   useLayoutEffect(() => {
@@ -51,15 +54,27 @@ export function useMaintenanceNoteForm(
 
   const text = draft.trim();
 
+  // En "Lo perdió" la nota y el estado los guarda el hook de la lista, que sigue vivo si
+  // el formulario se cierra; aquí solo se refleja el resultado.
+  const handleMissedSave = async (flow: MissedFlow) => {
+    const result = await flow.onSaveNote(text);
+    if (result === MissedSaveResult.NOTE_FAILED) {
+      setHasError(true);
+      return;
+    }
+    setDraft("");
+  };
+
   const handleSave = () => {
-    if (!text || isPending) return;
+    if (!text || isSaving || hasStatusError) return;
+    if (missedFlow) {
+      void handleMissedSave(missedFlow);
+      return;
+    }
     executeCreateMaintenanceNote(
       { patientUuid, maintenanceNumber, text },
       {
-        onSuccess: () => {
-          setDraft("");
-          if (isMissedPending) onMissedSaved?.();
-        },
+        onSuccess: () => setDraft(""),
         onError: () => setHasError(true),
       },
     );
@@ -76,8 +91,9 @@ export function useMaintenanceNoteForm(
     draft,
     fieldRef,
     hasError,
-    isSaving: isPending,
-    canSave: text.length > 0,
+    isSaving,
+    hasStatusError,
+    canSave: text.length > 0 && !hasStatusError,
     handleChange,
     handleKeyDown,
     handleSave,

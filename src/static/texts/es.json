@@ -776,7 +776,7 @@
       },
       "maintenance": {
         "UNMARKED": "Mantenimiento {{number}}: pendiente",
-        "ATTENDED": "Mantenimiento {{number}}: vino",
+        "ATTENDED": "Mantenimiento {{number}}: recepción",
         "MISSED": "Mantenimiento {{number}}: lo perdió"
       },
       "contactAttempts": "Intentos: {{before}} → {{after}}",
@@ -934,11 +934,11 @@
         "choiceLabel": "Mantenimiento {{number}}: {{choice}}",
         "toasts": {
           "UNMARKED": "Mantenimiento {{number}} pendiente",
-          "ATTENDED": "Mantenimiento {{number}}: vino",
+          "ATTENDED": "Mantenimiento {{number}}: recepción",
           "MISSED": "Mantenimiento {{number}}: lo perdió"
         },
         "pillLabels": {
-          "ATTENDED": "Mantenimiento {{number}}: vino",
+          "ATTENDED": "Mantenimiento {{number}}: recepción",
           "MISSED": "Mantenimiento {{number}}: lo perdió"
         },
         "pill": "Mant. {{number}}",
@@ -951,6 +951,8 @@
         "missedHint": "Escribe una nota para marcarlo como perdido",
         "save": "Guardar",
         "noteError": "No se pudo guardar la nota. Tu texto sigue aquí, vuelve a intentarlo.",
+        "missedStatusError": "La nota quedó guardada, pero no se pudo marcar como perdido.",
+        "missedStatusRetry": "Reintentar",
         "noteMeta": "{{date}} · {{author}}",
         "showAll": "Ver todas ({{count}})",
         "showLess": "Ver menos",

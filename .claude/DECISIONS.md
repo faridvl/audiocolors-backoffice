@@ -1027,3 +1027,18 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
 - `ApiError` lleva `details` (`{field,message}`) para mostrar los 400 del API junto al campo en Formik.
 - El teléfono de la clínica se guarda con `toPatientPhone` (Costa Rica con `+506 `); vacío se envía como cadena vacía y el API lo guarda como null.
 - "Lo perdió" exige nota: guardar graba la nota y, al terminar, marca el estado perdido; cancelar o tocar fuera no cambia el estado. "Vino" pasa a "Recepción" solo en el botón.
+
+
+## D66 · Cierre de las correcciones de Resumen, Clínica y Mantenimiento (2026-11-08)
+
+- La nota de "Lo perdió" la exige solo el front: el API no la pide, así que otro cliente podría
+  marcar perdido sin nota.
+- Cualquier DOCTOR puede marcar una audiometría como mal hecha. Los roles y permisos finos quedan
+  para un desarrollo futuro.
+- El correo de la clínica admite hasta 254 caracteres, igual que el API (`TENANT_EMAIL_MAX_LENGTH`).
+- Orden de publicación: primero el API con su migración y después el front. El front ya lee
+  `invalidatedAt` y lo tolera ausente, pero la marca de mal hecha y la clínica necesitan el API.
+- "Lo perdió" guarda desde el hook de la lista, no desde el formulario: la nota y el estado se
+  encadenan, un cambio de estado nunca se descarta por haber otro en curso, y mientras se guarda no
+  se puede cancelar ni plegar la fila. Si falla solo el estado, la nota ya está guardada y se
+  reintenta únicamente el estado.

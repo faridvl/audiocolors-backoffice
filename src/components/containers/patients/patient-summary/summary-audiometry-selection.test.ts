@@ -26,6 +26,15 @@ describe('filterValidAudiometries', () => {
     );
   });
 
+  it('trata un invalidatedAt ausente como valida (API que aun no manda el campo)', () => {
+    const withoutField = { uuid: 'sin-campo', createdAt: '2026-02-10T10:00:00.000Z' };
+    const result = filterValidAudiometries([withoutField, MIDDLE_INVALID]);
+    assert.deepEqual(
+      result.map((item) => item.uuid),
+      ['sin-campo'],
+    );
+  });
+
   it('devuelve vacio si todas estan marcadas', () => {
     assert.deepEqual(filterValidAudiometries([MIDDLE_INVALID, NEWEST_INVALID]), []);
   });

@@ -1,14 +1,14 @@
 export interface SelectableAudiometry {
   uuid: string;
   createdAt: string;
-  invalidatedAt: string | null;
+  invalidatedAt?: string | null;
 }
 
 const toTime = (isoDate: string): number => new Date(isoDate).getTime();
 
 /** Las marcadas como mal hechas no entran en ningún lado del resumen. */
 export const filterValidAudiometries = <T extends SelectableAudiometry>(entries: T[]): T[] =>
-  entries.filter((entry) => entry.invalidatedAt === null);
+  entries.filter((entry) => entry.invalidatedAt == null);
 
 /** Por defecto va la audiometría válida más reciente; sin válidas, ninguna. */
 export const resolveDefaultAudiometryUuids = (entries: SelectableAudiometry[]): string[] => {

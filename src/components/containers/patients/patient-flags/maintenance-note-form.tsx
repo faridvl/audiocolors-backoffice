@@ -6,6 +6,7 @@ import { TEXT } from '@/static/texts/i18n';
 import { MAINTENANCE_NOTE_MAX_LENGTH, MaintenanceNumber } from '@/types/patients/patient';
 import { tailwind } from '@/utils/tailwind-utils';
 import { useMaintenanceNoteForm } from './use-maintenance-note-form';
+import { MissedFlow } from './use-patient-maintenance';
 
 /** Desde cuántos caracteres aparece el contador. */
 const NOTE_COUNTER_THRESHOLD = 400;
@@ -15,19 +16,26 @@ export const MaintenanceNoteForm: React.FC<{
   patientUuid: string;
   maintenanceNumber: MaintenanceNumber;
   /** La nota es el paso previo a marcar el mantenimiento como perdido. */
-  isMissedPending: boolean;
-  onMissedSaved: () => void;
-  onMissedCancel: () => void;
-}> = ({ patientUuid, maintenanceNumber, isMissedPending, onMissedSaved, onMissedCancel }) => {
+  missedFlow: MissedFlow | null;
+}> = ({ patientUuid, maintenanceNumber, missedFlow }) => {
   const { t } = useTranslation();
-  const { draft, fieldRef, hasError, isSaving, canSave, handleChange, handleKeyDown, handleSave } =
-    useMaintenanceNoteForm(patientUuid, maintenanceNumber, isMissedPending, onMissedSaved);
+  const {
+    draft,
+    fieldRef,
+    hasError,
+    isSaving,
+    hasStatusError,
+    canSave,
+    handleChange,
+    handleKeyDown,
+    handleSave,
+  } = useMaintenanceNoteForm(patientUuid, maintenanceNumber, missedFlow);
   const placeholder = t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTE_PLACEHOLDER);
   const showCounter = draft.length > NOTE_COUNTER_THRESHOLD;
 
   return (
     <div className="flex min-w-0 flex-col">
-      {isMissedPending && (
+      {missedFlow && (
         <Typography variant={TypographyVariant.HELPER} className="pt-2 text-danger-700">
           {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.MISSED_HINT)}
         </Typography>
@@ -43,7 +51,7 @@ export const MaintenanceNoteForm: React.FC<{
           rows={1}
           placeholder={placeholder}
           aria-label={placeholder}
-          readOnly={isSaving}
+          readOnly={isSaving || hasStatusError}
           aria-invalid={hasError}
           className={tailwind(
             'min-w-0 flex-1 resize-none border-0 bg-transparent px-0 py-2.5 text-base text-ink-800 placeholder:text-ink-400 focus:outline-none focus:ring-0',
@@ -59,10 +67,10 @@ export const MaintenanceNoteForm: React.FC<{
         >
           {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.SAVE)}
         </Button>
-        {isMissedPending && (
+        {missedFlow && (
           <Button
             variant={ButtonVariant.GHOST}
-            onClick={onMissedCancel}
+            onClick={missedFlow.onCancel}
             disabled={isSaving}
             className="shrink-0 px-2"
           >
@@ -71,6 +79,21 @@ export const MaintenanceNoteForm: React.FC<{
         )}
       </div>
       <div aria-live="polite">
+        {hasStatusError && (
+          <div className="flex flex-wrap items-center gap-x-3">
+            <Typography variant={TypographyVariant.ERROR}>
+              {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.MISSED_STATUS_ERROR)}
+            </Typography>
+            <Button
+              variant={ButtonVariant.GHOST}
+              onClick={missedFlow?.onRetryStatus}
+              isLoading={isSaving}
+              className="px-2 text-brand-700"
+            >
+              {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.MISSED_STATUS_RETRY)}
+            </Button>
+          </div>
+        )}
         {hasError && (
           <Typography variant={TypographyVariant.ERROR}>
             {t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTE_ERROR)}

@@ -21,6 +21,8 @@ import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
 import { Patient, getPatientBranchUuids } from '@/types/patients/patient';
+import { buildEntryDateLabels } from '../patient-audiometry/audiometry-entry-date-labels';
+import { buildEntryWithPtaLabel } from '../patient-audiometry/audiometry-labels';
 import { PrintReportHeader } from '../patient-audiometry/use-audiometry-poc';
 import { PatientSummaryPrintProps } from './patient-summary-print';
 import { resolveKnownAuthor } from './summary-authorship';
@@ -97,7 +99,12 @@ export function usePatientSummary(patient: Patient) {
   const latestOtoscopy = [...(otoscopyQuery.data ?? [])].sort(byNewest)[0] ?? null;
   const audiometryList = audiometryListQuery.data ?? [];
   const validAudiometries = filterValidAudiometries(audiometryList);
-  const audiometryUuids = chosenAudiometryUuids ?? resolveDefaultAudiometryUuids(audiometryList);
+  // Lo elegido se contrasta con las válidas actuales: una marcada como mal hecha en otra pestaña
+  // sale de la selección apenas se refresca la lista.
+  const validAudiometryUuids = new Set(validAudiometries.map((entry) => entry.uuid));
+  const audiometryUuids =
+    chosenAudiometryUuids?.filter((uuid) => validAudiometryUuids.has(uuid)) ??
+    resolveDefaultAudiometryUuids(audiometryList);
   const latestValidAudiometryUuid = resolveDefaultAudiometryUuids(audiometryList)[0] ?? null;
   const hasTemplatesChosen = checked[SummaryCard.TEMPLATES] && templateUuids.length > 0;
 
@@ -125,6 +132,9 @@ export function usePatientSummary(patient: Patient) {
     ? audiometryDetailQueries.filter((query) => query.isError)
     : [];
   const isAudiometryDetailFailed = failedAudiometryQueries.length > 0;
+  // Sin la clínica o la última audiometría las variables saldrían vacías: se bloquea y se reintenta.
+  const isTemplateContextFailed =
+    hasTemplatesChosen && (clinicQuery.isError || latestAudiometryQuery.isError);
 
   // Las sedes no son una tarjeta: si fallan, la ficha sale sin ellas y no se bloquea nada.
   const cardStates: SummaryCardState[] = [
@@ -141,10 +151,15 @@ export function usePatientSummary(patient: Patient) {
       isAvailable: templates.length > 0,
       isChecked: checked[SummaryCard.TEMPLATES],
       isLoading: templatesQuery.isLoading,
-      isError: templatesQuery.isError || failedContentQueries.length > 0,
+      isError:
+        templatesQuery.isError || failedContentQueries.length > 0 || isTemplateContextFailed,
       onRetry: () => {
         if (templatesQuery.isError) void templatesQuery.refetch();
         failedContentQueries.forEach((query) => void query.refetch());
+        if (hasTemplatesChosen && clinicQuery.isError) void clinicQuery.refetch();
+        if (hasTemplatesChosen && latestAudiometryQuery.isError) {
+          void latestAudiometryQuery.refetch();
+        }
       },
     },
     ...(canViewClinical
@@ -183,6 +198,8 @@ export function usePatientSummary(patient: Patient) {
   const hasError = cardStates.some((state) => state.isError);
   const failureCount = [
     templatesQuery,
+    clinicQuery,
+    latestAudiometryQuery,
     backgroundQuery,
     otoscopyQuery,
     audiometryListQuery,
@@ -195,7 +212,8 @@ export function usePatientSummary(patient: Patient) {
   }, [hasError, failureCount, t]);
 
   // Una tarjeta marcada con su consulta caída bloquea generar; una sin marcar no estorba.
-  const hasChosenError = cardStates.some((state) => state.isChecked && state.isError);
+  const hasChosenError =
+    cardStates.some((state) => state.isChecked && state.isError) || isTemplateContextFailed;
 
   const toggleCard = (card: SummaryCard, isChecked: boolean) =>
     setChecked((current) => ({ ...current, [card]: isChecked }));
@@ -318,10 +336,15 @@ export function usePatientSummary(patient: Patient) {
     });
   };
 
+  const audiometryDateLabels = buildEntryDateLabels(
+    validAudiometries,
+    formatDateTime,
+    buildEntryWithPtaLabel(t),
+  );
   const audiometryOptions: AudiometryOption[] = [...validAudiometries]
     .sort(byNewest)
     .map((entry) => {
-      const date = formatDateTime(entry.createdAt);
+      const date = audiometryDateLabels.get(entry.uuid) ?? formatDateTime(entry.createdAt);
       const author = resolveKnownAuthor(user, entry.createdByUuid ?? '', entry.createdByName);
       return {
         value: entry.uuid,

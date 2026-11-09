@@ -19,7 +19,11 @@ interface CreateMaintenanceNoteVariables extends CreateMaintenanceNotePayload {
 /** Solo agrega: las notas de un mantenimiento no se editan ni se borran. */
 export function useCreateMaintenanceNoteMutation() {
   const queryClient = useQueryClient();
-  const { mutate: executeCreateMaintenanceNote, isPending } = useApiMutation<
+  const {
+    mutate: executeCreateMaintenanceNote,
+    mutateAsync: executeCreateMaintenanceNoteAsync,
+    isPending,
+  } = useApiMutation<
     MaintenanceNote,
     CreateMaintenanceNoteVariables
   >({
@@ -38,5 +42,5 @@ export function useCreateMaintenanceNoteMutation() {
     onError: (error) => toast.error(error.message),
   });
 
-  return { executeCreateMaintenanceNote, isPending };
+  return { executeCreateMaintenanceNote, executeCreateMaintenanceNoteAsync, isPending };
 }

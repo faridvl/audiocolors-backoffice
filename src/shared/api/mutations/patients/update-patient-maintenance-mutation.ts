@@ -30,7 +30,11 @@ interface UpdatePatientMaintenanceVariables {
 export function useUpdatePatientMaintenanceMutation() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { mutate: executeUpdatePatientMaintenance, isPending } = useApiMutation<
+  const {
+    mutate: executeUpdatePatientMaintenance,
+    mutateAsync: executeUpdatePatientMaintenanceAsync,
+    isPending,
+  } = useApiMutation<
     Patient,
     UpdatePatientMaintenanceVariables
   >({
@@ -60,5 +64,5 @@ export function useUpdatePatientMaintenanceMutation() {
     onError: (error) => toast.error(error.message),
   });
 
-  return { executeUpdatePatientMaintenance, isPending };
+  return { executeUpdatePatientMaintenance, executeUpdatePatientMaintenanceAsync, isPending };
 }

@@ -11,4 +11,4 @@ export interface Tenant {
 export type UpdateTenantPayload = Partial<Pick<Tenant, 'phone' | 'email' | 'address'>>;
 
 export const TENANT_ADDRESS_MAX_LENGTH = 300;
-export const TENANT_EMAIL_MAX_LENGTH = 120;
+export const TENANT_EMAIL_MAX_LENGTH = 254;

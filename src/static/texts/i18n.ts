@@ -738,6 +738,8 @@ export const TEXT = {
         MISSED_HINT: 'patients.flags.maintenance.missedHint',
         SAVE: 'patients.flags.maintenance.save',
         NOTE_ERROR: 'patients.flags.maintenance.noteError',
+        MISSED_STATUS_ERROR: 'patients.flags.maintenance.missedStatusError',
+        MISSED_STATUS_RETRY: 'patients.flags.maintenance.missedStatusRetry',
         NOTE_META: 'patients.flags.maintenance.noteMeta',
         SHOW_ALL: 'patients.flags.maintenance.showAll',
         SHOW_LESS: 'patients.flags.maintenance.showLess',

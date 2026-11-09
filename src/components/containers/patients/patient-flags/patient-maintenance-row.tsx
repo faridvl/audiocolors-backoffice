@@ -13,7 +13,7 @@ import {
   MAINTENANCE_NOTES_BUTTON_STYLES,
   MAINTENANCE_NOTES_CHEVRON_STYLES,
 } from "./patient-maintenance-styles";
-import { MaintenanceRow } from "./use-patient-maintenance";
+import { MaintenanceRow, MissedFlow } from "./use-patient-maintenance";
 
 interface PatientMaintenanceRowProps {
   row: MaintenanceRow;
@@ -24,10 +24,8 @@ interface PatientMaintenanceRowProps {
   hasNotesError: boolean;
   isOpen: boolean;
   rowRef: (element: HTMLElement | null) => void;
-  isMissedPending: boolean;
+  missedFlow: MissedFlow | null;
   onStatusChange: (status: MaintenanceStatus) => void;
-  onMissedSaved: () => void;
-  onMissedCancel: () => void;
   onToggleNotes: () => void;
   onRetryNotes: () => void;
 }
@@ -59,10 +57,8 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
   hasNotesError,
   isOpen,
   rowRef,
-  isMissedPending,
+  missedFlow,
   onStatusChange,
-  onMissedSaved,
-  onMissedCancel,
   onToggleNotes,
   onRetryNotes,
 }) => {
@@ -131,7 +127,7 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
         <button
           type="button"
           onClick={onToggleNotes}
-          disabled={isLoadingNotes}
+          disabled={isLoadingNotes || missedFlow?.isSaving}
           aria-expanded={isOpen}
           aria-controls={panelId}
           aria-label={t(TEXT.PATIENTS.FLAGS.MAINTENANCE.NOTES_TOGGLE_LABEL, {
@@ -171,9 +167,7 @@ export const PatientMaintenanceRow: React.FC<PatientMaintenanceRowProps> = ({
           patientUuid={patientUuid}
           maintenanceNumber={row.maintenanceNumber}
           notes={row.notes}
-          isMissedPending={isMissedPending}
-          onMissedSaved={onMissedSaved}
-          onMissedCancel={onMissedCancel}
+          missedFlow={missedFlow}
           isLoading={isLoadingNotes}
           hasError={hasNotesError}
           isRetrying={isFetchingNotes}
