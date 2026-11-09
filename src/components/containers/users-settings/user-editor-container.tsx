@@ -3,6 +3,7 @@ import { Form, Formik, useFormikContext } from 'formik';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { InfoPopover } from '@/components/common/info-popover/info-popover';
 import { FocusFirstError } from '@/components/common/form/focus-first-error';
 import { FormDirtyReporter } from '@/components/common/form/form-dirty-reporter';
 import { FormMultiSelectField } from '@/components/common/form/form-multi-select-field';
@@ -32,17 +33,19 @@ interface UserEditorContainerProps {
 const RoleLevels: React.FC<{ roles: UserRole[] }> = ({ roles }) => {
   const { t } = useTranslation();
   return (
-    <dl className="flex flex-col gap-1 rounded-lg bg-ink-50 px-3 py-2.5 text-sm">
-      <Typography variant={TypographyVariant.HELPER} as="p">
+    <InfoPopover ariaLabel={t(FORM.ROLE_LEVELS_TITLE)} className="-my-2.5">
+      <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="p" className="mb-2">
         {t(FORM.ROLE_LEVELS_TITLE)}
       </Typography>
-      {roles.map((role) => (
-        <div key={role} className="flex flex-col sm:flex-row sm:gap-2">
-          <dt className="font-medium text-ink-700">{t(TEXTS.ROLES[role])}</dt>
-          <dd className="text-ink-500">{t(TEXTS.ROLE_DESCRIPTIONS[role])}</dd>
-        </div>
-      ))}
-    </dl>
+      <dl className="flex flex-col gap-2">
+        {roles.map((role) => (
+          <div key={role} className="flex flex-col">
+            <dt className="font-medium text-ink-700">{t(TEXTS.ROLES[role])}</dt>
+            <dd className="text-ink-500">{t(TEXTS.ROLE_DESCRIPTIONS[role])}</dd>
+          </div>
+        ))}
+      </dl>
+    </InfoPopover>
   );
 };
 
@@ -210,6 +213,7 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
             name="role"
             as="select"
             label={t(FORM.ROLE)}
+            labelAddon={<RoleLevels roles={editor.assignableRoles} />}
             disabled={isLocked || isRoleLocked}
             hint={roleHint}
             isHintAlwaysVisible
@@ -233,7 +237,6 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
           {isCreatingWithoutOwnerLevel && (
             <Typography variant={TypographyVariant.HELPER}>{t(FORM.OWNER_CREATE_ONLY)}</Typography>
           )}
-          <RoleLevels roles={editor.assignableRoles} />
           <PhoneField name="phone" label={t(FORM.PHONE)} disabled={isLocked} />
           {isNew && (
             <FormField
@@ -255,7 +258,7 @@ export const UserEditorContainer: React.FC<UserEditorContainerProps> = ({ userUu
           )}
 
           {!isLocked && (
-            <div className="sticky bottom-0 z-10 -mx-1 flex flex-col-reverse gap-2 border-t border-ink-100 bg-white px-1 py-3 sm:flex-row sm:justify-end">
+            <div className="sticky bottom-0 z-10 -mx-1 flex flex-col-reverse gap-2 border-t border-ink-200 bg-ink-50 px-1 py-3 sm:flex-row sm:justify-end">
               <Button
                 variant={ButtonVariant.SECONDARY}
                 onClick={editor.goBack}

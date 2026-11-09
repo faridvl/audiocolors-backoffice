@@ -38,8 +38,6 @@ export const ProfileContainer: React.FC = () => {
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-5">
-      <Typography variant={TypographyVariant.HEADER}>{t(TEXTS.TITLE)}</Typography>
-
       <FormViewSection title={t(TEXTS.ACCOUNT)}>
         <div className="flex flex-col gap-3">
           <AccountField label={t(TEXT.SETTINGS.USERS.FORM.FULL_NAME)} value={user.fullName} />
@@ -76,11 +74,11 @@ export const ProfileContainer: React.FC = () => {
                 name="licenseNumber"
                 label={t(TEXTS.LICENSE_NUMBER)}
                 maxLength={USER_LICENSE_NUMBER_MAX_LENGTH}
-                hint={t(TEXTS.LICENSE_HINT)}
+                hint={profile.isLicenseMissing ? undefined : t(TEXTS.LICENSE_HINT)}
                 isHintAlwaysVisible
               />
               {profile.isLicenseMissing && (
-                <Typography variant={TypographyVariant.HELPER} className="text-warning-700">
+                <Typography variant={TypographyVariant.HELPER} className="text-sm text-warning-700">
                   {t(TEXTS.LICENSE_MISSING)}
                 </Typography>
               )}

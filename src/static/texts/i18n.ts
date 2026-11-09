@@ -25,7 +25,6 @@ export const TEXT = {
       ERROR_BEFORE_MIN: 'common.dateField.errorBeforeMin',
       ERROR_AFTER_MAX: 'common.dateField.errorAfterMax',
     },
-    PHONE_HINT: 'common.phoneHint',
     PHONE_COUNTRY: {
       LABEL: 'common.phoneCountry.label',
       SEARCH: 'common.phoneCountry.search',
@@ -98,7 +97,7 @@ export const TEXT = {
     PAGE_TITLE: 'settings.pageTitle',
     TITLE: 'settings.title',
     NAV: 'settings.nav',
-    /** `${SECTIONS_PREFIX}.${SettingsSection}.title` y `.description` */
+    /** `${SECTIONS_PREFIX}.${SettingsSection}.title` */
     SECTIONS_PREFIX: 'settings.sections',
     CLINIC: {
       PAGE_TITLE: 'settings.clinic.pageTitle',
@@ -242,8 +241,7 @@ export const TEXT = {
       },
       AUDIT: {
         TITLE: 'settings.users.audit.title',
-        EMPTY: 'settings.users.audit.empty',
-        LOAD_ERROR: 'settings.users.audit.loadError',
+          LOAD_ERROR: 'settings.users.audit.loadError',
         NO_ROLE: 'settings.users.audit.noRole',
         NO_SPECIALTIES: 'settings.users.audit.noSpecialties',
         CREATED: 'settings.users.audit.created',

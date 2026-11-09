@@ -14,7 +14,7 @@ export default function ProfilePage() {
         <title>{t(TEXT.PROFILE.PAGE_TITLE)}</title>
       </Head>
 
-      <AppLayout title={t(TEXT.PROFILE.TITLE)}>
+      <AppLayout title={t(TEXT.PROFILE.TITLE)} isTitleVisibleOnMobile>
         <ProfileContainer />
       </AppLayout>
     </>

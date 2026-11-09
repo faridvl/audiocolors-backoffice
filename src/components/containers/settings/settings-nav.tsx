@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { tailwind } from '@/utils/tailwind-utils';
 import {
-  sectionDescriptionKey,
   sectionTitleKey,
   SettingsSection,
   SettingsSectionItem,
@@ -44,11 +43,6 @@ export const SettingsNav: React.FC<SettingsNavProps> = ({ sections, activeSectio
               <Typography variant={TypographyVariant.BODY_SEMIBOLD} inline className="text-inherit">
                 {t(sectionTitleKey(section))}
               </Typography>
-              {isList && (
-                <Typography variant={TypographyVariant.HELPER} inline>
-                  {t(sectionDescriptionKey(section))}
-                </Typography>
-              )}
             </span>
             {isList && <ChevronRight className="h-4 w-4 shrink-0 text-ink-400" aria-hidden />}
           </Link>

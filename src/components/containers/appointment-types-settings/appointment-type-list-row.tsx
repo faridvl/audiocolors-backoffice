@@ -27,19 +27,23 @@ export const AppointmentTypeListRow: React.FC<AppointmentTypeListRowProps> = ({
         aria-label={t(TEXT.SETTINGS.APPOINTMENT_TYPES.EDIT_LABEL, { name: appointmentType.name })}
         className="min-h-[60px] rounded-none border-0 border-b border-ink-100 px-4"
       >
-        <span className="flex min-w-0 flex-1 items-center gap-2">
-          <Typography variant={TypographyVariant.BODY_SEMIBOLD} inline className="truncate">
-            {appointmentType.name}
-          </Typography>
-          {appointmentType.isControl && (
-            <Badge>{t(TEXT.SETTINGS.APPOINTMENT_TYPES.CONTROL_BADGE)}</Badge>
-          )}
+        <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left">
+          <span className="flex min-w-0 max-w-full items-center gap-2">
+            <Typography variant={TypographyVariant.BODY_SEMIBOLD} inline className="truncate">
+              {appointmentType.name}
+            </Typography>
+            {appointmentType.isControl && (
+              <Badge>{t(TEXT.SETTINGS.APPOINTMENT_TYPES.CONTROL_BADGE)}</Badge>
+            )}
+          </span>
+          {appointmentType.duration ? (
+            <Typography variant={TypographyVariant.HELPER} inline>
+              {t(TEXT.SETTINGS.APPOINTMENT_TYPES.MINUTES_SHORT, {
+                count: appointmentType.duration,
+              })}
+            </Typography>
+          ) : null}
         </span>
-        <Typography variant={TypographyVariant.BODY} inline className="shrink-0 text-ink-500">
-          {appointmentType.duration
-            ? t(TEXT.SETTINGS.APPOINTMENT_TYPES.MINUTES_SHORT, { count: appointmentType.duration })
-            : ''}
-        </Typography>
         <ChevronRight className="h-4 w-4 shrink-0 text-ink-400" aria-hidden />
       </Button>
     </li>

@@ -65,7 +65,7 @@ export const AppointmentTypesSettingsContainer: React.FC = () => {
       </Button>
 
       {appointmentTypes.length === 0 ? (
-        <Typography variant={TypographyVariant.BODY} className="py-6 text-center text-ink-500">
+        <Typography variant={TypographyVariant.BODY} className="py-2 text-ink-500">
           {t(TEXT.SETTINGS.APPOINTMENT_TYPES.EMPTY)}
         </Typography>
       ) : (

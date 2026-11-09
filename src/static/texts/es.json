@@ -49,7 +49,6 @@
       "errorBeforeMin": "La fecha no puede ser anterior al {{date}}.",
       "errorAfterMax": "La fecha no puede ser posterior al {{date}}."
     },
-    "phoneHint": "¿Otro país? Elige el código en la lista.",
     "phoneCountry": {
       "label": "País del teléfono",
       "search": "Buscar país o código",
@@ -231,24 +230,19 @@
     "nav": "Configuración",
     "sections": {
       "APPOINTMENT_TYPES": {
-        "title": "Tipos de cita",
-        "description": "Nombre y duración de cada tipo de cita."
+        "title": "Tipos de cita"
       },
       "QUESTIONS": {
-        "title": "Formularios",
-        "description": "Los formularios que la clínica llena con sus pacientes. Los cambios no afectan las respuestas ya guardadas."
+        "title": "Formularios"
       },
       "TEMPLATES": {
-        "title": "Plantillas",
-        "description": "Los documentos tipo de la clínica, con los datos del paciente ya puestos."
+        "title": "Plantillas"
       },
       "CLINIC": {
-        "title": "Clínica",
-        "description": "Los datos de contacto de la clínica. Salen en los documentos que generas."
+        "title": "Clínica"
       },
       "USERS": {
-        "title": "Usuarios",
-        "description": "Quién entra a la clínica y con qué nivel. Lo administran el propietario y administración."
+        "title": "Usuarios"
       }
     },
     "clinic": {
@@ -259,7 +253,7 @@
       "nameHint": "Sale en el menú y en los documentos.",
       "logo": {
         "title": "Logo",
-        "hint": "PNG, JPG, WEBP o SVG de hasta 2 MB. Sale en el menú y en los documentos.",
+        "hint": "PNG, JPG, WEBP o SVG de hasta 2 MB.",
         "alt": "Logo de la clínica",
         "empty": "Sin logo. En su lugar se muestra el nombre de la clínica.",
         "upload": "Subir logo",
@@ -370,9 +364,8 @@
         "licensePending": "Pendiente de completar por el profesional"
       },
       "audit": {
-        "title": "Cambios de acceso",
-        "empty": "Aún no hay cambios de acceso.",
-        "loadError": "No pudimos cargar los cambios de acceso.",
+        "title": "Historial de cambios",
+        "loadError": "No pudimos cargar el historial de cambios.",
         "noRole": "Sin nivel",
         "noSpecialties": "Sin especialidades",
         "created": "Usuario creado con nivel {{role}}.",

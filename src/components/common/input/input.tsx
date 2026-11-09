@@ -28,6 +28,8 @@ export const FIELD_LABEL_CLASSES = "text-sm font-medium text-ink-700";
 interface FormFieldProps {
   name: string;
   label: string;
+  /** Elemento junto a la etiqueta, fuera de ella (p. ej. un botón de información). */
+  labelAddon?: React.ReactNode;
   /** Cambia el estilo de la etiqueta (p. ej. `FIELD_LABEL_CLASSES`). */
   labelClassName?: string;
   type?: string;
@@ -61,6 +63,7 @@ interface FormFieldProps {
 export const FormField: React.FC<FormFieldProps> = ({
   name,
   label,
+  labelAddon,
   labelClassName,
   type = "text",
   placeholder,
@@ -99,13 +102,16 @@ export const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div className={tailwind("flex flex-col gap-1.5", className)}>
-      <label htmlFor={name}>
-        <Typography variant={TypographyVariant.BODY} className={labelClassName}>
-          {label}
-          {required && <span className="ml-0.5 text-danger">*</span>}
-          {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
-        </Typography>
-      </label>
+      <div className="flex items-center">
+        <label htmlFor={name}>
+          <Typography variant={TypographyVariant.BODY} className={labelClassName}>
+            {label}
+            {required && <span className="ml-0.5 text-danger">*</span>}
+            {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
+          </Typography>
+        </label>
+        {labelAddon}
+      </div>
 
       <div className="relative">
         <Field

@@ -246,6 +246,8 @@ interface AppLayoutProps {
    * el contenido, para que en movil no compita con los datos por el ancho.
    */
   action?: React.ReactNode;
+  /** En el celular la barra muestra el título en vez del logo de la clínica. */
+  isTitleVisibleOnMobile?: boolean;
   children: React.ReactNode;
 }
 
@@ -254,6 +256,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   backHref,
   subtitle,
   action,
+  isTitleVisibleOnMobile = false,
   children,
 }) => {
   const router = useRouter();
@@ -317,18 +320,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 <ArrowLeft className="h-4 w-4" aria-hidden />
               </Link>
             ) : (
-              <ClinicBrand
-                logoUrl={tenant?.logoUrl}
-                name={tenant?.businessName}
-                height={28}
-                className="max-w-[60vw] shrink-0 md:hidden"
-              />
+              !isTitleVisibleOnMobile && (
+                <ClinicBrand
+                  logoUrl={tenant?.logoUrl}
+                  name={tenant?.businessName}
+                  height={28}
+                  className="max-w-[60vw] shrink-0 md:hidden"
+                />
+              )
             )}
 
             <div className="flex min-w-0 flex-col">
               <Typography
                 variant={TypographyVariant.HEADER}
-                className={tailwind('truncate text-lg md:text-2xl', !backHref && 'hidden md:block')}
+                className={tailwind(
+                  'truncate text-lg md:text-2xl',
+                  !backHref && !isTitleVisibleOnMobile && 'hidden md:block',
+                )}
               >
                 {title}
               </Typography>

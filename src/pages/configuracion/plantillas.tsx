@@ -15,7 +15,7 @@ export default function DocumentTemplatesPage() {
         <title>{t(TEXT.DOCUMENT_TEMPLATES.PAGE_TITLE)}</title>
       </Head>
 
-      <SettingsLayout section={SettingsSection.TEMPLATES} showsDescription={false}>
+      <SettingsLayout section={SettingsSection.TEMPLATES}>
         <DocumentTemplatesContainer />
       </SettingsLayout>
     </>

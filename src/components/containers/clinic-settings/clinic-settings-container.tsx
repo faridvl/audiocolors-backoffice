@@ -69,7 +69,6 @@ export const ClinicSettingsContainer: React.FC = () => {
             hint={t(TEXT.SETTINGS.CLINIC.NAME_HINT)}
             maxLength={TENANT_NAME_MAX_LENGTH}
             disabled={!canEdit}
-            className="sm:max-w-sm"
           />
           <ClinicLogoField
             logoUrl={tenant.logoUrl}
@@ -78,12 +77,7 @@ export const ClinicSettingsContainer: React.FC = () => {
             logo={logo}
           />
 
-          <PhoneField
-            name="phone"
-            label={t(TEXT.SETTINGS.CLINIC.PHONE)}
-            disabled={!canEdit}
-            className="sm:max-w-sm"
-          />
+          <PhoneField name="phone" label={t(TEXT.SETTINGS.CLINIC.PHONE)} disabled={!canEdit} />
           <FormField
             name="email"
             type="email"
@@ -91,7 +85,6 @@ export const ClinicSettingsContainer: React.FC = () => {
             placeholder={t(TEXT.SETTINGS.CLINIC.EMAIL_PLACEHOLDER)}
             maxLength={TENANT_EMAIL_MAX_LENGTH}
             disabled={!canEdit}
-            className="sm:max-w-sm"
           />
           <FormField
             name="address"

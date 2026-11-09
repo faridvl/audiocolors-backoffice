@@ -66,10 +66,7 @@ export const DocumentTemplatesContainer: React.FC = () => {
       </Button>
 
       {templates.length === 0 ? (
-        <Typography
-          variant={TypographyVariant.BODY}
-          className="mx-auto max-w-md py-6 text-center text-ink-500"
-        >
+        <Typography variant={TypographyVariant.BODY} className="max-w-md py-2 text-ink-500">
           {t(TEXT.DOCUMENT_TEMPLATES.EMPTY)}
         </Typography>
       ) : (

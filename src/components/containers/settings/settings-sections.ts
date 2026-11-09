@@ -22,10 +22,9 @@ export interface SettingsSectionItem {
   section: SettingsSection;
   href: string;
   icon: LucideIcon;
-  /** `${TEXT.SETTINGS.SECTIONS_PREFIX}.${section}.title` y `.description`. */
   permission: Permission;
-  /** Pantallas con dos columnas (editor y panel): usan más ancho que el resto. */
-  isWide?: boolean;
+  /** Formularios: mantienen un ancho de lectura cómodo; tablas y listas ocupan toda la columna. */
+  isNarrow?: boolean;
 }
 
 /** Secciones de Configuración en el orden en que se muestran; se agrupan por tarea, no por tabla. */
@@ -47,13 +46,13 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
     href: routesPrivate.settings.templates,
     icon: FileText,
     permission: Permission.EDIT_CLINICAL_TEMPLATE,
-    isWide: true,
   },
   {
     section: SettingsSection.CLINIC,
     href: routesPrivate.settings.clinic,
     icon: Building2,
     permission: Permission.VIEW_CLINIC,
+    isNarrow: true,
   },
   {
     section: SettingsSection.USERS,
@@ -65,6 +64,3 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
 
 export const sectionTitleKey = (section: SettingsSection) =>
   `${TEXT.SETTINGS.SECTIONS_PREFIX}.${section}.title`;
-
-export const sectionDescriptionKey = (section: SettingsSection) =>
-  `${TEXT.SETTINGS.SECTIONS_PREFIX}.${section}.description`;

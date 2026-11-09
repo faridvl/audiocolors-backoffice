@@ -133,6 +133,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Ajustes de UI de Usuarios y Configuración (2026-11-09, listos en `feature/usuarios-ajustes-ui`):** Clínica con campos a ancho completo y ayudas en su lugar, Mi perfil con título en la barra móvil, Plantillas y Tipos de cita con vacío y duración alineados. Pendientes de subir a develop con permiso del usuario.
 - **Usuarios (2026-11-09, terminado y probado, en `develop`):** Configuración → Usuarios
   para que el OWNER administre los usuarios de su clínica (D70). Ramas `feature/usuarios` en el front
   y en el API. Revisado (cuestionador y revisor-ux), corregido y probado por qa en navegador contra el

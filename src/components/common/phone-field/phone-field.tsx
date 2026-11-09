@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { useField } from "formik";
-import { useTranslation } from "react-i18next";
 import { FormField } from "@/components/common/input/input";
 import { PhoneCountrySelect } from "@/components/common/phone-field/phone-country-select";
-import { TEXT } from "@/static/texts/i18n";
 import {
   composePhoneValue,
   detectPhoneCountry,
@@ -18,7 +16,7 @@ interface PhoneFieldProps {
   label: string;
   required?: boolean;
   disabled?: boolean;
-  /** Reemplaza la ayuda por defecto (cómo elegir otro país); '' la oculta. */
+  /** Ayuda bajo el campo; sin ella no se muestra ninguna. */
   hint?: string;
   /** Deja la ayuda a la vista aunque haya error. */
   isHintAlwaysVisible?: boolean;
@@ -39,7 +37,6 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
   isHintAlwaysVisible,
   className,
 }) => {
-  const { t } = useTranslation();
   const [{ value }, , { setValue }] = useField<string>(name);
   // Recuerda el país elegido mientras el campo está vacío o el código es compartido (+1).
   const [chosenCountry, setChosenCountry] = useState<PhoneCountry>();
@@ -55,7 +52,7 @@ export const PhoneField: React.FC<PhoneFieldProps> = ({
     <FormField
       name={name}
       label={label}
-      hint={hint ?? t(TEXT.GENERAL.PHONE_HINT)}
+      hint={hint}
       isHintAlwaysVisible={isHintAlwaysVisible}
       inputMode="tel"
       required={required}

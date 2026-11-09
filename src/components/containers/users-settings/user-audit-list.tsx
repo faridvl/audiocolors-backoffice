@@ -18,6 +18,8 @@ export const UserAuditList: React.FC<UserAuditListProps> = ({ targetUuid }) => {
   const { data, isLoading, isError } = useUserAuditQuery(targetUuid);
   const entries = buildAuditItems(data ?? [], t);
 
+  if (!isLoading && !isError && entries.length === 0) return null;
+
   return (
     <section className="flex flex-col gap-3" aria-labelledby="user-audit-title">
       <Typography variant={TypographyVariant.SUBTITLE} as="h2" id="user-audit-title">
@@ -30,9 +32,6 @@ export const UserAuditList: React.FC<UserAuditListProps> = ({ targetUuid }) => {
         </Typography>
       )}
       {isError && <Typography variant={TypographyVariant.ERROR}>{t(TEXTS.LOAD_ERROR)}</Typography>}
-      {!isLoading && !isError && entries.length === 0 && (
-        <Typography variant={TypographyVariant.HELPER}>{t(TEXTS.EMPTY)}</Typography>
-      )}
 
       {entries.length > 0 && (
         <ul className="flex flex-col divide-y divide-ink-100 rounded-lg border border-ink-100">
