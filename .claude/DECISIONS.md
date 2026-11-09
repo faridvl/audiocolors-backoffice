@@ -1174,7 +1174,7 @@ independientes:
 - Todas las secciones de Configuración (Tipos de cita, Formularios, Plantillas, Clínica, Usuarios) ocupan el ancho completo de la columna; se quitó `isNarrow`.
 - Piezas compartidas en `containers/settings/`: `SettingsCard` (`rounded-card border border-ink-200 bg-white`), `SettingsAddButton` (arriba a la derecha desde sm, ancho completo en móvil) y `SettingsSectionLoading`/`SettingsSectionError` (mismo `py`, icono y Reintentar).
 - Clínica va dentro de una `SettingsCard` con cuadrícula de 2 columnas desde `lg` (Nombre y Logo, Teléfono y Correo; Dirección y Guardar a ancho completo); una columna en móvil.
-- Bloques con `gap-4` en todas. Formularios conserva su botón punteado "Nueva sección" bajo la lista y Usuarios su `ResponsiveTable`, que ya trae la misma superficie.
+- Bloques con `gap-4` en todas. Usuarios conserva su `ResponsiveTable`, que ya trae la misma superficie. Formularios también usa el `SettingsAddButton` común, arriba como las demás (ya no el botón punteado bajo la lista); su ayuda de "no se puede agregar" va como `hint` del mismo componente, debajo del botón y alineada a la derecha.
 
 ## D75 · Configuración: grupos, ancho por dato y estados (2026-11-09)
 

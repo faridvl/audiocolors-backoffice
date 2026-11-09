@@ -11,6 +11,7 @@ const VIEWPORT_HEIGHT = 900;
 const MAX_TAB_PRESSES = 60;
 const PIXEL_TOLERANCE = 2;
 const FIELD_TOLERANCE = 8;
+const MAX_COMPACT_BUTTON_WIDTH = 300;
 const SETTLE_MS = 400;
 const NAV_SELECTOR = 'nav[aria-label="Configuración"]';
 const CONTENT_COLUMN = 'aside + div';
@@ -250,6 +251,9 @@ for (const section of sections) {
               `borde derecho del botón ${buttonRight} vs contenedor ${parentRight}`,
             )
             .toBeLessThanOrEqual(PIXEL_TOLERANCE);
+          expect
+            .soft(button.width, `botón compacto: ancho ${button.width}`)
+            .toBeLessThan(MAX_COMPACT_BUTTON_WIDTH);
         }
       }
 

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   AccordionSubtitleTone,
   AccordionVariant,
 } from '@/components/common/accordion/accordion';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
+import { SettingsAddButton } from '../settings/settings-add-button';
 import { SettingsCard } from '../settings/settings-card';
 import { SettingsSectionError, SettingsSectionLoading } from '../settings/settings-section-state';
 import { NewQuestionnaireSectionModal } from './questionnaire-template/new-questionnaire-section-modal';
@@ -73,6 +72,13 @@ export const QuestionsSettingsContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      <SettingsAddButton
+        label={t(TEXT.QUESTIONS.NEW_SECTION)}
+        onClick={handleOpenNameModal}
+        disabled={isLoading || isError || !canAddSection}
+        hint={canAddSection ? undefined : t(TEXT.QUESTIONS.NEW_SECTION_DISABLED_HINT)}
+      />
+
       {isLoading || isError ? (
         <SettingsCard>
           {isLoading ? (
@@ -94,23 +100,6 @@ export const QuestionsSettingsContainer: React.FC = () => {
           />
         ))
       )}
-
-      <div className="flex flex-col gap-1.5">
-        <button
-          type="button"
-          onClick={handleOpenNameModal}
-          disabled={isLoading || isError || !canAddSection}
-          className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-card border border-dashed border-ink-300 text-sm font-semibold text-ink-700 transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-ink-300 disabled:hover:bg-transparent disabled:hover:text-ink-700"
-        >
-          <Plus className="h-4 w-4" aria-hidden />
-          {t(TEXT.QUESTIONS.NEW_SECTION)}
-        </button>
-        {!canAddSection && (
-          <Typography variant={TypographyVariant.HELPER}>
-            {t(TEXT.QUESTIONS.NEW_SECTION_DISABLED_HINT)}
-          </Typography>
-        )}
-      </div>
 
       {isNameModalOpen && (
         <NewQuestionnaireSectionModal
