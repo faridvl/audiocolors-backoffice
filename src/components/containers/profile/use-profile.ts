@@ -10,6 +10,7 @@ import { FETCH_USERS_KEY } from '@/shared/api/querys/users-query';
 import { useUserCatalogsQuery } from '@/shared/api/querys/user-catalogs-query';
 import { TEXT } from '@/static/texts/i18n';
 import { ProfessionalTitle } from '@/types/auth/auth';
+import { formatProfessionalName } from '@/shared/utils/professional-name';
 import { USER_LICENSE_NUMBER_MAX_LENGTH } from '@/types/users/user';
 
 const ERRORS = TEXT.PROFILE.ERRORS;
@@ -51,6 +52,17 @@ export function useProfile() {
     licenseNumber: user?.licenseNumber ?? '',
   };
 
+  /** El nombre como sale en los documentos: mismo formato y prefijo que el resumen del paciente. */
+  const getPreviewName = (values: ProfileFormValues) =>
+    formatProfessionalName({
+      title: values.professionalTitle
+        ? t(TEXT.SETTINGS.USERS.TITLES[values.professionalTitle])
+        : null,
+      fullName: user?.fullName ?? '',
+      licenseNumber: values.licenseNumber,
+      licensePrefix: t(TEXT.DOCUMENT_TEMPLATES.LICENSE_PREFIX),
+    });
+
   const submit = (values: ProfileFormValues, helpers: FormikHelpers<ProfileFormValues>) => {
     if (!user) return;
     const licenseNumber = values.licenseNumber.trim();
@@ -78,10 +90,10 @@ export function useProfile() {
     user,
     isLoading,
     attendsPatients: user?.attendsPatients ?? false,
-    isLicenseMissing: Boolean(user?.attendsPatients && !user.licenseNumber),
     titleOptions,
     initialValues,
     schema,
+    getPreviewName,
     isSaving,
     submit,
   };

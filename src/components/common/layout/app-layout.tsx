@@ -29,6 +29,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { useLogout } from '@/hooks/use-logout';
 import { tailwind } from '@/utils/tailwind-utils';
+import { UserAvatar } from '@/components/common/user-avatar/user-avatar';
 import { ClinicBrand } from '@/components/common/brand/clinic-brand';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
@@ -52,16 +53,6 @@ const NAVIGATION: NavigationItem[] = [
   },
 ];
 
-function getInitials(fullName?: string): string {
-  if (!fullName) return 'AC';
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
-}
-
 const UserMenu: React.FC = () => {
   const { user, tenant } = useSession();
   const logout = useLogout();
@@ -75,8 +66,7 @@ const UserMenu: React.FC = () => {
     <div className="relative">
       <Menu as="div" className="relative">
         <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
-            {getInitials(user?.fullName)}
+          <UserAvatar fullName={user?.fullName}>
             {/* Invita a abrir el menú: ahí está la novedad sin ver. */}
             {notifications.unreadCount > 0 && (
               <span
@@ -84,7 +74,7 @@ const UserMenu: React.FC = () => {
                 aria-hidden
               />
             )}
-          </span>
+          </UserAvatar>
           <span className="hidden text-left lg:flex lg:flex-col">
             <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
               {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
