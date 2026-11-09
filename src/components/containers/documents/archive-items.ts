@@ -22,6 +22,8 @@ export interface AudiometryArchiveItem {
   displayName: string;
   sortTime: number;
   dateLabel: string;
+  ptaRight: number | null;
+  ptaLeft: number | null;
   createdByUuid: string;
   createdByName: string | null;
   /** Solo si la audiometría está marcada como mal hecha. */
@@ -53,6 +55,8 @@ export function mapAudiometryToArchiveItem(
     displayName,
     sortTime: Date.parse(entry.createdAt),
     dateLabel: formatDateTime(entry.createdAt),
+    ptaRight: entry.ptaRight ?? null,
+    ptaLeft: entry.ptaLeft ?? null,
     createdByUuid: entry.createdByUuid ?? '',
     createdByName: entry.createdByName,
     // Una lista vieja o en caché puede no traer la marca: `!= null` cubre null y undefined.

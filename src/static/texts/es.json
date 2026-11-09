@@ -184,7 +184,10 @@
         "removeMessage": "El menú y los documentos mostrarán el nombre de la clínica en su lugar.",
         "removeConfirm": "Quitar",
         "errorType": "Formato no permitido. El logo debe ser PNG, JPG, WEBP o SVG.",
-        "errorSize": "El logo no puede pesar más de 2 MB."
+        "errorSize": "El logo no puede pesar más de 2 MB.",
+        "errorUpload": "No se pudo subir el logo.",
+        "errorNetwork": "No hay conexión. Revisa tu internet e inténtalo de nuevo.",
+        "errorSessionExpired": "Tu sesión expiró. Inicia sesión de nuevo."
       },
       "phone": "Teléfono",
       "email": "Correo",
@@ -846,7 +849,9 @@
       "name": "Audiometría",
       "openLabel": "Ver audiometría del {{date}}",
       "modalLabel": "Informe de audiometría",
-      "loadError": "No se pudo cargar la audiometría."
+      "loadError": "No se pudo cargar la audiometría.",
+      "detail": "Audiometría · Informe",
+      "ptaSummary": "PTA OD {{right}} / OI {{left}}"
     },
     "preview": {
       "label": "Vista previa de {{name}}",

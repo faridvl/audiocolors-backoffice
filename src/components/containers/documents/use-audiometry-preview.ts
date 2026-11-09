@@ -22,6 +22,9 @@ import { buildSummaryAudiometry } from '../patients/patient-summary/summary-prin
 const SHEET_WIDTH_PX = 794;
 const SIDE_GUTTER_PX = 16;
 const FULL_ZOOM = 1;
+// Bajo el breakpoint `sm` la hoja no se encoge más de aquí: el audiograma sigue legible y se desplaza.
+const COMPACT_VIEWPORT_MAX_PX = 640;
+const COMPACT_MIN_ZOOM = 0.7;
 
 interface UseAudiometryPreviewParams {
   patientUuid: string;
@@ -58,8 +61,11 @@ export function useAudiometryPreview({
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return undefined;
-    const fit = () =>
-      setZoom(Math.min(FULL_ZOOM, (element.clientWidth - SIDE_GUTTER_PX * 2) / SHEET_WIDTH_PX));
+    const fit = () => {
+      const fitZoom = (element.clientWidth - SIDE_GUTTER_PX * 2) / SHEET_WIDTH_PX;
+      const minZoom = window.innerWidth < COMPACT_VIEWPORT_MAX_PX ? COMPACT_MIN_ZOOM : 0;
+      setZoom(Math.min(FULL_ZOOM, Math.max(minZoom, fitZoom)));
+    };
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(element);

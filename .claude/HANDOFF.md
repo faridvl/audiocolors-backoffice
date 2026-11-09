@@ -133,6 +133,13 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Correcciones de logo y Archivos (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):**
+  informe de audiometría legible en celular (zoom mínimo 0.7 y desplazamiento bajo 640 px; la
+  impresión no cambia), "Quitar logo" como botón secundario de peligro con papelera, tarjetas de
+  audiometría distinguibles (detalle, chevron, icono info, PTA por oído), la nota "Se realizó
+  audiometría" aparece en Evolución sin recargar, y la subida del logo maneja sesión vencida y red
+  caída. Lint y typecheck limpios. Sin probar en navegador: el dev server de :3000 estaba roto
+  ("__webpack_require__.t is not a function"); hay que reiniciarlo y verificar a 390 y 1440.
 
 - **Ajustes del 2026-11-08 (misma rama `feature/resumen-paciente` + API `feature/audiometria-mal-hecha`
   y `feature/plantilla-variables-clinica`):** hechos el informe impreso, marcar como mal hecha,

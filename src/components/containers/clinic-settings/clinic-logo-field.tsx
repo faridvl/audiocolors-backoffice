@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Trash2 } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ClinicBrand } from '@/components/common/brand/clinic-brand';
 import { ConfirmDialog } from '@/components/common/confirm-dialog/confirm-dialog';
@@ -56,7 +57,9 @@ export const ClinicLogoField: React.FC<ClinicLogoFieldProps> = ({
             {logoUrl && (
               <Button
                 type="button"
-                variant={ButtonVariant.GHOST}
+                variant={ButtonVariant.SECONDARY}
+                icon={<Trash2 className="h-4 w-4" aria-hidden />}
+                className="border-danger/40 text-danger-700 hover:border-danger hover:bg-danger/10"
                 onClick={logo.requestRemoval}
                 isLoading={logo.isRemoving}
                 disabled={logo.isBusy}

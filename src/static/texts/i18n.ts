@@ -120,6 +120,9 @@ export const TEXT = {
         REMOVE_CONFIRM: 'settings.clinic.logo.removeConfirm',
         ERROR_TYPE: 'settings.clinic.logo.errorType',
         ERROR_SIZE: 'settings.clinic.logo.errorSize',
+        ERROR_UPLOAD: 'settings.clinic.logo.errorUpload',
+        ERROR_NETWORK: 'settings.clinic.logo.errorNetwork',
+        ERROR_SESSION_EXPIRED: 'settings.clinic.logo.errorSessionExpired',
       },
       PHONE: 'settings.clinic.phone',
       EMAIL: 'settings.clinic.email',
@@ -605,6 +608,8 @@ export const TEXT = {
       OPEN_LABEL: 'documents.audiometry.openLabel',
       MODAL_LABEL: 'documents.audiometry.modalLabel',
       LOAD_ERROR: 'documents.audiometry.loadError',
+      DETAIL: 'documents.audiometry.detail',
+      PTA_SUMMARY: 'documents.audiometry.ptaSummary',
     },
     PREVIEW: {
       LABEL: 'documents.preview.label',

@@ -42,7 +42,7 @@ interface ApiErrorBody {
 const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
   Array.isArray(body?.details) ? body.details : [];
 
-const handleSessionExpired = (): void => {
+export const handleSessionExpired = (): void => {
   CookiesManager.clearAll();
   if (typeof window !== 'undefined') {
     window.location.href = `${routesPublic.login}?expired=true`;

@@ -66,10 +66,7 @@ export const AudiometryPreviewModal: React.FC<AudiometryPreviewModalProps> = ({
           </div>
         </div>
 
-        <div
-          ref={state.scrollRef}
-          className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-4"
-        >
+        <div ref={state.scrollRef} className="min-h-0 flex-1 overflow-auto py-4">
           {state.isLoading && (
             <div className="flex items-center justify-center py-14">
               <Loader2 className="h-5 w-5 animate-spin text-brand" aria-hidden />
@@ -90,7 +87,7 @@ export const AudiometryPreviewModal: React.FC<AudiometryPreviewModalProps> = ({
 
           {state.report && (
             <div
-              className="flex justify-center [zoom:var(--summary-zoom)] print:[zoom:1]"
+              className="flex w-max min-w-full justify-center [zoom:var(--summary-zoom)] print:w-auto print:min-w-0 print:[zoom:1]"
               style={{ '--summary-zoom': state.zoom } as CSSProperties}
             >
               <div data-print-summary="" className={SHEET_CLASSES}>
