@@ -313,3 +313,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Búsqueda de pacientes: nombre y apellido juntos ("PruebaSedes Cuatro") dan "Sin resultados", porque el API (`patient.storage.ts`) compara cada campo por separado. No viene de este lote; falta corregirlo.
 
 - **Logo y nombre de la clínica (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):** Configuración → Clínica edita el nombre y sube/quita el logo (D68); menú y documentos usan `ClinicBrand`. Probado en navegador sin logo y con logo (1440 y 390 px, capturas en `test-results/clinica-logo-nombre/`), validación de tipo/tamaño y cambio de nombre sin recargar. Sin probar: subida y borrado reales (bucket real), usuario sin permiso, informe y resumen impresos. Requiere el API de `feature/clinica-logo-y-nombre`.
+
+## Roles y especialidades (corte en curso)
+
+- Hecho y commiteado: alta/edicion en paginas `/configuracion/usuarios/nuevo` y `/[uuid]`, lista con atiende pacientes y especialidades, bitacora en la ficha.
+- Falta: (1) perfil propio `/perfil` + entrada "Mi perfil" en `UserMenu` (textos `TEXT.PROFILE` y ruta `profile.index` ya existen; falta hook, container, pagina); (2) variable "profesional" de plantillas (titulo + nombre + Cod. N) con prueba `test:*` y ejemplo en es.json; (3) prueba en navegador contra el API local y capturas 375/1440.

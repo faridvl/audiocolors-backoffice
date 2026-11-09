@@ -1144,3 +1144,10 @@ independientes:
   la petición; si vuelve a fallar, se muestra el error. Cubre el cambio de acceso con token viejo.
 - Los niveles asignables desde Usuarios pasan a Recepción y Administración; Propietario lo da solo
   el Propietario (pantalla de Usuarios en el encargo siguiente).
+
+## Roles y especialidades: usuarios en paginas (rama feature/roles-especialidades)
+
+- Formulario de usuarios con Formik + Yup, igual que el resto del repo (no RHF + Zod).
+- Los niveles que puede asignar cada quien se calculan en local (`getAssignableRoles`); el API es quien rechaza lo que no corresponde.
+- El ADMIN nunca envia `attendsPatients` ni `specialties` (el API responde 403).
+- La bitacora de cambios de acceso vive en la ficha del usuario (`UserAuditList`).
