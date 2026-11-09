@@ -120,6 +120,18 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   texto). "Lo perdió" no se guarda sin una nota: al tocarlo se abre el campo de nota y el estado
   se guarda junto con la nota; sin texto no deja guardar. Las marcas que ya existen no cambian.
 
+- Audiometría en evolución y Archivos (2026-11-08, pedidos del usuario):
+  - Generar resumen ya no tiene la tarjeta "Última otoscopía" (las variables de otoscopía de las
+    plantillas siguen).
+  - Al guardar una audiometría el API deja una nota de "Pruebas" en Control de evolución, como la
+    otoscopía (D47): "Se realizó audiometría" con la fecha.
+  - Archivos muestra cada audiometría guardada como una tarjeta más; al abrirla, un modal la arma
+    completa desde la BD (no hay PDF guardado) con un botón de imprimir.
+  - Agendar cita: el botón "Registrar paciente nuevo" también se ve antes de escribir.
+  - Configuración → Clínica: el nombre ya se edita (reemplaza lo de "no se edita") y se sube el
+    logo. Cada clínica (tenant) tiene su logo y se usa en todo: menú de la app y documentos
+    impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
+
 ## En qué estamos
 
 - **Ajustes del 2026-11-08 (misma rama `feature/resumen-paciente` + API `feature/audiometria-mal-hecha`

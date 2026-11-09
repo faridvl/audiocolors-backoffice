@@ -582,6 +582,12 @@ export const TEXT = {
       EDIT_LABEL: 'documents.list.editLabel',
       DELETE_LABEL: 'documents.list.deleteLabel',
     },
+    AUDIOMETRY: {
+      NAME: 'documents.audiometry.name',
+      OPEN_LABEL: 'documents.audiometry.openLabel',
+      MODAL_LABEL: 'documents.audiometry.modalLabel',
+      LOAD_ERROR: 'documents.audiometry.loadError',
+    },
     PREVIEW: {
       LABEL: 'documents.preview.label',
       OPEN_NEW_TAB: 'documents.preview.openNewTab',
@@ -662,7 +668,6 @@ export const TEXT = {
         TECHNICAL_SHEET: 'patients.clinicalSummary.sections.technicalSheet',
         TEMPLATES: 'patients.clinicalSummary.sections.templates',
         BACKGROUND: 'patients.clinicalSummary.sections.background',
-        OTOSCOPY: 'patients.clinicalSummary.sections.otoscopy',
         AUDIOMETRY: 'patients.clinicalSummary.sections.audiometry',
       },
       DOCUMENT: {

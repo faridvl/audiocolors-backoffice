@@ -824,6 +824,12 @@
       "updatedAt": "Actualizada el {{date}}",
       "deleteLabel": "Eliminar {{name}}"
     },
+    "audiometry": {
+      "name": "Audiometría",
+      "openLabel": "Ver audiometría del {{date}}",
+      "modalLabel": "Informe de audiometría",
+      "loadError": "No se pudo cargar la audiometría."
+    },
     "preview": {
       "label": "Vista previa de {{name}}",
       "openNewTab": "Abrir en pestaña nueva",
@@ -905,7 +911,6 @@
         "technicalSheet": "Ficha técnica",
         "templates": "Plantillas de documento",
         "background": "Historia clínica",
-        "otoscopy": "Última otoscopía",
         "audiometry": "Audiometrías"
       },
       "document": {

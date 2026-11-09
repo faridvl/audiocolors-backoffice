@@ -39,7 +39,6 @@ export enum SummaryCard {
   TECHNICAL_SHEET = 'TECHNICAL_SHEET',
   TEMPLATES = 'TEMPLATES',
   BACKGROUND = 'BACKGROUND',
-  OTOSCOPY = 'OTOSCOPY',
   AUDIOMETRY = 'AUDIOMETRY',
 }
 
@@ -79,7 +78,6 @@ export function usePatientSummary(patient: Patient) {
     [SummaryCard.TECHNICAL_SHEET]: true,
     [SummaryCard.TEMPLATES]: false,
     [SummaryCard.BACKGROUND]: false,
-    [SummaryCard.OTOSCOPY]: false,
     [SummaryCard.AUDIOMETRY]: false,
   });
   const [templateUuids, setTemplateUuids] = useState<string[]>([]);
@@ -108,8 +106,8 @@ export function usePatientSummary(patient: Patient) {
   const latestValidAudiometryUuid = resolveDefaultAudiometryUuids(audiometryList)[0] ?? null;
   const hasTemplatesChosen = checked[SummaryCard.TEMPLATES] && templateUuids.length > 0;
 
-  // Las variables de diagnóstico, observaciones y clínica salen de la última audiometría válida
-  // y de la clínica, no de lo elegido en las tarjetas: se piden solo si hay plantillas elegidas.
+  // Las variables de otoscopía, diagnóstico, observaciones y clínica salen de la última otoscopía y
+  // audiometría válida y de la clínica, no de lo elegido en las tarjetas: se piden solo si hay plantillas elegidas.
   const clinicQuery = useTenantQuery({ enabled: hasTemplatesChosen });
   const latestAudiometryQuery = useAudiometryEntryQuery(
     hasTemplatesChosen ? clinicalUuid : '',
@@ -134,7 +132,8 @@ export function usePatientSummary(patient: Patient) {
   const isAudiometryDetailFailed = failedAudiometryQueries.length > 0;
   // Sin la clínica o la última audiometría las variables saldrían vacías: se bloquea y se reintenta.
   const isTemplateContextFailed =
-    hasTemplatesChosen && (clinicQuery.isError || latestAudiometryQuery.isError);
+    hasTemplatesChosen &&
+    (clinicQuery.isError || latestAudiometryQuery.isError || otoscopyQuery.isError);
 
   // Las sedes no son una tarjeta: si fallan, la ficha sale sin ellas y no se bloquea nada.
   const cardStates: SummaryCardState[] = [
@@ -151,8 +150,7 @@ export function usePatientSummary(patient: Patient) {
       isAvailable: templates.length > 0,
       isChecked: checked[SummaryCard.TEMPLATES],
       isLoading: templatesQuery.isLoading,
-      isError:
-        templatesQuery.isError || failedContentQueries.length > 0 || isTemplateContextFailed,
+      isError: templatesQuery.isError || failedContentQueries.length > 0 || isTemplateContextFailed,
       onRetry: () => {
         if (templatesQuery.isError) void templatesQuery.refetch();
         failedContentQueries.forEach((query) => void query.refetch());
@@ -160,6 +158,7 @@ export function usePatientSummary(patient: Patient) {
         if (hasTemplatesChosen && latestAudiometryQuery.isError) {
           void latestAudiometryQuery.refetch();
         }
+        if (hasTemplatesChosen && otoscopyQuery.isError) void otoscopyQuery.refetch();
       },
     },
     ...(canViewClinical
@@ -171,14 +170,6 @@ export function usePatientSummary(patient: Patient) {
             isLoading: backgroundQuery.isLoading,
             isError: backgroundQuery.isError,
             onRetry: () => void backgroundQuery.refetch(),
-          },
-          {
-            card: SummaryCard.OTOSCOPY,
-            isAvailable: latestOtoscopy !== null,
-            isChecked: checked[SummaryCard.OTOSCOPY],
-            isLoading: otoscopyQuery.isLoading,
-            isError: otoscopyQuery.isError,
-            onRetry: () => void otoscopyQuery.refetch(),
           },
           {
             card: SummaryCard.AUDIOMETRY,
@@ -221,14 +212,14 @@ export function usePatientSummary(patient: Patient) {
   const isLoadingChosen =
     (checked[SummaryCard.TEMPLATES] && templateContentQueries.some((query) => query.isLoading)) ||
     (checked[SummaryCard.AUDIOMETRY] && audiometryDetailQueries.some((query) => query.isLoading)) ||
-    (hasTemplatesChosen && (clinicQuery.isLoading || latestAudiometryQuery.isLoading));
+    (hasTemplatesChosen &&
+      (clinicQuery.isLoading || latestAudiometryQuery.isLoading || otoscopyQuery.isLoading));
   const isTemplatesIncomplete = checked[SummaryCard.TEMPLATES] && templateUuids.length === 0;
   const isAudiometryIncomplete = checked[SummaryCard.AUDIOMETRY] && audiometryUuids.length === 0;
   const hasSomething =
     checked[SummaryCard.TECHNICAL_SHEET] ||
     hasTemplatesChosen ||
     checked[SummaryCard.BACKGROUND] ||
-    checked[SummaryCard.OTOSCOPY] ||
     checked[SummaryCard.AUDIOMETRY];
   const canGenerate =
     hasSomething &&
@@ -311,7 +302,6 @@ export function usePatientSummary(patient: Patient) {
               ),
             }
           : null,
-      otoscopy: checked[SummaryCard.OTOSCOPY] ? latestOtoscopy : null,
       audiometries: chosenAudiometries.map((audiometryEntry) =>
         buildSummaryAudiometry(
           audiometryEntry,

@@ -76,6 +76,8 @@ export interface AudiometryPrintReportProps {
   isEmbedded?: boolean;
   /** Informe suelto de una audiometría marcada como mal hecha: se avisa arriba, bien visible. */
   invalidation?: AudiometryInvalidationNotice | null;
+  /** Para mostrar el informe suelto en pantalla (por ejemplo en un modal); por defecto solo sale al imprimir. */
+  isVisibleOnScreen?: boolean;
 }
 
 /** Solo se ve al imprimir: informe clínico de la audiometría guardada, hecho para una hoja A4. */
@@ -93,6 +95,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   notes,
   isEmbedded = false,
   invalidation = null,
+  isVisibleOnScreen = false,
 }) => {
   const { t } = useTranslation();
   const empty = t(SUMMARY_TEXT.EMPTY);
@@ -157,7 +160,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       {...(isEmbedded ? { 'data-print-summary-section': '' } : { 'data-print-report': '' })}
       className={tailwind(
         'flex-col gap-2 bg-white text-xs leading-snug text-ink-700',
-        isEmbedded ? 'flex' : 'hidden print:flex',
+        isEmbedded || isVisibleOnScreen ? 'flex' : 'hidden print:flex',
       )}
     >
       {isEmbedded && (
