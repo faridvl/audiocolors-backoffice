@@ -21,7 +21,9 @@ import { isKnownRole, isLegacyRole } from './users-logic';
 
 const TEXTS = TEXT.SETTINGS.USERS;
 const ICON_CLASSES = 'h-4 w-4';
-const EMAIL_COLUMN_MAX_WIDTH = 'max-w-[16rem]';
+// Topes para que la tabla quepa en el ancho de Configuración a 1440 px.
+const USER_COLUMN_MAX_WIDTH = 'max-w-[15rem]';
+const SPECIALTY_COLUMN_MAX_WIDTH = 'max-w-[8rem]';
 
 const YouPill: React.FC<{ label: string }> = ({ label }) => (
   <span className="shrink-0 whitespace-nowrap rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand-700">
@@ -49,11 +51,16 @@ export const UsersSettingsContainer: React.FC = () => {
       header: t(TEXTS.COLUMNS.NAME),
       isCardTitle: true,
       render: (user) => (
-        <span className="flex items-center gap-2 whitespace-nowrap">
-          <Typography variant={TypographyVariant.ACCENT} as="span">
-            {user.fullName}
-          </Typography>
-          {isCurrentUser(user) && <YouPill label={t(TEXTS.YOU)} />}
+        <span className={tailwind('flex flex-col', USER_COLUMN_MAX_WIDTH)}>
+          <span className="flex min-w-0 items-center gap-2">
+            <Typography variant={TypographyVariant.ACCENT} as="span" className="truncate" title={user.fullName}>
+              {user.fullName}
+            </Typography>
+            {isCurrentUser(user) && <YouPill label={t(TEXTS.YOU)} />}
+          </span>
+          <span className="truncate text-ink-500" title={user.email}>
+            {user.email}
+          </span>
         </span>
       ),
       renderCard: (user) => (
@@ -68,12 +75,8 @@ export const UsersSettingsContainer: React.FC = () => {
     {
       key: 'email',
       header: t(TEXTS.COLUMNS.EMAIL),
-      render: (user) => (
-        <span className={tailwind('block truncate', EMAIL_COLUMN_MAX_WIDTH)} title={user.email}>
-          {user.email}
-        </span>
-      ),
-      renderCard: (user) => <span className="break-words">{user.email}</span>,
+      hideOnTable: true,
+      render: (user) => <span className="break-words">{user.email}</span>,
     },
     {
       key: 'role',
@@ -97,7 +100,12 @@ export const UsersSettingsContainer: React.FC = () => {
     {
       key: 'specialty',
       header: t(TEXTS.COLUMNS.SPECIALTY),
-      render: (user) => user.specialty ?? '',
+      render: (user) => (
+        <span className={tailwind('block truncate', SPECIALTY_COLUMN_MAX_WIDTH)} title={user.specialty ?? undefined}>
+          {user.specialty ?? ''}
+        </span>
+      ),
+      renderCard: (user) => <span className="break-words">{user.specialty ?? ''}</span>,
     },
   ];
 

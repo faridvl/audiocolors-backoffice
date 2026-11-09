@@ -33,6 +33,8 @@ export interface TableColumn<T> {
   renderCard?: (row: T) => React.ReactNode;
   /** Oculta la columna en la tarjeta de movil (p.ej. datos redundantes). */
   hideOnCard?: boolean;
+  /** Oculta la columna en la tabla de escritorio (p.ej. un dato que ya va dentro de otra columna). */
+  hideOnTable?: boolean;
   /** Marca la columna que encabeza la tarjeta en movil. */
   isCardTitle?: boolean;
 }
@@ -189,6 +191,7 @@ export function ResponsiveTable<T>({
     );
   }
 
+  const tableColumns = columns.filter((column) => !column.hideOnTable);
   const cardColumns = columns.filter((column) => !column.hideOnCard);
   const titleColumn =
     columns.find((column) => column.isCardTitle) ?? columns[0];
@@ -213,7 +216,7 @@ export function ResponsiveTable<T>({
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-ink-200 bg-ink-50">
-              {columns.map((column) => (
+              {tableColumns.map((column) => (
                 <th
                   key={column.key}
                   style={
@@ -241,7 +244,7 @@ export function ResponsiveTable<T>({
                 {groupStartLabel(index) && (
                   <tr className="border-b border-ink-200 bg-ink-50">
                     <td
-                      colSpan={columns.length + (rowActions ? 1 : 0)}
+                      colSpan={tableColumns.length + (rowActions ? 1 : 0)}
                       className="px-4 py-2 text-xs font-bold uppercase tracking-wide text-ink-500"
                     >
                       {groupStartLabel(index)}
@@ -255,7 +258,7 @@ export function ResponsiveTable<T>({
                     onRowClick && "cursor-pointer hover:bg-ink-50",
                   )}
                 >
-                  {columns.map((column) => (
+                  {tableColumns.map((column) => (
                     <td
                       key={column.key}
                       className="px-4 py-3 align-middle text-sm text-ink-700"

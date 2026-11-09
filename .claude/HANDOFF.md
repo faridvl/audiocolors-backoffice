@@ -133,8 +133,21 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
-- **Usuarios (2026-11-08, en curso):** Configuración → Usuarios para que el OWNER administre los
-  usuarios de su clínica (D70). Ramas `feature/usuarios` en el front y en el API.
+- **Usuarios (2026-11-09, terminado y probado, local sin push ni PR):** Configuración → Usuarios
+  para que el OWNER administre los usuarios de su clínica (D70). Ramas `feature/usuarios` en el front
+  y en el API. Revisado (cuestionador y revisor-ux), corregido y probado por qa en navegador contra el
+  API local y la base Docker `audiocolors-prueba-db`: crear, correo duplicado en mayúsculas, cambio de
+  rol con pérdida de acceso, contraseña, desactivar/reactivar, rol nulo heredado, DOCTOR/STAFF sin
+  acceso, 375/768/1280/1440/1920 sin cortes y el nombre del autor tras la caché de 5 min. Arreglado
+  al probar: la tabla se cortaba a 1440 (nombre y correo apilados) y el menú de acciones se salía
+  3 px a 375 (ahora se ancla a la pantalla). Menores sin arreglar: la página sin acceso muestra el
+  título "Usuarios" sobre el candado; el diálogo de confirmación no es `role=dialog`; no se probó una
+  especialidad larga.
+  **Antes de publicar**, en producción (solo lectura): roles por conteo, correos con mayúsculas y
+  correos repetidos ignorando mayúsculas. Orden: migración del API
+  `20261108160000_user_role_default_staff`, el API y el front.
+  qa subió 3 PNG de prueba al bucket real de R2 (`audilogyfiles`); no se borraron.
+  En la base local quedaron usuarios `qa-*` y tres notas "QA-D10" de prueba.
 
 - **Versión 2.0.0 (2026-11-08, rama `release/2.0.0` del front y del API, con PR a `develop` abierto en cada repo):**
   changelog de 20 cambios aprobado por el usuario y cargado en `releases.ts`/`es.json`; el API
