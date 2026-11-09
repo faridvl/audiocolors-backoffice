@@ -137,8 +137,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   changelog de 20 cambios aprobado por el usuario y cargado en `releases.ts`/`es.json`; el API
   sube a 2.0.0 en sus cuatro `package.json`. Cubre todo lo que hay en `develop` (no incluye
   `feature/audiometria-tipos` ni otras ramas locales). Sigue: push y PR a `develop` y de `develop`
-  a `main`, con permiso del usuario. En el API quedó en el stash el trabajo sin commit de
-  `identity` de la rama `feature/clinica-logo-y-nombre`.
+  a `main`, con permiso del usuario.
 
 - **Audiometría por tipos, Archivos y notas (2026-11-08, rama `feature/audiometria-tipos`, local):**
   la nota de audiometría en Control de evolución abre esa audiometría (`?audiometria=<uuid>`); Archivos
