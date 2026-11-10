@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 import { TEXT } from '@/static/texts/i18n';
-import { Branch, BRANCH_COLORS, BranchColor, DEFAULT_BRANCH_COLOR } from '@/types/branches/branch';
+import { Branch, BRANCH_COLORS, BranchColor } from '@/types/branches/branch';
 
 /** Sedes con las que se puede registrar o agendar algo nuevo. */
 export const getActiveBranches = (branches: Branch[] | undefined): Branch[] =>
@@ -27,10 +27,10 @@ export const findBranch = (
   return undefined;
 };
 
-/** El primer color que ninguna sede activa usa; si todos se usan, el azul. */
+/** El primer color que ninguna sede existente usa; si todos se usan, el primero. */
 export const pickDefaultBranchColor = (branches: Branch[] | undefined): BranchColor => {
-  const used = new Set(getActiveBranches(branches).map((branch) => branch.color));
-  return BRANCH_COLORS.find((color) => !used.has(color)) ?? DEFAULT_BRANCH_COLOR;
+  const used = new Set((branches ?? []).map((branch) => branch.color));
+  return BRANCH_COLORS.find((color) => !used.has(color)) ?? BRANCH_COLORS[0];
 };
 
 /** Nombre de una sede en un selector o filtro; las inactivas llevan la marca. */

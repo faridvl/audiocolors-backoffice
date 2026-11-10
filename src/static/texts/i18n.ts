@@ -330,11 +330,15 @@ export const TEXT = {
       DEACTIVATED: 'settings.branches.deactivated',
       REACTIVATED: 'settings.branches.reactivated',
       DUPLICATE_NAME: 'settings.branches.duplicateName',
+      LAST_ACTIVE_BRANCH: 'settings.branches.lastActiveBranch',
+      ACTIONS_LABEL: 'settings.branches.actionsLabel',
+      SELECTED_COLOR: 'settings.branches.selectedColor',
     },
   },
   BRANCHES: {
     /** `{{name}}` lleva el nombre de la sede */
     INACTIVE_OPTION: 'branches.inactiveOption',
+    NO_ACTIVE_FOR_PATIENT: 'branches.noActiveForPatient',
   },
   DOCUMENT_TEMPLATES: {
     LICENSE_PREFIX: 'documentTemplates.licensePrefix',
@@ -1255,6 +1259,7 @@ export const TEXT = {
       NO_TYPES: 'patients.schedule.noTypes',
       BRANCH_LABEL: 'patients.schedule.branchLabel',
       BRANCH_PLACEHOLDER: 'patients.schedule.branchPlaceholder',
+      EDIT_PATIENT: 'patients.schedule.editPatient',
       BACK: 'patients.schedule.back',
       VALIDATION: {
         MONTH_REQUIRED: 'patients.schedule.validation.monthRequired',

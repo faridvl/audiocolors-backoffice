@@ -99,6 +99,9 @@ export const STATUS_STYLES: Record<StatusTone, string> = {
   [StatusTone.INACTIVE]: 'bg-ink-100 text-ink-500',
 };
 
+/** Mismo valor que `warning-700` de `tailwind.config.js`: contraste AA sobre blanco. */
+const WARNING_TEXT_COLOR = '#b45309';
+
 /**
  * Color de cada sede: `stripe` para la franja y los puntos, `text` para la
  * píldora. El amarillo no da contraste como texto sobre su fondo suave, así
@@ -107,7 +110,7 @@ export const STATUS_STYLES: Record<StatusTone, string> = {
 const BRANCH_COLOR_STYLES: Record<BranchColor, { stripe: string; text: string }> = {
   [BranchColor.RED]: { stripe: BRAND_COLORS.red, text: BRAND_COLORS.red },
   [BranchColor.ORANGE]: { stripe: BRAND_COLORS.orange, text: BRAND_COLORS.orange },
-  [BranchColor.YELLOW]: { stripe: BRAND_COLORS.yellow, text: '#8a6a00' },
+  [BranchColor.YELLOW]: { stripe: BRAND_COLORS.yellow, text: WARNING_TEXT_COLOR },
   [BranchColor.GREEN]: { stripe: BRAND_COLORS.green, text: BRAND_COLORS.green },
   [BranchColor.BLUE]: { stripe: BRAND_COLORS.blue, text: BRAND_COLORS.blue },
   [BranchColor.PURPLE]: { stripe: BRAND_COLORS.purple, text: BRAND_COLORS.purple },

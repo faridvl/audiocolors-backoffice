@@ -25,6 +25,8 @@ export class ApiError extends Error {
     readonly status: number,
     /** Errores 400 por campo, cuando el API los detalla. */
     readonly details: ApiFieldError[] = [],
+    /** Código estable del API (p. ej. `BRANCH_LAST_ACTIVE`), cuando lo trae. */
+    readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -39,6 +41,7 @@ export interface ApiFieldError {
 interface ApiErrorBody {
   message?: string | string[];
   details?: ApiFieldError[];
+  error?: { code?: string; message?: string | string[] };
 }
 
 const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
@@ -87,8 +90,9 @@ export const handleSessionExpired = (): void => {
  * de Zod/class-validator). Se normaliza a una sola linea legible.
  */
 const resolveErrorMessage = (body: ApiErrorBody | null, fallback: string): string => {
-  if (!body?.message) return fallback;
-  return Array.isArray(body.message) ? body.message.join('. ') : body.message;
+  const message = body?.message ?? body?.error?.message;
+  if (!message) return fallback;
+  return Array.isArray(message) ? message.join('. ') : message;
 };
 
 /**
@@ -154,6 +158,7 @@ async function fetcher<T>(url: string, options: RequestInit = {}, isRetry = fals
       resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE),
       response.status,
       resolveFieldErrors(data as ApiErrorBody | null),
+      (data as ApiErrorBody | null)?.error?.code,
     );
   }
 

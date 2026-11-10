@@ -493,11 +493,15 @@
       "saved": "Sede guardada",
       "deactivated": "Sede desactivada",
       "reactivated": "Sede reactivada",
-      "duplicateName": "Ya tienes una sede con ese nombre."
+      "duplicateName": "Ya tienes una sede con ese nombre.",
+      "lastActiveBranch": "Debe quedar al menos una sede activa",
+      "actionsLabel": "Acciones de {{name}}",
+      "selectedColor": "Color elegido: {{name}}"
     }
   },
   "branches": {
-    "inactiveOption": "{{name}} (inactiva)"
+    "inactiveOption": "{{name}} (inactiva)",
+    "noActiveForPatient": "Este paciente no tiene sedes activas. Edítalo para asignarle una."
   },
   "documentTemplates": {
     "licensePrefix": "Cód.",
@@ -1379,6 +1383,7 @@
       "typePlaceholder": "Seleccione un tipo",
       "branchLabel": "Sede",
       "branchPlaceholder": "Elige la sede de la cita",
+      "editPatient": "Editar paciente",
       "noTypes": "No hay tipos de cita configurados. Pide a soporte que los agregue.",
       "back": "Volver",
       "validation": {

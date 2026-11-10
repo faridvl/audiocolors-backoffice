@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { ApiError } from '@/shared/api/api-service-client';
 import { useCreateBranchMutation } from '@/shared/api/mutations/branches/create-branch-mutation';
 import { useUpdateBranchMutation } from '@/shared/api/mutations/branches/update-branch-mutation';
 import { FETCH_BRANCHES_KEY, useBranchesQuery } from '@/shared/api/querys/branches-query';
@@ -14,6 +15,8 @@ export interface BranchSaveCallbacks {
   onSuccess: () => void;
   onError: (error: Error) => void;
 }
+
+const LAST_ACTIVE_BRANCH_CODE = 'BRANCH_LAST_ACTIVE';
 
 export function useBranchesSettings() {
   const { t } = useTranslation();
@@ -29,6 +32,9 @@ export function useBranchesSettings() {
   const branches = data ?? [];
   const editingBranch = branches.find((branch) => branch.uuid === editingUuid) ?? null;
   const deactivatingBranch = branches.find((branch) => branch.uuid === deactivatingUuid) ?? null;
+
+  const activeBranches = branches.filter((branch) => branch.isActive);
+  const lastActiveUuid = activeBranches.length === 1 ? activeBranches[0].uuid : null;
 
   const refreshBranches = () => queryClient.invalidateQueries({ queryKey: [FETCH_BRANCHES_KEY] });
 
@@ -74,7 +80,10 @@ export function useBranchesSettings() {
           );
           void refreshBranches();
         },
-        onError: (error: Error) => toast.error(error.message),
+        onError: (error: Error) => {
+          const isLastActive = error instanceof ApiError && error.code === LAST_ACTIVE_BRANCH_CODE;
+          toast.error(isLastActive ? t(TEXT.SETTINGS.BRANCHES.LAST_ACTIVE_BRANCH) : error.message);
+        },
         onSettled: () => {
           setChangingUuid(null);
           onDone?.();
@@ -91,6 +100,7 @@ export function useBranchesSettings() {
     editingBranch,
     isAdding,
     defaultColor: pickDefaultBranchColor(branches),
+    lastActiveUuid,
     deactivatingBranch,
     changingUuid,
     isSaving: isCreating || isUpdating,
@@ -102,7 +112,10 @@ export function useBranchesSettings() {
     },
     handleCreate,
     handleUpdate,
-    handleRequestDeactivate: (branch: Branch) => setDeactivatingUuid(branch.uuid),
+    handleRequestDeactivate: (branch: Branch) => {
+      if (branch.uuid === lastActiveUuid) return;
+      setDeactivatingUuid(branch.uuid);
+    },
     handleCancelDeactivate: () => setDeactivatingUuid(null),
     handleConfirmDeactivate: () => {
       if (deactivatingBranch) {

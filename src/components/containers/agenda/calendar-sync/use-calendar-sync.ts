@@ -99,6 +99,12 @@ export function useCalendarSync() {
   const groups: CalendarSyncGroup[] = useMemo(() => {
     if (!feed || !token) return [];
     const now = Date.now();
+    // Un calendario nuevo no se ofrece para una sede inactiva; uno que ya existe se sigue mostrando.
+    const visibleBranches = (branches ?? []).filter(
+      (branch) =>
+        branch.isActive ||
+        Object.keys(feed.fetchedCalendars).some((key) => key.split(':')[0] === branch.uuid),
+    );
 
     const buildRow = (
       branchUuid: string,
@@ -122,7 +128,7 @@ export function useCalendarSync() {
       return [
         {
           key: SINGLE_GROUP_KEY,
-          rows: (branches ?? []).map((branch) =>
+          rows: visibleBranches.map((branch) =>
             buildRow(
               branch.uuid,
               getBranchOptionLabel(branch, t),
@@ -133,7 +139,7 @@ export function useCalendarSync() {
       ];
     }
 
-    return (branches ?? []).map((branch) => {
+    return visibleBranches.map((branch) => {
       const branchColor = getBranchStripeColor(branch.color);
       return {
         key: branch.uuid,

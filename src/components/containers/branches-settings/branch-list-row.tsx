@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useId } from 'react';
+import { Pencil, Power, PowerOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ActionMenu, ActionMenuItem } from '@/components/common/action-menu/action-menu';
 import { Badge } from '@/components/common/badge/badge';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ColorDot } from '@/components/common/color-dot/color-dot';
@@ -13,20 +15,47 @@ import { tailwind } from '@/utils/tailwind-utils';
 interface BranchListRowProps {
   branch: Branch;
   isChanging: boolean;
+  /** Es la única sede activa: no se puede desactivar. */
+  isLastActive: boolean;
   onEdit: () => void;
   onDeactivate: () => void;
   onReactivate: () => void;
 }
 
+const MENU_ICON_CLASSES = 'h-4 w-4 shrink-0';
+
 /** Una sede tal como queda: se edita en su ventana; se desactiva o reactiva desde su fila. */
 export const BranchListRow: React.FC<BranchListRowProps> = ({
   branch,
   isChanging,
+  isLastActive,
   onEdit,
   onDeactivate,
   onReactivate,
 }) => {
   const { t } = useTranslation();
+  const helpId = useId();
+  const cannotDeactivate = branch.isActive && isLastActive;
+  const menuItems: ActionMenuItem[] = [
+    {
+      label: t(TEXT.SETTINGS.BRANCHES.EDIT),
+      icon: <Pencil className={MENU_ICON_CLASSES} aria-hidden />,
+      onClick: onEdit,
+    },
+  ];
+  if (!cannotDeactivate) {
+    menuItems.push({
+      label: t(
+        branch.isActive ? TEXT.SETTINGS.BRANCHES.DEACTIVATE : TEXT.SETTINGS.BRANCHES.REACTIVATE,
+      ),
+      icon: branch.isActive ? (
+        <PowerOff className={MENU_ICON_CLASSES} aria-hidden />
+      ) : (
+        <Power className={MENU_ICON_CLASSES} aria-hidden />
+      ),
+      onClick: branch.isActive ? onDeactivate : onReactivate,
+    });
+  }
   const details = [branch.phone ? formatPhoneForDisplay(branch.phone) : null, branch.address]
     .filter(Boolean)
     .join(' · ');
@@ -50,8 +79,18 @@ export const BranchListRow: React.FC<BranchListRowProps> = ({
             {details}
           </Typography>
         )}
+        {cannotDeactivate && (
+          <Typography id={helpId} variant={TypographyVariant.HELPER} inline className="max-w-full">
+            {t(TEXT.SETTINGS.BRANCHES.LAST_ACTIVE_BRANCH)}
+          </Typography>
+        )}
       </span>
-      <div className="flex shrink-0 items-center gap-2">
+      <ActionMenu
+        ariaLabel={t(TEXT.SETTINGS.BRANCHES.ACTIONS_LABEL, { name: branch.name })}
+        items={menuItems}
+        className="sm:hidden"
+      />
+      <div className="hidden shrink-0 items-center gap-2 sm:flex">
         <Button
           type="button"
           variant={ButtonVariant.SECONDARY}
@@ -65,6 +104,8 @@ export const BranchListRow: React.FC<BranchListRowProps> = ({
           variant={ButtonVariant.GHOST}
           onClick={branch.isActive ? onDeactivate : onReactivate}
           isLoading={isChanging}
+          disabled={cannotDeactivate}
+          aria-describedby={cannotDeactivate ? helpId : undefined}
         >
           {t(
             branch.isActive ? TEXT.SETTINGS.BRANCHES.DEACTIVATE : TEXT.SETTINGS.BRANCHES.REACTIVATE,

@@ -18,11 +18,9 @@ export const BRANCH_COLORS: BranchColor[] = [
   BranchColor.PURPLE,
 ];
 
-/** Color de una sede nueva cuando ya hay sedes activas con todos los demás. */
-export const DEFAULT_BRANCH_COLOR = BranchColor.BLUE;
-
-export const BRANCH_NAME_MAX_LENGTH = 120;
-export const BRANCH_ADDRESS_MAX_LENGTH = 300;
+/** Topes iguales a los del API. El teléfono (30 en el API) ya lo limita `PhoneField` a 20 caracteres. */
+export const BRANCH_NAME_MAX_LENGTH = 80;
+export const BRANCH_ADDRESS_MAX_LENGTH = 200;
 
 /** Sede (sucursal física) de la clínica. La clínica las crea, edita, desactiva y reactiva; nunca se borran. */
 export interface Branch {

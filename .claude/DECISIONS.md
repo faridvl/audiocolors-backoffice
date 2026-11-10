@@ -1201,3 +1201,13 @@ independientes:
 - Una sede nunca se borra: se desactiva y se reactiva. Las inactivas no se ofrecen al registrar pacientes ni al agendar; las que ya tienen paciente o cita se siguen mostrando (tratamiento por selector).
 - Campos: nombre (obligatorio, único: el 409 se muestra en el campo), teléfono y dirección opcionales (vaciarlos se manda como texto vacío) y color. Permisos iguales a Tipos de cita.
 - El menú queda en dos grupos: "Tu clínica" (Clínica, Sedes, Usuarios) y "Atención" (Tipos de cita, Formularios, Plantillas); ajusta D75.
+
+## D79 · Sedes: siempre una activa y la cita no se agenda sin sede (2026-11-09)
+
+- No se puede desactivar la única sede activa: el botón queda deshabilitado con la ayuda "Debe quedar al menos una sede activa" y, si el API responde 409 `BRANCH_LAST_ACTIVE`, se muestra ese mismo texto. El front distingue el error por `code`, no solo por el status.
+- Una cita existente cuya sede se desactiva conserva su sede al reagendarla: la sede de la cita se suma a las opciones aunque esté inactiva.
+- El API no exige sede al agendar (Zynka la comparte), así que el front nunca envía una cita sin sede cuando el paciente tiene sedes: las opciones salen de las sedes activas del paciente; con una se elige sola, con varias el selector es obligatorio.
+- Un paciente sin sedes activas no se puede agendar: se avisa "Este paciente no tiene sedes activas. Edítalo para asignarle una." con enlace a editarlo, y el botón de agendar queda deshabilitado. Lo mismo al agendar arrastrando en la agenda: toast y no se crea la cita.
+- Topes iguales a los del API, contados después de quitar espacios: nombre 80, teléfono 30 y dirección 200.
+- El calendario del iPhone no ofrece sedes inactivas para un calendario nuevo; uno ya creado con una sede inactiva se sigue mostrando.
+- El modal de sede tiene pie fijo con Guardar y Cancelar, foco atrapado con autofoco en Nombre (`useFocusTrap`) y no se cierra con Escape ni con el fondo mientras guarda.

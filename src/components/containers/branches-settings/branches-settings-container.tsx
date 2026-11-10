@@ -22,8 +22,10 @@ export const BranchesSettingsContainer: React.FC = () => {
     editingBranch,
     isAdding,
     defaultColor,
+    lastActiveUuid,
     deactivatingBranch,
     changingUuid,
+    isSaving,
     handleAdd,
     handleEdit,
     handleCloseModal,
@@ -71,6 +73,7 @@ export const BranchesSettingsContainer: React.FC = () => {
                 key={branch.uuid}
                 branch={branch}
                 isChanging={changingUuid === branch.uuid}
+                isLastActive={branch.uuid === lastActiveUuid}
                 onEdit={() => handleEdit(branch.uuid)}
                 onDeactivate={() => handleRequestDeactivate(branch)}
                 onReactivate={() => handleReactivate(branch)}
@@ -87,6 +90,7 @@ export const BranchesSettingsContainer: React.FC = () => {
           defaultColor={defaultColor}
           onCreate={handleCreate}
           onUpdate={handleUpdate}
+          isSaving={isSaving}
           onClose={handleCloseModal}
         />
       )}

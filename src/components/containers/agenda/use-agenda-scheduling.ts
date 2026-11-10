@@ -102,6 +102,12 @@ export function useAgendaScheduling() {
       preferredBranchUuid,
     );
 
+    // El API no exige sede, pero un paciente sin sedes activas no se agenda a ciegas.
+    if (!branchUuid) {
+      toast.error(t(TEXT.BRANCHES.NO_ACTIVE_FOR_PATIENT));
+      return Promise.resolve();
+    }
+
     return track({ id: patient.uuid, title: name, dayKey, startMinute }, async () => {
       const appointment = await executeCreateNextAppointmentAsync({
         patientUuid: patient.uuid,
@@ -109,7 +115,7 @@ export function useAgendaScheduling() {
         ...(patient.tentativeAppointmentTypeUuid && {
           typeUUID: patient.tentativeAppointmentTypeUuid,
         }),
-        ...(branchUuid && { branchUUID: branchUuid }),
+        branchUUID: branchUuid,
       });
 
       // El día ya quedó confirmado: si la hora falla, se avisa distinto para
