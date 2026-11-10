@@ -61,6 +61,8 @@ export interface AudiometryPrintReportProps {
   header: PrintReportHeader;
   entryDate: string;
   professional: string;
+  /** Nombre que va bajo la línea de firma, como sale en los documentos; sin él se usa `professional`. */
+  signatureName?: string;
   marks: AudiogramMarks;
   gradingScale: GradingScale;
   speechMarks: SpeechMarks;
@@ -94,6 +96,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   header,
   entryDate,
   professional,
+  signatureName,
   marks,
   gradingScale,
   speechMarks,
@@ -131,11 +134,6 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   const embeddedFields = [
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
-    { label: t(REPORT_TEXT.EQUIPMENT), value: equipment ? formatEquipmentName(equipment) : '' },
-  ].filter((field) => field.value !== '');
-  const signatureFields = [
-    { label: t(REPORT_TEXT.PATIENT), value: header.patientName },
-    { label: t(REPORT_TEXT.DOCUMENT_ID), value: header.patientDocumentId },
     { label: t(REPORT_TEXT.EQUIPMENT), value: equipment ? formatEquipmentName(equipment) : '' },
   ].filter((field) => field.value !== '');
 
@@ -376,22 +374,12 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
 
         {!isEmbedded && (
           <footer
-            className="flex items-end justify-between gap-6 border-t border-ink-200 pt-1.5"
+            className="flex justify-end pt-1.5"
             style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
           >
-            <dl className="flex min-w-0 flex-1 flex-wrap gap-x-6 gap-y-1">
-              {signatureFields.map((field) => (
-                <div key={field.label} className="min-w-0">
-                  <dt className="text-[10px] uppercase tracking-wide text-ink-500">
-                    {field.label}
-                  </dt>
-                  <dd className="font-medium text-ink-800">{field.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="flex w-64 shrink-0 flex-col gap-0.5">
-              <div className="mt-3 flex flex-col gap-0.5 border-t border-ink-500 pt-1">
-                <p className="text-sm font-medium text-ink-800">{professional}</p>
+            <div className="flex w-72 shrink-0 flex-col items-center gap-0.5 text-center">
+              <div className="mt-8 flex w-full flex-col gap-0.5 border-t border-ink-500 pt-1">
+                <p className="text-sm font-medium text-ink-800">{signatureName || professional}</p>
                 <p className="text-[10px] uppercase tracking-wide text-ink-500">
                   {t(REPORT_TEXT.SIGNATURE)}
                 </p>

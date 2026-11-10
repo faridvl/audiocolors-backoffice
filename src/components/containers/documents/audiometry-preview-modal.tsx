@@ -93,6 +93,7 @@ export const AudiometryPreviewModal: React.FC<AudiometryPreviewModalProps> = ({
               <div data-print-summary="" className={SHEET_CLASSES}>
                 <AudiometryPrintReport
                   {...state.report}
+                  signatureName={state.signatureName}
                   invalidation={state.invalidation}
                   isVisibleOnScreen
                 />

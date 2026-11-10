@@ -16,6 +16,7 @@ import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProfessionalSignatureName } from '@/hooks/use-professional-signature-name';
 import { useSession } from '@/hooks/use-session';
 import { Permission } from '@/shared/auth/permissions';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
@@ -565,6 +566,7 @@ export function useAudiometryPoc(patientUuid: string) {
   // Ya viene en caché desde el detalle del paciente y la sesión; solo alimentan el informe impreso.
   const { data: patient } = usePatientQuery(patientUuid);
   const { tenant } = useSession();
+  const signatureName = useProfessionalSignatureName();
   const printReportHeader: PrintReportHeader = {
     clinicName: tenant?.businessName ?? '',
     clinicLogoUrl: tenant?.logoUrl ?? null,
@@ -606,6 +608,7 @@ export function useAudiometryPoc(patientUuid: string) {
     handleConfirmTypeChange,
     handleCancelTypeChange,
     printReportHeader,
+    signatureName,
     handlePrint,
     isSaving,
     canSave,

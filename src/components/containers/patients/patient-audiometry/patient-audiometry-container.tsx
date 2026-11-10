@@ -74,6 +74,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     selectedEntryValue,
     selectedEntry,
     selectedEntryAuthor,
+    signatureName,
     handleSelectEntry,
     invalidationNotice,
     canInvalidate,
@@ -471,6 +472,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
           header={printReportHeader}
           entryDate={formatDateTime(selectedEntry.createdAt)}
           professional={selectedEntryAuthor ?? ''}
+          signatureName={signatureName}
           typeName={selectedEntry.typeName}
           equipment={selectedEntry.equipment}
           screening={isScreening ? { result: screeningResult } : undefined}

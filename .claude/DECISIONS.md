@@ -1234,3 +1234,4 @@ independientes:
 - Weber `NO_RESPONSE` se muestra como "NR" con etiqueta accesible "Sin respuesta".
 - Weber arranca vacío ("Sin registrar") en cada frecuencia y solo se envía lo que el audiólogo elige; el API acepta Weber parcial. Antes arrancaba en "Centro" y quedaba guardado aunque nadie lo eligiera. El informe imprime "Sin registrar" donde no hay valor.
 - En la lista de opciones, NR se lee "NR · Sin respuesta". El 409 `PATIENT_ALREADY_PRIORITY` recarga al paciente y avisa que ya estaba marcado.
+- El informe de audiometria muestra paciente, identificacion y equipo una sola vez, en la ficha de arriba; el bloque final solo lleva la firma del profesional (nombre como sale en los documentos, con titulo y colegiado, y la leyenda "Firma del profesional"). Decision del usuario 2026-11-09.
