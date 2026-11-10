@@ -128,6 +128,15 @@ describe('buildAuditItems', () => {
     assert.equal(items[0].text, 'Nivel de acceso: Sin nivel → Administración');
   });
 
+  it('un cambio de contraseña dice que se cambió y no muestra valores', () => {
+    const items = buildAuditItems(
+      [buildEntry({ field: UserAuditField.PASSWORD, before: null, after: null })],
+      t,
+    );
+    assert.equal(items.length, 1);
+    assert.equal(items[0].text, 'Contraseña: se cambió (no se muestra su valor)');
+  });
+
   it('conserva el orden de los instantes y no mezcla los de otro momento', () => {
     const items = buildAuditItems(
       [

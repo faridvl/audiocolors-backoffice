@@ -13,6 +13,7 @@ const FIELD_ORDER: UserAuditField[] = [
   UserAuditField.ROLE,
   UserAuditField.ATTENDS_PATIENTS,
   UserAuditField.SPECIALTIES,
+  UserAuditField.PASSWORD,
 ];
 
 export interface UserAuditItem {
@@ -52,6 +53,8 @@ export function formatAuditValue(
 }
 
 export function formatAuditChange(entry: UserAuditEntry, t: TFunction): string {
+  // Nunca se muestran valores de una contraseña, ni siquiera los que llegaran del API.
+  if (entry.field === UserAuditField.PASSWORD) return t(TEXTS.AUDIT.PASSWORD_CHANGED);
   return t(TEXTS.AUDIT.CHANGE, {
     field: t(TEXTS.AUDIT.FIELDS[entry.field]),
     before: formatAuditValue(entry.field, entry.before, t),

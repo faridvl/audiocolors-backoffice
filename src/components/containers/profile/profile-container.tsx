@@ -12,6 +12,7 @@ import { tailwind } from '@/utils/tailwind-utils';
 import { USER_LICENSE_NUMBER_MAX_LENGTH } from '@/types/users/user';
 import { SettingsCard } from '../settings/settings-card';
 import { SettingsSectionLoading } from '../settings/settings-section-state';
+import { ProfilePasswordCard } from './profile-password-card';
 import { ProfileFormValues, useProfile } from './use-profile';
 
 const TEXTS = TEXT.PROFILE;
@@ -147,6 +148,8 @@ export const ProfileContainer: React.FC = () => {
           )}
         </Formik>
       )}
+
+      <ProfilePasswordCard />
     </div>
   );
 };

@@ -391,10 +391,12 @@
         "createdAttends": "Usuario creado con nivel {{role}}, atiende pacientes: {{specialties}}.",
         "summary": "{{actor}} · {{date}}",
         "change": "{{field}}: {{before}} → {{after}}",
+        "passwordChanged": "Contraseña: se cambió (no se muestra su valor)",
         "fields": {
           "ROLE": "Nivel de acceso",
           "ATTENDS_PATIENTS": "Atiende pacientes",
-          "SPECIALTIES": "Especialidades"
+          "SPECIALTIES": "Especialidades",
+          "PASSWORD": "Contraseña"
         }
       },
       "passwordModal": {
@@ -1755,6 +1757,21 @@
     "saved": "Perfil actualizado",
     "errors": {
       "licenseMax": "El número de colegiado es demasiado largo"
+    },
+    "password": {
+      "title": "Contraseña",
+      "current": "Contraseña actual",
+      "new": "Contraseña nueva",
+      "confirm": "Confirmar contraseña nueva",
+      "submit": "Cambiar contraseña",
+      "changed": "Contraseña cambiada.",
+      "errors": {
+        "currentRequired": "Escribe tu contraseña actual",
+        "confirmRequired": "Repite la contraseña nueva",
+        "confirmMismatch": "Las contraseñas no coinciden",
+        "currentInvalid": "La contraseña actual no es correcta.",
+        "samePassword": "La nueva contraseña debe ser distinta a la actual."
+      }
     }
   }
 }

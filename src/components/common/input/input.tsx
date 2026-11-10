@@ -50,6 +50,8 @@ interface FormFieldProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   /** Teclado virtual correcto en iOS/Android para campos numéricos o de teléfono. */
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  /** Ayuda al navegador y al gestor de contraseñas (p. ej. `current-password`, `new-password`). */
+  autoComplete?: string;
   /** Botón de ícono dentro del campo, a la derecha (posicionado `absolute`, ancho `w-11`). */
   endAdornment?: React.ReactNode;
   /** Texto gris dentro del campo, a la izquierda; no es parte del valor (p. ej. "+506"). */
@@ -79,6 +81,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   onChange,
   inputMode,
+  autoComplete,
   endAdornment,
   startAdornment,
   startControl,
@@ -123,6 +126,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           disabled={disabled}
           maxLength={maxLength}
           inputMode={inputMode}
+          autoComplete={autoComplete}
           {...(displayValue !== undefined ? { value: displayValue } : {})}
           aria-invalid={errorText ? true : undefined}
           aria-describedby={describedBy}

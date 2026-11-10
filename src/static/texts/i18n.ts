@@ -252,10 +252,12 @@ export const TEXT = {
         CREATED_ATTENDS: 'settings.users.audit.createdAttends',
         SUMMARY: 'settings.users.audit.summary',
         CHANGE: 'settings.users.audit.change',
+        PASSWORD_CHANGED: 'settings.users.audit.passwordChanged',
         FIELDS: {
           ROLE: 'settings.users.audit.fields.ROLE',
           ATTENDS_PATIENTS: 'settings.users.audit.fields.ATTENDS_PATIENTS',
           SPECIALTIES: 'settings.users.audit.fields.SPECIALTIES',
+          PASSWORD: 'settings.users.audit.fields.PASSWORD',
         },
       },
       ERRORS: {
@@ -1346,6 +1348,21 @@ export const TEXT = {
     SAVED: 'profile.saved',
     ERRORS: {
       LICENSE_MAX: 'profile.errors.licenseMax',
+    },
+    PASSWORD: {
+      TITLE: 'profile.password.title',
+      CURRENT: 'profile.password.current',
+      NEW: 'profile.password.new',
+      CONFIRM: 'profile.password.confirm',
+      SUBMIT: 'profile.password.submit',
+      CHANGED: 'profile.password.changed',
+      ERRORS: {
+        CURRENT_REQUIRED: 'profile.password.errors.currentRequired',
+        CONFIRM_REQUIRED: 'profile.password.errors.confirmRequired',
+        CONFIRM_MISMATCH: 'profile.password.errors.confirmMismatch',
+        CURRENT_INVALID: 'profile.password.errors.currentInvalid',
+        SAME_PASSWORD: 'profile.password.errors.samePassword',
+      },
     },
   },
 } as const;
