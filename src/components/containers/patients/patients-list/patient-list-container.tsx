@@ -38,6 +38,8 @@ import {
 import { tailwind } from "@/utils/tailwind-utils";
 import { getBranchStripeColor } from "@/shared/design/tokens";
 import { useBranchesQuery } from "@/shared/api/querys/branches-query";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Permission } from "@/shared/auth/permissions";
 import { findBranch } from "@/shared/utils/branches";
 import {
   usePatientList,
@@ -220,6 +222,7 @@ export const PatientListContainer: React.FC = () => {
 
   const { data: branches } = useBranchesQuery();
   const { t } = useTranslation();
+  const { can } = usePermissions();
   const columns = useMemo(() => buildColumns(branches, t), [branches, t]);
   const getRowAccentColor = (patient: Patient) =>
     getBranchStripeColor(
@@ -367,14 +370,16 @@ export const PatientListContainer: React.FC = () => {
           rowActions={(patient) => (
             <div className="flex items-center justify-end gap-2">
               <PatientPriorityButton patient={patient} />
-              <Button
-                variant={ButtonVariant.GHOST}
-                onClick={() => navigateToEdit(patient.uuid)}
-                aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
-                className="min-h-[44px] min-w-[44px] px-2 py-1.5 sm:min-h-0 sm:min-w-0"
-              >
-                <Pencil className="h-4 w-4" aria-hidden />
-              </Button>
+              {can(Permission.EDIT_PATIENT) && (
+                <Button
+                  variant={ButtonVariant.GHOST}
+                  onClick={() => navigateToEdit(patient.uuid)}
+                  aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
+                  className="min-h-[44px] min-w-[44px] px-2 py-1.5"
+                >
+                  <Pencil className="h-4 w-4" aria-hidden />
+                </Button>
+              )}
             </div>
           )}
         />

@@ -11,11 +11,22 @@ import { TEXT } from '@/static/texts/i18n';
 
 interface RequirePermissionProps {
   permission: Permission;
+  /** Aviso sin permiso; por defecto el genérico de acceso. */
+  message?: string;
+  /** Destino y texto del botón sin permiso; por defecto, volver al inicio. */
+  backHref?: string;
+  backLabel?: string;
   children: React.ReactNode;
 }
 
 /** Pantalla entera para un permiso: sin él, un aviso en vez del contenido (y sin pedir sus datos). */
-export const RequirePermission: React.FC<RequirePermissionProps> = ({ permission, children }) => {
+export const RequirePermission: React.FC<RequirePermissionProps> = ({
+  permission,
+  message,
+  backHref,
+  backLabel,
+  children,
+}) => {
   const { t } = useTranslation();
   const { can, isLoading } = usePermissions();
 
@@ -31,12 +42,12 @@ export const RequirePermission: React.FC<RequirePermissionProps> = ({ permission
     return (
       <div className="mx-auto flex max-w-md flex-col items-center gap-2 py-12 text-center">
         <Lock className="h-8 w-8 text-ink-400" aria-hidden />
-        <Typography variant={TypographyVariant.BODY}>{t(TEXT.GENERAL.FORBIDDEN)}</Typography>
+        <Typography variant={TypographyVariant.BODY}>{message ?? t(TEXT.GENERAL.FORBIDDEN)}</Typography>
         <Link
-          href={routesPrivate.patients.index}
+          href={backHref ?? routesPrivate.patients.index}
           className={buttonClasses(ButtonVariant.SECONDARY, 'mt-2')}
         >
-          {t(TEXT.GENERAL.BACK_HOME)}
+          {backLabel ?? t(TEXT.GENERAL.BACK_HOME)}
         </Link>
       </div>
     );

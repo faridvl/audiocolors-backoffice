@@ -180,10 +180,10 @@ Pensado para varias clínicas (multi-tenant): lo que ve cada usuario sale de su
 
 | Combinación | Ve |
 |---|---|
-| Recepción | Pacientes (datos generales, contactos, citas) y Agenda. Sin expediente clínico ni Archivos |
-| Administración | Lo de Recepción + Configuración, Bitácora y Usuarios |
+| Recepción | Pacientes (datos generales, contactos, citas) y Agenda; registra pacientes nuevos pero no modifica uno existente ni cambia su estado. Sin expediente clínico ni Archivos |
+| Administración | Lo de Recepción + modificar paciente y cambiar su estado, Configuración, Bitácora y Usuarios |
 | Propietario | Lo de Administración + todo Usuarios |
-| Cualquier nivel + atiende pacientes | Suma el expediente completo (historia, evolución, pruebas, preguntas, mantenimientos) y Archivos |
+| Cualquier nivel + atiende pacientes | Suma modificar paciente, el expediente completo (historia, evolución, pruebas, preguntas, indicadores, resumen, mantenimientos) y Archivos |
 | Atiende pacientes con Audiología | Suma crear e invalidar pruebas; sin Audiología las pruebas solo se ven |
 
 - Ningún nivel, ni el Propietario, ve datos clínicos sin "Atiende pacientes".

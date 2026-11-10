@@ -59,6 +59,13 @@ describe('hasPermission', () => {
     }
   }
 
+  it('modificar paciente y cambiar su estado: gestion o atender', () => {
+    assert.equal(hasPermission(subject(UserRole.RECEPTION, false), Permission.EDIT_PATIENT), false);
+    assert.equal(hasPermission(subject(UserRole.RECEPTION, true), Permission.EDIT_PATIENT), true);
+    assert.equal(hasPermission(subject(UserRole.ADMIN, false), Permission.EDIT_PATIENT), true);
+    assert.equal(hasPermission(subject(UserRole.OWNER, false), Permission.EDIT_PATIENT), true);
+  });
+
   it('atiende con Otorrinolaringologia sin Audiologia ve lo clinico pero no edita pruebas', () => {
     const current = subject(UserRole.ADMIN, true, [ClinicalSpecialty.ENT]);
     assert.equal(hasPermission(current, Permission.VIEW_CLINICAL_RECORD), true);

@@ -984,6 +984,8 @@ export const TEXT = {
       CONTACTS: 'patients.detail.contacts',
       PATIENT_CONTACT: 'patients.detail.patientContact',
       EDIT_CONTACTS: 'patients.detail.editContacts',
+      EDIT_FORBIDDEN: 'patients.detail.editForbidden',
+      EDIT_FORBIDDEN_BACK: 'patients.detail.editForbiddenBack',
       EVOLUTION_NOTE: {
         VIEW_AUDIOMETRY: 'patients.detail.evolutionNote.viewAudiometry',
         OPEN_AUDIOMETRY_LABEL: 'patients.detail.evolutionNote.openAudiometryLabel',

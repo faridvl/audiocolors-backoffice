@@ -1211,3 +1211,18 @@ independientes:
 - Topes iguales a los del API, contados después de quitar espacios: nombre 80, teléfono 30 y dirección 200.
 - El calendario del iPhone no ofrece sedes inactivas para un calendario nuevo; uno ya creado con una sede inactiva se sigue mostrando.
 - El modal de sede tiene pie fijo con Guardar y Cancelar, foco atrapado con autofoco en Nombre (`useFocusTrap`) y no se cierra con Escape ni con el fondo mientras guarda.
+
+## D80 · Acciones del paciente por permiso (2026-11-09)
+
+- Recepción ve los datos generales y los contactos del paciente, pero no lo modifica. Las acciones del expediente salen de dos permisos (`Permission.EDIT_PATIENT` y `Permission.VIEW_CLINICAL_RECORD`), nunca del rol suelto:
+
+| Acción | Recepción sin atender | Administración/Propietario sin atender | Cualquier nivel con "Atiende pacientes" |
+|---|---|---|---|
+| Modificar paciente, cambiar estado, contactos y dispositivos | No | Sí | Sí |
+| Abrir o cambiar indicadores (incluidos prioridad y candidato a video) | No | No | Sí |
+| Generar resumen | No | No | Sí |
+
+- Contactos y dispositivos siguen la regla de modificar paciente (`EDIT_PATIENT`): sin él no hay botón de editar ni se monta el modal de contactos. Prioridad y candidato a video son indicadores: gestión sin atender pacientes ya no los marca. Tipo de sangre y documento de garantía solo los escribe quien atiende pacientes; el API los ignora para los demás y los formularios de alta y edición no los piden.
+- Las etiquetas de indicadores se ven a todos en solo lectura (la prioridad con bandera y su etiqueta en el expediente y solo el ícono con `aria-label` en la lista; candidato a video como chip) y solo se abren o cambian con permiso. Sin ninguna acción permitida la columna de acciones no se renderiza; con dos acciones o menos muestra su etiqueta también en celular. La pantalla de modificar va dentro de `RequirePermission` (`EDIT_PATIENT`) con su aviso y el botón "Volver al paciente", y sin permiso no pide los datos del paciente. Los íconos de acción por fila de la lista miden al menos 44x44.
+- El API valida lo mismo: modificar y cambiar estado exigen gestión o atender pacientes; los indicadores, atender pacientes.
+- No cambia: registrar un paciente nuevo y el registro rápido al agendar siguen para Recepción.
