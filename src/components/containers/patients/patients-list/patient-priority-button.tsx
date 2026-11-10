@@ -6,6 +6,7 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { PriorityReasonModal } from '@/components/containers/patients/patient-flags/priority-reason-modal';
 import { usePatientPriority } from '@/components/containers/patients/patient-flags/use-patient-priority';
+import { getPriorityReasonText } from '@/components/containers/patients/patient-flags/priority-reason';
 import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { getFullName } from '@/shared/utils/formatters';
@@ -36,7 +37,7 @@ export const PatientPriorityButton: React.FC<{
   const canToggle = can(Permission.VIEW_CLINICAL_RECORD);
   const action = t(isOn ? TEXT.PATIENTS.FLAGS.PRIORITY.UNMARK : TEXT.PATIENTS.FLAGS.PRIORITY.MARK);
 
-  const reason = isOn ? patient.priorityReason : null;
+  const reason = isOn ? getPriorityReasonText(patient.priorityReason) : null;
   const withReason = (text: string) =>
     reason ? t(TEXT.PATIENTS.FLAGS.PRIORITY.REASON_TOOLTIP, { action: text, reason }) : text;
   const patientName = getFullName(patient.firstName, patient.lastName);
@@ -47,7 +48,7 @@ export const PatientPriorityButton: React.FC<{
       <span
         title={withReason(label)}
         role={showLabel ? undefined : 'img'}
-        aria-label={showLabel ? undefined : label}
+        aria-label={showLabel ? undefined : withReason(label)}
         className={tailwind('flex items-center gap-1.5 px-2 text-danger', className)}
       >
         <Flag className="h-4 w-4 fill-current" aria-hidden />
@@ -68,10 +69,12 @@ export const PatientPriorityButton: React.FC<{
         isLoading={isUpdating}
         aria-pressed={isOn}
         title={withReason(action)}
-        aria-label={t(TEXT.PATIENTS.FLAGS.PRIORITY.PATIENT_ACTION, {
-          action,
-          name: patientName,
-        })}
+        aria-label={withReason(
+          t(TEXT.PATIENTS.FLAGS.PRIORITY.PATIENT_ACTION, {
+            action,
+            name: patientName,
+          }),
+        )}
         icon={<Flag className={tailwind('h-4 w-4', isOn && 'fill-current')} aria-hidden />}
         className={tailwind(
           'min-h-[44px] min-w-[44px] px-2 py-1.5',

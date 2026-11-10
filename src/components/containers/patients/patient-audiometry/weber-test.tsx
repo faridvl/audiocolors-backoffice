@@ -8,6 +8,7 @@ import { WEBER_ICONS, WeberResultView } from './weber-icons';
 import { ReadOnlyValue } from './audiometry-read-only-value';
 
 const SUMMARY_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY.SUMMARY;
+const WEBER_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY.WEBER;
 
 interface WeberTestProps {
   weber: Record<number, WeberResult>;
@@ -22,12 +23,17 @@ export const WeberTest: React.FC<WeberTestProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const weberOptions = WEBER_RESULTS.map((result) => ({
-    value: result,
-    label: t(WEBER_LABEL_KEYS[result]),
-    icon: WEBER_ICONS[result],
-    isLabelHidden: true,
-  }));
+  // "NR" no tiene ícono con significado propio: en la lista se lee completo, "NR · Sin respuesta".
+  const weberOptions = WEBER_RESULTS.map((result) =>
+    result === WeberResult.NO_RESPONSE
+      ? { value: result, label: t(WEBER_TEXT.NO_RESPONSE_OPTION) }
+      : {
+          value: result,
+          label: t(WEBER_LABEL_KEYS[result]),
+          icon: WEBER_ICONS[result],
+          isLabelHidden: true,
+        },
+  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -55,6 +61,7 @@ export const WeberTest: React.FC<WeberTestProps> = ({
                 })}
                 value={weber[frequencyHz]}
                 options={weberOptions}
+                placeholder={t(TEXT.GENERAL.NOT_RECORDED)}
                 onChange={(value) => onWeberChange(frequencyHz, value as WeberResult)}
                 isSheetOnMobile
               />

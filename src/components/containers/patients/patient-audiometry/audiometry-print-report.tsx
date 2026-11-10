@@ -291,7 +291,11 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
                 <tr>
                   {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
                     <td key={frequencyHz} className={CELL_CLASSES}>
-                      {weber[frequencyHz] ? <WeberResultView result={weber[frequencyHz]} /> : empty}
+                      {weber[frequencyHz] ? (
+                        <WeberResultView result={weber[frequencyHz]} />
+                      ) : (
+                        t(TEXT.GENERAL.NOT_RECORDED)
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -363,11 +367,16 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         ))}
 
         {!isEmbedded && (
-          <footer className="mt-1 flex flex-col gap-3 pt-2">
-            <dl className="flex flex-col gap-0.5">
+          <footer
+            className="mt-1 flex flex-col gap-3 pt-2"
+            style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
+          >
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5">
               {signatureFields.map((field) => (
-                <div key={field.label} className="flex gap-1">
-                  <dt className="text-ink-500">{field.label}:</dt>
+                <div key={field.label} className="min-w-0">
+                  <dt className="text-[10px] uppercase tracking-wide text-ink-500">
+                    {field.label}
+                  </dt>
                   <dd className="font-medium text-ink-800">{field.value}</dd>
                 </div>
               ))}

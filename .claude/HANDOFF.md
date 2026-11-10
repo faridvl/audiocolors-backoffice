@@ -355,3 +355,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Hechos y con lint, typecheck y test:audiometry en verde: motivo de prioridad, Weber NR, Configuracion de Equipos y selector de equipo en la audiometria nueva (con equipo junto a profesional y fecha).
 - Hecho (punto 5): informe impreso con bloque final Paciente, Cedula, Equipo y firma; en el resumen, fila Equipo junto a fecha y profesional. Equipo llega desde la audiometria guardada (impresion suelta, modal de Archivos y Generar resumen). Sin probar en navegador.
 - Falta: las pruebas en navegador contra el API local.
+
+- Ajustes de la clínica (2026-11-09, ronda 2, en la rama `feature/pedidos-clinica-1109`): hechos en código los puntos 1-16 (prioridad 409/null/lista/expediente, equipos 409/vacío/nombres largos, audiometría: foco al equipo, `EQUIPMENT_REQUIRED`, NR en el desplegable, Weber vacío por defecto con "Sin registrar" en el informe, bloque final a dos columnas sin cortar). Falta verificarlos en navegador (375/768/1440) y con el `code` del API.

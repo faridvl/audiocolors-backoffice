@@ -543,5 +543,5 @@ export const buildSampleSpeechMarks = (): SpeechMarks => ({
   [Ear.LEFT]: { 25: 10, 35: 30, 45: 60, 55: 88, 65: 92 },
 });
 
-export const buildDefaultWeber = (): Record<number, WeberResult> =>
-  Object.fromEntries(WEBER_FREQUENCIES_HZ.map((frequency) => [frequency, WeberResult.CENTER]));
+/** El Weber arranca sin resultado: lo que no se elige no se guarda ni se imprime como "Centro". */
+export const buildEmptyWeber = (): Record<number, WeberResult> => ({});

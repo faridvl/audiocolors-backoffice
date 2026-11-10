@@ -53,13 +53,18 @@ export const EquipmentListRow: React.FC<EquipmentListRowProps> = ({
   return (
     <li className="flex min-h-[60px] items-center gap-3 border-b border-ink-100 px-4 py-2">
       <span className="flex min-w-0 flex-1 items-center gap-2 text-left">
-        <Typography
-          variant={TypographyVariant.BODY_SEMIBOLD}
-          inline
-          className={tailwind('truncate', !equipment.isActive && 'text-ink-500')}
-        >
-          {name}
-        </Typography>
+        <span title={name} className="line-clamp-2 min-w-0 break-words">
+          <Typography
+            variant={TypographyVariant.BODY_SEMIBOLD}
+            inline
+            className={tailwind(!equipment.isActive && 'text-ink-500')}
+          >
+            {equipment.brand}
+          </Typography>{' '}
+          <Typography variant={TypographyVariant.BODY} inline className="text-ink-500">
+            {equipment.model}
+          </Typography>
+        </span>
         {!equipment.isActive && <Badge>{t(TEXT.SETTINGS.EQUIPMENT.INACTIVE_BADGE)}</Badge>}
       </span>
       <ActionMenu

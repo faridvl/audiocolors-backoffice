@@ -173,6 +173,9 @@ export type UpdatePatientPayload = Partial<CreatePatientPayload> & {
 /** Máximo de caracteres del motivo de prioridad (lo mismo que valida el API). */
 export const PATIENT_PRIORITY_REASON_MAX_LENGTH = 500;
 
+/** Código con el que el API avisa que el paciente ya estaba marcado como prioridad. */
+export const PATIENT_ALREADY_PRIORITY_ERROR_CODE = 'PATIENT_ALREADY_PRIORITY';
+
 export enum PatientFlag {
   HEARING_AIDS_IN_LAB = 'hearingAidsInLab',
   ACTIVE_WARRANTY = 'hasActiveWarranty',

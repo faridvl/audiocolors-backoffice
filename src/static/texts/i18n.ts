@@ -998,6 +998,9 @@ export const TEXT = {
         REASON_LINE_AUTHOR: 'patients.flags.priority.reasonLineAuthor',
         /** `{{action}}`, `{{reason}}` */
         REASON_TOOLTIP: 'patients.flags.priority.reasonTooltip',
+        /** `{{reason}}`: línea gris bajo el nombre en las tarjetas de la lista */
+        LIST_LINE: 'patients.flags.priority.listLine',
+        ALREADY_MARKED: 'patients.flags.priority.alreadyMarked',
       },
       TOAST_ON_PREFIX: 'patients.flags.toastsOn',
       TOAST_OFF_PREFIX: 'patients.flags.toastsOff',
@@ -1213,6 +1216,7 @@ export const TEXT = {
           LEFT: 'patients.detail.audiometry.weber.left',
           NO_RESPONSE: 'patients.detail.audiometry.weber.noResponse',
           NO_RESPONSE_SHORT: 'patients.detail.audiometry.weber.noResponseShort',
+          NO_RESPONSE_OPTION: 'patients.detail.audiometry.weber.noResponseOption',
         },
       },
       FIELDS: {

@@ -2,10 +2,11 @@ import { useMemo } from 'react';
 import { FormikHelpers } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { ApiError } from '@/shared/api/api-service-client';
+import { ApiError, HttpStatus } from '@/shared/api/api-service-client';
 import { TEXT } from '@/static/texts/i18n';
 import {
   CreateEquipmentPayload,
+  EQUIPMENT_ALREADY_EXISTS_ERROR_CODE,
   Equipment,
   UpdateEquipmentPayload,
 } from '@/types/equipment/equipment';
@@ -17,8 +18,6 @@ import {
   buildUpdateEquipmentPayload,
 } from './equipment-form';
 import { EquipmentSaveCallbacks } from './use-equipment-settings';
-
-const HTTP_CONFLICT = 409;
 
 interface UseEditEquipmentParams {
   /** Sin equipo, la ventana crea uno nuevo. */
@@ -51,7 +50,12 @@ export function useEditEquipment({
       onSuccess: () => helpers.setSubmitting(false),
       onError: (error: Error) => {
         helpers.setSubmitting(false);
-        if (error instanceof ApiError && error.status === HTTP_CONFLICT) {
+        // El 409 sin código se toma por duplicado: es el único conflicto que tiene este formulario.
+        const isDuplicate =
+          error instanceof ApiError &&
+          (error.code === EQUIPMENT_ALREADY_EXISTS_ERROR_CODE ||
+            (!error.code && error.status === HttpStatus.CONFLICT));
+        if (isDuplicate) {
           helpers.setFieldError('model', t(TEXT.SETTINGS.EQUIPMENT.DUPLICATE));
           return;
         }

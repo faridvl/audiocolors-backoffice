@@ -110,7 +110,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <PatientPriorityButton patient={patient} className="-my-2" showLabel />
             <PatientStatusPill status={patient.status} />
           </div>
-          <PatientPriorityReason patient={patient} className="mt-0.5" />
+          <PatientPriorityReason patient={patient} className="mt-1.5" />
           {identity && (
             <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
               {identity}

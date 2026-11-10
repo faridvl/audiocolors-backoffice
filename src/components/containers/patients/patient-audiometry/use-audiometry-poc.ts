@@ -45,7 +45,7 @@ import {
   SpeechFieldValues,
   SpeechMarks,
   WeberResult,
-  buildDefaultWeber,
+  buildEmptyWeber,
   buildEmptyFailedWordsValues,
   buildEmptyAudiometryNotes,
   buildEmptyMarks,
@@ -90,7 +90,7 @@ export interface PrintReportHeader {
 
 export const buildEmptyFormState = (): AudiometryFormState => ({
   marks: buildEmptyMarks(),
-  weber: buildDefaultWeber(),
+  weber: buildEmptyWeber(),
   speechMarks: buildEmptySpeechMarks(),
   speechFieldValues: buildEmptySpeechFieldValues(),
   failedWords: buildEmptyFailedWordsValues(),
@@ -141,7 +141,7 @@ export function useAudiometryPoc(patientUuid: string) {
     buildEmptySpeechFieldValues,
   );
   const [failedWords, setFailedWords] = useState<FailedWordsValues>(buildEmptyFailedWordsValues);
-  const [weber, setWeber] = useState<Record<number, WeberResult>>(buildDefaultWeber);
+  const [weber, setWeber] = useState<Record<number, WeberResult>>(buildEmptyWeber);
   const [ptaType, setPtaType] = useState<PtaType>(DEFAULT_PTA_TYPE);
   const [gradingScale, setGradingScale] = useState<GradingScale>(DEFAULT_GRADING_SCALE);
   const [activeTool, setActiveTool] = useState<AudiometryTool>(AudiometryTool.AIR);
@@ -363,7 +363,17 @@ export function useAudiometryPoc(patientUuid: string) {
     [marks, ptaType, gradingScale],
   );
 
+  const equipmentFieldRef = useRef<HTMLDivElement>(null);
+  // En pantallas bajas el error queda fuera de vista: se lleva el selector al centro y se enfoca.
+  const flagEquipmentMissing = () => {
+    setIsEquipmentMissing(true);
+    const field = equipmentFieldRef.current;
+    field?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    field?.querySelector('button')?.focus({ preventScroll: true });
+  };
+
   const { executeCreateEntry, isPending: isSaving } = useCreateAudiometryEntryMutation({
+    onEquipmentRequired: flagEquipmentMissing,
     onCreated: (entry) => {
       // Se siembra el detalle para no volver a pedir lo que se acaba de guardar.
       queryClient.setQueryData([FETCH_AUDIOMETRY_ENTRY_KEY, patientUuid, entry.uuid], entry);
@@ -482,7 +492,7 @@ export function useAudiometryPoc(patientUuid: string) {
   const handleSave = () => {
     if (!canSave) return;
     if (activeEquipment.length > 0 && !equipmentUuid) {
-      setIsEquipmentMissing(true);
+      flagEquipmentMissing();
       return;
     }
     if (isScreening) {
@@ -588,6 +598,7 @@ export function useAudiometryPoc(patientUuid: string) {
     equipmentOptions,
     equipmentUuid,
     isEquipmentMissing,
+    equipmentFieldRef,
     handleEquipmentChange,
     handleScreeningResultChange,
     pendingType,

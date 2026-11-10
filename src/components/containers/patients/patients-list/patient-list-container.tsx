@@ -24,6 +24,7 @@ import {
 } from "@/components/common/typography/typography";
 import { inputBaseClasses } from "@/components/common/input/input";
 import { FilterBar } from "@/components/common/filter-bar/filter-bar";
+import { getPriorityReasonText } from "@/components/containers/patients/patient-flags/priority-reason";
 import { PatientStatusPill } from "@/components/containers/patients/patient-status-pill";
 import {
   PatientFlagPills,
@@ -74,6 +75,14 @@ function buildColumns(
             </Typography>
             <PatientStatusPill status={patient.status} />
           </span>
+          {/* En la tabla el motivo va en el tooltip de la bandera; en las tarjetas del celular no hay dónde pasar el cursor. */}
+          {patient.prioritySince && getPriorityReasonText(patient.priorityReason) && (
+            <Typography variant={TypographyVariant.HELPER} className="truncate md:hidden">
+              {t(TEXT.PATIENTS.FLAGS.PRIORITY.LIST_LINE, {
+                reason: getPriorityReasonText(patient.priorityReason),
+              })}
+            </Typography>
+          )}
           {/* La cédula va bajo el nombre: así no ocupa una columna propia. */}
           {(patient.documentId || patient.email) && (
             <Typography

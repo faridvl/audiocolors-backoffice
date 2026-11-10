@@ -21,7 +21,7 @@ import {
   SpeechMarks,
   WEBER_FREQUENCIES_HZ,
   WeberResult,
-  buildDefaultWeber,
+  buildEmptyWeber,
   buildEmptyFailedWordsValues,
   buildEmptyMarks,
   buildEmptySpeechFieldValues,
@@ -155,7 +155,8 @@ export function stateToPayload(
 ): AudiometryPayload {
   const weber: AudiometryPayload['weber'] = {};
   WEBER_FREQUENCIES_HZ.forEach((frequency) => {
-    weber[String(frequency)] = state.weber[frequency] ?? WeberResult.CENTER;
+    const result = state.weber[frequency];
+    if (result) weber[String(frequency)] = result;
   });
 
   return {
@@ -197,7 +198,7 @@ export function payloadToState(payload: AudiometryPayload): AudiometryFormState 
     failedWords[ear] = toText(summary.failedWords);
   });
 
-  const weber = buildDefaultWeber();
+  const weber = buildEmptyWeber();
   Object.entries(payload.weber).forEach(([frequency, result]) => {
     if (result) weber[Number(frequency)] = result;
   });

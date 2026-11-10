@@ -56,6 +56,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     equipmentOptions,
     equipmentUuid,
     isEquipmentMissing,
+    equipmentFieldRef,
     handleEquipmentChange,
     handleScreeningResultChange,
     pendingType,
@@ -193,7 +194,11 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                 )}
               </div>
               {selectedEntry && (
-                <Typography variant={TypographyVariant.HELPER}>{entryAuthorDate}</Typography>
+                <div className="min-w-0" title={entryAuthorDate}>
+                  <Typography variant={TypographyVariant.HELPER} className="truncate">
+                    {entryAuthorDate}
+                  </Typography>
+                </div>
               )}
             </div>
           }
@@ -250,7 +255,10 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                 </div>
               )}
               {!isReadOnly && equipmentOptions.length > 0 && (
-                <div className="flex max-w-sm flex-col gap-1.5">
+                <div
+                  ref={equipmentFieldRef}
+                  className="flex max-w-sm scroll-mt-24 flex-col gap-1.5"
+                >
                   <Typography variant={TypographyVariant.ACCENT}>
                     {t(AUDIOMETRY_TEXT.EQUIPMENT_LABEL)}
                   </Typography>

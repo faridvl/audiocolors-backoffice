@@ -36,13 +36,18 @@ export const EquipmentSettingsContainer: React.FC = () => {
     handleReactivate,
   } = useEquipmentSettings();
 
+  const isEmpty = !isLoading && !isError && equipment.length === 0;
+  const addButton = (
+    <SettingsAddButton
+      label={t(TEXT.SETTINGS.EQUIPMENT.ADD)}
+      onClick={handleAdd}
+      disabled={isLoading || isError}
+    />
+  );
+
   return (
     <div className="flex w-full flex-col gap-4">
-      <SettingsAddButton
-        label={t(TEXT.SETTINGS.EQUIPMENT.ADD)}
-        onClick={handleAdd}
-        disabled={isLoading || isError}
-      />
+      {!isEmpty && addButton}
 
       {isLoading ? (
         <SettingsCard>
@@ -55,15 +60,18 @@ export const EquipmentSettingsContainer: React.FC = () => {
             onRetry={() => refetch()}
           />
         </SettingsCard>
-      ) : equipment.length === 0 ? (
-        <div className="flex flex-col gap-1 py-2">
-          <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
-            {t(TEXT.SETTINGS.EQUIPMENT.EMPTY_TITLE)}
-          </Typography>
-          <Typography variant={TypographyVariant.BODY} className="text-ink-500">
-            {t(TEXT.SETTINGS.EQUIPMENT.EMPTY_HINT)}
-          </Typography>
-        </div>
+      ) : isEmpty ? (
+        <SettingsCard className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+              {t(TEXT.SETTINGS.EQUIPMENT.EMPTY_TITLE)}
+            </Typography>
+            <Typography variant={TypographyVariant.BODY} className="text-ink-500">
+              {t(TEXT.SETTINGS.EQUIPMENT.EMPTY_HINT)}
+            </Typography>
+          </div>
+          {addButton}
+        </SettingsCard>
       ) : (
         <SettingsCard hasPadding={false}>
           <ul className="[&>li:last-child]:border-b-0">

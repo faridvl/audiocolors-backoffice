@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { useUpdatePatientFlagMutation } from '@/shared/api/mutations/patients/update-patient-flag-mutation';
+import {
+  isAlreadyPriorityError,
+  useUpdatePatientFlagMutation,
+} from '@/shared/api/mutations/patients/update-patient-flag-mutation';
 import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
@@ -51,7 +54,18 @@ export function usePatientPriority(patient: Patient) {
             : TEXT.PATIENTS.FLAGS.TOAST_OFF_PREFIX;
           toast.success(t(`${prefix}.${FLAG}`));
         },
-        onError: (error: Error) => toast.error(error.message),
+        onError: (error: Error) => {
+          if (!isAlreadyPriorityError(error)) {
+            toast.error(error.message);
+            return;
+          }
+          // Otra persona ya la marcó: se recarga el paciente para mostrar su motivo y se cierra.
+          setIsReasonOpen(false);
+          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_KEY, patient.uuid] });
+          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENTS_KEY] });
+          void queryClient.invalidateQueries({ queryKey: [FETCH_PATIENT_ACTIVITY_KEY] });
+          toast.info(t(TEXT.PATIENTS.FLAGS.PRIORITY.ALREADY_MARKED));
+        },
         onSettled: () => setIsUpdating(false),
       },
     );

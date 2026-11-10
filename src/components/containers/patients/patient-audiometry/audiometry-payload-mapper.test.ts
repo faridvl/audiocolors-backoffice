@@ -10,7 +10,7 @@ import {
   ScreeningResult,
   SpeechField,
   WeberResult,
-  buildDefaultWeber,
+  buildEmptyWeber,
   buildEmptyAudiometryNotes,
   buildEmptyFailedWordsValues,
   buildEmptyMarks,
@@ -32,7 +32,7 @@ import { WordListType } from './speech-word-lists';
 
 const buildEmptyState = (): AudiometryFormState => ({
   marks: buildEmptyMarks(),
-  weber: buildDefaultWeber(),
+  weber: buildEmptyWeber(),
   speechMarks: buildEmptySpeechMarks(),
   speechFieldValues: buildEmptySpeechFieldValues(),
   failedWords: buildEmptyFailedWordsValues(),
@@ -48,7 +48,7 @@ const buildFullState = (): AudiometryFormState => {
   const state = buildEmptyState();
   state.marks = buildSampleMarks();
   state.speechMarks = buildSampleSpeechMarks();
-  state.weber = { ...buildDefaultWeber(), 1000: WeberResult.LEFT };
+  state.weber = { ...buildEmptyWeber(), 1000: WeberResult.LEFT };
   state.wordListType = WordListType.BISYLLABLE;
   state.wordListId = 'B2';
   state.presentedWords = 10;
@@ -111,15 +111,10 @@ describe('stateToPayload', () => {
     assert.equal(ears.LEFT.failedWords, null);
   });
 
-  it('manda todas las frecuencias del Weber, las notas sin espacios y la lista solo si hay tipo', () => {
+  it('manda solo el Weber elegido, las notas sin espacios y la lista solo si hay tipo', () => {
     const state = buildFullState();
     const payload = stateToPayload(state, summariesOf(state));
-    assert.deepEqual(payload.weber, {
-      '500': 'CENTER',
-      '1000': 'LEFT',
-      '2000': 'CENTER',
-      '4000': 'CENTER',
-    });
+    assert.deepEqual(payload.weber, { '1000': 'LEFT' });
     assert.equal(payload.notes.diagnosis, 'Hipoacusia leve');
     assert.equal(payload.speech.wordListId, 'B2');
 
@@ -181,17 +176,17 @@ describe('payloadToState', () => {
     );
   });
 
-  it('rellena el Weber que falte con el valor por defecto', () => {
+  it('deja sin resultado el Weber que falte', () => {
     const payload = stateToPayload(buildEmptyState(), summariesOf(buildEmptyState()));
     payload.weber = { '500': WeberResult.RIGHT };
     const restored = payloadToState(payload);
     assert.equal(restored.weber[500], WeberResult.RIGHT);
-    assert.equal(restored.weber[4000], WeberResult.CENTER);
+    assert.equal(restored.weber[4000], undefined);
   });
 });
 
 describe('hasAudiometryData', () => {
-  it('no hay datos en una audiometría nueva, con el Weber por defecto', () => {
+  it('no hay datos en una audiometría nueva, con el Weber vacío', () => {
     assert.equal(hasAudiometryData(buildEmptyState()), false);
   });
 

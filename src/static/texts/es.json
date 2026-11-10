@@ -507,7 +507,7 @@
       "loading": "Cargando equipos...",
       "loadError": "No se pudieron cargar los equipos",
       "emptyTitle": "Aún no hay equipos",
-      "emptyHint": "Registra los audiómetros de la clínica para elegir con cuál se hace cada audiometría.",
+      "emptyHint": "Registra tus audiómetros para elegir con cuál se hace cada audiometría.",
       "add": "Nuevo equipo",
       "newTitle": "Nuevo equipo",
       "editTitle": "Editar equipo",
@@ -522,13 +522,13 @@
       "inactiveBadge": "Inactivo",
       "deactivate": "Desactivar",
       "deactivateTitle": "¿Desactivar {{name}}?",
-      "deactivateMessage": "Dejará de ofrecerse al registrar una audiometría nueva. Las audiometrías que ya lo tienen lo siguen mostrando, y puedes reactivarlo cuando quieras.",
+      "deactivateMessage": "Dejará de ofrecerse en audiometrías nuevas. Las que ya lo usan lo siguen mostrando. Puedes reactivarlo cuando quieras.",
       "reactivate": "Reactivar",
       "created": "Equipo creado",
       "saved": "Equipo guardado",
       "deactivated": "Equipo desactivado",
       "reactivated": "Equipo reactivado",
-      "duplicate": "Ya existe un equipo con esa marca y modelo",
+      "duplicate": "Ya existe un equipo con esa marca y modelo.",
       "actionsLabel": "Acciones de {{name}}"
     }
   },
@@ -1313,10 +1313,12 @@
         "reasonHint": "Queda en el control de evolución del paciente.",
         "reasonRequired": "Escribe el motivo de la prioridad",
         "reasonTooLong": "El motivo es demasiado largo",
-        "reasonConfirm": "Marcar",
+        "reasonConfirm": "Marcar prioridad",
         "reasonLineDate": "Motivo: {{reason}} · {{date}}",
         "reasonLineAuthor": "Motivo: {{reason}} · {{author}}, {{date}}",
-        "reasonTooltip": "{{action}}. Motivo: {{reason}}"
+        "reasonTooltip": "{{action}}. Motivo: {{reason}}",
+        "listLine": "Prioridad: {{reason}}",
+        "alreadyMarked": "Este paciente ya estaba marcado como prioridad."
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
@@ -1643,7 +1645,8 @@
           "right": "Derecha",
           "left": "Izquierda",
           "noResponse": "Sin respuesta",
-          "noResponseShort": "NR"
+          "noResponseShort": "NR",
+          "noResponseOption": "NR · Sin respuesta"
         }
       },
       "fields": {
