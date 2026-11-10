@@ -3,10 +3,16 @@ import {
   ASSIGNABLE_USER_ROLES,
   ManagedUser,
   OWNER_ASSIGNABLE_USER_ROLES,
+  USER_PASSWORD_MAX_LENGTH,
   UserStatus,
 } from '../../../types/users/user';
 
 const SORT_LOCALE = 'es';
+
+/** bcrypt ignora lo que pase de 72 bytes UTF-8, así que el tope se mide en bytes. */
+export function isPasswordWithinByteLimit(password: string): boolean {
+  return new TextEncoder().encode(password).length <= USER_PASSWORD_MAX_LENGTH;
+}
 
 /** Activos primero; dentro de cada grupo, por nombre. */
 export function sortUsers(users: ManagedUser[]): ManagedUser[] {

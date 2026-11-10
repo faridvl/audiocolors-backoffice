@@ -8,6 +8,7 @@ import {
   getSelectableRoles,
   getUserActions,
   isLegacyRole,
+  isPasswordWithinByteLimit,
   sortUsers,
 } from './users-logic';
 
@@ -167,5 +168,26 @@ describe('getSelectableRoles', () => {
     assert.deepEqual(getSelectableRoles(assignable, 'MEDICO'), assignable);
     assert.deepEqual(getSelectableRoles(assignable, null), assignable);
     assert.deepEqual(getSelectableRoles(assignable, undefined), assignable);
+  });
+});
+
+describe('isPasswordWithinByteLimit', () => {
+  it('acepta hasta 72 bytes', () => {
+    assert.equal(isPasswordWithinByteLimit('A1'.padEnd(72, 'a')), true);
+  });
+
+  it('rechaza 73 bytes', () => {
+    assert.equal(isPasswordWithinByteLimit('A1'.padEnd(73, 'a')), false);
+  });
+
+  it('mide bytes y no caracteres: 40 «ñ» son 80 bytes', () => {
+    const password = 'ñ'.repeat(40);
+    assert.equal(password.length < 72, true);
+    assert.equal(isPasswordWithinByteLimit(password), false);
+  });
+
+  it('un emoji ocupa 4 bytes: 18 caben y 19 no', () => {
+    assert.equal(isPasswordWithinByteLimit('😀'.repeat(18)), true);
+    assert.equal(isPasswordWithinByteLimit('😀'.repeat(19)), false);
   });
 });

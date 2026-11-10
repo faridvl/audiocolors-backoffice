@@ -1760,17 +1760,19 @@
     },
     "password": {
       "title": "Contraseña",
+      "description": "Cambia la contraseña con la que entras a tu cuenta.",
+      "modalTitle": "Cambiar contraseña",
       "current": "Contraseña actual",
       "new": "Contraseña nueva",
       "confirm": "Confirmar contraseña nueva",
       "submit": "Cambiar contraseña",
-      "changed": "Contraseña cambiada.",
+      "changed": "Contraseña cambiada",
       "errors": {
         "currentRequired": "Escribe tu contraseña actual",
         "confirmRequired": "Repite la contraseña nueva",
         "confirmMismatch": "Las contraseñas no coinciden",
-        "currentInvalid": "La contraseña actual no es correcta.",
-        "samePassword": "La nueva contraseña debe ser distinta a la actual."
+        "currentInvalid": "La contraseña actual no es correcta",
+        "samePassword": "La contraseña nueva debe ser distinta de la actual"
       }
     }
   }

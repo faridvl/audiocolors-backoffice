@@ -1351,6 +1351,8 @@ export const TEXT = {
     },
     PASSWORD: {
       TITLE: 'profile.password.title',
+      DESCRIPTION: 'profile.password.description',
+      MODAL_TITLE: 'profile.password.modalTitle',
       CURRENT: 'profile.password.current',
       NEW: 'profile.password.new',
       CONFIRM: 'profile.password.confirm',

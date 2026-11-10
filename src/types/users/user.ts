@@ -56,6 +56,7 @@ export const USER_EMAIL_MAX_LENGTH = 160;
 export const INVALID_CURRENT_PASSWORD_ERROR_CODE = 'INVALID_CURRENT_PASSWORD';
 export const SAME_PASSWORD_ERROR_CODE = 'SAME_PASSWORD';
 export const USER_PASSWORD_MIN_LENGTH = 8;
+/** Límite de bcrypt: son 72 bytes UTF-8, no caracteres (una «ñ» o un emoji ocupan más de uno). */
 export const USER_PASSWORD_MAX_LENGTH = 72;
 export const USER_PASSWORD_UPPERCASE_PATTERN = /[A-Z]/;
 export const USER_PASSWORD_DIGIT_PATTERN = /\d/;

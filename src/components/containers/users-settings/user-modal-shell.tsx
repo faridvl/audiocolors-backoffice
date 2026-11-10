@@ -11,6 +11,8 @@ interface UserModalShellProps {
   icon: React.ReactNode;
   /** Hay cambios sin guardar: Esc o el fondo piden confirmar antes de cerrar. */
   isDirty: boolean;
+  /** Hay un guardado en curso: ni Esc ni el fondo cierran la ventana. */
+  isBusy?: boolean;
   onClose: () => void;
   children: React.ReactNode;
 }
@@ -20,6 +22,7 @@ export const UserModalShell: React.FC<UserModalShellProps> = ({
   title,
   icon,
   isDirty,
+  isBusy = false,
   onClose,
   children,
 }) => {
@@ -27,12 +30,13 @@ export const UserModalShell: React.FC<UserModalShellProps> = ({
   const [isConfirmingDiscard, setIsConfirmingDiscard] = useState(false);
 
   const requestClose = useCallback(() => {
+    if (isBusy) return;
     if (isDirty) {
       setIsConfirmingDiscard(true);
       return;
     }
     onClose();
-  }, [isDirty, onClose]);
+  }, [isBusy, isDirty, onClose]);
 
   useEscapeKey(requestClose, !isConfirmingDiscard);
   const backdropProps = useBackdropClose(requestClose);

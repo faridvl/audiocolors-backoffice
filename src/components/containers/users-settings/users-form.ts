@@ -9,11 +9,10 @@ import {
   USER_EMAIL_MAX_LENGTH,
   USER_FULL_NAME_MAX_LENGTH,
   USER_PASSWORD_DIGIT_PATTERN,
-  USER_PASSWORD_MAX_LENGTH,
   USER_PASSWORD_MIN_LENGTH,
   USER_PASSWORD_UPPERCASE_PATTERN,
 } from '@/types/users/user';
-import { getInitialRoleSelection } from './users-logic';
+import { getInitialRoleSelection, isPasswordWithinByteLimit } from './users-logic';
 
 const ERRORS = TEXT.SETTINGS.USERS.ERRORS;
 
@@ -71,7 +70,9 @@ export const buildPasswordSchema = (t: TFunction) =>
   Yup.string()
     .required(t(ERRORS.PASSWORD_REQUIRED))
     .min(USER_PASSWORD_MIN_LENGTH, t(ERRORS.PASSWORD_MIN))
-    .max(USER_PASSWORD_MAX_LENGTH, t(ERRORS.PASSWORD_MAX))
+    .test('password-max-bytes', t(ERRORS.PASSWORD_MAX), (value) =>
+      isPasswordWithinByteLimit(value ?? ''),
+    )
     .matches(USER_PASSWORD_UPPERCASE_PATTERN, t(ERRORS.PASSWORD_UPPERCASE))
     .matches(USER_PASSWORD_DIGIT_PATTERN, t(ERRORS.PASSWORD_DIGIT));
 
