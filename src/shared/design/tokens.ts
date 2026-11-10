@@ -103,15 +103,23 @@ export const STATUS_STYLES: Record<StatusTone, string> = {
 const WARNING_TEXT_COLOR = '#b45309';
 
 /**
- * Color de cada sede: `stripe` para la franja y los puntos, `text` para la
- * píldora. El amarillo no da contraste como texto sobre su fondo suave, así
- * que lleva un tono más oscuro; los demás usan el color pleno.
+ * Tonos más oscuros de la misma familia para el texto de la píldora: el color
+ * de marca pleno no llega a 4.5:1 sobre su fondo suave (rojo, naranja, verde).
+ */
+const BRANCH_RED_TEXT_COLOR = '#d01d1a';
+const BRANCH_ORANGE_TEXT_COLOR = '#b1530d';
+const BRANCH_GREEN_TEXT_COLOR = '#457a24';
+
+/**
+ * Color de cada sede: `stripe` para la franja y los puntos (color de marca),
+ * `text` para la píldora, con contraste AA sobre su fondo suave. Azul y morado
+ * ya lo cumplen con el color pleno.
  */
 const BRANCH_COLOR_STYLES: Record<BranchColor, { stripe: string; text: string }> = {
-  [BranchColor.RED]: { stripe: BRAND_COLORS.red, text: BRAND_COLORS.red },
-  [BranchColor.ORANGE]: { stripe: BRAND_COLORS.orange, text: BRAND_COLORS.orange },
+  [BranchColor.RED]: { stripe: BRAND_COLORS.red, text: BRANCH_RED_TEXT_COLOR },
+  [BranchColor.ORANGE]: { stripe: BRAND_COLORS.orange, text: BRANCH_ORANGE_TEXT_COLOR },
   [BranchColor.YELLOW]: { stripe: BRAND_COLORS.yellow, text: WARNING_TEXT_COLOR },
-  [BranchColor.GREEN]: { stripe: BRAND_COLORS.green, text: BRAND_COLORS.green },
+  [BranchColor.GREEN]: { stripe: BRAND_COLORS.green, text: BRANCH_GREEN_TEXT_COLOR },
   [BranchColor.BLUE]: { stripe: BRAND_COLORS.blue, text: BRAND_COLORS.blue },
   [BranchColor.PURPLE]: { stripe: BRAND_COLORS.purple, text: BRAND_COLORS.purple },
 };
