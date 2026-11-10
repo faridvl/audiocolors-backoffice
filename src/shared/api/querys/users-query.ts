@@ -11,10 +11,9 @@ import {
 export const FETCH_USERS_KEY = 'fetchUsers';
 
 /** Todos los usuarios de la clínica, activos e inactivos. */
-export function useUsersQuery({ enabled = true }: { enabled?: boolean } = {}) {
+export function useUsersQuery() {
   return useQuery({
     queryKey: [FETCH_USERS_KEY],
-    enabled,
     queryFn: async (): Promise<ManagedUser[]> => {
       const response = await ApiServiceClient(env.API.IDENTITY_URL).get<PaginatedUsers>(
         `/users?page=1&limit=${USERS_PAGE_LIMIT}&status=${USERS_STATUS_FILTER_ALL}`,

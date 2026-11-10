@@ -21,6 +21,12 @@ export interface ManagedUser {
   createdAt: string;
 }
 
+/** Lo que `GET /users/:uuid/signature` da de un profesional: solo lo que lleva su firma. */
+export type UserSignature = Pick<
+  ManagedUser,
+  'uuid' | 'fullName' | 'professionalTitle' | 'licenseNumber'
+>;
+
 export interface PaginatedUsers {
   data: ManagedUser[];
   meta: { total: number; page: number; limit: number; totalPages: number };

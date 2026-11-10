@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { usePermissions } from '@/hooks/use-permissions';
 import { useSession } from '@/hooks/use-session';
-import { useUsersQuery } from '@/shared/api/querys/users-query';
-import { Permission } from '@/shared/auth/permissions';
+import { useUserSignatureQuery } from '@/shared/api/querys/user-signature-query';
 import { formatProfessionalName } from '@/shared/utils/professional-name';
 import { TEXT } from '@/static/texts/i18n';
 
@@ -11,7 +9,8 @@ import { TEXT } from '@/static/texts/i18n';
  * si se conocen. Vacío si no se sabe quién fue, para que el documento use su respaldo.
  *
  * El API del registro solo trae el nombre; título y colegiado salen de la sesión (si fue quien
- * imprime) o de la lista de usuarios, que solo puede pedir quien administra usuarios.
+ * imprime) o de la firma del profesional, que cualquier usuario puede leer: el informe no debe
+ * variar según quién lo imprime. Si esa lectura falla, la firma lleva solo el nombre.
  */
 export function useAuthorSignatureName(
   authorUuid: string | null | undefined,
@@ -19,13 +18,10 @@ export function useAuthorSignatureName(
 ): string {
   const { t } = useTranslation();
   const { user } = useSession();
-  const { can } = usePermissions();
   const isSessionUser = !!authorUuid && authorUuid === user?.uuid;
-  const { data: users } = useUsersQuery({
-    enabled: !!authorUuid && !isSessionUser && can(Permission.MANAGE_USERS),
-  });
+  const { data: signature } = useUserSignatureQuery(authorUuid, !isSessionUser);
 
-  const author = isSessionUser ? user : users?.find((candidate) => candidate.uuid === authorUuid);
+  const author = isSessionUser ? user : signature;
   // Mismo criterio que la ficha del informe: sin nombre en el registro, solo se conoce a quien imprime.
   const fullName = authorName || (isSessionUser ? (user?.fullName ?? '') : '');
   if (!fullName) return '';
