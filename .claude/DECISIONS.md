@@ -1194,3 +1194,18 @@ independientes:
 ## D77 · Mi perfil: identidad, campos al ancho de su dato y vista previa (2026-11-09)
 
 - Mi perfil usa el encabezado de identidad (avatar con iniciales, nombre, correo y nivel de acceso en `Badge`), las mismas tarjetas y el mismo ancho `max-w-6xl` de Configuración, campos al ancho de su dato (Título 13rem y colegiado 14rem desde `sm`) y una vista previa del nombre como sale en los documentos (`formatProfessionalName`, mismo prefijo y título abreviado que el resumen del paciente). El aviso de colegiado faltante va dentro de la vista previa, en tono de advertencia. El avatar se extrajo a `UserAvatar` y lo comparte la barra superior.
+
+## D80 · Acciones del paciente por permiso (2026-11-09)
+
+- Recepción ve los datos generales y los contactos del paciente, pero no lo modifica. Las acciones del expediente salen de dos permisos (`Permission.EDIT_PATIENT` y `Permission.VIEW_CLINICAL_RECORD`), nunca del rol suelto:
+
+| Acción | Recepción sin atender | Administración/Propietario sin atender | Cualquier nivel con "Atiende pacientes" |
+|---|---|---|---|
+| Modificar paciente | No | Sí | Sí |
+| Cambiar estado | No | Sí | Sí |
+| Indicadores | No | No | Sí |
+| Generar resumen | No | No | Sí |
+
+- Sin ninguna acción permitida la columna de acciones no se renderiza. La pantalla de modificar va dentro de `RequirePermission` (`EDIT_PATIENT`); el lápiz de la lista de pacientes, los indicadores del expediente (etiquetas y casilla de candidato a video), la prioridad y los modales solo existen con su permiso, así que ni piden sus datos. Sin "Atiende pacientes" la prioridad se ve pero no se cambia.
+- El API valida lo mismo: modificar y cambiar estado exigen gestión o atender pacientes; los indicadores, atender pacientes.
+- No cambia: registrar un paciente nuevo y el registro rápido al agendar siguen para Recepción.

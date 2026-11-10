@@ -2,6 +2,8 @@ import React from 'react';
 import { Ear, FileText, Pencil, UserCog } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { TEXT } from '@/static/texts/i18n';
 
 interface PatientActionsProps {
@@ -19,20 +21,35 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
   onGenerateSummary,
 }) => {
   const { t } = useTranslation();
+  const { can } = usePermissions();
   const actions = [
-    { label: t(TEXT.PATIENTS.DETAIL.ACTIONS.EDIT), icon: Pencil, onClick: onEdit },
+    {
+      label: t(TEXT.PATIENTS.DETAIL.ACTIONS.EDIT),
+      icon: Pencil,
+      onClick: onEdit,
+      permission: Permission.EDIT_PATIENT,
+    },
     {
       label: t(TEXT.PATIENTS.DETAIL.ACTIONS.CHANGE_STATUS),
       icon: UserCog,
       onClick: onChangeStatus,
+      permission: Permission.EDIT_PATIENT,
     },
-    { label: t(TEXT.PATIENTS.FLAGS.MENU), icon: Ear, onClick: onEditFlags },
+    {
+      label: t(TEXT.PATIENTS.FLAGS.MENU),
+      icon: Ear,
+      onClick: onEditFlags,
+      permission: Permission.VIEW_CLINICAL_RECORD,
+    },
     {
       label: t(TEXT.PATIENTS.DETAIL.ACTIONS.GENERATE_SUMMARY),
       icon: FileText,
       onClick: onGenerateSummary,
+      permission: Permission.VIEW_CLINICAL_RECORD,
     },
-  ];
+  ].filter((action) => can(action.permission));
+
+  if (actions.length === 0) return null;
 
   return (
     <div className="flex shrink-0 flex-col gap-2">

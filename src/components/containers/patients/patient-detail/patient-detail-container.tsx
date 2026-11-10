@@ -91,7 +91,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
 
       {can(Permission.VIEW_PATIENT_FILES) && <DocumentsContainer patientUuid={patient.uuid} />}
 
-      {isChangingStatus && (
+      {can(Permission.EDIT_PATIENT) && isChangingStatus && (
         <ChangePatientStatusModal
           patientUuid={patient.uuid}
           currentStatus={patient.status ?? PatientStatus.ACTIVE}
@@ -101,7 +101,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         />
       )}
 
-      {isGeneratingSummary && (
+      {can(Permission.VIEW_CLINICAL_RECORD) && isGeneratingSummary && (
         <PatientSummaryModal patient={patient} onClose={() => setIsGeneratingSummary(false)} />
       )}
 
@@ -109,7 +109,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         <EditContactsModal patient={patient} onClose={() => setIsEditingContacts(false)} />
       )}
 
-      {flagsSection && (
+      {can(Permission.VIEW_CLINICAL_RECORD) && flagsSection && (
         <PatientFlagsModal
           patient={patient}
           initialSection={flagsSection}

@@ -115,11 +115,16 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
+          <PatientFlagPills
+            patient={patient}
+            flags={MODAL_FLAGS}
+            showDates
+            onClick={can(Permission.VIEW_CLINICAL_RECORD) ? onEditFlags : undefined}
+          />
           {can(Permission.VIEW_CLINICAL_RECORD) && (
             <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
           )}
-          <VideoCandidateCheck patient={patient} />
+          {can(Permission.VIEW_CLINICAL_RECORD) && <VideoCandidateCheck patient={patient} />}
         </div>
 
         <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 lg:grid-cols-2">

@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { TEXT } from "@/static/texts/i18n";
 import { Button, ButtonVariant } from "@/components/common/button/button";
 import { usePatientPriority } from "@/components/containers/patients/patient-flags/use-patient-priority";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Permission } from "@/shared/auth/permissions";
 import { getFullName } from "@/shared/utils/formatters";
 import { Patient } from "@/types/patients/patient";
 import { tailwind } from "@/utils/tailwind-utils";
@@ -14,12 +16,26 @@ export const PatientPriorityButton: React.FC<{ patient: Patient; className?: str
   className,
 }) => {
   const { t } = useTranslation();
-  const { isOn, isUpdating, handleToggle } = usePatientPriority(patient);
+  const { isOn, isUpdating, label, handleToggle } = usePatientPriority(patient);
+  const { can } = usePermissions();
+  const canToggle = can(Permission.VIEW_CLINICAL_RECORD);
   const action = t(
     isOn
       ? TEXT.PATIENTS.FLAGS.PRIORITY.UNMARK
       : TEXT.PATIENTS.FLAGS.PRIORITY.MARK,
   );
+
+  // Marcar la prioridad escribe indicadores: sin atender pacientes se ve el estado, no se cambia.
+  if (!canToggle) {
+    return isOn ? (
+      <span
+        title={label}
+        className={tailwind("flex items-center px-2 text-danger", className)}
+      >
+        <Flag className="h-4 w-4 fill-current" aria-hidden />
+      </span>
+    ) : null;
+  }
 
   return (
     <Button
