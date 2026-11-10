@@ -122,6 +122,11 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
     { label: t(AUDIOMETRY_TEXT.TYPE.LABEL), value: typeName ?? '' },
+    {
+      label: t(REPORT_TEXT.EQUIPMENT),
+      value: equipment ? formatEquipmentName(equipment) : '',
+      isWide: true,
+    },
   ].filter((field) => field.value !== '');
   const embeddedFields = [
     { label: t(REPORT_TEXT.DATE), value: entryDate },
@@ -183,7 +188,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     <article
       {...(isEmbedded ? { 'data-print-summary-section': '' } : { 'data-print-report': '' })}
       className={tailwind(
-        'flex-col gap-2 bg-white text-xs leading-snug text-ink-700',
+        'flex-col gap-1.5 bg-white text-xs leading-snug text-ink-700',
         isEmbedded || isVisibleOnScreen ? 'flex' : 'hidden print:flex',
       )}
     >
@@ -202,7 +207,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       )}
       {!isEmbedded && (
         <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
-          <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-3">
             <ClinicBrand logoUrl={header.clinicLogoUrl} name={header.clinicName} height={40} />
             {header.clinicLogoUrl && header.clinicName && (
               <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
@@ -232,9 +237,12 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
       )}
 
       {!isEmbedded && (
-        <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
+        <dl className="grid grid-cols-3 gap-x-4 gap-y-1 rounded border border-ink-200 bg-ink-50 px-3 py-1.5">
           {patientFields.map((field) => (
-            <div key={field.label} className="min-w-0">
+            <div
+              key={field.label}
+              className={tailwind('min-w-0', 'isWide' in field && field.isWide && 'col-span-3')}
+            >
               <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
               <dd className="font-medium text-ink-800">{field.value}</dd>
             </div>
@@ -353,8 +361,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         </>
       )}
 
-      {/* Diagnóstico, observaciones y firma pasan juntos a la hoja siguiente si no caben. */}
-      <div className="flex break-inside-avoid flex-col gap-2">
+      {/* Sin break-inside-avoid en el bloque: si el texto no cabe, solo se mueve lo que no entra. */}
+      <div className="flex flex-col gap-2">
         {textSections.map((section) => (
           <section key={section.key} className="flex break-inside-avoid flex-col gap-1">
             <h2 className={SECTION_TITLE_CLASSES}>{section.title}</h2>
@@ -368,10 +376,10 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
 
         {!isEmbedded && (
           <footer
-            className="mt-1 flex flex-col gap-3 pt-2"
+            className="flex items-end justify-between gap-6 border-t border-ink-200 pt-1.5"
             style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
           >
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+            <dl className="flex min-w-0 flex-1 flex-wrap gap-x-6 gap-y-1">
               {signatureFields.map((field) => (
                 <div key={field.label} className="min-w-0">
                   <dt className="text-[10px] uppercase tracking-wide text-ink-500">
@@ -381,8 +389,8 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
                 </div>
               ))}
             </dl>
-            <div className="flex items-end justify-between gap-6">
-              <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
+            <div className="flex w-64 shrink-0 flex-col gap-0.5">
+              <div className="mt-3 flex flex-col gap-0.5 border-t border-ink-500 pt-1">
                 <p className="text-sm font-medium text-ink-800">{professional}</p>
                 <p className="text-[10px] uppercase tracking-wide text-ink-500">
                   {t(REPORT_TEXT.SIGNATURE)}
