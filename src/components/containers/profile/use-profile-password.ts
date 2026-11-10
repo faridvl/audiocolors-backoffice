@@ -74,7 +74,7 @@ export function useProfilePassword() {
         return;
       }
     }
-    toast.error(error instanceof Error ? error.message : t(TEXT.GENERAL.ERRORS.UNEXPECTED));
+    toast.error(t(TEXTS.ERRORS.SAVE_FAILED));
   };
 
   const submit = async (

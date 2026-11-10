@@ -1364,6 +1364,7 @@ export const TEXT = {
         CONFIRM_MISMATCH: 'profile.password.errors.confirmMismatch',
         CURRENT_INVALID: 'profile.password.errors.currentInvalid',
         SAME_PASSWORD: 'profile.password.errors.samePassword',
+        SAVE_FAILED: 'profile.password.errors.saveFailed',
       },
     },
   },

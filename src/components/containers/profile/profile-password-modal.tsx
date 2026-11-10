@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import { KeyRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonVariant } from '@/components/common/button/button';
+import { FormDirtyReporter } from '@/components/common/form/form-dirty-reporter';
 import { FocusFirstError } from '@/components/common/form/focus-first-error';
 import { FIELD_LABEL_CLASSES, FormField } from '@/components/common/input/input';
 import { TEXT } from '@/static/texts/i18n';
@@ -30,12 +31,13 @@ export const ProfilePasswordModal: React.FC<ProfilePasswordModalProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
+  const [isDirty, setIsDirty] = useState(false);
 
   return (
     <UserModalShell
       title={t(TEXTS.MODAL_TITLE)}
       icon={<KeyRound className="h-5 w-5 text-brand-700" aria-hidden />}
-      isDirty={false}
+      isDirty={isDirty}
       isBusy={isSaving}
       onClose={onClose}
     >
@@ -45,6 +47,7 @@ export const ProfilePasswordModal: React.FC<ProfilePasswordModalProps> = ({
         onSubmit={onSubmit}
       >
         <Form className="mt-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" noValidate>
+          <FormDirtyReporter onDirtyChange={setIsDirty} />
           <FocusFirstError />
           <FormField
             name="currentPassword"

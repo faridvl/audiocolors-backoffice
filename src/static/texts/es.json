@@ -1772,7 +1772,8 @@
         "confirmRequired": "Repite la contraseña nueva",
         "confirmMismatch": "Las contraseñas no coinciden",
         "currentInvalid": "La contraseña actual no es correcta",
-        "samePassword": "La contraseña nueva debe ser distinta de la actual"
+        "samePassword": "La contraseña nueva debe ser distinta de la actual",
+        "saveFailed": "No pudimos cambiar la contraseña. Intenta de nuevo."
       }
     }
   }

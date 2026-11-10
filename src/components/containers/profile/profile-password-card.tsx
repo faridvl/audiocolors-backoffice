@@ -24,7 +24,7 @@ export const ProfilePasswordCard: React.FC = () => {
           <Button
             variant={ButtonVariant.SECONDARY}
             onClick={openModal}
-            className="w-full sm:w-auto"
+            className="w-full whitespace-nowrap sm:w-auto sm:shrink-0"
           >
             {t(TEXTS.SUBMIT)}
           </Button>
