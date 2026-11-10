@@ -2,6 +2,7 @@ import {
   Building2,
   CalendarClock,
   FileText,
+  MapPin,
   MessageSquareText,
   Users,
   type LucideIcon,
@@ -15,6 +16,7 @@ export enum SettingsSection {
   QUESTIONS = 'QUESTIONS',
   TEMPLATES = 'TEMPLATES',
   CLINIC = 'CLINIC',
+  BRANCHES = 'BRANCHES',
   USERS = 'USERS',
 }
 
@@ -43,6 +45,13 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
     href: routesPrivate.settings.clinic,
     icon: Building2,
     permission: Permission.VIEW_CLINIC,
+  },
+  {
+    section: SettingsSection.BRANCHES,
+    group: SettingsGroup.PRACTICE,
+    href: routesPrivate.settings.branches,
+    icon: MapPin,
+    permission: Permission.EDIT_APPOINTMENT_TYPES,
   },
   {
     section: SettingsSection.USERS,
