@@ -50,10 +50,7 @@ export enum MaintenanceStatus {
 }
 
 type MaintenanceStatusField =
-  | 'maintenance1Status'
-  | 'maintenance2Status'
-  | 'maintenance3Status'
-  | 'maintenance4Status';
+  'maintenance1Status' | 'maintenance2Status' | 'maintenance3Status' | 'maintenance4Status';
 
 export const MAINTENANCE_STATUS_FIELDS: Record<MaintenanceNumber, MaintenanceStatusField> = {
   1: 'maintenance1Status',
@@ -88,6 +85,10 @@ export interface Patient {
   warrantyExpiredSince?: string | null;
   renewPrescriptionSince?: string | null;
   prioritySince?: string | null;
+  /** Por qué se marcó la prioridad; el API lo exige al marcarla. */
+  priorityReason?: string | null;
+  /** Quién la marcó; puede faltar si esa persona ya no existe. */
+  priorityByName?: string | null;
   /** Documento (categoría WARRANTY) elegido como el de la garantía. */
   warrantyDocumentUuid?: string | null;
   birthDate?: string | null;
@@ -169,6 +170,9 @@ export type UpdatePatientPayload = Partial<CreatePatientPayload> & {
 };
 
 /** Indicadores que se prenden y apagan desde el expediente. El valor es la clave del API. */
+/** Máximo de caracteres del motivo de prioridad (lo mismo que valida el API). */
+export const PATIENT_PRIORITY_REASON_MAX_LENGTH = 500;
+
 export enum PatientFlag {
   HEARING_AIDS_IN_LAB = 'hearingAidsInLab',
   ACTIVE_WARRANTY = 'hasActiveWarranty',

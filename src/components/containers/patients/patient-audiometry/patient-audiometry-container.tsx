@@ -26,6 +26,7 @@ import { SpeechWordListSelectors } from './speech-word-list-selectors';
 import { SpeechAudiogramChart } from './speech-audiogram-chart';
 import { NEW_ENTRY_OPTION_VALUE, useAudiometryPoc } from './use-audiometry-poc';
 import { formatDateTime } from '@/shared/utils/formatters';
+import { formatEquipmentName } from '@/shared/utils/equipment';
 import { PillSelect, PillSelectVariant } from '@/components/common/pill-select/pill-select';
 
 const AUDIOMETRY_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY;
@@ -52,6 +53,10 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     isScreening,
     screeningResult,
     isResultMissing,
+    equipmentOptions,
+    equipmentUuid,
+    isEquipmentMissing,
+    handleEquipmentChange,
     handleScreeningResultChange,
     pendingType,
     handleTypeChange,
@@ -123,10 +128,19 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
   ];
 
   const entryAuthorDate = selectedEntry
-    ? t(AUDIOMETRY_TEXT.ENTRY_AUTHOR_DATE, {
-        author: selectedEntryAuthor,
-        date: formatDateTime(selectedEntry.createdAt),
-      })
+    ? [
+        t(AUDIOMETRY_TEXT.ENTRY_AUTHOR_DATE, {
+          author: selectedEntryAuthor,
+          date: formatDateTime(selectedEntry.createdAt),
+        }),
+        selectedEntry.equipment
+          ? t(AUDIOMETRY_TEXT.ENTRY_EQUIPMENT, {
+              equipment: formatEquipmentName(selectedEntry.equipment),
+            })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
     : '';
 
   return (
@@ -233,6 +247,28 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                     isSheetOnMobile
                     isLabelFull
                   />
+                </div>
+              )}
+              {!isReadOnly && equipmentOptions.length > 0 && (
+                <div className="flex max-w-sm flex-col gap-1.5">
+                  <Typography variant={TypographyVariant.ACCENT}>
+                    {t(AUDIOMETRY_TEXT.EQUIPMENT_LABEL)}
+                  </Typography>
+                  <PillSelect
+                    variant={PillSelectVariant.FIELD}
+                    ariaLabel={t(AUDIOMETRY_TEXT.EQUIPMENT_LABEL)}
+                    value={equipmentUuid ?? ''}
+                    options={equipmentOptions}
+                    onChange={handleEquipmentChange}
+                    placeholder={t(AUDIOMETRY_TEXT.EQUIPMENT_PLACEHOLDER)}
+                    isSheetOnMobile
+                    isLabelFull
+                  />
+                  {isEquipmentMissing && !equipmentUuid && (
+                    <p role="alert" className="text-sm text-danger">
+                      {t(AUDIOMETRY_TEXT.EQUIPMENT_REQUIRED)}
+                    </p>
+                  )}
                 </div>
               )}
               <section className="flex flex-col gap-3">

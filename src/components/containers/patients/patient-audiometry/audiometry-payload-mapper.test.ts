@@ -56,7 +56,10 @@ const buildFullState = (): AudiometryFormState => {
   state.speechFieldValues[Ear.RIGHT][SpeechField.MAX_DISCRIMINATION] = '90';
   state.speechFieldValues[Ear.LEFT][SpeechField.THRESHOLD] = '-';
   state.failedWords[Ear.RIGHT] = '1';
-  state.notes = { diagnosis: '  Hipoacusia leve  ', observations: 'Sin observaciones' };
+  state.notes = {
+    diagnosis: '  Hipoacusia leve  ',
+    observations: 'Sin observaciones',
+  };
   return state;
 };
 
@@ -167,6 +170,17 @@ describe('payloadToState', () => {
     assert.deepEqual(restored, state);
   });
 
+  it('manda y restaura "sin respuesta" del Weber', () => {
+    const state = buildFullState();
+    state.weber = { ...state.weber, 2000: WeberResult.NO_RESPONSE };
+    const payload = stateToPayload(state, summariesOf(state));
+    assert.equal(payload.weber['2000'], 'NO_RESPONSE');
+    assert.equal(
+      payloadToState(JSON.parse(JSON.stringify(payload))).weber[2000],
+      WeberResult.NO_RESPONSE,
+    );
+  });
+
   it('rellena el Weber que falte con el valor por defecto', () => {
     const payload = stateToPayload(buildEmptyState(), summariesOf(buildEmptyState()));
     payload.weber = { '500': WeberResult.RIGHT };
@@ -196,11 +210,27 @@ describe('hasAudiometryData', () => {
 
 const buildScreeningState = (): ScreeningFormState => {
   const marks = buildEmptyMarks();
-  marks[AudiometryTool.AIR][Ear.RIGHT][1000] = { thresholdDb: 20, isMasked: true, hasNoResponse: false };
-  marks[AudiometryTool.AIR][Ear.RIGHT][3000] = { thresholdDb: 25, isMasked: false, hasNoResponse: false };
-  marks[AudiometryTool.AIR][Ear.LEFT][500] = { thresholdDb: 120, isMasked: false, hasNoResponse: true };
+  marks[AudiometryTool.AIR][Ear.RIGHT][1000] = {
+    thresholdDb: 20,
+    isMasked: true,
+    hasNoResponse: false,
+  };
+  marks[AudiometryTool.AIR][Ear.RIGHT][3000] = {
+    thresholdDb: 25,
+    isMasked: false,
+    hasNoResponse: false,
+  };
+  marks[AudiometryTool.AIR][Ear.LEFT][500] = {
+    thresholdDb: 120,
+    isMasked: false,
+    hasNoResponse: true,
+  };
   // Una marca ajena a rastreo no debe viajar.
-  marks[AudiometryTool.BONE][Ear.LEFT][500] = { thresholdDb: 30, isMasked: false, hasNoResponse: false };
+  marks[AudiometryTool.BONE][Ear.LEFT][500] = {
+    thresholdDb: 30,
+    isMasked: false,
+    hasNoResponse: false,
+  };
   return {
     marks,
     result: ScreeningResult.REFER,
@@ -239,7 +269,10 @@ describe('screeningPayloadToState', () => {
     const restored = screeningPayloadToState(JSON.parse(JSON.stringify(payload)));
 
     assert.equal(restored.result, ScreeningResult.REFER);
-    assert.deepEqual(restored.notes, { diagnosis: '', observations: 'Control en un mes' });
+    assert.deepEqual(restored.notes, {
+      diagnosis: '',
+      observations: 'Control en un mes',
+    });
     assert.equal(restored.marks[AudiometryTool.AIR][Ear.RIGHT][3000]?.thresholdDb, 25);
     assert.equal(restored.marks[AudiometryTool.AIR][Ear.LEFT][500]?.hasNoResponse, true);
     assert.deepEqual(restored.marks[AudiometryTool.BONE][Ear.LEFT], {});

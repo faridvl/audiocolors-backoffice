@@ -7,6 +7,8 @@ import type {
   ScreeningResult,
 } from '@/components/containers/patients/patient-audiometry/audiometry-constants';
 
+import type { EquipmentSummary } from '@/types/equipment/equipment';
+
 export const AUDIOMETRY_SCHEMA_VERSION = 1;
 
 /** Marca de "mal hecha": todo null mientras la audiometría no se ha marcado. */
@@ -32,6 +34,7 @@ export interface AudiometryEntryListItem extends AudiometryInvalidation {
   gradingScale: string | null;
   ptaRight: number | null;
   ptaLeft: number | null;
+  equipment?: EquipmentSummary | null;
 }
 
 interface AudiometryEntryBase extends AudiometryInvalidation {
@@ -42,6 +45,8 @@ interface AudiometryEntryBase extends AudiometryInvalidation {
   createdAt: string;
   createdByUuid: string | null;
   createdByName: string | null;
+  /** Audiómetro usado; null en las audiometrías anteriores a los equipos. */
+  equipment: EquipmentSummary | null;
 }
 
 export interface ClinicalAudiometryEntry extends AudiometryEntryBase {

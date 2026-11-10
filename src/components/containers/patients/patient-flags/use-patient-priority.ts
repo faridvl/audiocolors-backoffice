@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useUpdatePatientFlagMutation } from "@/shared/api/mutations/patients/update-patient-flag-mutation";
-import { FETCH_PATIENT_KEY } from "@/shared/api/querys/get-patient-query";
-import { FETCH_PATIENTS_KEY } from "@/shared/api/querys/patients-query";
-import { FETCH_PATIENT_ACTIVITY_KEY } from "@/shared/api/querys/patient-activity-query";
-import { TEXT } from "@/static/texts/i18n";
-import { Patient, PatientFlag } from "@/types/patients/patient";
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { useUpdatePatientFlagMutation } from '@/shared/api/mutations/patients/update-patient-flag-mutation';
+import { FETCH_PATIENT_KEY } from '@/shared/api/querys/get-patient-query';
+import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
+import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
+import { TEXT } from '@/static/texts/i18n';
+import { Patient, PatientFlag } from '@/types/patients/patient';
 
 const FLAG = PatientFlag.PRIORITY;
 
@@ -20,21 +20,25 @@ export function usePatientPriority(patient: Patient) {
   const queryClient = useQueryClient();
   const { executeUpdatePatientFlag } = useUpdatePatientFlagMutation();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isReasonOpen, setIsReasonOpen] = useState(false);
   const isOn = Boolean(patient.prioritySince);
 
-  const handleToggle = () => {
-    const nextIsOn = !isOn;
+  const updatePriority = (nextIsOn: boolean, priorityReason?: string) => {
     setIsUpdating(true);
     executeUpdatePatientFlag(
-      { patientUuid: patient.uuid, flag: FLAG, isOn: nextIsOn },
+      { patientUuid: patient.uuid, flag: FLAG, isOn: nextIsOn, priorityReason },
       {
         onSuccess: (updated) => {
-          queryClient.setQueryData(
-            [FETCH_PATIENT_KEY, patient.uuid],
-            (previous?: Patient) =>
-              previous
-                ? { ...previous, prioritySince: updated.prioritySince ?? null }
-                : previous,
+          setIsReasonOpen(false);
+          queryClient.setQueryData([FETCH_PATIENT_KEY, patient.uuid], (previous?: Patient) =>
+            previous
+              ? {
+                  ...previous,
+                  prioritySince: updated.prioritySince ?? null,
+                  priorityReason: updated.priorityReason ?? null,
+                  priorityByName: updated.priorityByName ?? null,
+                }
+              : previous,
           );
           void queryClient.invalidateQueries({
             queryKey: [FETCH_PATIENTS_KEY],
@@ -53,10 +57,19 @@ export function usePatientPriority(patient: Patient) {
     );
   };
 
+  // Marcar pide el motivo primero; quitar la prioridad no.
+  const handleToggle = () => {
+    if (isOn) updatePriority(false);
+    else setIsReasonOpen(true);
+  };
+
   return {
     isOn,
     isUpdating,
+    isReasonOpen,
     label: t(`${TEXT.PATIENTS.FLAGS.LABEL_PREFIX}.${FLAG}`),
     handleToggle,
+    handleConfirmReason: (reason: string) => updatePriority(true, reason),
+    handleCloseReason: () => setIsReasonOpen(false),
   };
 }

@@ -2,7 +2,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { useApiMutation } from '@/shared/api/mutations/use-api-mutation';
-import { ApiServiceClient } from '@/shared/api/api-service-client';
+import { ApiError, ApiServiceClient } from '@/shared/api/api-service-client';
+import { EQUIPMENT_REQUIRED_ERROR_CODE } from '@/types/equipment/equipment';
 import { env } from '@/shared/api/config';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
 import { FETCH_AUDIOMETRY_ENTRIES_KEY } from '@/shared/api/querys/patient-audiometry-entries-query';
@@ -15,7 +16,10 @@ import type {
 import { AudiometryTypeCode } from '@/components/containers/patients/patient-audiometry/audiometry-constants';
 import { AUDIOMETRY_SCHEMA_VERSION, AudiometryEntry } from '@/types/patients/audiometry-entry';
 
-type CreateAudiometryEntryVariables = { patientUuid: string } & (
+type CreateAudiometryEntryVariables = {
+  patientUuid: string;
+  equipmentUuid?: string;
+} & (
   | { typeCode: AudiometryTypeCode.CLINICAL; payload: AudiometryPayload }
   | { typeCode: AudiometryTypeCode.SCREENING; payload: ScreeningPayload }
 );
@@ -32,10 +36,15 @@ export function useCreateAudiometryEntryMutation({ onCreated }: CreateAudiometry
     CreateAudiometryEntryVariables
   >({
     mutationKey: ['createAudiometryEntry'],
-    mutationFn: ({ patientUuid, typeCode, payload }) =>
+    mutationFn: ({ patientUuid, typeCode, payload, equipmentUuid }) =>
       ApiServiceClient(env.API.MEDICAL_RECORDS_URL).post<AudiometryEntry>(
         `/patients/${patientUuid}/audiometry-entries`,
-        { typeCode, schemaVersion: AUDIOMETRY_SCHEMA_VERSION, payload },
+        {
+          typeCode,
+          schemaVersion: AUDIOMETRY_SCHEMA_VERSION,
+          payload,
+          equipmentUuid,
+        },
       ),
     onSuccess: async (entry, { patientUuid }) => {
       toast.success(t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.SAVED));
@@ -52,7 +61,13 @@ export function useCreateAudiometryEntryMutation({ onCreated }: CreateAudiometry
       });
       onCreated?.(entry);
     },
-    onError: (error) => toast.error(error.message),
+    onError: (error) => {
+      const isEquipmentMissing =
+        error instanceof ApiError && error.code === EQUIPMENT_REQUIRED_ERROR_CODE;
+      toast.error(
+        isEquipmentMissing ? t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.EQUIPMENT_REQUIRED) : error.message,
+      );
+    },
   });
 
   return { executeCreateEntry, isPending };

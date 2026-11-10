@@ -18,6 +18,18 @@ el usuario explica o decide algo y antes de cada commit; lo cerrado pasa a
   `develop` (D24).
 
 ## Reglas de negocio confirmadas
+- Pedidos de la clínica (2026-11-09, sin empezar):
+  - Prioridad: marcarla pide un motivo obligatorio. El motivo se ve debajo de la casilla del
+    expediente (con quién y cuándo), en el tooltip del ícono de la lista y queda como nota en
+    Control de evolución. Quitarla no pide motivo; deja nota "Se quitó la prioridad".
+  - Weber: falta la opción NR (sin respuesta), en pantalla y en el informe.
+  - Equipos: Configuración → Equipos, cada uno con marca y modelo (sin serie ni calibración); se
+    desactivan, no se borran, como las sedes. La audiometría nueva elige con qué equipo se hizo
+    (obligatorio si la clínica tiene equipos activos); las viejas quedan sin equipo.
+  - Informe de audiometría: se deja la ficha de arriba y al final va un bloque con paciente,
+    cédula, equipo usado (marca y modelo) y la firma del audiólogo.
+  - Enviar audífonos al laboratorio deja nota en Control de evolución; recibirlos también (hoy
+    solo queda nota si se escribe una al entregar).
 - Sedes (2026-11-09): una sede tiene nombre, teléfono, dirección y color; solo se desactivan, nunca se borran.
 
 Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
@@ -338,3 +350,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Sigue: permiso del usuario para push y PR (los dos repos, incluida `feature/usuarios`). Antes de
   publicar, en producción (solo lectura): conteo de roles; los ADMIN actuales pierden el acceso clínico
   hasta que el Propietario les active "Atiende pacientes".
+
+## En que estamos (pedidos de la clinica, avance)
+- Hechos y con lint, typecheck y test:audiometry en verde: motivo de prioridad, Weber NR, Configuracion de Equipos y selector de equipo en la audiometria nueva (con equipo junto a profesional y fecha).
+- Falta: bloque final del informe impreso (Paciente, Cedula, Equipo, firma; modo embebido con fila Equipo) en `audiometry-print-report.tsx`, `audiometry-report-data.ts` y `summary-print-data.ts`; y las pruebas en navegador contra el API local.

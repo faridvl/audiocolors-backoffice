@@ -25,6 +25,8 @@ export class ApiError extends Error {
     readonly status: number,
     /** Errores 400 por campo, cuando el API los detalla. */
     readonly details: ApiFieldError[] = [],
+    /** Código estable del error (p. ej. EQUIPMENT_REQUIRED), cuando el API lo manda. */
+    readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -39,7 +41,8 @@ export interface ApiFieldError {
 interface ApiErrorBody {
   message?: string | string[];
   details?: ApiFieldError[];
-  error?: { message?: string | string[] };
+  code?: string;
+  error?: { message?: string | string[]; code?: string };
 }
 
 const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
@@ -60,7 +63,10 @@ const refreshAccessToken = async (): Promise<boolean> => {
   try {
     const response = await fetch(`${env.API.IDENTITY_URL}${REFRESH_ENDPOINT}`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     });
     if (!response.ok) return false;
     const refreshed = await parseJsonBody<LoginResponse>(response);
@@ -156,6 +162,7 @@ async function fetcher<T>(url: string, options: RequestInit = {}, isRetry = fals
       resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE),
       response.status,
       resolveFieldErrors(data as ApiErrorBody | null),
+      (data as ApiErrorBody | null)?.error?.code ?? (data as ApiErrorBody | null)?.code,
     );
   }
 

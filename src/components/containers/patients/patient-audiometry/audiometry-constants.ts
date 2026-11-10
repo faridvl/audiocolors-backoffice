@@ -49,12 +49,15 @@ export enum WeberResult {
   CENTER = 'CENTER',
   RIGHT = 'RIGHT',
   LEFT = 'LEFT',
+  /** "NR": el paciente no percibe el sonido en ningún lado. */
+  NO_RESPONSE = 'NO_RESPONSE',
 }
 
 export const WEBER_RESULTS: WeberResult[] = [
   WeberResult.CENTER,
   WeberResult.RIGHT,
   WeberResult.LEFT,
+  WeberResult.NO_RESPONSE,
 ];
 
 export const WEBER_FREQUENCIES_HZ: number[] = [500, 1000, 2000, 4000];
@@ -161,7 +164,12 @@ const ASHA_BANDS: HearingBand[] = [
   { grade: HearingGrade.SLIGHT, fromDb: 15, toDb: 25, showLabel: false },
   { grade: HearingGrade.MILD, fromDb: 25, toDb: 40, showLabel: true },
   { grade: HearingGrade.MODERATE, fromDb: 40, toDb: 55, showLabel: true },
-  { grade: HearingGrade.MODERATELY_SEVERE, fromDb: 55, toDb: 70, showLabel: true },
+  {
+    grade: HearingGrade.MODERATELY_SEVERE,
+    fromDb: 55,
+    toDb: 70,
+    showLabel: true,
+  },
   { grade: HearingGrade.SEVERE, fromDb: 70, toDb: 90, showLabel: true },
   { grade: HearingGrade.PROFOUND, fromDb: 90, toDb: 120, showLabel: true },
 ];
@@ -176,7 +184,13 @@ const BIAP_BANDS: HearingBand[] = [
   { grade: HearingGrade.MODERATE, fromDb: 40, toDb: 70, showLabel: true },
   { grade: HearingGrade.SEVERE, fromDb: 70, toDb: 90, showLabel: true },
   { grade: HearingGrade.PROFOUND, fromDb: 90, toDb: 119, showLabel: true },
-  { grade: HearingGrade.TOTAL_LOSS, fromDb: 119, toDb: 120, showLabel: true, isOpenEnded: true },
+  {
+    grade: HearingGrade.TOTAL_LOSS,
+    fromDb: 119,
+    toDb: 120,
+    showLabel: true,
+    isOpenEnded: true,
+  },
 ];
 
 export const GRADING_SCALE_CONFIG: Record<GradingScale, GradingScaleConfig> = {
@@ -355,7 +369,10 @@ export const SPEECH_FIELDS: SpeechField[] = [SpeechField.THRESHOLD, SpeechField.
 
 export const SPEECH_FIELD_RANGES: Record<SpeechField, { min: number; max: number }> = {
   [SpeechField.THRESHOLD]: { min: -10, max: 120 },
-  [SpeechField.MAX_DISCRIMINATION]: { min: SPEECH_MIN_PERCENT, max: SPEECH_MAX_PERCENT },
+  [SpeechField.MAX_DISCRIMINATION]: {
+    min: SPEECH_MIN_PERCENT,
+    max: SPEECH_MAX_PERCENT,
+  },
 };
 
 export const SPEECH_FAILED_WORDS_MIN = 0;
@@ -384,8 +401,14 @@ export const buildEmptyFailedWordsValues = (): FailedWordsValues => ({
 export type SpeechFieldValues = Record<Ear, Record<SpeechField, string>>;
 
 export const buildEmptySpeechFieldValues = (): SpeechFieldValues => ({
-  [Ear.RIGHT]: { [SpeechField.THRESHOLD]: '', [SpeechField.MAX_DISCRIMINATION]: '' },
-  [Ear.LEFT]: { [SpeechField.THRESHOLD]: '', [SpeechField.MAX_DISCRIMINATION]: '' },
+  [Ear.RIGHT]: {
+    [SpeechField.THRESHOLD]: '',
+    [SpeechField.MAX_DISCRIMINATION]: '',
+  },
+  [Ear.LEFT]: {
+    [SpeechField.THRESHOLD]: '',
+    [SpeechField.MAX_DISCRIMINATION]: '',
+  },
 });
 
 /**

@@ -6,6 +6,7 @@ import { PatientStatusPill } from '@/components/containers/patients/patient-stat
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
 import { PatientMaintenancePills } from '@/components/containers/patients/patient-flags/patient-maintenance-pills';
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
+import { PatientPriorityReason } from '@/components/containers/patients/patient-flags/patient-priority-reason';
 import { PatientPriorityButton } from '@/components/containers/patients/patients-list/patient-priority-button';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
 import { usePermissions } from '@/hooks/use-permissions';
@@ -109,6 +110,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <PatientPriorityButton patient={patient} className="-my-2" showLabel />
             <PatientStatusPill status={patient.status} />
           </div>
+          <PatientPriorityReason patient={patient} className="mt-0.5" />
           {identity && (
             <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
               {identity}
@@ -159,7 +161,9 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             value={patient.birthDate ? formatCalendarDate(patient.birthDate) : null}
           />
           <PatientDatum
-            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, { count: patientBranches.length })}
+            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, {
+              count: patientBranches.length,
+            })}
           >
             {patientBranches.map((branch) => (
               <BranchBadge key={branch.uuid} branch={branch} />

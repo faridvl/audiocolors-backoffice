@@ -61,6 +61,7 @@ export const WEBER_LABEL_KEYS: Record<WeberResult, string> = {
   [WeberResult.CENTER]: AUDIOMETRY_TEXT.WEBER.CENTER,
   [WeberResult.RIGHT]: AUDIOMETRY_TEXT.WEBER.RIGHT,
   [WeberResult.LEFT]: AUDIOMETRY_TEXT.WEBER.LEFT,
+  [WeberResult.NO_RESPONSE]: AUDIOMETRY_TEXT.WEBER.NO_RESPONSE,
 };
 
 export const PTA_TYPE_LABEL_KEYS: Record<PtaType, string> = {

@@ -27,13 +27,12 @@ import {
   GRADE_LABEL_KEYS,
   PTA_TYPE_LABEL_KEYS,
   SCREENING_RESULT_LABEL_KEYS,
-  WEBER_LABEL_KEYS,
 } from './audiometry-labels';
 import { GradeLabelsCenter } from './grade-labels-column';
 import { SpeechAudiogramChart } from './speech-audiogram-chart';
 import { WordListType } from './speech-word-lists';
 import { AudiometryInvalidationNotice, PrintReportHeader } from './use-audiometry-poc';
-import { WEBER_ICONS } from './weber-icons';
+import { WeberResultView } from './weber-icons';
 import { ReadOnlyValue } from './audiometry-read-only-value';
 
 const AUDIOMETRY_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY;
@@ -213,7 +212,11 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
               date: invalidation.date,
             })}
           </p>
-          <p>{t(AUDIOMETRY_TEXT.INVALIDATE.BANNER_REASON, { reason: invalidation.reason })}</p>
+          <p>
+            {t(AUDIOMETRY_TEXT.INVALIDATE.BANNER_REASON, {
+              reason: invalidation.reason,
+            })}
+          </p>
         </div>
       )}
 
@@ -277,14 +280,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
                 <tr>
                   {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
                     <td key={frequencyHz} className={CELL_CLASSES}>
-                      {weber[frequencyHz] ? (
-                        <span className="inline-flex items-center gap-1.5">
-                          {WEBER_ICONS[weber[frequencyHz]]}
-                          {t(WEBER_LABEL_KEYS[weber[frequencyHz]])}
-                        </span>
-                      ) : (
-                        empty
-                      )}
+                      {weber[frequencyHz] ? <WeberResultView result={weber[frequencyHz]} /> : empty}
                     </td>
                   ))}
                 </tr>
@@ -364,7 +360,9 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
               </p>
             </div>
             <p className="text-[10px] text-ink-500">
-              {t(REPORT_TEXT.PRINTED_ON, { date: formatDate(new Date().toISOString()) })}
+              {t(REPORT_TEXT.PRINTED_ON, {
+                date: formatDate(new Date().toISOString()),
+              })}
             </p>
           </footer>
         )}

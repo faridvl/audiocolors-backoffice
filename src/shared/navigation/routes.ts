@@ -18,6 +18,7 @@ export const routesPrivate = {
     templates: '/configuracion/plantillas',
     clinic: '/configuracion/clinica',
     branches: '/configuracion/sedes',
+    equipment: '/configuracion/equipos',
     users: '/configuracion/usuarios',
     usersNew: '/configuracion/usuarios/nuevo',
     userDetail: (uuid: string) => `/configuracion/usuarios/${uuid}`,

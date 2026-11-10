@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarClock,
+  Ear,
   FileText,
   MapPin,
   MessageSquareText,
@@ -17,6 +18,7 @@ export enum SettingsSection {
   TEMPLATES = 'TEMPLATES',
   CLINIC = 'CLINIC',
   BRANCHES = 'BRANCHES',
+  EQUIPMENT = 'EQUIPMENT',
   USERS = 'USERS',
 }
 
@@ -65,6 +67,13 @@ export const SETTINGS_SECTIONS: SettingsSectionItem[] = [
     group: SettingsGroup.CARE,
     href: routesPrivate.settings.appointmentTypes,
     icon: CalendarClock,
+    permission: Permission.EDIT_APPOINTMENT_TYPES,
+  },
+  {
+    section: SettingsSection.EQUIPMENT,
+    group: SettingsGroup.CARE,
+    href: routesPrivate.settings.equipment,
+    icon: Ear,
     permission: Permission.EDIT_APPOINTMENT_TYPES,
   },
   {

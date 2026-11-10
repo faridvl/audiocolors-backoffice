@@ -10,6 +10,8 @@ import {
   useAudiometryTypesQuery,
   useAudiometryEntryQuery,
 } from '@/shared/api/querys/patient-audiometry-entries-query';
+import { useEquipmentQuery } from '@/shared/api/querys/equipment-query';
+import { formatEquipmentName, getActiveEquipment } from '@/shared/utils/equipment';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
@@ -155,6 +157,21 @@ export function useAudiometryPoc(patientUuid: string) {
   const [chosenType, setChosenType] = useState<AudiometryTypeCode>(DEFAULT_AUDIOMETRY_TYPE);
   const [screeningResult, setScreeningResult] = useState<ScreeningResult | null>(null);
   const [isResultMissing, setIsResultMissing] = useState(false);
+  const [chosenEquipmentUuid, setChosenEquipmentUuid] = useState<string | null>(null);
+  const [isEquipmentMissing, setIsEquipmentMissing] = useState(false);
+  const equipmentQuery = useEquipmentQuery();
+  const activeEquipment = getActiveEquipment(equipmentQuery.data);
+  // Con un solo equipo activo no hay nada que elegir.
+  const equipmentUuid =
+    chosenEquipmentUuid ?? (activeEquipment.length === 1 ? activeEquipment[0].uuid : null);
+  const equipmentOptions = activeEquipment.map((item) => ({
+    value: item.uuid,
+    label: formatEquipmentName(item),
+  }));
+  const handleEquipmentChange = (uuid: string) => {
+    setChosenEquipmentUuid(uuid);
+    setIsEquipmentMissing(false);
+  };
   const [pendingType, setPendingType] = useState<AudiometryTypeCode | null>(null);
 
   const presentedWords = presentedWordsOf(lastWordListType);
@@ -198,7 +215,11 @@ export function useAudiometryPoc(patientUuid: string) {
     if (!loadedEntry) return;
     if (loadedEntry.typeCode === AudiometryTypeCode.SCREENING) {
       const state = screeningPayloadToState(loadedEntry.payload);
-      applyFormState({ ...buildEmptyFormState(), marks: state.marks, notes: state.notes });
+      applyFormState({
+        ...buildEmptyFormState(),
+        marks: state.marks,
+        notes: state.notes,
+      });
       setScreeningResult(state.result);
       return;
     }
@@ -279,7 +300,10 @@ export function useAudiometryPoc(patientUuid: string) {
 
   const handleSpeechFieldChange = (ear: Ear, field: SpeechField, text: string) => {
     if (!isSpeechFieldInputValid(field, text)) return;
-    setSpeechFieldValues((current) => ({ ...current, [ear]: { ...current[ear], [field]: text } }));
+    setSpeechFieldValues((current) => ({
+      ...current,
+      [ear]: { ...current[ear], [field]: text },
+    }));
   };
 
   const handleFailedWordsChange = (ear: Ear, text: string) => {
@@ -457,8 +481,16 @@ export function useAudiometryPoc(patientUuid: string) {
 
   const handleSave = () => {
     if (!canSave) return;
+    if (activeEquipment.length > 0 && !equipmentUuid) {
+      setIsEquipmentMissing(true);
+      return;
+    }
     if (isScreening) {
-      const screeningPayload = screeningStateToPayload({ marks, result: screeningResult, notes });
+      const screeningPayload = screeningStateToPayload({
+        marks,
+        result: screeningResult,
+        notes,
+      });
       if (!screeningPayload) {
         setIsResultMissing(true);
         return;
@@ -467,6 +499,7 @@ export function useAudiometryPoc(patientUuid: string) {
         patientUuid,
         typeCode: AudiometryTypeCode.SCREENING,
         payload: screeningPayload,
+        equipmentUuid: equipmentUuid ?? undefined,
       });
       return;
     }
@@ -474,6 +507,7 @@ export function useAudiometryPoc(patientUuid: string) {
       patientUuid,
       typeCode: AudiometryTypeCode.CLINICAL,
       payload: stateToPayload(formState, summaries),
+      equipmentUuid: equipmentUuid ?? undefined,
     });
   };
 
@@ -551,6 +585,10 @@ export function useAudiometryPoc(patientUuid: string) {
     isScreening,
     screeningResult,
     isResultMissing,
+    equipmentOptions,
+    equipmentUuid,
+    isEquipmentMissing,
+    handleEquipmentChange,
     handleScreeningResultChange,
     pendingType,
     handleTypeChange,

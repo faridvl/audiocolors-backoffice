@@ -1226,3 +1226,9 @@ independientes:
 - Las etiquetas de indicadores se ven a todos en solo lectura (la prioridad con bandera y su etiqueta en el expediente y solo el ícono con `aria-label` en la lista; candidato a video como chip) y solo se abren o cambian con permiso. Sin ninguna acción permitida la columna de acciones no se renderiza; con dos acciones o menos muestra su etiqueta también en celular. La pantalla de modificar va dentro de `RequirePermission` (`EDIT_PATIENT`) con su aviso y el botón "Volver al paciente", y sin permiso no pide los datos del paciente. Los íconos de acción por fila de la lista miden al menos 44x44.
 - El API valida lo mismo: modificar y cambiar estado exigen gestión o atender pacientes; los indicadores, atender pacientes.
 - No cambia: registrar un paciente nuevo y el registro rápido al agendar siguen para Recepción.
+
+## D81. Motivo de prioridad, Equipos y equipo en la audiometria
+- El motivo de prioridad se pide en un modal (por portal) al marcar, desde la lista y el expediente; quitar no lo pide. Se muestra bajo la casilla y en el tooltip del icono.
+- Equipos vive en Configuracion con ruta `/configuracion/equipos`, grupo CARE, icono `Ear` y el mismo permiso que Sedes (`EDIT_APPOINTMENT_TYPES`). El 409 se muestra en el campo modelo.
+- El selector de equipo de la audiometria nueva solo aparece si hay equipos activos; con uno solo queda preseleccionado; si falta, el guardado se frena con aviso en el campo y `EQUIPMENT_REQUIRED` del API se traduce a un toast. `ApiError` expone ahora `code`.
+- Weber `NO_RESPONSE` se muestra como "NR" con etiqueta accesible "Sin respuesta".

@@ -257,6 +257,10 @@
       "BRANCHES": {
         "title": "Sedes",
         "description": "Dónde atiende la clínica"
+      },
+      "EQUIPMENT": {
+        "title": "Equipos",
+        "description": "Audiómetros de la clínica"
       }
     },
     "clinic": {
@@ -497,6 +501,35 @@
       "lastActiveBranch": "Debe quedar al menos una sede activa",
       "actionsLabel": "Acciones de {{name}}",
       "selectedColor": "Color elegido: {{name}}"
+    },
+    "equipment": {
+      "pageTitle": "Equipos · AudioColors Gestión Clínica",
+      "loading": "Cargando equipos...",
+      "loadError": "No se pudieron cargar los equipos",
+      "emptyTitle": "Aún no hay equipos",
+      "emptyHint": "Registra los audiómetros de la clínica para elegir con cuál se hace cada audiometría.",
+      "add": "Nuevo equipo",
+      "newTitle": "Nuevo equipo",
+      "editTitle": "Editar equipo",
+      "editLabel": "Editar {{name}}",
+      "edit": "Editar",
+      "brand": "Marca",
+      "brandRequired": "Escribe la marca del equipo",
+      "brandTooLong": "La marca es demasiado larga",
+      "model": "Modelo",
+      "modelRequired": "Escribe el modelo del equipo",
+      "modelTooLong": "El modelo es demasiado largo",
+      "inactiveBadge": "Inactivo",
+      "deactivate": "Desactivar",
+      "deactivateTitle": "¿Desactivar {{name}}?",
+      "deactivateMessage": "Dejará de ofrecerse al registrar una audiometría nueva. Las audiometrías que ya lo tienen lo siguen mostrando, y puedes reactivarlo cuando quieras.",
+      "reactivate": "Reactivar",
+      "created": "Equipo creado",
+      "saved": "Equipo guardado",
+      "deactivated": "Equipo desactivado",
+      "reactivated": "Equipo reactivado",
+      "duplicate": "Ya existe un equipo con esa marca y modelo",
+      "actionsLabel": "Acciones de {{name}}"
     }
   },
   "branches": {
@@ -1274,7 +1307,16 @@
       "priority": {
         "mark": "Marcar como prioridad",
         "unmark": "Quitar prioridad",
-        "patientAction": "{{action}}: {{name}}"
+        "patientAction": "{{action}}: {{name}}",
+        "reasonTitle": "Marcar como prioridad",
+        "reasonLabel": "Motivo",
+        "reasonHint": "Queda en el control de evolución del paciente.",
+        "reasonRequired": "Escribe el motivo de la prioridad",
+        "reasonTooLong": "El motivo es demasiado largo",
+        "reasonConfirm": "Marcar",
+        "reasonLineDate": "Motivo: {{reason}} · {{date}}",
+        "reasonLineAuthor": "Motivo: {{reason}} · {{author}}, {{date}}",
+        "reasonTooltip": "{{action}}. Motivo: {{reason}}"
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
@@ -1432,6 +1474,10 @@
         "entryWithPta": "{{date}} · PTA OD {{right}} / OI {{left}}",
         "saveHint": "Marca al menos un punto para guardar",
         "entryAuthorDate": "Registrada por {{author}} · {{date}}",
+        "entryEquipment": "Equipo: {{equipment}}",
+        "equipmentLabel": "Equipo",
+        "equipmentPlaceholder": "Elige el equipo",
+        "equipmentRequired": "Elige el equipo con el que se hizo la audiometría",
         "entryLoading": "Cargando la audiometría…",
         "print": "Imprimir",
         "entryTyped": "{{date}} · {{type}}",
@@ -1594,7 +1640,9 @@
         "weber": {
           "center": "Centro",
           "right": "Derecha",
-          "left": "Izquierda"
+          "left": "Izquierda",
+          "noResponse": "Sin respuesta",
+          "noResponseShort": "NR"
         }
       },
       "fields": {
