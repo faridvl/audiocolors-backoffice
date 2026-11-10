@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClinicBrand } from '@/components/common/brand/clinic-brand';
+import { formatEquipmentName } from '@/shared/utils/equipment';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
+import { EquipmentSummary } from '@/types/equipment/equipment';
 import { tailwind } from '@/utils/tailwind-utils';
 import { AudiogramChart } from './audiogram-chart';
 import { EarSummary } from './audiometry-calculations';
@@ -77,6 +79,8 @@ export interface AudiometryPrintReportProps {
   isEmbedded?: boolean;
   /** Informe suelto de una audiometría marcada como mal hecha: se avisa arriba, bien visible. */
   invalidation?: AudiometryInvalidationNotice | null;
+  /** Audiómetro usado; sin él no se muestra la fila Equipo. */
+  equipment?: EquipmentSummary | null;
   /** Nombre del tipo de audiometría; sin él no se muestra el dato. */
   typeName?: string;
   /** Solo en rastreo: informe con vía aérea, resultado y observaciones, sin las pruebas de una clínica. */
@@ -101,6 +105,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   isEmbedded = false,
   invalidation = null,
   typeName,
+  equipment = null,
   screening,
   isVisibleOnScreen = false,
 }) => {
@@ -121,6 +126,12 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   const embeddedFields = [
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
+    { label: t(REPORT_TEXT.EQUIPMENT), value: equipment ? formatEquipmentName(equipment) : '' },
+  ].filter((field) => field.value !== '');
+  const signatureFields = [
+    { label: t(REPORT_TEXT.PATIENT), value: header.patientName },
+    { label: t(REPORT_TEXT.DOCUMENT_ID), value: header.patientDocumentId },
+    { label: t(REPORT_TEXT.EQUIPMENT), value: equipment ? formatEquipmentName(equipment) : '' },
   ].filter((field) => field.value !== '');
 
   const earValue = (ear: Ear, field: SpeechField): string => speechFieldValues[ear][field] || empty;
@@ -352,18 +363,28 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         ))}
 
         {!isEmbedded && (
-          <footer className="mt-1 flex items-end justify-between gap-6 pt-2">
-            <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
-              <p className="text-sm font-medium text-ink-800">{professional}</p>
-              <p className="text-[10px] uppercase tracking-wide text-ink-500">
-                {t(REPORT_TEXT.SIGNATURE)}
+          <footer className="mt-1 flex flex-col gap-3 pt-2">
+            <dl className="flex flex-col gap-0.5">
+              {signatureFields.map((field) => (
+                <div key={field.label} className="flex gap-1">
+                  <dt className="text-ink-500">{field.label}:</dt>
+                  <dd className="font-medium text-ink-800">{field.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="flex items-end justify-between gap-6">
+              <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
+                <p className="text-sm font-medium text-ink-800">{professional}</p>
+                <p className="text-[10px] uppercase tracking-wide text-ink-500">
+                  {t(REPORT_TEXT.SIGNATURE)}
+                </p>
+              </div>
+              <p className="text-[10px] text-ink-500">
+                {t(REPORT_TEXT.PRINTED_ON, {
+                  date: formatDate(new Date().toISOString()),
+                })}
               </p>
             </div>
-            <p className="text-[10px] text-ink-500">
-              {t(REPORT_TEXT.PRINTED_ON, {
-                date: formatDate(new Date().toISOString()),
-              })}
-            </p>
           </footer>
         )}
       </div>

@@ -1520,6 +1520,7 @@
           "birthDate": "Fecha de nacimiento",
           "date": "Fecha de la audiometría",
           "professional": "Profesional",
+          "equipment": "Equipo",
           "frequencyHz": "{{frequency}} Hz",
           "signature": "Firma del profesional",
           "printedOn": "Impreso el {{date}}"

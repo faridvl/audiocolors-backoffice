@@ -464,6 +464,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
           entryDate={formatDateTime(selectedEntry.createdAt)}
           professional={selectedEntryAuthor ?? ''}
           typeName={selectedEntry.typeName}
+          equipment={selectedEntry.equipment}
           screening={isScreening ? { result: screeningResult } : undefined}
           marks={marks}
           gradingScale={gradingScale}

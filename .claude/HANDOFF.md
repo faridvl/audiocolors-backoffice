@@ -353,4 +353,5 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
 ## En que estamos (pedidos de la clinica, avance)
 - Hechos y con lint, typecheck y test:audiometry en verde: motivo de prioridad, Weber NR, Configuracion de Equipos y selector de equipo en la audiometria nueva (con equipo junto a profesional y fecha).
-- Falta: bloque final del informe impreso (Paciente, Cedula, Equipo, firma; modo embebido con fila Equipo) en `audiometry-print-report.tsx`, `audiometry-report-data.ts` y `summary-print-data.ts`; y las pruebas en navegador contra el API local.
+- Hecho (punto 5): informe impreso con bloque final Paciente, Cedula, Equipo y firma; en el resumen, fila Equipo junto a fecha y profesional. Equipo llega desde la audiometria guardada (impresion suelta, modal de Archivos y Generar resumen). Sin probar en navegador.
+- Falta: las pruebas en navegador contra el API local.

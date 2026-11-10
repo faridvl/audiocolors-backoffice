@@ -1089,6 +1089,7 @@ export const TEXT = {
           BIRTH_DATE: 'patients.detail.audiometry.report.birthDate',
           DATE: 'patients.detail.audiometry.report.date',
           PROFESSIONAL: 'patients.detail.audiometry.report.professional',
+          EQUIPMENT: 'patients.detail.audiometry.report.equipment',
           FREQUENCY_HZ: 'patients.detail.audiometry.report.frequencyHz',
           SIGNATURE: 'patients.detail.audiometry.report.signature',
           PRINTED_ON: 'patients.detail.audiometry.report.printedOn',
