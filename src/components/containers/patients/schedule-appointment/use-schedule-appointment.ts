@@ -20,6 +20,8 @@ import {
   toSlotHour,
 } from '@/components/containers/agenda/agenda-presenter';
 import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
+import { findBranch, getBranchOptionLabel } from '@/shared/utils/branches';
+import { Branch } from '@/types/branches/branch';
 import {
   formatHour,
   MINUTES_IN_HOUR,
@@ -116,10 +118,19 @@ export function useScheduleAppointment({
     (branchUuid && patientBranchUuids.includes(branchUuid) ? branchUuid : '') ||
     (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
   const selectedBranchUuid = pickedBranchUuid || initialBranchUuid;
-  const branchOptions = branchOptionUuids.map((uuid) => {
-    const name = branches?.find((branch) => branch.uuid === uuid)?.name ?? '';
-    return { value: uuid, label: name, accentColor: getBranchStripeColor(name) };
-  });
+  // Solo se ofrecen sedes activas; la que ya traía la cita se conserva aunque se haya desactivado.
+  const branchOptions = branchOptionUuids
+    .map((uuid) => findBranch(branches, { uuid }))
+    .filter(
+      (branch): branch is Branch =>
+        Boolean(branch) &&
+        (branch!.isActive || branch!.uuid === nextAppointmentBranchUuid),
+    )
+    .map((branch) => ({
+      value: branch.uuid,
+      label: getBranchOptionLabel(branch, t),
+      accentColor: getBranchStripeColor(branch.color),
+    }));
   const hasBranchChoice = branchOptions.length > 1;
 
   // Al reagendar una cita confirmada el API da el tipo solo por nombre.

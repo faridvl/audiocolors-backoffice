@@ -170,7 +170,7 @@ export const DayTimeline: React.FC<DayTimelineProps> = ({ agenda, board }) => {
             block={block}
             section={resolveSection(block.appointment, agenda.selectedTiming)}
             typeColor={agenda.resolveTypeColor(block.appointment.typeUUID)}
-            branchName={agenda.resolveBranchName(block.appointment.branchUUID)}
+            branch={agenda.resolveBranch(block.appointment.branchUUID)}
             style={blockStyle(
               range,
               block.startMinute,

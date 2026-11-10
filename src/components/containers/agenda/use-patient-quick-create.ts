@@ -6,6 +6,7 @@ import { FormikHelpers } from 'formik';
 import { useCreatePatientMutation } from '@/shared/api/mutations/patients/create-patient-mutation';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { getActiveBranches } from '@/shared/utils/branches';
 import { resolveContactsForSave } from '@/components/containers/patients/patient-validation';
 import { buildPatientFullName } from '@/components/containers/patients/patient-contacts/patient-name-fill-button';
 import { TEXT } from '@/static/texts/i18n';
@@ -34,7 +35,9 @@ export function usePatientQuickCreate(
   // Cédula que el API rechazó por repetida.
   const [duplicateDocument, setDuplicateDocument] = useState<string | null>(null);
 
-  const isBranchRequired = isLoadingBranches || (branches?.length ?? 0) > 0;
+  // Un paciente nuevo solo se registra en sedes activas.
+  const activeBranches = useMemo(() => getActiveBranches(branches ?? []), [branches]);
+  const isBranchRequired = isLoadingBranches || activeBranches.length > 0;
   const validationSchema = useMemo(
     () => buildPatientQuickCreateSchema(t, isBranchRequired, duplicateDocument),
     [t, isBranchRequired, duplicateDocument],
@@ -100,6 +103,6 @@ export function usePatientQuickCreate(
     validationSchema,
     handleSubmit,
     isPending,
-    branches: branches ?? [],
+    branches: activeBranches,
   };
 }

@@ -11,6 +11,7 @@ import { useAppointmentTypesQuery } from "@/shared/api/querys/appointment-types-
 import { useNavigation } from "@/hooks/use-navigation";
 import { useRememberedState } from "@/hooks/use-remembered-state";
 import { getBranchStripeColor } from "@/shared/design/tokens";
+import { getBranchOptionLabel } from "@/shared/utils/branches";
 import { toClinicDayKey } from "@/shared/utils/dates";
 import { buildMonthOption } from "@/shared/utils/formatters";
 import { TEXT } from "@/static/texts/i18n";
@@ -117,12 +118,12 @@ export function usePatientList() {
     () => [
       { label: "Todas", value: ALL_VALUE },
       ...(branches ?? []).map((branch) => ({
-        label: branch.name,
+        label: getBranchOptionLabel(branch, t),
         value: branch.uuid,
-        accentColor: getBranchStripeColor(branch.name),
+        accentColor: getBranchStripeColor(branch.color),
       })),
     ],
-    [branches],
+    [branches, t],
   );
 
   const appointmentTypeOptions = useMemo(

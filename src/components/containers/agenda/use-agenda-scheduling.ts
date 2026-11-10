@@ -8,14 +8,16 @@ import { useUpdateAppointmentStatusMutation } from '@/shared/api/mutations/appoi
 import { useUpdateAppointmentTimeMutation } from '@/shared/api/mutations/appointments/update-appointment-time-mutation';
 import { FETCH_APPOINTMENTS_KEY } from '@/shared/api/querys/appointments-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
+import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { FETCH_APPOINTMENT_MONTHS_KEY } from '@/shared/api/querys/appointment-months-query';
 import { FETCH_PATIENT_ACTIVITY_KEY } from '@/shared/api/querys/patient-activity-query';
 import { FETCH_PATIENTS_KEY } from '@/shared/api/querys/patients-query';
+import { pickActiveBranchUuid } from '@/shared/utils/branches';
 import { formatMinuteOfDay } from '@/shared/utils/dates';
 import { EMPTY_VALUE, getFullName } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
 import { Appointment, AppointmentStatus } from '@/types/appointments/appointment';
-import { Patient, pickPatientBranchUuid } from '@/types/patients/patient';
+import { getPatientBranchUuids, Patient } from '@/types/patients/patient';
 import {
   buildSlotTimes,
   resolveAppointmentDuration,
@@ -60,6 +62,7 @@ export function useAgendaScheduling() {
   const { executeSetTentativeMonthAsync } = useSetTentativeMonthMutation();
   const { executeUpdateAppointmentStatusAsync } = useUpdateAppointmentStatusMutation();
   const { data: appointmentTypes } = useAppointmentTypesQuery();
+  const { data: branches } = useBranchesQuery();
 
   const [savingItems, setSavingItems] = useState<SavingItem[]>([]);
   const savingIds = useMemo(() => new Set(savingItems.map((item) => item.id)), [savingItems]);
@@ -92,6 +95,12 @@ export function useAgendaScheduling() {
     preferredBranchUuid?: string | null,
   ) => {
     const name = getFullName(patient.firstName, patient.lastName);
+    // Una cita nueva solo se agenda en una sede activa.
+    const branchUuid = pickActiveBranchUuid(
+      getPatientBranchUuids(patient),
+      branches,
+      preferredBranchUuid,
+    );
 
     return track({ id: patient.uuid, title: name, dayKey, startMinute }, async () => {
       const appointment = await executeCreateNextAppointmentAsync({
@@ -100,9 +109,7 @@ export function useAgendaScheduling() {
         ...(patient.tentativeAppointmentTypeUuid && {
           typeUUID: patient.tentativeAppointmentTypeUuid,
         }),
-        ...(pickPatientBranchUuid(patient, preferredBranchUuid) && {
-          branchUUID: pickPatientBranchUuid(patient, preferredBranchUuid),
-        }),
+        ...(branchUuid && { branchUUID: branchUuid }),
       });
 
       // El día ya quedó confirmado: si la hora falla, se avisa distinto para

@@ -5,7 +5,7 @@ import { Branch } from '@/types/branches/branch';
 
 export const FETCH_BRANCHES_KEY = 'fetchBranches';
 
-/** Catalogo de sedes activas del tenant, ya ordenado por nombre por el API. */
+/** Sedes del tenant, activas primero y por nombre (el API las ordena). Incluye las inactivas: para ofrecer opciones nuevas filtra con `getActiveBranches` o `getSelectableBranches` de `@/shared/utils/branches`. */
 export function useBranchesQuery() {
   return useQuery({
     queryKey: [FETCH_BRANCHES_KEY],

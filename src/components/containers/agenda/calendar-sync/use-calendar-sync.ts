@@ -11,6 +11,7 @@ import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useIssueCalendarFeedMutation } from '@/shared/api/mutations/calendar-feed/issue-calendar-feed-mutation';
 import { useSetCalendarVisibilityMutation } from '@/shared/api/mutations/calendar-feed/set-calendar-visibility-mutation';
 import { getBranchStripeColor } from '@/shared/design/tokens';
+import { getBranchOptionLabel } from '@/shared/utils/branches';
 import { buildCalendarFeedUrl, buildCalendarKey } from '@/shared/utils/calendar-feed';
 import { TEXT } from '@/static/texts/i18n';
 import {
@@ -122,17 +123,21 @@ export function useCalendarSync() {
         {
           key: SINGLE_GROUP_KEY,
           rows: (branches ?? []).map((branch) =>
-            buildRow(branch.uuid, branch.name, getBranchStripeColor(branch.name)),
+            buildRow(
+              branch.uuid,
+              getBranchOptionLabel(branch, t),
+              getBranchStripeColor(branch.color),
+            ),
           ),
         },
       ];
     }
 
     return (branches ?? []).map((branch) => {
-      const branchColor = getBranchStripeColor(branch.name);
+      const branchColor = getBranchStripeColor(branch.color);
       return {
         key: branch.uuid,
-        title: branch.name,
+        title: getBranchOptionLabel(branch, t),
         color: branchColor,
         rows: (appointmentTypes ?? []).map((type) =>
           buildRow(
@@ -144,7 +149,7 @@ export function useCalendarSync() {
         ),
       };
     });
-  }, [feed, token, grouping, branches, appointmentTypes]);
+  }, [feed, token, grouping, branches, appointmentTypes, t]);
 
   const handleRemove = (row: CalendarSyncRowData) => {
     setUpdatingKey(row.key);
