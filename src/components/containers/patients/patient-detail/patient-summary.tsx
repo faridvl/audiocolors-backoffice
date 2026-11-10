@@ -38,6 +38,9 @@ const MODAL_FLAGS = [
   PatientFlag.RENEW_PRESCRIPTION,
 ];
 
+/** Lo que se ve como chip sin permiso de cambiarlo (igual que en la lista). */
+const READ_ONLY_FLAGS = [PatientFlag.VIDEO_CANDIDATE];
+
 interface PatientSummaryProps {
   patient: Patient;
   onScheduleAppointment: () => void;
@@ -101,7 +104,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <Typography variant={TypographyVariant.SUBTITLE} as="p" className="break-words">
               {getFullName(patient.firstName, patient.lastName)}
             </Typography>
-            <PatientPriorityButton patient={patient} className="-my-2" />
+            <PatientPriorityButton patient={patient} className="-my-2" showLabel />
             <PatientStatusPill status={patient.status} />
           </div>
           {identity && (
@@ -124,7 +127,11 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
           {can(Permission.VIEW_CLINICAL_RECORD) && (
             <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
           )}
-          {can(Permission.VIEW_CLINICAL_RECORD) && <VideoCandidateCheck patient={patient} />}
+          {can(Permission.VIEW_CLINICAL_RECORD) ? (
+            <VideoCandidateCheck patient={patient} />
+          ) : (
+            <PatientFlagPills patient={patient} flags={READ_ONLY_FLAGS} />
+          )}
         </div>
 
         <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 lg:grid-cols-2">
@@ -139,7 +146,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <PatientContactsContainer
               patientUuid={patient.uuid}
               patientPhone={patient.phone}
-              onEdit={onEditContacts}
+              onEdit={can(Permission.EDIT_PATIENT) ? onEditContacts : undefined}
             />
           </div>
         </div>

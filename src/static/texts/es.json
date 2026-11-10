@@ -1364,6 +1364,8 @@
       "contacts": "Contactos",
       "patientContact": "Paciente",
       "editContacts": "Editar contactos",
+      "editForbidden": "Tu usuario no puede modificar pacientes. Pídele a un administrador que lo haga.",
+      "editForbiddenBack": "Volver al paciente",
       "evolutionNote": {
         "viewAudiometry": "Ver audiometría",
         "openAudiometryLabel": "Ver la audiometría de esta nota"

@@ -6,6 +6,8 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { TEXT } from '@/static/texts/i18n';
 
+const MAX_ACTIONS_WITH_MOBILE_LABEL = 2;
+
 interface PatientActionsProps {
   onEdit: () => void;
   onChangeStatus: () => void;
@@ -13,7 +15,10 @@ interface PatientActionsProps {
   onGenerateSummary: () => void;
 }
 
-/** Acciones del paciente en una columna a la derecha. En el celular solo íconos: con texto le quitan ancho a los datos. */
+/**
+ * Acciones del paciente en una columna a la derecha. Con tres o más, en el celular solo íconos:
+ * con texto le quitan ancho a los datos; con pocas, la etiqueta cabe y se ve siempre.
+ */
 export const PatientActions: React.FC<PatientActionsProps> = ({
   onEdit,
   onChangeStatus,
@@ -51,6 +56,8 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
 
   if (actions.length === 0) return null;
 
+  const showsLabelOnMobile = actions.length <= MAX_ACTIONS_WITH_MOBILE_LABEL;
+
   return (
     <div className="flex shrink-0 flex-col gap-2">
       {actions.map((action) => (
@@ -63,7 +70,9 @@ export const PatientActions: React.FC<PatientActionsProps> = ({
           icon={<action.icon className="h-4 w-4 text-ink-500" aria-hidden />}
           className="min-w-[44px] justify-start whitespace-nowrap px-3"
         >
-          <span className="hidden sm:inline">{action.label}</span>
+          <span className={showsLabelOnMobile ? undefined : 'hidden sm:inline'}>
+            {action.label}
+          </span>
         </Button>
       ))}
     </div>

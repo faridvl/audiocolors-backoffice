@@ -1201,11 +1201,11 @@ independientes:
 
 | Acción | Recepción sin atender | Administración/Propietario sin atender | Cualquier nivel con "Atiende pacientes" |
 |---|---|---|---|
-| Modificar paciente | No | Sí | Sí |
-| Cambiar estado | No | Sí | Sí |
-| Indicadores | No | No | Sí |
+| Modificar paciente, cambiar estado, contactos y dispositivos | No | Sí | Sí |
+| Abrir o cambiar indicadores (incluidos prioridad y candidato a video) | No | No | Sí |
 | Generar resumen | No | No | Sí |
 
-- Sin ninguna acción permitida la columna de acciones no se renderiza. La pantalla de modificar va dentro de `RequirePermission` (`EDIT_PATIENT`); el lápiz de la lista de pacientes, los indicadores del expediente (etiquetas y casilla de candidato a video), la prioridad y los modales solo existen con su permiso, así que ni piden sus datos. Sin "Atiende pacientes" la prioridad se ve pero no se cambia.
+- Contactos y dispositivos siguen la regla de modificar paciente (`EDIT_PATIENT`): sin él no hay botón de editar ni se monta el modal de contactos. Prioridad y candidato a video son indicadores: gestión sin atender pacientes ya no los marca. Tipo de sangre y documento de garantía solo los escribe quien atiende pacientes; el API los ignora para los demás y los formularios de alta y edición no los piden.
+- Las etiquetas de indicadores se ven a todos en solo lectura (la prioridad con bandera y su etiqueta en el expediente y solo el ícono con `aria-label` en la lista; candidato a video como chip) y solo se abren o cambian con permiso. Sin ninguna acción permitida la columna de acciones no se renderiza; con dos acciones o menos muestra su etiqueta también en celular. La pantalla de modificar va dentro de `RequirePermission` (`EDIT_PATIENT`) con su aviso y el botón "Volver al paciente", y sin permiso no pide los datos del paciente. Los íconos de acción por fila de la lista miden al menos 44x44.
 - El API valida lo mismo: modificar y cambiar estado exigen gestión o atender pacientes; los indicadores, atender pacientes.
 - No cambia: registrar un paciente nuevo y el registro rápido al agendar siguen para Recepción.

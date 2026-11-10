@@ -105,7 +105,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         <PatientSummaryModal patient={patient} onClose={() => setIsGeneratingSummary(false)} />
       )}
 
-      {isEditingContacts && (
+      {can(Permission.EDIT_PATIENT) && isEditingContacts && (
         <EditContactsModal patient={patient} onClose={() => setIsEditingContacts(false)} />
       )}
 

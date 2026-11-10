@@ -3,6 +3,10 @@ import { Flag } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { TEXT } from "@/static/texts/i18n";
 import { Button, ButtonVariant } from "@/components/common/button/button";
+import {
+  Typography,
+  TypographyVariant,
+} from "@/components/common/typography/typography";
 import { usePatientPriority } from "@/components/containers/patients/patient-flags/use-patient-priority";
 import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/shared/auth/permissions";
@@ -10,11 +14,16 @@ import { getFullName } from "@/shared/utils/formatters";
 import { Patient } from "@/types/patients/patient";
 import { tailwind } from "@/utils/tailwind-utils";
 
-/** Marca o quita la prioridad desde la lista o el expediente; no cambia el orden. */
-export const PatientPriorityButton: React.FC<{ patient: Patient; className?: string }> = ({
-  patient,
-  className,
-}) => {
+/**
+ * Marca o quita la prioridad desde la lista o el expediente; no cambia el orden. Sin permiso
+ * de cambiarla se ve el estado: en el expediente con su etiqueta, en la lista solo el ícono.
+ */
+export const PatientPriorityButton: React.FC<{
+  patient: Patient;
+  className?: string;
+  /** Etiqueta de texto visible junto a la bandera cuando es de solo lectura. */
+  showLabel?: boolean;
+}> = ({ patient, className, showLabel = false }) => {
   const { t } = useTranslation();
   const { isOn, isUpdating, label, handleToggle } = usePatientPriority(patient);
   const { can } = usePermissions();
@@ -30,9 +39,19 @@ export const PatientPriorityButton: React.FC<{ patient: Patient; className?: str
     return isOn ? (
       <span
         title={label}
-        className={tailwind("flex items-center px-2 text-danger", className)}
+        role={showLabel ? undefined : "img"}
+        aria-label={showLabel ? undefined : label}
+        className={tailwind(
+          "flex items-center gap-1.5 px-2 text-danger",
+          className,
+        )}
       >
         <Flag className="h-4 w-4 fill-current" aria-hidden />
+        {showLabel && (
+          <Typography variant={TypographyVariant.HELPER} inline className="text-danger">
+            {label}
+          </Typography>
+        )}
       </span>
     ) : null;
   }
@@ -55,7 +74,7 @@ export const PatientPriorityButton: React.FC<{ patient: Patient; className?: str
         />
       }
       className={tailwind(
-        "min-h-[44px] min-w-[44px] px-2 py-1.5 sm:min-h-0 sm:min-w-0",
+        "min-h-[44px] min-w-[44px] px-2 py-1.5",
         isOn ? "bg-danger/10 text-danger hover:bg-danger/20" : "text-ink-500",
         className,
       )}
