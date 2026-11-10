@@ -435,7 +435,7 @@ organiza su equipo a su manera y no queremos lógica por clínica en el código.
 
 ## D21 · Configuración en una sola entrada del menú
 
-**Estado:** implementado con Tipos de cita e Historia clínica (2026-10-22); faltan sedes y usuarios.
+**Estado:** completa (2026-11-09): Tipos de cita, Historia clínica, Usuarios (D70) y Sedes (D78).
 
 **Decisión:** los mantenimientos (sedes, tipos de cita y su duración, preguntas
 de la historia clínica, usuarios y permisos) van en una sola entrada
@@ -1194,3 +1194,10 @@ independientes:
 ## D77 · Mi perfil: identidad, campos al ancho de su dato y vista previa (2026-11-09)
 
 - Mi perfil usa el encabezado de identidad (avatar con iniciales, nombre, correo y nivel de acceso en `Badge`), las mismas tarjetas y el mismo ancho `max-w-6xl` de Configuración, campos al ancho de su dato (Título 13rem y colegiado 14rem desde `sm`) y una vista previa del nombre como sale en los documentos (`formatProfessionalName`, mismo prefijo y título abreviado que el resumen del paciente). El aviso de colegiado faltante va dentro de la vista previa, en tono de advertencia. El avatar se extrajo a `UserAvatar` y lo comparte la barra superior.
+
+## D78 · Sedes en Configuración: color guardado y nunca se borran (2026-11-09)
+
+- Cada sede guarda su color entre los 6 de marca (rojo, naranja, amarillo, verde, azul, morado). Ya no se calcula nada por el nombre de la sede (D1); agenda, pacientes y actividad leen `branch.color`. El amarillo usa texto oscuro `#8a6a00` por contraste.
+- Una sede nunca se borra: se desactiva y se reactiva. Las inactivas no se ofrecen al registrar pacientes ni al agendar; las que ya tienen paciente o cita se siguen mostrando (tratamiento por selector).
+- Campos: nombre (obligatorio, único: el 409 se muestra en el campo), teléfono y dirección opcionales (vaciarlos se manda como texto vacío) y color. Permisos iguales a Tipos de cita.
+- El menú queda en dos grupos: "Tu clínica" (Clínica, Sedes, Usuarios) y "Atención" (Tipos de cita, Formularios, Plantillas); ajusta D75.
