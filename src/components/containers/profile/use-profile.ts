@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import * as Yup from 'yup';
 import { SESSION_QUERY_KEY, useSession } from '@/hooks/use-session';
 import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
+import { FETCH_USER_SIGNATURE_KEY } from '@/shared/api/querys/user-signature-query';
 import { FETCH_USERS_KEY } from '@/shared/api/querys/users-query';
 import { useUserCatalogsQuery } from '@/shared/api/querys/user-catalogs-query';
 import { TEXT } from '@/static/texts/i18n';
@@ -78,6 +79,7 @@ export function useProfile() {
         onSuccess: () => {
           void queryClient.invalidateQueries({ queryKey: [SESSION_QUERY_KEY] });
           void queryClient.invalidateQueries({ queryKey: [FETCH_USERS_KEY] });
+          void queryClient.invalidateQueries({ queryKey: [FETCH_USER_SIGNATURE_KEY] });
           toast.success(t(TEXT.PROFILE.SAVED));
         },
         onError: (error) => toast.error(error.message),

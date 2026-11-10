@@ -49,7 +49,7 @@ export const AudiometryPreviewModal: React.FC<AudiometryPreviewModalProps> = ({
               type="button"
               variant={ButtonVariant.PRIMARY}
               icon={<Printer className="h-4 w-4" aria-hidden />}
-              isLoading={state.isPreparingPrint}
+              isLoading={state.isPreparingPrint || state.isSignatureLoading}
               disabled={!state.report}
               onClick={() => void state.print()}
             >

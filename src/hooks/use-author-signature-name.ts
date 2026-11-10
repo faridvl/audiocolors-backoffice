@@ -11,22 +11,23 @@ import { TEXT } from '@/static/texts/i18n';
  * El API del registro solo trae el nombre; título y colegiado salen de la sesión (si fue quien
  * imprime) o de la firma del profesional, que cualquier usuario puede leer: el informe no debe
  * variar según quién lo imprime. Si esa lectura falla, la firma lleva solo el nombre.
+ * `isLoading` es verdadero mientras esa lectura corre: quien imprime debe esperar.
  */
 export function useAuthorSignatureName(
   authorUuid: string | null | undefined,
   authorName: string | null | undefined,
-): string {
+): { signatureName: string; isLoading: boolean } {
   const { t } = useTranslation();
   const { user } = useSession();
   const isSessionUser = !!authorUuid && authorUuid === user?.uuid;
-  const { data: signature } = useUserSignatureQuery(authorUuid, !isSessionUser);
+  const { data: signature, isLoading } = useUserSignatureQuery(authorUuid, !isSessionUser);
 
   const author = isSessionUser ? user : signature;
   // Mismo criterio que la ficha del informe: sin nombre en el registro, solo se conoce a quien imprime.
   const fullName = authorName || (isSessionUser ? (user?.fullName ?? '') : '');
-  if (!fullName) return '';
+  if (!fullName) return { signatureName: '', isLoading };
 
-  return formatProfessionalName({
+  const signatureName = formatProfessionalName({
     title: author?.professionalTitle
       ? t(TEXT.SETTINGS.USERS.TITLES[author.professionalTitle])
       : null,
@@ -34,4 +35,5 @@ export function useAuthorSignatureName(
     licenseNumber: author?.licenseNumber,
     licensePrefix: t(TEXT.DOCUMENT_TEMPLATES.LICENSE_PREFIX),
   });
+  return { signatureName, isLoading };
 }

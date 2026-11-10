@@ -566,7 +566,7 @@ export function useAudiometryPoc(patientUuid: string) {
   // Ya viene en caché desde el detalle del paciente y la sesión; solo alimentan el informe impreso.
   const { data: patient } = usePatientQuery(patientUuid);
   const { tenant } = useSession();
-  const signatureName = useAuthorSignatureName(
+  const { signatureName, isLoading: isSignatureLoading } = useAuthorSignatureName(
     selectedEntry?.createdByUuid,
     selectedEntry?.createdByName,
   );
@@ -612,6 +612,7 @@ export function useAudiometryPoc(patientUuid: string) {
     handleCancelTypeChange,
     printReportHeader,
     signatureName,
+    isSignatureLoading,
     handlePrint,
     isSaving,
     canSave,

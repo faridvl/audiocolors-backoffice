@@ -83,7 +83,10 @@ export function useAudiometryPreview({
   };
 
   const entry = entryQuery.data;
-  const signatureName = useAuthorSignatureName(entry?.createdByUuid, entry?.createdByName);
+  const { signatureName, isLoading: isSignatureLoading } = useAuthorSignatureName(
+    entry?.createdByUuid,
+    entry?.createdByName,
+  );
   const listItem = entries?.find((item) => item.uuid === entryUuid);
   const invalidation: AudiometryInvalidationNotice | null = listItem?.invalidatedAt
     ? {
@@ -119,6 +122,7 @@ export function useAudiometryPreview({
     zoom,
     report,
     signatureName,
+    isSignatureLoading,
     invalidation,
     isLoading: entryQuery.isLoading,
     isError: entryQuery.isError,

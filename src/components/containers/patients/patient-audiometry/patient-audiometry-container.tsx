@@ -65,6 +65,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     handleCancelTypeChange,
     printReportHeader,
     handlePrint,
+    isSignatureLoading,
     isSaving,
     canSave,
     canEdit,
@@ -175,7 +176,11 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   </Button>
                 )}
                 {selectedEntry && (
-                  <Button variant={ButtonVariant.SECONDARY} onClick={handlePrint}>
+                  <Button
+                    variant={ButtonVariant.SECONDARY}
+                    isLoading={isSignatureLoading}
+                    onClick={handlePrint}
+                  >
                     <Printer className="h-4 w-4" aria-hidden />
                     {t(AUDIOMETRY_TEXT.PRINT)}
                   </Button>

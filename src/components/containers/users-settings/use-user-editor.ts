@@ -11,6 +11,7 @@ import { useCreateUserMutation } from '@/shared/api/mutations/users/create-user-
 import { useUpdateUserMutation } from '@/shared/api/mutations/users/update-user-mutation';
 import { FETCH_USER_AUDIT_KEY } from '@/shared/api/querys/user-audit-query';
 import { useUserCatalogsQuery } from '@/shared/api/querys/user-catalogs-query';
+import { FETCH_USER_SIGNATURE_KEY } from '@/shared/api/querys/user-signature-query';
 import { FETCH_USERS_KEY, useUsersQuery } from '@/shared/api/querys/users-query';
 import { Permission } from '@/shared/auth/permissions';
 import { routesPrivate } from '@/shared/navigation/routes';
@@ -79,6 +80,7 @@ export function useUserEditor(userUuid?: string) {
   const refreshAfterSave = () => {
     void queryClient.invalidateQueries({ queryKey: [FETCH_USERS_KEY] });
     void queryClient.invalidateQueries({ queryKey: [FETCH_USER_AUDIT_KEY] });
+    void queryClient.invalidateQueries({ queryKey: [FETCH_USER_SIGNATURE_KEY] });
     if (isSelf) void queryClient.invalidateQueries({ queryKey: [SESSION_QUERY_KEY] });
   };
 
