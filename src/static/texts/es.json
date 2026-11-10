@@ -197,6 +197,52 @@
           "title": "Seguridad",
           "description": "cada clínica accede únicamente a sus propios pacientes, citas y tipos de cita."
         }
+      },
+      "v2_1_0": {
+        "users": {
+          "title": "Usuarios",
+          "description": "el propietario crea y administra los usuarios de su clínica, con su nivel de acceso y si atiende pacientes."
+        },
+        "profile": {
+          "title": "Mi perfil",
+          "description": "cada profesional registra su título y colegiado, que aparecen en los documentos, y puede cambiar su contraseña."
+        },
+        "branches": {
+          "title": "Sedes",
+          "description": "desde Configuración se crean, editan, desactivan y reactivan las sedes, cada una con su color."
+        },
+        "equipment": {
+          "title": "Equipos",
+          "description": "cada audiometría registra el equipo con el que se hizo."
+        },
+        "permissions": {
+          "title": "Permisos",
+          "description": "la información clínica solo la ve y la modifica quien atiende pacientes."
+        },
+        "priority": {
+          "title": "Prioridad",
+          "description": "al marcar a un paciente como prioritario se indica el motivo."
+        },
+        "weber": {
+          "title": "Prueba de Weber",
+          "description": "permite registrar “sin respuesta”."
+        },
+        "audiometryReport": {
+          "title": "Informe de audiometría",
+          "description": "cabe en una hoja, muestra los datos del paciente y el equipo una sola vez y lo firma quien hizo la audiometría."
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "todas las secciones tienen el mismo orden y diseño."
+        },
+        "clinicalRecord": {
+          "title": "Expediente",
+          "description": "las secciones se abren solo cuando usted lo indica."
+        },
+        "session": {
+          "title": "Sesión",
+          "description": "se renueva sola al vencer."
+        }
       }
     },
     "kinds": {
