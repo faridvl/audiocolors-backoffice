@@ -907,6 +907,7 @@ export const TEXT = {
         ISSUED: 'patients.clinicalSummary.document.issued',
         BRANCH: 'patients.clinicalSummary.document.branch',
         AUTHORSHIP: 'patients.clinicalSummary.document.authorship',
+        SIGNATURE: 'patients.clinicalSummary.document.signature',
       },
     },
     FLAGS: {

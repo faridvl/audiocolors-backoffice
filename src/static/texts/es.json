@@ -1251,7 +1251,8 @@
         "issued": "Emitido",
         "branch_one": "Sede",
         "branch_other": "Sedes",
-        "authorship": "{{author}}, {{date}}"
+        "authorship": "{{author}}, {{date}}",
+        "signature": "Firma de quien genera el resumen"
       }
     },
     "flags": {

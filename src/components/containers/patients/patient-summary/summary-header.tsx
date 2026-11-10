@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClinicBrand } from '@/components/common/brand/clinic-brand';
-import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { PrintDocumentTitleBar } from '@/components/common/brand/print-document-title-bar';
 import {
   calculateAge,
   EMPTY_VALUE,
@@ -57,20 +56,14 @@ export const SummaryHeader: React.FC<SummaryHeaderProps> = ({
   ];
 
   return (
-    <header className="flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
-        <div className="flex flex-col gap-1">
-          <ClinicBrand logoUrl={tenant.logoUrl} name={tenant.name} height={40} />
-          {tenant.logoUrl && tenant.name && (
-            <Typography variant={TypographyVariant.BODY_SEMIBOLD}>{tenant.name}</Typography>
-          )}
-        </div>
-        <Typography variant={TypographyVariant.HEADER} className="text-right">
-          {t(DOCUMENT_TEXT.TITLE)}
-        </Typography>
-      </div>
+    <header className="flex flex-col gap-2">
+      <PrintDocumentTitleBar
+        logoUrl={tenant.logoUrl}
+        clinicName={tenant.name}
+        title={t(DOCUMENT_TEXT.TITLE)}
+      />
       {showPatientSheet && (
-        <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
+        <dl className="grid grid-cols-3 gap-x-4 gap-y-1 rounded border border-ink-200 bg-ink-50 px-3 py-1.5">
           {fields.map((field) => (
             <div key={field.label} className="min-w-0">
               <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>

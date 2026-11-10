@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClinicBrand } from '@/components/common/brand/clinic-brand';
+import { PrintDocumentTitleBar } from '@/components/common/brand/print-document-title-bar';
 import { formatEquipmentName } from '@/shared/utils/equipment';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
@@ -204,14 +204,12 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         </header>
       )}
       {!isEmbedded && (
-        <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
-          <div className="flex items-center gap-3">
-            <ClinicBrand logoUrl={header.clinicLogoUrl} name={header.clinicName} height={40} />
-            {header.clinicLogoUrl && header.clinicName && (
-              <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
-            )}
-          </div>
-          <h1 className="text-right text-xl font-semibold text-ink-900">{t(REPORT_TEXT.TITLE)}</h1>
+        <header>
+          <PrintDocumentTitleBar
+            logoUrl={header.clinicLogoUrl}
+            clinicName={header.clinicName}
+            title={t(REPORT_TEXT.TITLE)}
+          />
         </header>
       )}
 
@@ -239,7 +237,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
           {patientFields.map((field) => (
             <div
               key={field.label}
-              className={tailwind('min-w-0', 'isWide' in field && field.isWide && 'col-span-3')}
+              className={tailwind('min-w-0', 'isWide' in field && field.isWide && 'col-span-2')}
             >
               <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
               <dd className="font-medium text-ink-800">{field.value}</dd>
@@ -359,8 +357,10 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         </>
       )}
 
-      {/* Sin break-inside-avoid en el bloque: si el texto no cabe, solo se mueve lo que no entra. */}
-      <div className="flex flex-col gap-2">
+      {/* Embebido: Diagnóstico y Observaciones pasan juntos a la hoja siguiente, con la firma del resumen. */}
+      <div
+        className={isEmbedded ? 'flex break-inside-avoid flex-col gap-2' : 'flex flex-col gap-2'}
+      >
         {textSections.map((section) => (
           <section key={section.key} className="flex break-inside-avoid flex-col gap-1">
             <h2 className={SECTION_TITLE_CLASSES}>{section.title}</h2>
