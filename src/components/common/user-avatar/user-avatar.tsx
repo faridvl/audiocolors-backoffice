@@ -11,7 +11,7 @@ export enum UserAvatarSize {
 
 const SIZE_STYLES: Record<UserAvatarSize, string> = {
   [UserAvatarSize.SMALL]: 'h-8 w-8 text-xs',
-  [UserAvatarSize.LARGE]: 'h-16 w-16 text-xl',
+  [UserAvatarSize.LARGE]: 'h-14 w-14 text-lg sm:h-16 sm:w-16 sm:text-xl',
 };
 
 function getInitials(fullName?: string): string {

@@ -16,6 +16,7 @@ const LICENSE_TEST_VALUE = '98765';
 const LICENSE_PREFIX = 'Cód.';
 
 const WIDTH_MOBILE = 390;
+const WIDTH_TABLET = 768;
 const WIDTH_DESKTOP = 1440;
 const WIDTH_WIDE = 1920;
 
@@ -70,7 +71,7 @@ async function hasHorizontalScroll(page: Page) {
   );
 }
 
-for (const width of [WIDTH_MOBILE, WIDTH_DESKTOP, WIDTH_WIDE]) {
+for (const width of [WIDTH_MOBILE, WIDTH_TABLET, WIDTH_DESKTOP, WIDTH_WIDE]) {
   test(`sin scroll horizontal y cabecera de identidad a ${width}`, async ({ page }) => {
     await openProfile(page, width);
     expect(await hasHorizontalScroll(page), 'scroll horizontal').toBe(false);
@@ -124,4 +125,68 @@ test('la vista previa sigue el colegiado escrito y Guardar se habilita', async (
   await page.waitForTimeout(SETTLE_MS);
   expect(await hasHorizontalScroll(page), 'scroll horizontal').toBe(false);
   await page.screenshot({ path: `${SCREENSHOT_DIR}/perfil-390.png`, fullPage: true });
+});
+
+test('el colegiado no se sale de su tarjeta a 768', async ({ page }) => {
+  await openProfile(page, WIDTH_TABLET);
+  const license = await page.locator('#licenseNumber').boundingBox();
+  const card = await page
+    .locator('#licenseNumber')
+    .locator('xpath=ancestor::*[contains(@class,"rounded-card")][1]')
+    .boundingBox();
+  if (!license || !card) throw new Error('Sin caja del campo o de la tarjeta');
+
+  expect(license.x + license.width, 'borde derecho del colegiado').toBeLessThanOrEqual(
+    card.x + card.width,
+  );
+});
+
+test('el select y el input miden lo mismo', async ({ page }) => {
+  await openProfile(page, WIDTH_DESKTOP);
+  const title = await page.locator('#professionalTitle').boundingBox();
+  const license = await page.locator('#licenseNumber').boundingBox();
+  if (!title || !license) throw new Error('Sin caja de los campos');
+
+  expect(Math.abs(title.height - license.height), 'altura').toBeLessThanOrEqual(PIXEL_TOLERANCE);
+});
+
+test('sin colegiado la vista previa avisa como advertencia, con colegiado no repite texto', async ({
+  page,
+}) => {
+  await openProfile(page, WIDTH_DESKTOP);
+  const box = page.locator('#profile-preview').locator('xpath=..');
+  await page.locator('#licenseNumber').fill('');
+  await expect(box).toHaveClass(/border-warning-300/);
+  await expect(box.getByRole('status')).toContainText('Falta tu número de colegiado');
+  await page.screenshot({
+    path: `${SCREENSHOT_DIR}/perfil-1440-sin-colegiado.png`,
+    fullPage: true,
+  });
+
+  await page.locator('#licenseNumber').fill(LICENSE_TEST_VALUE);
+  await expect(box).not.toHaveClass(/border-warning-300/);
+  await expect(box.getByRole('status')).toHaveCount(0);
+  await expect(box).not.toContainText('Aparece junto a tu nombre');
+  await page.screenshot({
+    path: `${SCREENSHOT_DIR}/perfil-1440-con-colegiado.png`,
+    fullPage: true,
+  });
+});
+
+test('la tarjeta de identidad va en fila a 390', async ({ page }) => {
+  await openProfile(page, WIDTH_MOBILE);
+  const identity = page.locator('[class*="rounded-card"]').first();
+  const avatar = await identity.locator('span.rounded-full').first().boundingBox();
+  const name = await identity.getByRole('heading').boundingBox();
+  if (!avatar || !name) throw new Error('Sin caja del avatar o del nombre');
+
+  expect(name.x, 'nombre a la derecha del avatar').toBeGreaterThan(avatar.x + avatar.width);
+  expect(name.y, 'nombre dentro de la fila del avatar').toBeLessThan(avatar.y + avatar.height);
+});
+
+test('capturas a 390 y 768', async ({ page }) => {
+  for (const width of [WIDTH_MOBILE, WIDTH_TABLET]) {
+    await openProfile(page, width);
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/perfil-${width}.png`, fullPage: true });
+  }
 });

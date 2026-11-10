@@ -87,6 +87,7 @@ export const TEXT = {
     LOADING_USER: 'layout.loadingUser',
     LOGOUT: 'layout.logout',
     VERSION: 'layout.version',
+    UNREAD_NEWS: 'layout.unreadNews',
     NAV: {
       PATIENTS: 'layout.nav.patients',
       AGENDA: 'layout.nav.agenda',
@@ -1244,7 +1245,6 @@ export const TEXT = {
     PROFESSIONAL_TITLE: 'profile.professionalTitle',
     TITLE_PLACEHOLDER: 'profile.titlePlaceholder',
     LICENSE_NUMBER: 'profile.licenseNumber',
-    LICENSE_HINT: 'profile.licenseHint',
     LICENSE_MISSING: 'profile.licenseMissing',
     PREVIEW_TITLE: 'profile.previewTitle',
     NOT_PROFESSIONAL: 'profile.notProfessional',

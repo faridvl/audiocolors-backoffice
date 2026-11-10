@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Form, Formik, useFormikContext } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { Badge, BadgeSize } from '@/components/common/badge/badge';
@@ -7,6 +8,7 @@ import { FIELD_LABEL_CLASSES, FormField } from '@/components/common/input/input'
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { UserAvatar, UserAvatarSize } from '@/components/common/user-avatar/user-avatar';
 import { TEXT } from '@/static/texts/i18n';
+import { tailwind } from '@/utils/tailwind-utils';
 import { USER_LICENSE_NUMBER_MAX_LENGTH } from '@/types/users/user';
 import { SettingsCard } from '../settings/settings-card';
 import { SettingsSectionLoading } from '../settings/settings-section-state';
@@ -30,7 +32,7 @@ const ProfessionalFields: React.FC<ProfessionalFieldsProps> = ({
 
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-[13rem_14rem]">
+      <div className="grid gap-4 sm:grid-cols-[minmax(0,13rem)_minmax(0,14rem)]">
         <FormField
           name="professionalTitle"
           as="select"
@@ -52,7 +54,12 @@ const ProfessionalFields: React.FC<ProfessionalFieldsProps> = ({
         />
       </div>
 
-      <div className="mt-4 flex flex-col gap-1 rounded-lg border border-ink-100 bg-ink-50 p-4">
+      <div
+        className={tailwind(
+          'mt-4 flex flex-col gap-1 rounded-lg border p-4',
+          isLicenseMissing ? 'border-warning-300 bg-warning-50' : 'border-ink-100 bg-ink-50',
+        )}
+      >
         <Typography variant={TypographyVariant.HELPER}>{t(TEXTS.PREVIEW_TITLE)}</Typography>
         <Typography
           variant={TypographyVariant.BODY_SEMIBOLD}
@@ -61,12 +68,14 @@ const ProfessionalFields: React.FC<ProfessionalFieldsProps> = ({
         >
           {getPreviewName(values)}
         </Typography>
-        <Typography
-          variant={TypographyVariant.HELPER}
-          className={isLicenseMissing ? 'text-warning-700' : undefined}
-        >
-          {isLicenseMissing ? t(TEXTS.LICENSE_MISSING) : t(TEXTS.LICENSE_HINT)}
-        </Typography>
+        {isLicenseMissing && (
+          <div role="status" className="flex items-start gap-2 text-warning-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning-700" aria-hidden />
+            <Typography variant={TypographyVariant.HELPER} className="text-warning-800">
+              {t(TEXTS.LICENSE_MISSING)}
+            </Typography>
+          </div>
+        )}
       </div>
     </>
   );
@@ -82,9 +91,9 @@ export const ProfileContainer: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
       <SettingsCard>
-        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-4">
           <UserAvatar fullName={user.fullName} size={UserAvatarSize.LARGE} />
           <div className="flex min-w-0 flex-col items-start gap-1">
             <Typography variant={TypographyVariant.SUBTITLE} className="break-words">

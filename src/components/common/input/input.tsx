@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Field, useField } from "formik";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tailwind } from "@/utils/tailwind-utils";
 import {
@@ -130,6 +130,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             inputBaseClasses,
             as === "textarea" && "min-h-[88px] resize-none",
             (isPassword || endAdornment) && "pr-11",
+            as === "select" && "appearance-none pr-10",
             startAdornment && "pl-[4.5rem]",
             startControl && "pl-[7.5rem]",
           )}
@@ -168,6 +169,13 @@ export const FormField: React.FC<FormFieldProps> = ({
               <Eye className="h-4 w-4" aria-hidden />
             )}
           </button>
+        )}
+
+        {as === "select" && (
+          <ChevronDown
+            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
+            aria-hidden
+          />
         )}
 
         {!isPassword && endAdornment}

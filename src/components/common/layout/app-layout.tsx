@@ -76,12 +76,25 @@ const UserMenu: React.FC = () => {
             )}
           </UserAvatar>
           <span className="hidden text-left lg:flex lg:flex-col">
-            <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+            <Typography
+              variant={TypographyVariant.BODY_SEMIBOLD}
+              className="max-w-[16rem] truncate"
+              title={user?.fullName}
+            >
               {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
             </Typography>
-            <Typography variant={TypographyVariant.HELPER}>{tenant?.businessName ?? ''}</Typography>
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="max-w-[16rem] truncate"
+              title={tenant?.businessName}
+            >
+              {tenant?.businessName ?? ''}
+            </Typography>
           </span>
           <ChevronDown className="h-4 w-4 text-ink-400" aria-hidden />
+          {notifications.unreadCount > 0 && (
+            <span className="sr-only">{t(TEXT.LAYOUT.UNREAD_NEWS)}</span>
+          )}
         </Menu.Button>
 
         <Transition
