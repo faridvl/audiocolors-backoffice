@@ -7,7 +7,7 @@ import {
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
-import { useProfessionalSignatureName } from '@/hooks/use-professional-signature-name';
+import { useAuthorSignatureName } from '@/hooks/use-author-signature-name';
 import { useSession } from '@/hooks/use-session';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
@@ -41,7 +41,6 @@ export function useAudiometryPreview({
   const { t } = useTranslation();
   const resolveAuthorLabel = useResolveAuthorLabel();
   const { tenant } = useSession();
-  const signatureName = useProfessionalSignatureName();
   const { data: patient } = usePatientQuery(patientUuid);
   const entryQuery = useAudiometryEntryQuery(patientUuid, entryUuid);
   // La marca de "mal hecha" puede cambiar después de guardada: se toma siempre de la lista.
@@ -84,6 +83,7 @@ export function useAudiometryPreview({
   };
 
   const entry = entryQuery.data;
+  const signatureName = useAuthorSignatureName(entry?.createdByUuid, entry?.createdByName);
   const listItem = entries?.find((item) => item.uuid === entryUuid);
   const invalidation: AudiometryInvalidationNotice | null = listItem?.invalidatedAt
     ? {
