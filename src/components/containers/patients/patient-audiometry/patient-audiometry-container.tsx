@@ -26,6 +26,7 @@ import { SpeechWordListSelectors } from './speech-word-list-selectors';
 import { SpeechAudiogramChart } from './speech-audiogram-chart';
 import { NEW_ENTRY_OPTION_VALUE, useAudiometryPoc } from './use-audiometry-poc';
 import { formatDateTime } from '@/shared/utils/formatters';
+import { formatEquipmentName } from '@/shared/utils/equipment';
 import { PillSelect, PillSelectVariant } from '@/components/common/pill-select/pill-select';
 
 const AUDIOMETRY_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY;
@@ -52,6 +53,11 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     isScreening,
     screeningResult,
     isResultMissing,
+    equipmentOptions,
+    equipmentUuid,
+    isEquipmentMissing,
+    equipmentFieldRef,
+    handleEquipmentChange,
     handleScreeningResultChange,
     pendingType,
     handleTypeChange,
@@ -59,14 +65,17 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
     handleCancelTypeChange,
     printReportHeader,
     handlePrint,
+    isSignatureLoading,
     isSaving,
     canSave,
+    canEdit,
     handleSave,
     formVersion,
     entryOptions,
     selectedEntryValue,
     selectedEntry,
     selectedEntryAuthor,
+    signatureName,
     handleSelectEntry,
     invalidationNotice,
     canInvalidate,
@@ -117,15 +126,24 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
   } = useAudiometryPoc(patientUuid);
 
   const historyOptions = [
-    { value: NEW_ENTRY_OPTION_VALUE, label: t(AUDIOMETRY_TEXT.NEW_ENTRY) },
+    ...(canEdit ? [{ value: NEW_ENTRY_OPTION_VALUE, label: t(AUDIOMETRY_TEXT.NEW_ENTRY) }] : []),
     ...entryOptions,
   ];
 
   const entryAuthorDate = selectedEntry
-    ? t(AUDIOMETRY_TEXT.ENTRY_AUTHOR_DATE, {
-        author: selectedEntryAuthor,
-        date: formatDateTime(selectedEntry.createdAt),
-      })
+    ? [
+        t(AUDIOMETRY_TEXT.ENTRY_AUTHOR_DATE, {
+          author: selectedEntryAuthor,
+          date: formatDateTime(selectedEntry.createdAt),
+        }),
+        selectedEntry.equipment
+          ? t(AUDIOMETRY_TEXT.ENTRY_EQUIPMENT, {
+              equipment: formatEquipmentName(selectedEntry.equipment),
+            })
+          : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
     : '';
 
   return (
@@ -148,7 +166,7 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   isLabelFull
                   className="min-w-0 lg:w-auto lg:min-w-64"
                 />
-                {selectedEntry && (
+                {selectedEntry && canEdit && (
                   <Button
                     variant={ButtonVariant.SECONDARY}
                     onClick={() => handleSelectEntry(NEW_ENTRY_OPTION_VALUE)}
@@ -158,7 +176,11 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                   </Button>
                 )}
                 {selectedEntry && (
-                  <Button variant={ButtonVariant.SECONDARY} onClick={handlePrint}>
+                  <Button
+                    variant={ButtonVariant.SECONDARY}
+                    isLoading={isSignatureLoading}
+                    onClick={handlePrint}
+                  >
                     <Printer className="h-4 w-4" aria-hidden />
                     {t(AUDIOMETRY_TEXT.PRINT)}
                   </Button>
@@ -178,7 +200,11 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                 )}
               </div>
               {selectedEntry && (
-                <Typography variant={TypographyVariant.HELPER}>{entryAuthorDate}</Typography>
+                <div className="min-w-0" title={entryAuthorDate}>
+                  <Typography variant={TypographyVariant.HELPER} className="truncate">
+                    {entryAuthorDate}
+                  </Typography>
+                </div>
               )}
             </div>
           }
@@ -232,6 +258,31 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
                     isSheetOnMobile
                     isLabelFull
                   />
+                </div>
+              )}
+              {!isReadOnly && equipmentOptions.length > 0 && (
+                <div
+                  ref={equipmentFieldRef}
+                  className="flex max-w-sm scroll-mt-24 flex-col gap-1.5"
+                >
+                  <Typography variant={TypographyVariant.ACCENT}>
+                    {t(AUDIOMETRY_TEXT.EQUIPMENT_LABEL)}
+                  </Typography>
+                  <PillSelect
+                    variant={PillSelectVariant.FIELD}
+                    ariaLabel={t(AUDIOMETRY_TEXT.EQUIPMENT_LABEL)}
+                    value={equipmentUuid ?? ''}
+                    options={equipmentOptions}
+                    onChange={handleEquipmentChange}
+                    placeholder={t(AUDIOMETRY_TEXT.EQUIPMENT_PLACEHOLDER)}
+                    isSheetOnMobile
+                    isLabelFull
+                  />
+                  {isEquipmentMissing && !equipmentUuid && (
+                    <p role="alert" className="text-sm text-danger">
+                      {t(AUDIOMETRY_TEXT.EQUIPMENT_REQUIRED)}
+                    </p>
+                  )}
                 </div>
               )}
               <section className="flex flex-col gap-3">
@@ -426,7 +477,9 @@ export const PatientAudiometryContainer: React.FC<PatientAudiometryContainerProp
           header={printReportHeader}
           entryDate={formatDateTime(selectedEntry.createdAt)}
           professional={selectedEntryAuthor ?? ''}
+          signatureName={signatureName}
           typeName={selectedEntry.typeName}
+          equipment={selectedEntry.equipment}
           screening={isScreening ? { result: screeningResult } : undefined}
           marks={marks}
           gradingScale={gradingScale}

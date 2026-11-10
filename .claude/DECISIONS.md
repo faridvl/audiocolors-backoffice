@@ -435,7 +435,7 @@ organiza su equipo a su manera y no queremos lógica por clínica en el código.
 
 ## D21 · Configuración en una sola entrada del menú
 
-**Estado:** implementado con Tipos de cita e Historia clínica (2026-10-22); faltan sedes y usuarios.
+**Estado:** completa (2026-11-09): Tipos de cita, Historia clínica, Usuarios (D70) y Sedes (D78).
 
 **Decisión:** los mantenimientos (sedes, tipos de cita y su duración, preguntas
 de la historia clínica, usuarios y permisos) van en una sola entrada
@@ -1072,3 +1072,172 @@ resumen (el mismo componente de impresión), para revisar y corregir textos ante
 - La vista previa se arma desde los datos de la audiometría (`buildSummaryAudiometry`), sin generar ni subir un PDF.
 - Control de evolución: la nota con `audiometryEntryUuid` abre esa audiometría en el expediente por el parámetro de URL `audiometria=<uuid>`. Un uuid que no existe se ignora.
 
+
+## D70 · Configuración → Usuarios (2026-11-08)
+
+- Solo el `OWNER` administra usuarios de su clínica (nuevo permiso, no comparar el rol). El API lo
+  exige en crear, editar a otro, cambiar rol, activar/desactivar y poner contraseña; hoy `/users` no
+  revisaba el rol y cualquier sesión podía crear un OWNER.
+- Alta con contraseña temporal que pone el OWNER (no hay envío de correos). El OWNER también puede
+  poner una contraseña nueva a cualquier usuario de su clínica.
+- No se borra: se desactiva y se reactiva. Un usuario inactivo no puede iniciar sesión.
+- Nadie se desactiva ni se cambia el rol a sí mismo, y la clínica nunca queda sin un OWNER activo.
+- El rol OWNER no se crea ni se asigna desde la pantalla ni el API: se asignan ADMIN, DOCTOR y STAFF.
+- Un token emitido (1 h) sigue sirviendo hasta vencer aunque el usuario se desactive; login y
+  `/auth/me` ya lo rechazan. Cerrarlo del todo (consultar estado por petición) queda para después.
+- Un OWNER no administra a otro OWNER (ni rol, ni estado, ni contraseña): los dueños no se tocan
+  desde la pantalla, y así la clínica no puede quedar sin OWNER activo.
+- Cada acción de administración relee al actor en la base: debe estar ACTIVE y ser OWNER en ese
+  momento (el token no basta).
+- La firma y el avatar los cambia solo su dueño (la firma sale en documentos clínicos).
+- Un rol viejo (USER, MEDICO o vacío) se muestra como "Rol anterior" y no se pisa al editar otros
+  datos. El default de la columna `role` pasa a STAFF.
+- Los correos se guardan y se comparan en minúsculas.
+- Los roles siguen fijos (D20); los permisos configurables quedan para después.
+
+## D71 · Niveles de acceso y "Atiende pacientes" (2026-11-09)
+
+Reemplaza los roles OWNER/ADMIN/DOCTOR/STAFF como base de los permisos. Cada usuario tiene dos cosas
+independientes:
+
+- **Nivel de acceso** (uno, acumulativo):
+  - **Recepción:** pacientes (datos generales y contactos), agenda y citas. Nada clínico y **ningún
+    archivo** del paciente (ni ver ni subir).
+  - **Administración:** lo de Recepción + Configuración (sedes, tipos de cita, formularios y
+    plantillas clínicas, plantillas de documento), bitácora y usuarios con límites (abajo).
+  - **Propietario:** lo de Administración + todo Usuarios, suscripción y exportar o borrar datos.
+    La clínica nunca queda sin un Propietario activo.
+- **Atiende pacientes** (sí/no): la única puerta al expediente clínico (historia clínica, evolución,
+  pruebas, preguntas) y a Archivos. Lleva una o varias especialidades de un catálogo fijo de la
+  plataforma (Audiología, Otorrinolaringología, Terapia del lenguaje, Medicina general), elegidas
+  de una lista, sin texto libre. Todo profesional ve el expediente completo; la edición de pruebas
+  se limita a su especialidad cuando existan pruebas de otra especialidad (hoy todas son de
+  Audiología).
+- Lo que ve una persona = su nivel + el expediente si atiende pacientes (mínimo necesario, HIPAA y
+  Ley 8968). Sin "Atiende pacientes", ningún nivel ve datos clínicos, ni el Propietario.
+- **Quién asigna qué:**
+  - Administración crea usuarios, los desactiva y reactiva, les pone contraseña y asigna los niveles
+    Recepción o Administración.
+  - Solo el Propietario activa o quita "Atiende pacientes" y las especialidades, da el nivel
+    Propietario y administra a otro Propietario. Puede activarse "Atiende pacientes" a sí mismo.
+  - Nadie más se cambia su propio nivel ni su acceso clínico. Así un administrador no puede abrirse
+    (ni abrirle a otro) los expedientes.
+  - Cada cambio de nivel, de acceso clínico o de especialidad queda en la bitácora.
+- **Título y colegiado:** los pone el propio profesional en su perfil, no el dueño. El acceso clínico
+  no espera al colegiado; si falta, su perfil lo avisa.
+- La variable "profesional" de las plantillas de documento es título + nombre + número de colegiado.
+- Agregar y editar usuario son páginas propias, no un modal.
+- Migración: OWNER → Propietario con "Atiende pacientes" (Audiología), para no cortarle el acceso
+  que ya tiene; ADMIN → Administración sin acceso clínico; DOCTOR → Recepción + "Atiende pacientes"
+  (Audiología); STAFF y roles viejos → Recepción. El texto libre de especialidad se descarta.
+- El API valida todo; ocultar en pantalla no protege. Sustituye D20 y la parte de roles de D70.
+
+## D72 · Aplicación de D71 en las pantallas (2026-11-09)
+
+- Archivos del paciente cuenta como clínico: sin "Atiende pacientes" no se renderiza la sección.
+- Mantenimiento (pastillas y sección de indicadores) se oculta sin acceso clínico, porque el API lo
+  protege con `@ClinicalAccess()`.
+- Indicadores y prioridad del paciente quedan abiertos a cualquier nivel: son datos generales del
+  paciente y el endpoint no pide acceso clínico.
+- Crear e invalidar pruebas pide además Audiología; ver pruebas solo pide atender pacientes.
+- 403: el cliente llama una vez a `/auth/refresh`, guarda el token nuevo, refresca la sesión y repite
+  la petición; si vuelve a fallar, se muestra el error. Cubre el cambio de acceso con token viejo.
+- Los niveles asignables desde Usuarios pasan a Recepción y Administración; Propietario lo da solo
+  el Propietario (pantalla de Usuarios en el encargo siguiente).
+
+## Roles y especialidades: usuarios en paginas (rama feature/roles-especialidades)
+
+- Formulario de usuarios con Formik + Yup, igual que el resto del repo (no RHF + Zod).
+- Los niveles que puede asignar cada quien se calculan en local (`getAssignableRoles`); el API es quien rechaza lo que no corresponde.
+- El ADMIN nunca envia `attendsPatients` ni `specialties` (el API responde 403).
+- La bitacora de cambios de acceso vive en la ficha del usuario (`UserAuditList`).
+
+- El profesional de las variables de documento y de la firma es quien genera el documento (sesion `/auth/me`): `formatProfessionalName` da `Lic. Ana Mora · Cod. 1234` y omite titulo o colegiado si faltan.
+- La abreviatura MSC se muestra `MSc.`; el prefijo `Cod.` vive en `documentTemplates.licensePrefix`.
+- `/perfil` guarda titulo y colegiado con `PATCH /users/:uuid` sobre uno mismo, solo si el usuario atiende pacientes, e invalida `authMe`.
+
+## D73 · Cierre de la aplicación de D71 en pantalla (2026-11-09)
+
+- `getSelectableRoles` calcula en local los niveles que ofrece el selector de Usuarios según quién edita (ADMIN: Recepción y Administración; OWNER: también Propietario). El API sigue siendo quien rechaza.
+- "Ver" en la lista de usuarios se deriva de `!canEdit` (no de un permiso aparte): si no puede editar a esa persona, la acción pasa a "Ver".
+- La fila de la tabla es clicable y además lleva un enlace en el nombre, para teclado y lectores de pantalla.
+- `ResponsiveTable` renderiza las dos versiones (tabla y tarjetas); la oculta lleva `aria-hidden` e `inert` para que no reciba foco ni se lea dos veces.
+- 401: el cliente intenta `/auth/refresh` una sola vez y repite la petición. Si el refresh falla, o el reintento vuelve a dar 401, cierra la sesión y manda al login. El refresh usa `fetch` directo, así que no hay bucle; el 403 conserva su único reintento.
+- `DELETE_PATIENT` (Administración o Propietario) existe en `permissions.ts`, igual que en el API. No hay pantalla de eliminar paciente, así que no hay acción que ocultar.
+- Sin permiso, `RequirePermission` y Configuración sin pestañas muestran el mensaje y el botón "Volver al inicio" (`common.backHome`), para no dejar un callejón sin salida.
+- Perfil: sin "Atiende pacientes" no se muestra "Datos profesionales"; una nota gris pequeña (`profile.notProfessional`) queda dentro de la tarjeta "Tu cuenta".
+- Ya estaban resueltos por permisos: menú y Configuración sin "Usuarios" para Recepción, y Mantenimiento oculto sin acceso clínico (D72). La ficha del paciente no tiene campos clínicos propios (como `bloodType`), así que no hay nada más que ocultar en el front.
+- El front ahora permite al Propietario administrar a otro Propietario (editar, contraseña, nivel y estado), como ya hacía el API; `getUserActions` recibe el nivel del actor y sin actor un Propietario ajeno queda de solo lectura. Nadie cambia su propio nivel ni estado, y el API valida que quede un Propietario activo.
+
+## D74 · Configuración estandarizada (2026-11-09)
+
+- Todas las secciones de Configuración (Tipos de cita, Formularios, Plantillas, Clínica, Usuarios) ocupan el ancho completo de la columna; se quitó `isNarrow`.
+- Piezas compartidas en `containers/settings/`: `SettingsCard` (`rounded-card border border-ink-200 bg-white`), `SettingsAddButton` (arriba a la derecha desde sm, ancho completo en móvil) y `SettingsSectionLoading`/`SettingsSectionError` (mismo `py`, icono y Reintentar).
+- Clínica va dentro de una `SettingsCard` con cuadrícula de 2 columnas desde `lg` (Nombre y Logo, Teléfono y Correo; Dirección y Guardar a ancho completo); una columna en móvil.
+- Bloques con `gap-4` en todas. Usuarios conserva su `ResponsiveTable`, que ya trae la misma superficie. Formularios también usa el `SettingsAddButton` común, arriba como las demás (ya no el botón punteado bajo la lista); su ayuda de "no se puede agregar" va como `hint` del mismo componente, debajo del botón y alineada a la derecha.
+
+## D75 · Configuración: grupos, ancho por dato y estados (2026-11-09)
+
+- El menú de Configuración tiene dos grupos con título pequeño, modelados con el enum `SettingsGroup`: "Tu clínica" (Clínica, Usuarios) y "Atención" (Tipos de cita, Formularios, Plantillas). Un grupo sin secciones visibles no muestra su título. En celular, el inicio usa los mismos grupos y cada sección lleva su descripción de una línea; escritorio y celular comparten las mismas piezas (`SettingsNav`).
+- Un solo estado fuerte en el menú: el activo es `bg-brand-50 text-brand-700` con una barra a la izquierda. El hover cambia solo el color del texto y nunca compite con el activo; el foco es visible.
+- Regla de ancho por dato (`SettingsFieldRow`): desde `lg`, etiqueta y ayuda a la izquierda (un tercio) y campo a la derecha; en celular, apilado. El campo mide lo que mide su dato: teléfono y duración `max-w-xs`, correo y nombre `max-w-md`, dirección `max-w-xl`, logo a su ancho natural. Los modales siguen la misma regla (duración en Tipos de cita, teléfono en Usuarios). Se quitó la cuadrícula de 2 columnas de Clínica; sustituye esa parte de D74.
+- Ancho máximo común `max-w-6xl` en el layout de Configuración.
+- Regla de estados de las listas (Tipos de cita, Plantillas, Usuarios, Formularios): el botón principal siempre se ve y queda deshabilitado mientras carga o falla; el estado de carga o error va dentro de una `SettingsCard`. Formularios tiene un solo bloque de error y un solo "Reintentar" que recarga las dos consultas; el verbo del botón es el mismo en todas ("Nuevo tipo de cita", "Nueva plantilla", "Nuevo usuario").
+- La barra fija de Guardar de los formularios lleva fondo, sombra superior suave y espacio abajo; las filas de las listas tienen la misma altura mínima y el dato secundario el mismo color.
+
+## D76 · Acordeones del expediente y de Configuración arrancan cerrados (2026-11-09)
+
+- Al entrar a la pantalla ningún acordeón está abierto: ni Audiometría, ni Preguntas y sus secciones, ni los antecedentes, ni las secciones de Configuración → Formularios. Solo se abren por una acción de la persona.
+- Acciones que sí abren: tocar el acordeón, crear una "Nueva sección", guardarla, "Actualizar" un registro y abrir una audiometría desde el enlace `?audiometria=<uuid>` de la nota de Control de evolución.
+- Se quitó la apertura automática de la única sección (Preguntas y Configuración) y el estado inicial abierto de Audiometría. Una sección con cambios sin guardar muestra su aviso en el subtítulo aunque esté cerrada.
+
+## D77 · Mi perfil: identidad, campos al ancho de su dato y vista previa (2026-11-09)
+
+- Mi perfil usa el encabezado de identidad (avatar con iniciales, nombre, correo y nivel de acceso en `Badge`), las mismas tarjetas y el mismo ancho `max-w-6xl` de Configuración, campos al ancho de su dato (Título 13rem y colegiado 14rem desde `sm`) y una vista previa del nombre como sale en los documentos (`formatProfessionalName`, mismo prefijo y título abreviado que el resumen del paciente). El aviso de colegiado faltante va dentro de la vista previa, en tono de advertencia. El avatar se extrajo a `UserAvatar` y lo comparte la barra superior.
+
+## D78 · Sedes en Configuración: color guardado y nunca se borran (2026-11-09)
+
+- Cada sede guarda su color entre los 6 de marca (rojo, naranja, amarillo, verde, azul, morado). Ya no se calcula nada por el nombre de la sede (D1); agenda, pacientes y actividad leen `branch.color`. El amarillo usa texto oscuro `#8a6a00` por contraste.
+- Una sede nunca se borra: se desactiva y se reactiva. Las inactivas no se ofrecen al registrar pacientes ni al agendar; las que ya tienen paciente o cita se siguen mostrando (tratamiento por selector).
+- Campos: nombre (obligatorio, único: el 409 se muestra en el campo), teléfono y dirección opcionales (vaciarlos se manda como texto vacío) y color. Permisos iguales a Tipos de cita.
+- El menú queda en dos grupos: "Tu clínica" (Clínica, Sedes, Usuarios) y "Atención" (Tipos de cita, Formularios, Plantillas); ajusta D75.
+
+## D79 · Sedes: siempre una activa y la cita no se agenda sin sede (2026-11-09)
+
+- No se puede desactivar la única sede activa: el botón queda deshabilitado con la ayuda "Debe quedar al menos una sede activa" y, si el API responde 409 al desactivar, se muestra ese mismo texto. El front lo distingue por el status 409 porque el API no transmite el código (`BRANCH_LAST_ACTIVE` se pierde en su filtro global de errores).
+- Una cita existente cuya sede se desactiva conserva su sede al reagendarla: la sede de la cita se suma a las opciones aunque esté inactiva.
+- El API no exige sede al agendar (Zynka la comparte), así que el front nunca envía una cita sin sede cuando el paciente tiene sedes: las opciones salen de las sedes activas del paciente; con una se elige sola, con varias el selector es obligatorio.
+- Un paciente sin sedes activas no se puede agendar: se avisa "Este paciente no tiene sedes activas. Edítalo para asignarle una." con enlace a editarlo, y el botón de agendar queda deshabilitado. Lo mismo al agendar arrastrando en la agenda: toast y no se crea la cita.
+- Topes iguales a los del API, contados después de quitar espacios: nombre 80, teléfono 30 y dirección 200.
+- El calendario del iPhone no ofrece sedes inactivas para un calendario nuevo; uno ya creado con una sede inactiva se sigue mostrando.
+- El modal de sede tiene pie fijo con Guardar y Cancelar, foco atrapado con autofoco en Nombre (`useFocusTrap`) y no se cierra con Escape ni con el fondo mientras guarda.
+
+## D80 · Acciones del paciente por permiso (2026-11-09)
+
+- Recepción ve los datos generales y los contactos del paciente, pero no lo modifica. Las acciones del expediente salen de dos permisos (`Permission.EDIT_PATIENT` y `Permission.VIEW_CLINICAL_RECORD`), nunca del rol suelto:
+
+| Acción | Recepción sin atender | Administración/Propietario sin atender | Cualquier nivel con "Atiende pacientes" |
+|---|---|---|---|
+| Modificar paciente, cambiar estado, contactos y dispositivos | No | Sí | Sí |
+| Abrir o cambiar indicadores (incluidos prioridad y candidato a video) | No | No | Sí |
+| Generar resumen | No | No | Sí |
+
+- Contactos y dispositivos siguen la regla de modificar paciente (`EDIT_PATIENT`): sin él no hay botón de editar ni se monta el modal de contactos. Prioridad y candidato a video son indicadores: gestión sin atender pacientes ya no los marca. Tipo de sangre y documento de garantía solo los escribe quien atiende pacientes; el API los ignora para los demás y los formularios de alta y edición no los piden.
+- Las etiquetas de indicadores se ven a todos en solo lectura (la prioridad con bandera y su etiqueta en el expediente y solo el ícono con `aria-label` en la lista; candidato a video como chip) y solo se abren o cambian con permiso. Sin ninguna acción permitida la columna de acciones no se renderiza; con dos acciones o menos muestra su etiqueta también en celular. La pantalla de modificar va dentro de `RequirePermission` (`EDIT_PATIENT`) con su aviso y el botón "Volver al paciente", y sin permiso no pide los datos del paciente. Los íconos de acción por fila de la lista miden al menos 44x44.
+- El API valida lo mismo: modificar y cambiar estado exigen gestión o atender pacientes; los indicadores, atender pacientes.
+- No cambia: registrar un paciente nuevo y el registro rápido al agendar siguen para Recepción.
+
+## D81. Motivo de prioridad, Equipos y equipo en la audiometria
+- El motivo de prioridad se pide en un modal (por portal) al marcar, desde la lista y el expediente; quitar no lo pide. Se muestra bajo la casilla y en el tooltip del icono.
+- Equipos vive en Configuracion con ruta `/configuracion/equipos`, grupo CARE, icono `Ear` y el mismo permiso que Sedes (`EDIT_APPOINTMENT_TYPES`). El 409 se muestra en el campo modelo.
+- El selector de equipo de la audiometria nueva solo aparece si hay equipos activos; con uno solo queda preseleccionado; si falta, el guardado se frena con aviso en el campo y `EQUIPMENT_REQUIRED` del API se traduce a un toast. `ApiError` expone ahora `code`.
+- Weber `NO_RESPONSE` se muestra como "NR" con etiqueta accesible "Sin respuesta".
+- Weber arranca vacío ("Sin registrar") en cada frecuencia y solo se envía lo que el audiólogo elige; el API acepta Weber parcial. Antes arrancaba en "Centro" y quedaba guardado aunque nadie lo eligiera. El informe imprime "Sin registrar" donde no hay valor.
+- En la lista de opciones, NR se lee "NR · Sin respuesta". El 409 `PATIENT_ALREADY_PRIORITY` recarga al paciente y avisa que ya estaba marcado.
+- El informe de audiometria muestra paciente, identificacion y equipo una sola vez, en la ficha de arriba; el bloque final solo lleva la firma del profesional y la leyenda "Firma del profesional". Decision del usuario 2026-11-09.
+- La firma del informe de audiometria es de quien hizo la audiometria (el mismo profesional de la ficha), no de quien imprime; la del resumen del paciente es de quien lo genera. El API de la entrada solo trae el nombre del autor: el titulo y el colegiado se agregan cuando el autor es quien imprime (sesion) o los lee de `GET /users/:uuid/signature` (identity), que cualquier usuario de la clinica puede pedir (tambien de un profesional inactivo); asi el mismo informe sale igual sin importar quien lo imprime. Si esa lectura falla o da 404, sale el nombre solo, nunca un nombre distinto al de la ficha. Sin autor conocido, la firma repite lo que muestra la ficha. Hook `use-author-signature-name`.
+- El pie del resumen del paciente dice "Firma de quien genera el resumen"; cada entrada embebida sigue mostrando a su profesional.
+- Ajusta D68: el nombre de la clinica junto al logo se escribe solo si no hay logo (caso multi-clinica sin logo). Informe suelto y resumen comparten la banda `PrintDocumentTitleBar` (logo, o nombre, y titulo).
+- Ficha de 3 columnas: Tipo en la columna 1 y Equipo en las columnas 2 y 3 de la misma fila.
+- La vista previa en Archivos escala la hoja A4 segun el ancho del contenedor ((ancho - 32) / 794, tope 1) y se recalcula con ResizeObserver, sin escala minima.
+- Resumen impreso: Diagnostico y Observaciones de cada informe embebido pasan juntos (sin partirse) y la firma no queda sola en una hoja.

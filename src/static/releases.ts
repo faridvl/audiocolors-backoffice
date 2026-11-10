@@ -41,6 +41,23 @@ const fix = change(ReleaseChangeKind.FIXED);
 export const RELEASES: Release[] = [
   // release:next — `yarn release:bump` agrega la versión nueva acá arriba.
   {
+    version: '2.1.0',
+    publishedAt: '2026-11-10T12:00:00Z',
+    changes: [
+      feature('v2_1_0.users'),
+      feature('v2_1_0.profile'),
+      feature('v2_1_0.branches'),
+      feature('v2_1_0.equipment'),
+      improvement('v2_1_0.permissions'),
+      improvement('v2_1_0.priority'),
+      improvement('v2_1_0.weber'),
+      improvement('v2_1_0.audiometryReport'),
+      improvement('v2_1_0.settings'),
+      improvement('v2_1_0.clinicalRecord'),
+      improvement('v2_1_0.session'),
+    ],
+  },
+  {
     version: '2.0.0',
     publishedAt: '2026-11-08T12:00:00Z',
     changes: [

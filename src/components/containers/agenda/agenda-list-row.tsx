@@ -5,6 +5,7 @@ import { BranchBadge } from '@/components/common/badge/branch-badge';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ColorDot } from '@/components/common/color-dot/color-dot';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { Branch } from '@/types/branches/branch';
 import { getBranchStripeColor, topStripeStyle } from '@/shared/design/tokens';
 import { EMPTY_VALUE } from '@/shared/utils/formatters';
 import { tailwind } from '@/utils/tailwind-utils';
@@ -25,7 +26,7 @@ interface ListRowProps {
   /** Punto de color: el tipo de cita. */
   accentColor?: string;
   /** Sede: franja superior de su color, como las tarjetas de pacientes. */
-  branchName?: string;
+  branch?: Branch;
   className?: string;
   isMuted?: boolean;
   trailing?: React.ReactNode;
@@ -41,7 +42,7 @@ export const ListRow: React.FC<ListRowProps> = ({
   title,
   subtitle,
   accentColor,
-  branchName,
+  branch,
   className,
   isMuted = false,
   trailing,
@@ -60,7 +61,7 @@ export const ListRow: React.FC<ListRowProps> = ({
         draggable={Boolean(drag)}
         onDragStart={drag?.onDragStart}
         onDragEnd={drag?.onDragEnd}
-        style={topStripeStyle(getBranchStripeColor(branchName))}
+        style={topStripeStyle(getBranchStripeColor(branch?.color))}
         className={tailwind(
           ROW_DENSITY_STYLES[density],
           className,
@@ -91,7 +92,7 @@ export const ListRow: React.FC<ListRowProps> = ({
             <Typography variant={TypographyVariant.HELPER} inline className="block truncate">
               {subtitle}
             </Typography>
-            <BranchBadge name={branchName} />
+            <BranchBadge branch={branch} />
           </Typography>
         </Typography>
         {trailing}
@@ -107,7 +108,7 @@ interface AppointmentListRowProps {
   section: AgendaSection;
   scheduledByLabel: string;
   typeColor?: string;
-  branchName?: string;
+  branch?: Branch;
   drag?: RowDragProps;
   isDragSource?: boolean;
   density?: RowDensity;
@@ -120,7 +121,7 @@ export const AppointmentListRow: React.FC<AppointmentListRowProps> = ({
   section,
   scheduledByLabel,
   typeColor,
-  branchName,
+  branch,
   drag,
   isDragSource,
   density,
@@ -134,7 +135,7 @@ export const AppointmentListRow: React.FC<AppointmentListRowProps> = ({
       title={appointment.patientName ?? EMPTY_VALUE}
       subtitle={[appointment.typeName ?? t(TEXT.AGENDA.ROW.NO_TYPE), scheduledByLabel].join(' · ')}
       accentColor={typeColor}
-      branchName={branchName}
+      branch={branch}
       className={SECTION_ROW_STYLES[section]}
       isMuted={isDone}
       trailing={

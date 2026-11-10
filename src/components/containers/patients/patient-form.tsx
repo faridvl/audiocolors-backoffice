@@ -19,6 +19,7 @@ import {
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { TEXT } from '@/static/texts/i18n';
 import { getBranchStripeColor } from '@/shared/design/tokens';
+import { getBranchOptionLabel, getSelectableBranches } from '@/shared/utils/branches';
 import { toDayKey } from '@/shared/utils/dates';
 import { DOCUMENT_MASKS, formatNationalId, PatientFormValues } from './patient-validation';
 
@@ -37,7 +38,7 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const todayKey = toDayKey(new Date());
-  const { values, setFieldValue } = useFormikContext<PatientFormValues>();
+  const { values, initialValues, setFieldValue } = useFormikContext<PatientFormValues>();
   const patientFullName = buildPatientFullName(values.firstName, values.lastName);
   const documentMask = DOCUMENT_MASKS[values.documentType] ?? DOCUMENT_MASKS[DocumentType.NATIONAL];
   const { data: branches } = useBranchesQuery();
@@ -97,11 +98,13 @@ export const PatientFormFields: React.FC<PatientFormProps> = ({
             label={t(TEXT.PATIENTS.FORM.BRANCHES_LABEL)}
             placeholder={t(TEXT.PATIENTS.FORM.BRANCHES_PLACEHOLDER)}
             hint={t(TEXT.PATIENTS.FORM.BRANCHES_HINT)}
-            options={(branches ?? []).map((branch) => ({
-              value: branch.uuid,
-              label: branch.name,
-              accentColor: getBranchStripeColor(branch.name),
-            }))}
+            options={getSelectableBranches(branches, initialValues.branchUuids).map(
+              (branch) => ({
+                value: branch.uuid,
+                label: getBranchOptionLabel(branch, t),
+                accentColor: getBranchStripeColor(branch.color),
+              }),
+            )}
             required
           />
         </div>

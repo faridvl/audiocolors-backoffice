@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClinicBrand } from '@/components/common/brand/clinic-brand';
+import { PrintDocumentTitleBar } from '@/components/common/brand/print-document-title-bar';
+import { formatEquipmentName } from '@/shared/utils/equipment';
 import { formatDate } from '@/shared/utils/formatters';
 import { TEXT } from '@/static/texts/i18n';
+import { EquipmentSummary } from '@/types/equipment/equipment';
 import { tailwind } from '@/utils/tailwind-utils';
 import { AudiogramChart } from './audiogram-chart';
 import { EarSummary } from './audiometry-calculations';
@@ -27,13 +29,12 @@ import {
   GRADE_LABEL_KEYS,
   PTA_TYPE_LABEL_KEYS,
   SCREENING_RESULT_LABEL_KEYS,
-  WEBER_LABEL_KEYS,
 } from './audiometry-labels';
 import { GradeLabelsCenter } from './grade-labels-column';
 import { SpeechAudiogramChart } from './speech-audiogram-chart';
 import { WordListType } from './speech-word-lists';
 import { AudiometryInvalidationNotice, PrintReportHeader } from './use-audiometry-poc';
-import { WEBER_ICONS } from './weber-icons';
+import { WeberResultView } from './weber-icons';
 import { ReadOnlyValue } from './audiometry-read-only-value';
 
 const AUDIOMETRY_TEXT = TEXT.PATIENTS.DETAIL.AUDIOMETRY;
@@ -60,6 +61,8 @@ export interface AudiometryPrintReportProps {
   header: PrintReportHeader;
   entryDate: string;
   professional: string;
+  /** Nombre que va bajo la línea de firma, como sale en los documentos; sin él se usa `professional`. */
+  signatureName?: string;
   marks: AudiogramMarks;
   gradingScale: GradingScale;
   speechMarks: SpeechMarks;
@@ -78,6 +81,8 @@ export interface AudiometryPrintReportProps {
   isEmbedded?: boolean;
   /** Informe suelto de una audiometría marcada como mal hecha: se avisa arriba, bien visible. */
   invalidation?: AudiometryInvalidationNotice | null;
+  /** Audiómetro usado; sin él no se muestra la fila Equipo. */
+  equipment?: EquipmentSummary | null;
   /** Nombre del tipo de audiometría; sin él no se muestra el dato. */
   typeName?: string;
   /** Solo en rastreo: informe con vía aérea, resultado y observaciones, sin las pruebas de una clínica. */
@@ -91,6 +96,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   header,
   entryDate,
   professional,
+  signatureName,
   marks,
   gradingScale,
   speechMarks,
@@ -102,6 +108,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
   isEmbedded = false,
   invalidation = null,
   typeName,
+  equipment = null,
   screening,
   isVisibleOnScreen = false,
 }) => {
@@ -118,10 +125,16 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
     { label: t(AUDIOMETRY_TEXT.TYPE.LABEL), value: typeName ?? '' },
+    {
+      label: t(REPORT_TEXT.EQUIPMENT),
+      value: equipment ? formatEquipmentName(equipment) : '',
+      isWide: true,
+    },
   ].filter((field) => field.value !== '');
   const embeddedFields = [
     { label: t(REPORT_TEXT.DATE), value: entryDate },
     { label: t(REPORT_TEXT.PROFESSIONAL), value: professional },
+    { label: t(REPORT_TEXT.EQUIPMENT), value: equipment ? formatEquipmentName(equipment) : '' },
   ].filter((field) => field.value !== '');
 
   const earValue = (ear: Ear, field: SpeechField): string => speechFieldValues[ear][field] || empty;
@@ -173,7 +186,7 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
     <article
       {...(isEmbedded ? { 'data-print-summary-section': '' } : { 'data-print-report': '' })}
       className={tailwind(
-        'flex-col gap-2 bg-white text-xs leading-snug text-ink-700',
+        'flex-col gap-1.5 bg-white text-xs leading-snug text-ink-700',
         isEmbedded || isVisibleOnScreen ? 'flex' : 'hidden print:flex',
       )}
     >
@@ -191,14 +204,12 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         </header>
       )}
       {!isEmbedded && (
-        <header className="flex items-start justify-between gap-4 border-b-2 border-ink-300 pb-2">
-          <div className="flex flex-col gap-1">
-            <ClinicBrand logoUrl={header.clinicLogoUrl} name={header.clinicName} height={40} />
-            {header.clinicLogoUrl && header.clinicName && (
-              <p className="text-sm font-semibold text-ink-800">{header.clinicName}</p>
-            )}
-          </div>
-          <h1 className="text-right text-xl font-semibold text-ink-900">{t(REPORT_TEXT.TITLE)}</h1>
+        <header>
+          <PrintDocumentTitleBar
+            logoUrl={header.clinicLogoUrl}
+            clinicName={header.clinicName}
+            title={t(REPORT_TEXT.TITLE)}
+          />
         </header>
       )}
 
@@ -213,14 +224,21 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
               date: invalidation.date,
             })}
           </p>
-          <p>{t(AUDIOMETRY_TEXT.INVALIDATE.BANNER_REASON, { reason: invalidation.reason })}</p>
+          <p>
+            {t(AUDIOMETRY_TEXT.INVALIDATE.BANNER_REASON, {
+              reason: invalidation.reason,
+            })}
+          </p>
         </div>
       )}
 
       {!isEmbedded && (
-        <dl className="grid grid-cols-3 gap-x-4 gap-y-1.5 rounded border border-ink-200 bg-ink-50 px-3 py-2">
+        <dl className="grid grid-cols-3 gap-x-4 gap-y-1 rounded border border-ink-200 bg-ink-50 px-3 py-1.5">
           {patientFields.map((field) => (
-            <div key={field.label} className="min-w-0">
+            <div
+              key={field.label}
+              className={tailwind('min-w-0', 'isWide' in field && field.isWide && 'col-span-2')}
+            >
               <dt className="text-[10px] uppercase tracking-wide text-ink-500">{field.label}</dt>
               <dd className="font-medium text-ink-800">{field.value}</dd>
             </div>
@@ -278,12 +296,9 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
                   {WEBER_FREQUENCIES_HZ.map((frequencyHz) => (
                     <td key={frequencyHz} className={CELL_CLASSES}>
                       {weber[frequencyHz] ? (
-                        <span className="inline-flex items-center gap-1.5">
-                          {WEBER_ICONS[weber[frequencyHz]]}
-                          {t(WEBER_LABEL_KEYS[weber[frequencyHz]])}
-                        </span>
+                        <WeberResultView result={weber[frequencyHz]} />
                       ) : (
-                        empty
+                        t(TEXT.GENERAL.NOT_RECORDED)
                       )}
                     </td>
                   ))}
@@ -342,8 +357,10 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         </>
       )}
 
-      {/* Diagnóstico, observaciones y firma pasan juntos a la hoja siguiente si no caben. */}
-      <div className="flex break-inside-avoid flex-col gap-2">
+      {/* Embebido: Diagnóstico y Observaciones pasan juntos a la hoja siguiente, con la firma del resumen. */}
+      <div
+        className={isEmbedded ? 'flex break-inside-avoid flex-col gap-2' : 'flex flex-col gap-2'}
+      >
         {textSections.map((section) => (
           <section key={section.key} className="flex break-inside-avoid flex-col gap-1">
             <h2 className={SECTION_TITLE_CLASSES}>{section.title}</h2>
@@ -356,16 +373,23 @@ export const AudiometryPrintReport: React.FC<AudiometryPrintReportProps> = ({
         ))}
 
         {!isEmbedded && (
-          <footer className="mt-1 flex items-end justify-between gap-6 pt-2">
-            <div className="flex w-64 flex-col gap-1 border-t border-ink-500 pt-1">
-              <p className="text-sm font-medium text-ink-800">{professional}</p>
-              <p className="text-[10px] uppercase tracking-wide text-ink-500">
-                {t(REPORT_TEXT.SIGNATURE)}
+          <footer
+            className="flex justify-end pt-1.5"
+            style={{ breakInside: 'avoid', pageBreakInside: 'avoid' }}
+          >
+            <div className="flex w-72 shrink-0 flex-col items-center gap-0.5 text-center">
+              <div className="mt-8 flex w-full flex-col gap-0.5 border-t border-ink-500 pt-1">
+                <p className="text-sm font-medium text-ink-800">{signatureName || professional}</p>
+                <p className="text-[10px] uppercase tracking-wide text-ink-500">
+                  {t(REPORT_TEXT.SIGNATURE)}
+                </p>
+              </div>
+              <p className="text-[10px] text-ink-500">
+                {t(REPORT_TEXT.PRINTED_ON, {
+                  date: formatDate(new Date().toISOString()),
+                })}
               </p>
             </div>
-            <p className="text-[10px] text-ink-500">
-              {t(REPORT_TEXT.PRINTED_ON, { date: formatDate(new Date().toISOString()) })}
-            </p>
           </footer>
         )}
       </div>

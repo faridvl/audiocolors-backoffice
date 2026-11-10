@@ -10,10 +10,15 @@ import {
   useAudiometryTypesQuery,
   useAudiometryEntryQuery,
 } from '@/shared/api/querys/patient-audiometry-entries-query';
+import { useEquipmentQuery } from '@/shared/api/querys/equipment-query';
+import { formatEquipmentName, getActiveEquipment } from '@/shared/utils/equipment';
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
+import { usePermissions } from '@/hooks/use-permissions';
+import { useAuthorSignatureName } from '@/hooks/use-author-signature-name';
 import { useSession } from '@/hooks/use-session';
+import { Permission } from '@/shared/auth/permissions';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
 import { buildPrintFileName } from '@/shared/utils/print-file-name';
 import { TEXT } from '@/static/texts/i18n';
@@ -41,7 +46,7 @@ import {
   SpeechFieldValues,
   SpeechMarks,
   WeberResult,
-  buildDefaultWeber,
+  buildEmptyWeber,
   buildEmptyFailedWordsValues,
   buildEmptyAudiometryNotes,
   buildEmptyMarks,
@@ -86,7 +91,7 @@ export interface PrintReportHeader {
 
 export const buildEmptyFormState = (): AudiometryFormState => ({
   marks: buildEmptyMarks(),
-  weber: buildDefaultWeber(),
+  weber: buildEmptyWeber(),
   speechMarks: buildEmptySpeechMarks(),
   speechFieldValues: buildEmptySpeechFieldValues(),
   failedWords: buildEmptyFailedWordsValues(),
@@ -137,14 +142,14 @@ export function useAudiometryPoc(patientUuid: string) {
     buildEmptySpeechFieldValues,
   );
   const [failedWords, setFailedWords] = useState<FailedWordsValues>(buildEmptyFailedWordsValues);
-  const [weber, setWeber] = useState<Record<number, WeberResult>>(buildDefaultWeber);
+  const [weber, setWeber] = useState<Record<number, WeberResult>>(buildEmptyWeber);
   const [ptaType, setPtaType] = useState<PtaType>(DEFAULT_PTA_TYPE);
   const [gradingScale, setGradingScale] = useState<GradingScale>(DEFAULT_GRADING_SCALE);
   const [activeTool, setActiveTool] = useState<AudiometryTool>(AudiometryTool.AIR);
   const [isMasked, setIsMasked] = useState(false);
   const [hasNoResponse, setHasNoResponse] = useState(false);
   const [speechEar, setSpeechEar] = useState<Ear>(Ear.RIGHT);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [wordListType, setWordListType] = useState<WordListType | null>(null);
   const [wordListId, setWordListId] = useState<string | null>(null);
   // No se borra al ocultar el panel: define cuántas palabras se presentaron por oído.
@@ -153,6 +158,21 @@ export function useAudiometryPoc(patientUuid: string) {
   const [chosenType, setChosenType] = useState<AudiometryTypeCode>(DEFAULT_AUDIOMETRY_TYPE);
   const [screeningResult, setScreeningResult] = useState<ScreeningResult | null>(null);
   const [isResultMissing, setIsResultMissing] = useState(false);
+  const [chosenEquipmentUuid, setChosenEquipmentUuid] = useState<string | null>(null);
+  const [isEquipmentMissing, setIsEquipmentMissing] = useState(false);
+  const equipmentQuery = useEquipmentQuery();
+  const activeEquipment = getActiveEquipment(equipmentQuery.data);
+  // Con un solo equipo activo no hay nada que elegir.
+  const equipmentUuid =
+    chosenEquipmentUuid ?? (activeEquipment.length === 1 ? activeEquipment[0].uuid : null);
+  const equipmentOptions = activeEquipment.map((item) => ({
+    value: item.uuid,
+    label: formatEquipmentName(item),
+  }));
+  const handleEquipmentChange = (uuid: string) => {
+    setChosenEquipmentUuid(uuid);
+    setIsEquipmentMissing(false);
+  };
   const [pendingType, setPendingType] = useState<AudiometryTypeCode | null>(null);
 
   const presentedWords = presentedWordsOf(lastWordListType);
@@ -160,7 +180,10 @@ export function useAudiometryPoc(patientUuid: string) {
   const entries = entriesQuery.data ?? [];
   const selectedEntryUuid =
     chosenEntryUuid === undefined ? (entries[0]?.uuid ?? null) : chosenEntryUuid;
-  const isReadOnly = selectedEntryUuid !== null;
+  const { can } = usePermissions();
+  // Verlas no exige Audiología; crear o invalidar sí.
+  const canEdit = can(Permission.EDIT_AUDIOLOGY_TESTS);
+  const isReadOnly = selectedEntryUuid !== null || !canEdit;
   const entryQuery = useAudiometryEntryQuery(patientUuid, selectedEntryUuid);
   const loadedEntry = entryQuery.data;
   const selectedEntry = entries.find((entry) => entry.uuid === selectedEntryUuid);
@@ -193,7 +216,11 @@ export function useAudiometryPoc(patientUuid: string) {
     if (!loadedEntry) return;
     if (loadedEntry.typeCode === AudiometryTypeCode.SCREENING) {
       const state = screeningPayloadToState(loadedEntry.payload);
-      applyFormState({ ...buildEmptyFormState(), marks: state.marks, notes: state.notes });
+      applyFormState({
+        ...buildEmptyFormState(),
+        marks: state.marks,
+        notes: state.notes,
+      });
       setScreeningResult(state.result);
       return;
     }
@@ -274,7 +301,10 @@ export function useAudiometryPoc(patientUuid: string) {
 
   const handleSpeechFieldChange = (ear: Ear, field: SpeechField, text: string) => {
     if (!isSpeechFieldInputValid(field, text)) return;
-    setSpeechFieldValues((current) => ({ ...current, [ear]: { ...current[ear], [field]: text } }));
+    setSpeechFieldValues((current) => ({
+      ...current,
+      [ear]: { ...current[ear], [field]: text },
+    }));
   };
 
   const handleFailedWordsChange = (ear: Ear, text: string) => {
@@ -334,7 +364,17 @@ export function useAudiometryPoc(patientUuid: string) {
     [marks, ptaType, gradingScale],
   );
 
+  const equipmentFieldRef = useRef<HTMLDivElement>(null);
+  // En pantallas bajas el error queda fuera de vista: se lleva el selector al centro y se enfoca.
+  const flagEquipmentMissing = () => {
+    setIsEquipmentMissing(true);
+    const field = equipmentFieldRef.current;
+    field?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    field?.querySelector('button')?.focus({ preventScroll: true });
+  };
+
   const { executeCreateEntry, isPending: isSaving } = useCreateAudiometryEntryMutation({
+    onEquipmentRequired: flagEquipmentMissing,
     onCreated: (entry) => {
       // Se siembra el detalle para no volver a pedir lo que se acaba de guardar.
       queryClient.setQueryData([FETCH_AUDIOMETRY_ENTRY_KEY, patientUuid, entry.uuid], entry);
@@ -452,8 +492,16 @@ export function useAudiometryPoc(patientUuid: string) {
 
   const handleSave = () => {
     if (!canSave) return;
+    if (activeEquipment.length > 0 && !equipmentUuid) {
+      flagEquipmentMissing();
+      return;
+    }
     if (isScreening) {
-      const screeningPayload = screeningStateToPayload({ marks, result: screeningResult, notes });
+      const screeningPayload = screeningStateToPayload({
+        marks,
+        result: screeningResult,
+        notes,
+      });
       if (!screeningPayload) {
         setIsResultMissing(true);
         return;
@@ -462,6 +510,7 @@ export function useAudiometryPoc(patientUuid: string) {
         patientUuid,
         typeCode: AudiometryTypeCode.SCREENING,
         payload: screeningPayload,
+        equipmentUuid: equipmentUuid ?? undefined,
       });
       return;
     }
@@ -469,6 +518,7 @@ export function useAudiometryPoc(patientUuid: string) {
       patientUuid,
       typeCode: AudiometryTypeCode.CLINICAL,
       payload: stateToPayload(formState, summaries),
+      equipmentUuid: equipmentUuid ?? undefined,
     });
   };
 
@@ -507,7 +557,8 @@ export function useAudiometryPoc(patientUuid: string) {
       }
     : null;
   // Solo se marca una audiometría guardada que aún no está marcada.
-  const canInvalidate = selectedEntry !== undefined && selectedEntry.invalidatedAt == null;
+  const canInvalidate =
+    canEdit && selectedEntry !== undefined && selectedEntry.invalidatedAt == null;
   const selectedEntryAuthor = selectedEntry
     ? resolveAuthorLabel(selectedEntry.createdByUuid ?? '', selectedEntry.createdByName)
     : null;
@@ -515,6 +566,10 @@ export function useAudiometryPoc(patientUuid: string) {
   // Ya viene en caché desde el detalle del paciente y la sesión; solo alimentan el informe impreso.
   const { data: patient } = usePatientQuery(patientUuid);
   const { tenant } = useSession();
+  const { signatureName, isLoading: isSignatureLoading } = useAuthorSignatureName(
+    selectedEntry?.createdByUuid,
+    selectedEntry?.createdByName,
+  );
   const printReportHeader: PrintReportHeader = {
     clinicName: tenant?.businessName ?? '',
     clinicLogoUrl: tenant?.logoUrl ?? null,
@@ -545,15 +600,23 @@ export function useAudiometryPoc(patientUuid: string) {
     isScreening,
     screeningResult,
     isResultMissing,
+    equipmentOptions,
+    equipmentUuid,
+    isEquipmentMissing,
+    equipmentFieldRef,
+    handleEquipmentChange,
     handleScreeningResultChange,
     pendingType,
     handleTypeChange,
     handleConfirmTypeChange,
     handleCancelTypeChange,
     printReportHeader,
+    signatureName,
+    isSignatureLoading,
     handlePrint,
     isSaving,
     canSave,
+    canEdit,
     handleSave,
     formVersion,
     entryOptions,

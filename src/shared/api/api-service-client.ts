@@ -1,4 +1,6 @@
+import { env } from '@/shared/api/config';
 import { CookiesManager } from '@/shared/utils/cookies-manager';
+import { LoginResponse } from '@/types/auth/auth';
 import { routesPublic } from '@/shared/navigation/routes';
 
 // En local, un origen que el API no tiene en ALLOWED_ORIGINS (CORS) falla igual
@@ -23,6 +25,8 @@ export class ApiError extends Error {
     readonly status: number,
     /** Errores 400 por campo, cuando el API los detalla. */
     readonly details: ApiFieldError[] = [],
+    /** Código estable del error (p. ej. EQUIPMENT_REQUIRED), cuando el API lo manda. */
+    readonly code?: string,
   ) {
     super(message);
     this.name = 'ApiError';
@@ -37,10 +41,46 @@ export interface ApiFieldError {
 interface ApiErrorBody {
   message?: string | string[];
   details?: ApiFieldError[];
+  code?: string;
+  error?: { message?: string | string[]; code?: string };
 }
 
 const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
   Array.isArray(body?.details) ? body.details : [];
+
+/** Aviso para que la sesión (`/auth/me`) se relea cuando el acceso del usuario cambió. */
+export const ACCESS_REFRESHED_EVENT = 'access-refreshed';
+const REFRESH_ENDPOINT = '/auth/refresh';
+
+/**
+ * Un 401 o un 403 puede ser un acceso cambiado después de iniciar sesión (el token lleva el
+ * acceso viejo).
+ * Se pide un token nuevo; devuelve false si no se pudo.
+ */
+const refreshAccessToken = async (): Promise<boolean> => {
+  const token = CookiesManager.getAccessToken();
+  if (!token) return false;
+  try {
+    const response = await fetch(`${env.API.IDENTITY_URL}${REFRESH_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) return false;
+    const refreshed = await parseJsonBody<LoginResponse>(response);
+    if (!refreshed?.access_token) return false;
+    CookiesManager.setSession(
+      refreshed.access_token,
+      refreshed.user?.name ?? CookiesManager.getUserName() ?? '',
+    );
+    window.dispatchEvent(new Event(ACCESS_REFRESHED_EVENT));
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export const handleSessionExpired = (): void => {
   CookiesManager.clearAll();
@@ -54,8 +94,9 @@ export const handleSessionExpired = (): void => {
  * de Zod/class-validator). Se normaliza a una sola linea legible.
  */
 const resolveErrorMessage = (body: ApiErrorBody | null, fallback: string): string => {
-  if (!body?.message) return fallback;
-  return Array.isArray(body.message) ? body.message.join('. ') : body.message;
+  const message = body?.message ?? body?.error?.message;
+  if (!message) return fallback;
+  return Array.isArray(message) ? message.join('. ') : message;
 };
 
 /**
@@ -73,7 +114,7 @@ const parseJsonBody = async <T>(response: Response): Promise<T | null> => {
   }
 };
 
-async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
+async function fetcher<T>(url: string, options: RequestInit = {}, isRetry = false): Promise<T> {
   const token = CookiesManager.getAccessToken();
 
   const headers = new Headers({
@@ -93,14 +134,23 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
 
   if (response.status === 401) {
     // Sin token es un login fallido: se propaga el mensaje del API.
-    // Con token, la sesion expiro y se cierra de verdad.
+    // Con token, un 401 puede ser un token viejo (sin `attendsPatients` o con un rol legado): se
+    // intenta un refresh una sola vez y, si falla, la sesion se cierra de verdad.
     if (token) {
+      if (!isRetry && (await refreshAccessToken())) {
+        return fetcher<T>(url, options, true);
+      }
       handleSessionExpired();
       throw new Error('Tu sesión expiró. Inicia sesión de nuevo.');
     }
 
     const errorBody = await parseJsonBody<ApiErrorBody>(response);
     throw new Error(resolveErrorMessage(errorBody, 'Credenciales inválidas'));
+  }
+
+  const isAccessDenied = response.status === HttpStatus.FORBIDDEN;
+  if (isAccessDenied && token && !isRetry && (await refreshAccessToken())) {
+    return fetcher<T>(url, options, true);
   }
 
   if (response.status === 204) return null as T;
@@ -112,6 +162,7 @@ async function fetcher<T>(url: string, options: RequestInit = {}): Promise<T> {
       resolveErrorMessage(data as ApiErrorBody | null, GENERIC_ERROR_MESSAGE),
       response.status,
       resolveFieldErrors(data as ApiErrorBody | null),
+      (data as ApiErrorBody | null)?.error?.code ?? (data as ApiErrorBody | null)?.code,
     );
   }
 

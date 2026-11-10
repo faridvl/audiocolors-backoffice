@@ -7,6 +7,7 @@ import {
 import { usePatientQuery } from '@/shared/api/querys/get-patient-query';
 import { useEscapeKey } from '@/hooks/use-escape-key';
 import { useResolveAuthorLabel } from '@/hooks/use-resolve-author-label';
+import { useAuthorSignatureName } from '@/hooks/use-author-signature-name';
 import { useSession } from '@/hooks/use-session';
 import { calculateAge, formatCalendarDate, formatDateTime } from '@/shared/utils/formatters';
 import { printWithFileName, waitForImages } from '@/shared/utils/print-document';
@@ -22,9 +23,6 @@ import { buildSummaryAudiometry } from '../patients/patient-summary/summary-prin
 const SHEET_WIDTH_PX = 794;
 const SIDE_GUTTER_PX = 16;
 const FULL_ZOOM = 1;
-// Bajo el breakpoint `sm` la hoja no se encoge más de aquí: el audiograma sigue legible y se desplaza.
-const COMPACT_VIEWPORT_MAX_PX = 640;
-const COMPACT_MIN_ZOOM = 0.7;
 
 interface UseAudiometryPreviewParams {
   patientUuid: string;
@@ -63,8 +61,7 @@ export function useAudiometryPreview({
     if (!element) return undefined;
     const fit = () => {
       const fitZoom = (element.clientWidth - SIDE_GUTTER_PX * 2) / SHEET_WIDTH_PX;
-      const minZoom = window.innerWidth < COMPACT_VIEWPORT_MAX_PX ? COMPACT_MIN_ZOOM : 0;
-      setZoom(Math.min(FULL_ZOOM, Math.max(minZoom, fitZoom)));
+      setZoom(Math.min(FULL_ZOOM, Math.max(0, fitZoom)));
     };
     fit();
     const observer = new ResizeObserver(fit);
@@ -82,6 +79,10 @@ export function useAudiometryPreview({
   };
 
   const entry = entryQuery.data;
+  const { signatureName, isLoading: isSignatureLoading } = useAuthorSignatureName(
+    entry?.createdByUuid,
+    entry?.createdByName,
+  );
   const listItem = entries?.find((item) => item.uuid === entryUuid);
   const invalidation: AudiometryInvalidationNotice | null = listItem?.invalidatedAt
     ? {
@@ -116,6 +117,8 @@ export function useAudiometryPreview({
     scrollRef,
     zoom,
     report,
+    signatureName,
+    isSignatureLoading,
     invalidation,
     isLoading: entryQuery.isLoading,
     isError: entryQuery.isError,

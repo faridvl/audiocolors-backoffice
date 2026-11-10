@@ -54,7 +54,14 @@ module.exports = {
           900: '#18181b',
         },
         success: '#0d9488',
-        warning: '#f59e0b',
+        warning: {
+          DEFAULT: '#f59e0b',
+          /** Aviso que pide completar algo: fondo, borde y textos con contraste sobre el fondo 50. */
+          50: '#fffbeb',
+          300: '#fcd34d',
+          700: '#b45309',
+          800: '#92400e',
+        },
         danger: {
           DEFAULT: '#ef4444',
           /** Texto y relleno rojo sobre blanco con contraste de 4.5:1 o más (el 500 no llega). */

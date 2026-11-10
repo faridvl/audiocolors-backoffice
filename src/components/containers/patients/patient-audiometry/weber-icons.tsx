@@ -1,7 +1,10 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
 import { AudiometryTool, Ear, WeberResult } from './audiometry-constants';
+import { WEBER_LABEL_KEYS } from './audiometry-labels';
 import { getSymbolTone } from './audiometry-styles';
 
 const ICON_CLASSES = 'h-5 w-5';
@@ -36,8 +39,38 @@ const CenterIcon: React.FC = () => (
   </svg>
 );
 
+/** "NR" en texto: sin flechas ni líneas, porque no hay lado hacia donde se oiga. */
+const NoResponseIcon: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <span
+      className="inline-flex h-5 min-w-5 items-center justify-center text-sm font-bold leading-none text-ink-700"
+      aria-hidden
+    >
+      {t(TEXT.PATIENTS.DETAIL.AUDIOMETRY.WEBER.NO_RESPONSE_SHORT)}
+    </span>
+  );
+};
+
 export const WEBER_ICONS: Record<WeberResult, React.ReactNode> = {
   [WeberResult.CENTER]: <CenterIcon />,
   [WeberResult.RIGHT]: <ArrowRight className={tailwind(ICON_CLASSES, earStroke(Ear.RIGHT))} />,
   [WeberResult.LEFT]: <ArrowLeft className={tailwind(ICON_CLASSES, earStroke(Ear.LEFT))} />,
+  [WeberResult.NO_RESPONSE]: <NoResponseIcon />,
+};
+
+/** Resultado de Weber ya guardado: ícono y nombre; "NR" lleva su nombre solo para lectores de pantalla. */
+export const WeberResultView: React.FC<{
+  result: WeberResult;
+  labelClassName?: string;
+}> = ({ result, labelClassName }) => {
+  const { t } = useTranslation();
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {WEBER_ICONS[result]}
+      <span className={tailwind(labelClassName, result === WeberResult.NO_RESPONSE && 'sr-only')}>
+        {t(WEBER_LABEL_KEYS[result])}
+      </span>
+    </span>
+  );
 };

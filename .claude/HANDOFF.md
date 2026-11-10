@@ -18,6 +18,19 @@ el usuario explica o decide algo y antes de cada commit; lo cerrado pasa a
   `develop` (D24).
 
 ## Reglas de negocio confirmadas
+- Pedidos de la clínica (2026-11-09, sin empezar):
+  - Prioridad: marcarla pide un motivo obligatorio. El motivo se ve debajo de la casilla del
+    expediente (con quién y cuándo), en el tooltip del ícono de la lista y queda como nota en
+    Control de evolución. Quitarla no pide motivo; deja nota "Se quitó la prioridad".
+  - Weber: falta la opción NR (sin respuesta), en pantalla y en el informe.
+  - Equipos: Configuración → Equipos, cada uno con marca y modelo (sin serie ni calibración); se
+    desactivan, no se borran, como las sedes. La audiometría nueva elige con qué equipo se hizo
+    (obligatorio si la clínica tiene equipos activos); las viejas quedan sin equipo.
+  - Informe de audiometría: se deja la ficha de arriba y al final va un bloque con paciente,
+    cédula, equipo usado (marca y modelo) y la firma del audiólogo.
+  - Enviar audífonos al laboratorio deja nota en Control de evolución; recibirlos también (hoy
+    solo queda nota si se escribe una al entregar).
+- Sedes (2026-11-09): una sede tiene nombre, teléfono, dirección y color; solo se desactivan, nunca se borran.
 
 Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
@@ -133,6 +146,35 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Informe de audiometría y cambiar contraseña (2026-11-10, en `develop`; el API va antes, ya en `develop` con `GET /users/:uuid/signature` y `PUT /users/me/password`):** D81. Informe con paciente, identificación y equipo una vez en la ficha y solo la firma abajo; firma de quien hizo la audiometría (nombre, título, colegiado) aunque imprima otro; Imprimir espera la firma y, si falla, firma solo con el nombre. Resumen firmado por quien lo genera, 2 hojas (diagnóstico, observaciones y firma juntos en la 2). Vista previa en Archivos escalada al ancho del celular. Mi perfil: cambiar contraseña en un modal de 3 campos en columna; toast arriba en móvil. qa en navegador contra el API local: todo pasa. Sin probar en pantalla: el resumen en PDF tras la última ronda; una clínica sin logo.
+  - Cancelar en el modal de contraseña cierra sin preguntar (igual que el de Usuarios); Esc y el fondo sí preguntan.
+  - Franja blanca al pie de la pantalla del paciente: no se reproduce en 375 a 1920; falta que el usuario diga dispositivo, navegador y pestaña.
+- **Acciones del paciente por permiso (2026-11-09, en `develop` en el front (PR 41) y en el API (PR 22); publicar primero el API):** D80. Recepción sin atender no modifica, no cambia estado, no edita contactos ni dispositivos, no ve Indicadores ni Generar resumen; gestión sin atender modifica pero no marca indicadores ni prioridad. El API valida lo mismo e ignora tipo de sangre y garantía de quien no atiende. qa: 403 de Recepción en las 8 rutas, gestión pasa, tipo de sangre ignorado (base), pantalla de Recepción y Administración sin acciones indebidas, aviso de editar, sin scroll a 375/1440, suite de medical-records en verde. Sin probar en pantalla: cambiar el teléfono principal como Administración (por API pasa), marcar prioridad, abrir Generar resumen y registro rápido como Recepción; dos íconos de 32 px sin identificar en la lista.
+  - Aparte, previo a la rama: quitar "Atiende pacientes" no aplica hasta que vence el token; borrar un contacto inexistente da 500; la bitácora muestra tipo de sangre y extractos de notas a gestión sin atender.
+- **Sedes en Configuración (2026-11-09, en `develop` en el front (PR 40) y en el API (PR 21)):** crear, editar, desactivar y reactivar sedes con nombre, teléfono, dirección y color (D78, D79). qa hecho en navegador contra el API local y la base Docker 5433, 11 casos que pasan: sede inactiva no ofrecida en alta, registro rápido, agendar ni calendario del iPhone; paciente sin sede activa: aviso, sin cita; cita reagendada conserva su sede desactivada; editar conserva las sedes; "(inactiva)" al final de los filtros; colores desde la sede; 375 px sin scroll horizontal. `e2e/sedes.spec.ts`: 8 de 8 pasan contra :3002. Contraste de las píldoras corregido (rojo, naranja y verde con texto más oscuro).
+  - Antes de publicar, en producción y solo lectura: `SELECT name, color FROM "Branch"` (por el caso `ELSE 'BLUE'` del backfill) y confirmar que Zynka tolera sedes inactivas en `GET /branches`.
+  - Orden de publicación: migración `20261109180000_branch_settings`, luego el API, luego el front.
+  - Datos de qa en la base local: sedes "QA Inactiva" y "QA Temporal" (inactivas); pacientes "QA SoloInactiva", "QA Mixto" y "QA Temporal".
+- **Mi perfil rediseñado (2026-11-09, en `develop`):** encabezado de identidad con avatar, campos Título y colegiado al ancho de su dato y vista previa del nombre en documentos (D77). Aviso de colegiado faltante en ámbar, chevron propio en todos los selectores y escala `warning` 50–800 en el tema. Probado con `e2e/mi-perfil.spec.ts` (solo lectura contra :3000).
+- **Acordeones cerrados (2026-11-09, en `develop`):** en el expediente y en Configuración → Formularios todo acordeón arranca cerrado y solo se abre por acción de la persona (D76).
+- **Configuración estandarizada (2026-11-09, en `develop`):** las 5 secciones comparten tarjeta, botón "Nuevo" y estados de carga/error (D74); el menú tiene grupos y un solo resaltado, y los campos de Clínica miden lo que su dato (D75). El editor de usuario usa la misma tarjeta con filas, la barra de Guardar de Formularios va fuera de la tarjeta al ancho de las demás secciones y los ítems del menú resaltan al pasar el mouse. Medido a 390, 1440 y 1920 sin scroll horizontal; carga y error de las 4 listas probados interceptando respuestas. Probado con 4 specs e2e (`configuracion-estandar`, `acordeones-cerrados` de solo lectura contra :3000; `formularios-guardar`, `configuracion-guardar` de escritura contra el API local con `E2E_BASE_URL`): todos pasan..
+- **Ajustes de UI de Usuarios y Configuración (2026-11-09, en `develop`, commit 15eb8a3):** Clínica con campos a ancho completo y ayudas en su lugar, Mi perfil con título en la barra móvil, Plantillas y Tipos de cita con vacío y duración alineados.
+- **Usuarios (2026-11-09, terminado y probado, en `develop`):** Configuración → Usuarios
+  para que el OWNER administre los usuarios de su clínica (D70). Ramas `feature/usuarios` en el front
+  y en el API. Revisado (cuestionador y revisor-ux), corregido y probado por qa en navegador contra el
+  API local y la base Docker `audiocolors-prueba-db`: crear, correo duplicado en mayúsculas, cambio de
+  rol con pérdida de acceso, contraseña, desactivar/reactivar, rol nulo heredado, DOCTOR/STAFF sin
+  acceso, 375/768/1280/1440/1920 sin cortes y el nombre del autor tras la caché de 5 min. Arreglado
+  al probar: la tabla se cortaba a 1440 (nombre y correo apilados) y el menú de acciones se salía
+  3 px a 375 (ahora se ancla a la pantalla). Menores sin arreglar: la página sin acceso muestra el
+  título "Usuarios" sobre el candado; el diálogo de confirmación no es `role=dialog`; no se probó una
+  especialidad larga.
+  **Antes de publicar**, en producción (solo lectura): roles por conteo, correos con mayúsculas y
+  correos repetidos ignorando mayúsculas. Orden: migración del API
+  `20261108160000_user_role_default_staff`, el API y el front.
+  qa subió 3 PNG de prueba al bucket real de R2 (`audilogyfiles`); no se borraron.
+  En la base local quedaron usuarios `qa-*` y tres notas "QA-D10" de prueba.
+
 - **Versión 2.0.0 (2026-11-08, rama `release/2.0.0` del front y del API, con PR a `develop` abierto en cada repo):**
   changelog de 20 cambios aprobado por el usuario y cargado en `releases.ts`/`es.json`; el API
   sube a 2.0.0 en sus cuatro `package.json`. Cubre todo lo que hay en `develop` (no incluye
@@ -255,7 +297,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 4. **Antes de publicar** (pre-registro, etapa 6): la migración `birthDate` opcional va antes
    que el front en cada ambiente. Zynka (`next-audiology-files`,
    `use-patient-summary-header.ts:28-43,70`) muestra una edad falsa cuando `birthDate` es null.
-5. Luego **P3-1** (Configuración: faltan sedes y usuarios, D21) y **P3-2**
+5. Luego **P3-1** (Configuración, D21: completa) y **P3-2**
    (permisos configurables por el administrador, D20).
 6. **Pruebas guardadas en el repo** (2026-10-30, para gastar menos en navegador): empezar con un
    test del API (editar y volver a leer) y un flujo de Playwright, el del pre-registro; comando
@@ -297,3 +339,23 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 - Búsqueda de pacientes: nombre y apellido juntos ("PruebaSedes Cuatro") dan "Sin resultados", porque el API (`patient.storage.ts`) compara cada campo por separado. No viene de este lote; falta corregirlo.
 
 - **Logo y nombre de la clínica (2026-11-08, rama `feature/clinica-logo-y-nombre`, local):** Configuración → Clínica edita el nombre y sube/quita el logo (D68); menú y documentos usan `ClinicBrand`. Probado en navegador sin logo y con logo (1440 y 390 px, capturas en `test-results/clinica-logo-nombre/`), validación de tipo/tamaño y cambio de nombre sin recargar. Sin probar: subida y borrado reales (bucket real), usuario sin permiso, informe y resumen impresos. Requiere el API de `feature/clinica-logo-y-nombre`.
+
+## Roles y especialidades (terminado y probado, en `develop` desde 2026-11-09; API y migraciones de desarrollo aplicadas)
+
+- Rama `feature/roles-especialidades` en el front y en el API (contiene `feature/usuarios`, D70). D71 a D73.
+- Probado en navegador contra el API local y la base Docker 5433 con cada rol: lo clínico por usuario,
+  "Nueva audiometría" e invalidar solo con Audiología (API 403 sin ella), Configuración, Bitácora y
+  Usuarios bloqueados para Recepción, alta y edición en páginas, usuarios nuevos que inician sesión,
+  bitácora en una línea, Propietario que administra a otro Propietario (Administración lo ve de
+  lectura), nadie cambia su propio estado, variable profesional "Lic. Nombre · Cód. N", documento y
+  paciente de otra clínica en 404, Agenda de Recepción con "Agendada por", sesión vencida, 375, 1024
+  y 1440 px sin scroll horizontal, foco de teclado en la tabla de usuarios.
+- Sigue: permiso del usuario para push y PR (los dos repos, incluida `feature/usuarios`). Antes de
+  publicar, en producción (solo lectura): conteo de roles; los ADMIN actuales pierden el acceso clínico
+  hasta que el Propietario les active "Atiende pacientes".
+
+## En que estamos (pedidos de la clinica)
+- Terminado y probado en navegador (2026-11-09), en `develop` de los dos repos (2026-11-09, sin PR, aprobado por el usuario). API: 1948734, 8e65681, aaa24ee (el filtro global devuelve `code`). Front: 11a489c, aa60a68, c10d6f1. Migración aplicada en la base 5433 y en la de desarrollo (Neon); en producción corre al mergear el API a `main`.
+- qa pasó: prioridad (motivo, 409 en dos pestañas, Recepción sin motivo), Equipos (crear, duplicado, editar, desactivar/reactivar, 403/404), audiometría (equipo obligatorio, NR, Weber vacío, línea Equipo truncada), informe (bloque final, sin cédula, 2 hojas sin cortar la firma, audiometría vieja sin equipo), Generar resumen y notas de laboratorio. Evidencia en `test-results/pedidos-clinica/qa1..qa4`.
+- Pendientes menores: los modales de motivo y de Nuevo equipo muestran el error de obligatorio al abrir solo en desarrollo (StrictMode monta dos veces `useFocusTrap` y el campo queda tocado); confirmar en build antes de la versión. El campo Equipo con error no pone `aria-invalid`. El 400 de equipo inactivo no trae `code`. El vacío de Equipos no se probó (no hay clínica sin equipos). Buscar "QA Temporal" con espacio no encuentra (buscador, anterior al lote).
+- Antes del PR a `main`: novedades de la versión para la clínica (D23) y aviso a Zynka de que la audiometría exige `equipmentUuid` si la clínica tiene equipos.

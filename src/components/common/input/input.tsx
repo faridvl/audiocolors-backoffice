@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Field, useField } from "formik";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tailwind } from "@/utils/tailwind-utils";
 import {
@@ -28,6 +28,8 @@ export const FIELD_LABEL_CLASSES = "text-sm font-medium text-ink-700";
 interface FormFieldProps {
   name: string;
   label: string;
+  /** Elemento junto a la etiqueta, fuera de ella (p. ej. un botón de información). */
+  labelAddon?: React.ReactNode;
   /** Cambia el estilo de la etiqueta (p. ej. `FIELD_LABEL_CLASSES`). */
   labelClassName?: string;
   type?: string;
@@ -48,6 +50,8 @@ interface FormFieldProps {
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   /** Teclado virtual correcto en iOS/Android para campos numéricos o de teléfono. */
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  /** Ayuda al navegador y al gestor de contraseñas (p. ej. `current-password`, `new-password`). */
+  autoComplete?: string;
   /** Botón de ícono dentro del campo, a la derecha (posicionado `absolute`, ancho `w-11`). */
   endAdornment?: React.ReactNode;
   /** Texto gris dentro del campo, a la izquierda; no es parte del valor (p. ej. "+506"). */
@@ -61,6 +65,7 @@ interface FormFieldProps {
 export const FormField: React.FC<FormFieldProps> = ({
   name,
   label,
+  labelAddon,
   labelClassName,
   type = "text",
   placeholder,
@@ -76,6 +81,7 @@ export const FormField: React.FC<FormFieldProps> = ({
   children,
   onChange,
   inputMode,
+  autoComplete,
   endAdornment,
   startAdornment,
   startControl,
@@ -99,13 +105,16 @@ export const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <div className={tailwind("flex flex-col gap-1.5", className)}>
-      <label htmlFor={name}>
-        <Typography variant={TypographyVariant.BODY} className={labelClassName}>
-          {label}
-          {required && <span className="ml-0.5 text-danger">*</span>}
-          {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
-        </Typography>
-      </label>
+      <div className="flex items-center">
+        <label htmlFor={name}>
+          <Typography variant={TypographyVariant.BODY} className={labelClassName}>
+            {label}
+            {required && <span className="ml-0.5 text-danger">*</span>}
+            {optional && <span className="ml-1 text-ink-400">(Opcional)</span>}
+          </Typography>
+        </label>
+        {labelAddon}
+      </div>
 
       <div className="relative">
         <Field
@@ -117,6 +126,7 @@ export const FormField: React.FC<FormFieldProps> = ({
           disabled={disabled}
           maxLength={maxLength}
           inputMode={inputMode}
+          autoComplete={autoComplete}
           {...(displayValue !== undefined ? { value: displayValue } : {})}
           aria-invalid={errorText ? true : undefined}
           aria-describedby={describedBy}
@@ -124,6 +134,7 @@ export const FormField: React.FC<FormFieldProps> = ({
             inputBaseClasses,
             as === "textarea" && "min-h-[88px] resize-none",
             (isPassword || endAdornment) && "pr-11",
+            as === "select" && "appearance-none pr-10",
             startAdornment && "pl-[4.5rem]",
             startControl && "pl-[7.5rem]",
           )}
@@ -162,6 +173,13 @@ export const FormField: React.FC<FormFieldProps> = ({
               <Eye className="h-4 w-4" aria-hidden />
             )}
           </button>
+        )}
+
+        {as === "select" && (
+          <ChevronDown
+            className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400"
+            aria-hidden
+          />
         )}
 
         {!isPassword && endAdornment}

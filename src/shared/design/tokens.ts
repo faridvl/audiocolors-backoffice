@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { BranchColor } from '@/types/branches/branch';
 
 /**
  * Design tokens de AudioColors — fuente unica de verdad para el estilo.
@@ -15,6 +16,8 @@ import type { CSSProperties } from 'react';
  * - `ink` es una escala de grises NEUTROS, sin tinte azul.
  * - `danger` es el rojo de relleno y de iconos; el texto rojo y el relleno que lleva
  *   texto blanco usan `danger-700` (contraste de 4.5:1 o más sobre blanco).
+ * - `warning` es el ámbar de aviso: `warning-50` fondo, `warning-300` borde y `warning-700`/`warning-800`
+ *   para ícono y texto (aviso que pide completar algo, sin alarmar como `danger`).
  * - La franja de 6 colores es un gesto de bienvenida: vive en el login, no en
  *   las pantallas de trabajo.
  * - Tipografia Fira Sans, la del manual de marca oficial.
@@ -96,60 +99,39 @@ export const STATUS_STYLES: Record<StatusTone, string> = {
   [StatusTone.INACTIVE]: 'bg-ink-100 text-ink-500',
 };
 
-/**
- * Color de marca por sede, para la franja de identificacion en la lista de
- * pacientes (idea del login: cada row lleva "su" color, no las 6 juntas).
- * Las sedes son un catalogo de solo lectura del API sin campo de color ni
- * codigo/slug propio, solo `name` en texto libre (p.ej. "Centro Medico Yireh
- * Río Claro", no solo "Río Claro") - el mapeo empareja por la ciudad que
- * contiene el nombre, no por nombre exacto, para no depender del prefijo de
- * cada sede (que puede cambiar).
- */
-enum BranchCity {
-  RIO_CLARO = 'Río Claro',
-  QUEPOS = 'Quepos',
-  NEILY = 'Neily',
-  PEREZ_ZELEDON = 'Pérez Zeledón',
-  UVITA = 'Uvita',
-}
-
-const BRANCH_CITY_COLORS: Record<BranchCity, string> = {
-  [BranchCity.RIO_CLARO]: BRAND_COLORS.blue,
-  [BranchCity.QUEPOS]: BRAND_COLORS.yellow,
-  [BranchCity.NEILY]: BRAND_COLORS.red,
-  [BranchCity.PEREZ_ZELEDON]: BRAND_COLORS.orange,
-  [BranchCity.UVITA]: BRAND_COLORS.purple,
-};
-
-const normalize = (value: string): string =>
-  value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-
-/** Color de la franja para una sede, buscando la ciudad dentro del nombre; `undefined` si no hay match. */
-export function getBranchStripeColor(branchName: string | undefined): string | undefined {
-  if (!branchName) return undefined;
-  const normalizedName = normalize(branchName);
-  const city = Object.values(BranchCity).find((candidate) =>
-    normalizedName.includes(normalize(candidate)),
-  );
-  return city ? BRANCH_CITY_COLORS[city] : undefined;
-}
+/** Mismo valor que `warning-700` de `tailwind.config.js`: contraste AA sobre blanco. */
+const WARNING_TEXT_COLOR = '#b45309';
 
 /**
- * Texto de la píldora de sede. El amarillo de Quepos no da contraste sobre su
- * fondo suave, así que esa sede lleva un tono más oscuro; las demás, el color pleno.
+ * Tonos más oscuros de la misma familia para el texto de la píldora: el color
+ * de marca pleno no llega a 4.5:1 sobre su fondo suave (rojo, naranja, verde).
  */
-const BRANCH_CITY_TEXT_COLORS: Partial<Record<BranchCity, string>> = {
-  [BranchCity.QUEPOS]: '#8a6a00',
+const BRANCH_RED_TEXT_COLOR = '#d01d1a';
+const BRANCH_ORANGE_TEXT_COLOR = '#b1530d';
+const BRANCH_GREEN_TEXT_COLOR = '#457a24';
+
+/**
+ * Color de cada sede: `stripe` para la franja y los puntos (color de marca),
+ * `text` para la píldora, con contraste AA sobre su fondo suave. Azul y morado
+ * ya lo cumplen con el color pleno.
+ */
+const BRANCH_COLOR_STYLES: Record<BranchColor, { stripe: string; text: string }> = {
+  [BranchColor.RED]: { stripe: BRAND_COLORS.red, text: BRANCH_RED_TEXT_COLOR },
+  [BranchColor.ORANGE]: { stripe: BRAND_COLORS.orange, text: BRANCH_ORANGE_TEXT_COLOR },
+  [BranchColor.YELLOW]: { stripe: BRAND_COLORS.yellow, text: WARNING_TEXT_COLOR },
+  [BranchColor.GREEN]: { stripe: BRAND_COLORS.green, text: BRANCH_GREEN_TEXT_COLOR },
+  [BranchColor.BLUE]: { stripe: BRAND_COLORS.blue, text: BRAND_COLORS.blue },
+  [BranchColor.PURPLE]: { stripe: BRAND_COLORS.purple, text: BRAND_COLORS.purple },
 };
 
-/** Color del texto de la píldora de una sede; `undefined` si la sede no tiene color. */
-export function getBranchTextColor(branchName: string | undefined): string | undefined {
-  if (!branchName) return undefined;
-  const normalizedName = normalize(branchName);
-  const city = Object.values(BranchCity).find((candidate) =>
-    normalizedName.includes(normalize(candidate)),
-  );
-  return city ? (BRANCH_CITY_TEXT_COLORS[city] ?? BRANCH_CITY_COLORS[city]) : undefined;
+/** Color de la franja de una sede; `undefined` si no se conoce la sede o su color. */
+export function getBranchStripeColor(color: BranchColor | undefined | null): string | undefined {
+  return color ? BRANCH_COLOR_STYLES[color]?.stripe : undefined;
+}
+
+/** Color del texto de la píldora de una sede; `undefined` si no se conoce. */
+export function getBranchTextColor(color: BranchColor | undefined | null): string | undefined {
+  return color ? BRANCH_COLOR_STYLES[color]?.text : undefined;
 }
 
 /** Opacidad en hex que se agrega a un color `#rrggbb`: fondo suave de una píldora. */

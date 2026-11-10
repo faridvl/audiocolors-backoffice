@@ -6,16 +6,23 @@ import { Button, ButtonVariant } from '@/components/common/button/button';
 import { FormDirtyReporter } from '@/components/common/form/form-dirty-reporter';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
+import { tailwind } from '@/utils/tailwind-utils';
+import { SectionSaveBar } from '../questions/section-save-bar';
 import { ClinicalTemplateEditor } from './clinical-template-editor';
 import { ClinicalTemplateFormValues } from './clinical-template-form';
 import { useClinicalHistoryTemplate } from './use-clinical-history-template';
 
+const FORM_ID = 'clinical-history-form';
+
 interface ClinicalHistoryTemplateContainerProps {
   onDirtyChange: (isDirty: boolean) => void;
+  /** Dónde dibujar la barra de Guardar, fuera de la tarjeta de la sección. */
+  footerSlot?: HTMLElement | null;
 }
 
 export const ClinicalHistoryTemplateContainer: React.FC<ClinicalHistoryTemplateContainerProps> = ({
   onDirtyChange,
+  footerSlot,
 }) => {
   const { t } = useTranslation();
   const { initialValues, validationSchema, isLoading, isError, refetch, isPending, handleSubmit } =
@@ -54,7 +61,10 @@ export const ClinicalHistoryTemplateContainer: React.FC<ClinicalHistoryTemplateC
       enableReinitialize
     >
       {({ errors, dirty }) => (
-        <Form className="flex w-full flex-col gap-4">
+        <Form
+          id={FORM_ID}
+          className={tailwind('flex w-full flex-col gap-4', !footerSlot && 'pb-2')}
+        >
           <FormDirtyReporter onDirtyChange={onDirtyChange} />
           {/* Con el dedo no se arrastra: la indicación solo desde `sm`. */}
           <Typography variant={TypographyVariant.HELPER} className="hidden sm:block">
@@ -66,16 +76,20 @@ export const ClinicalHistoryTemplateContainer: React.FC<ClinicalHistoryTemplateC
           />
 
           {/* Fija abajo: con muchas preguntas, guardar no obliga a bajar hasta el final. */}
-          <div className="sticky bottom-0 z-10 flex justify-end border-t border-ink-100 bg-white py-3">
+          <SectionSaveBar
+            slot={footerSlot}
+            label={t(TEXT.QUESTIONS.SAVE_BAR_LABEL, { title: t(TEXT.QUESTIONS.CLINICAL_HISTORY) })}
+          >
             <Button
               type="submit"
+              form={FORM_ID}
               variant={ButtonVariant.PRIMARY}
               isLoading={isPending}
               disabled={!dirty}
             >
               {t(TEXT.GENERAL.BUTTONS.SAVE)}
             </Button>
-          </div>
+          </SectionSaveBar>
         </Form>
       )}
     </Formik>

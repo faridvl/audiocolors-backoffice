@@ -79,7 +79,7 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         onGenerateSummary={() => setIsGeneratingSummary(true)}
       />
 
-      {/* El empleado ve los datos generales y los archivos, nada clínico. */}
+      {/* Sin "Atiende pacientes" solo se ven los datos generales: nada clínico ni archivos. */}
       {can(Permission.VIEW_CLINICAL_RECORD) && (
         <>
           <PatientPhysicalExamContainer patientUuid={patient.uuid} />
@@ -89,9 +89,9 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         </>
       )}
 
-      <DocumentsContainer patientUuid={patient.uuid} />
+      {can(Permission.VIEW_PATIENT_FILES) && <DocumentsContainer patientUuid={patient.uuid} />}
 
-      {isChangingStatus && (
+      {can(Permission.EDIT_PATIENT) && isChangingStatus && (
         <ChangePatientStatusModal
           patientUuid={patient.uuid}
           currentStatus={patient.status ?? PatientStatus.ACTIVE}
@@ -101,15 +101,15 @@ export const PatientDetailContainer: React.FC<PatientDetailContainerProps> = ({ 
         />
       )}
 
-      {isGeneratingSummary && (
+      {can(Permission.VIEW_CLINICAL_RECORD) && isGeneratingSummary && (
         <PatientSummaryModal patient={patient} onClose={() => setIsGeneratingSummary(false)} />
       )}
 
-      {isEditingContacts && (
+      {can(Permission.EDIT_PATIENT) && isEditingContacts && (
         <EditContactsModal patient={patient} onClose={() => setIsEditingContacts(false)} />
       )}
 
-      {flagsSection && (
+      {can(Permission.VIEW_CLINICAL_RECORD) && flagsSection && (
         <PatientFlagsModal
           patient={patient}
           initialSection={flagsSection}

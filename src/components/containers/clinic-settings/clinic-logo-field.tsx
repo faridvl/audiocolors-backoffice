@@ -7,6 +7,7 @@ import { ConfirmDialog } from '@/components/common/confirm-dialog/confirm-dialog
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 import { TEXT } from '@/static/texts/i18n';
 import { TENANT_LOGO_ACCEPTED_TYPES } from '@/types/tenant/tenant';
+import { SettingsFieldRow, SettingsFieldWidth } from '../settings/settings-field-row';
 import { useClinicSettings } from './use-clinic-settings';
 
 interface ClinicLogoFieldProps {
@@ -29,9 +30,11 @@ export const ClinicLogoField: React.FC<ClinicLogoFieldProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-2">
-      <Typography variant={TypographyVariant.HELPER}>{t(LOGO_TEXT.TITLE)}</Typography>
-
+    <SettingsFieldRow
+      label={t(LOGO_TEXT.TITLE)}
+      hint={t(LOGO_TEXT.HINT)}
+      width={SettingsFieldWidth.FULL}
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="flex min-h-[88px] w-full items-center justify-center rounded-lg border border-dashed border-ink-200 bg-ink-50 p-3 sm:w-64">
           {logoUrl ? (
@@ -44,11 +47,12 @@ export const ClinicLogoField: React.FC<ClinicLogoFieldProps> = ({
         </div>
 
         {canEdit && (
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:shrink-0">
             <Button
               type="button"
               variant={ButtonVariant.SECONDARY}
               onClick={logo.openPicker}
+              className="whitespace-nowrap"
               isLoading={logo.isUploading}
               disabled={logo.isBusy}
             >
@@ -59,7 +63,7 @@ export const ClinicLogoField: React.FC<ClinicLogoFieldProps> = ({
                 type="button"
                 variant={ButtonVariant.SECONDARY}
                 icon={<Trash2 className="h-4 w-4" aria-hidden />}
-                className="border-danger/40 text-danger-700 hover:border-danger hover:bg-danger/10"
+                className="whitespace-nowrap border-danger/40 text-danger-700 hover:border-danger hover:bg-danger/10"
                 onClick={logo.requestRemoval}
                 isLoading={logo.isRemoving}
                 disabled={logo.isBusy}
@@ -71,7 +75,6 @@ export const ClinicLogoField: React.FC<ClinicLogoFieldProps> = ({
         )}
       </div>
 
-      <Typography variant={TypographyVariant.HELPER}>{t(LOGO_TEXT.HINT)}</Typography>
       {logo.error && (
         <div role="alert">
           <Typography variant={TypographyVariant.ERROR}>{logo.error}</Typography>
@@ -96,6 +99,6 @@ export const ClinicLogoField: React.FC<ClinicLogoFieldProps> = ({
           onCancel={logo.cancelRemoval}
         />
       )}
-    </div>
+    </SettingsFieldRow>
   );
 };

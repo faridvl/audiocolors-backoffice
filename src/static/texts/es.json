@@ -49,13 +49,13 @@
       "errorBeforeMin": "La fecha no puede ser anterior al {{date}}.",
       "errorAfterMax": "La fecha no puede ser posterior al {{date}}."
     },
-    "phoneHint": "¿Otro país? Elige su código en la lista.",
     "phoneCountry": {
       "label": "País del teléfono",
       "search": "Buscar país o código",
       "empty": "No encontramos ese país."
     },
-    "forbidden": "Tu usuario no tiene acceso a esta sección.",
+    "forbidden": "No tienes acceso a esta sección.",
+    "backHome": "Volver al inicio",
     "characterCount": "{{count}} / {{max}}",
     "yes": "Sí",
     "no": "No",
@@ -93,7 +93,7 @@
         },
         "roles": {
           "title": "Permisos por rol",
-          "description": "el personal de recepción accede a pacientes, agenda y archivos, sin la información clínica."
+          "description": "Recepción ve pacientes y agenda; Administración suma la configuración; la información clínica y los archivos son solo de quien atiende pacientes."
         },
         "warranty": {
           "title": "Garantía",
@@ -197,6 +197,52 @@
           "title": "Seguridad",
           "description": "cada clínica accede únicamente a sus propios pacientes, citas y tipos de cita."
         }
+      },
+      "v2_1_0": {
+        "users": {
+          "title": "Usuarios",
+          "description": "el propietario crea y administra los usuarios de su clínica, con su nivel de acceso y si atiende pacientes."
+        },
+        "profile": {
+          "title": "Mi perfil",
+          "description": "cada profesional registra su título y colegiado, que aparecen en los documentos, y puede cambiar su contraseña."
+        },
+        "branches": {
+          "title": "Sedes",
+          "description": "desde Configuración se crean, editan, desactivan y reactivan las sedes, cada una con su color."
+        },
+        "equipment": {
+          "title": "Equipos",
+          "description": "cada audiometría registra el equipo con el que se hizo."
+        },
+        "permissions": {
+          "title": "Permisos",
+          "description": "la información clínica solo la ve y la modifica quien atiende pacientes."
+        },
+        "priority": {
+          "title": "Prioridad",
+          "description": "al marcar a un paciente como prioritario se indica el motivo."
+        },
+        "weber": {
+          "title": "Prueba de Weber",
+          "description": "permite registrar “sin respuesta”."
+        },
+        "audiometryReport": {
+          "title": "Informe de audiometría",
+          "description": "cabe en una hoja, muestra los datos del paciente y el equipo una sola vez y lo firma quien hizo la audiometría."
+        },
+        "settings": {
+          "title": "Configuración",
+          "description": "todas las secciones tienen el mismo orden y diseño."
+        },
+        "clinicalRecord": {
+          "title": "Expediente",
+          "description": "las secciones se abren solo cuando usted lo indica."
+        },
+        "session": {
+          "title": "Sesión",
+          "description": "se renueva sola al vencer."
+        }
       }
     },
     "kinds": {
@@ -216,6 +262,7 @@
   "layout": {
     "appLabel": "Gestión Clínica",
     "loadingUser": "Cargando...",
+    "unreadNews": "Tienes novedades sin ver",
     "logout": "Cerrar sesión",
     "nav": {
       "patients": "Pacientes",
@@ -228,22 +275,38 @@
     "pageTitle": "Configuración · AudioColors Gestión Clínica",
     "title": "Configuración",
     "nav": "Configuración",
+    "groups": {
+      "PRACTICE": "Tu clínica",
+      "CARE": "Atención"
+    },
     "sections": {
       "APPOINTMENT_TYPES": {
         "title": "Tipos de cita",
-        "description": "Nombre y duración de cada tipo de cita."
+        "description": "Duración de cada tipo de cita"
       },
       "QUESTIONS": {
         "title": "Formularios",
-        "description": "Los formularios que la clínica llena con sus pacientes. Los cambios no afectan las respuestas ya guardadas."
+        "description": "Preguntas de la historia clínica y secciones propias"
       },
       "TEMPLATES": {
         "title": "Plantillas",
-        "description": "Los documentos tipo de la clínica, con los datos del paciente ya puestos."
+        "description": "Documentos con los datos del paciente"
       },
       "CLINIC": {
         "title": "Clínica",
-        "description": "Los datos de contacto de la clínica. Salen en los documentos que generas."
+        "description": "Nombre, logo y datos de contacto"
+      },
+      "USERS": {
+        "title": "Usuarios",
+        "description": "Quién entra y qué puede hacer"
+      },
+      "BRANCHES": {
+        "title": "Sedes",
+        "description": "Dónde atiende la clínica"
+      },
+      "EQUIPMENT": {
+        "title": "Equipos",
+        "description": "Audiómetros de la clínica"
       }
     },
     "clinic": {
@@ -254,7 +317,7 @@
       "nameHint": "Sale en el menú y en los documentos.",
       "logo": {
         "title": "Logo",
-        "hint": "PNG, JPG, WEBP o SVG de hasta 2 MB. Sale en el menú y en los documentos.",
+        "hint": "PNG, JPG, WEBP o SVG de hasta 2 MB.",
         "alt": "Logo de la clínica",
         "empty": "Sin logo. En su lugar se muestra el nombre de la clínica.",
         "upload": "Subir logo",
@@ -275,7 +338,7 @@
       "email": "Correo",
       "emailPlaceholder": "correo@clinica.com",
       "address": "Dirección",
-      "addressHint": "Como quieres que aparezca en los documentos.",
+      "addressHint": "Así aparecerá en tus documentos.",
       "readOnly": "Solo el dueño y administración pueden cambiar estos datos.",
       "saved": "Datos de la clínica guardados",
       "errors": {
@@ -285,6 +348,140 @@
         "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
         "emailInvalid": "Correo inválido",
         "addressMax": "Máximo 300 caracteres"
+      }
+    },
+    "users": {
+      "pageTitle": "Usuarios · AudioColors Gestión Clínica",
+      "loading": "Cargando usuarios...",
+      "loadError": "No se pudieron cargar los usuarios",
+      "emptyTitle": "Aún no hay usuarios",
+      "add": "Nuevo usuario",
+      "you": "Tú",
+      "legacyRole": "Nivel anterior",
+      "columns": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Nivel de acceso",
+        "attendsPatients": "Atiende pacientes",
+        "status": "Estado"
+      },
+      "status": {
+        "ACTIVE": "Activo",
+        "INACTIVE": "Inactivo"
+      },
+      "roles": {
+        "RECEPTION": "Recepción",
+        "ADMIN": "Administración",
+        "OWNER": "Propietario"
+      },
+      "specialties": {
+        "AUDIOLOGY": "Audiología",
+        "ENT": "Otorrinolaringología",
+        "SPEECH_THERAPY": "Terapia del lenguaje",
+        "GENERAL_MEDICINE": "Medicina general"
+      },
+      "roleDescriptions": {
+        "RECEPTION": "Atiende la agenda y registra pacientes.",
+        "ADMIN": "Además administra usuarios y la configuración de la clínica.",
+        "OWNER": "Además define quién atiende pacientes y administra a otros propietarios."
+      },
+      "titles": {
+        "LIC": "Lic.",
+        "LICDA": "Licda.",
+        "MSC": "MSc.",
+        "DR": "Dr.",
+        "DRA": "Dra."
+      },
+      "actionsLabel": "Acciones de {{name}}",
+      "actions": {
+        "edit": "Editar",
+        "setPassword": "Poner contraseña nueva",
+        "deactivate": "Desactivar",
+        "reactivate": "Reactivar",
+        "view": "Ver"
+      },
+      "form": {
+        "newTitle": "Nuevo usuario",
+        "editTitle": "Editar usuario",
+        "fullName": "Nombre completo",
+        "email": "Correo",
+        "emailReadOnly": "El correo no se puede cambiar.",
+        "role": "Nivel de acceso",
+        "roleSelfHint": "No puedes cambiar tu propio nivel de acceso.",
+        "rolePlaceholder": "Elige un nivel",
+        "roleLegacyHint": "Tiene un nivel anterior. Si no eliges uno nuevo, se queda como está.",
+        "phone": "Teléfono",
+        "password": "Contraseña temporal",
+        "passwordHint": "Mínimo 8 caracteres, con una mayúscula y un número.",
+        "create": "Crear usuario",
+        "back": "Volver a usuarios",
+        "notFound": "No encontramos a este usuario.",
+        "ownerReadOnly": "Solo un propietario puede editar a otro propietario.",
+        "ownerCreateOnly": "Solo un propietario puede crear otros propietarios.",
+        "roleLevelsTitle": "Qué puede hacer cada nivel",
+        "clinicalAccessTitle": "Acceso clínico",
+        "attendsPatients": "Atiende pacientes",
+        "attendsDescription": "Atiende consultas y firma los documentos clínicos.",
+        "attendsOwnerOnly": "Solo el propietario puede cambiar si atiende pacientes y sus especialidades.",
+        "specialties": "Especialidades",
+        "specialtiesPlaceholder": "Elige al menos una",
+        "noSpecialties": "Sin especialidades",
+        "licensePending": "Pendiente de completar por el profesional"
+      },
+      "audit": {
+        "title": "Historial de cambios",
+        "loadError": "No pudimos cargar el historial de cambios.",
+        "noRole": "Sin nivel",
+        "noSpecialties": "Sin especialidades",
+        "created": "Usuario creado con nivel {{role}}.",
+        "createdAttends": "Usuario creado con nivel {{role}}, atiende pacientes: {{specialties}}.",
+        "summary": "{{actor}} · {{date}}",
+        "change": "{{field}}: {{before}} → {{after}}",
+        "passwordChanged": "Contraseña: se cambió (no se muestra su valor)",
+        "fields": {
+          "ROLE": "Nivel de acceso",
+          "ATTENDS_PATIENTS": "Atiende pacientes",
+          "SPECIALTIES": "Especialidades",
+          "PASSWORD": "Contraseña"
+        }
+      },
+      "passwordModal": {
+        "title": "Poner contraseña nueva",
+        "description": "Escribe la contraseña nueva de {{name}}. La anterior deja de servir.",
+        "label": "Contraseña nueva",
+        "submit": "Guardar contraseña"
+      },
+      "statusDialog": {
+        "deactivateTitle": "¿Desactivar a {{name}}?",
+        "deactivateMessage": "{{name}} no podrá iniciar sesión mientras esté inactivo. Sus datos se conservan.",
+        "deactivateConfirm": "Desactivar",
+        "reactivateTitle": "¿Reactivar a {{name}}?",
+        "reactivateMessage": "{{name}} volverá a poder iniciar sesión con su contraseña actual.",
+        "reactivateConfirm": "Reactivar",
+        "error": "No pudimos cambiar el estado. Intenta de nuevo."
+      },
+      "toasts": {
+        "created": "Usuario creado",
+        "saved": "Cambios guardados",
+        "passwordSet": "Contraseña nueva guardada",
+        "deactivated": "Usuario desactivado",
+        "reactivated": "Usuario reactivado"
+      },
+      "errors": {
+        "fullNameRequired": "Escribe el nombre completo",
+        "roleRequired": "Elige un nivel",
+        "fullNameMax": "El nombre es demasiado largo",
+        "emailRequired": "Escribe el correo",
+        "emailInvalid": "Revisa el correo: no parece válido",
+        "emailTaken": "Ya existe un usuario con este correo",
+        "phoneLocal": "Formato: 8888-8888. Si es de otro país, elígelo en la lista.",
+        "phoneInternational": "Revisa el número: con el código del país, de 8 a 15 dígitos.",
+        "passwordRequired": "Escribe la contraseña",
+        "passwordMin": "Usa al menos 8 caracteres",
+        "passwordMax": "La contraseña es demasiado larga",
+        "passwordUppercase": "Incluye al menos una mayúscula",
+        "specialtiesRequired": "Elige al menos una especialidad",
+        "passwordDigit": "Incluye al menos un número"
       }
     },
     "appointmentTypes": {
@@ -298,7 +495,7 @@
       "minutes": "{{count}} minutos",
       "saved": "Tipo de cita guardado",
       "created": "Tipo de cita agregado",
-      "add": "Agregar tipo de cita",
+      "add": "Nuevo tipo de cita",
       "newTitle": "Nuevo tipo de cita",
       "duplicateName": "Ya existe un tipo de cita con ese nombre.",
       "isControl": "Cuenta como control",
@@ -311,9 +508,84 @@
       "editLabel": "Editar {{name}}",
       "updatedAt": "Actualizada el {{date}}",
       "minutesShort": "{{count}} min"
+    },
+    "branches": {
+      "pageTitle": "Sedes · AudioColors Gestión Clínica",
+      "loading": "Cargando sedes...",
+      "loadError": "No se pudieron cargar las sedes",
+      "emptyTitle": "Aún no hay sedes",
+      "emptyHint": "Crea la primera para registrar pacientes y agendar citas en ella.",
+      "add": "Nueva sede",
+      "newTitle": "Nueva sede",
+      "editTitle": "Editar sede",
+      "editLabel": "Editar {{name}}",
+      "edit": "Editar",
+      "name": "Nombre",
+      "nameRequired": "Escribe el nombre de la sede",
+      "nameTooLong": "El nombre es demasiado largo",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "addressTooLong": "La dirección es demasiado larga",
+      "color": "Color",
+      "colorHint": "Identifica la sede en la agenda y en las listas.",
+      "colors": {
+        "RED": "Rojo",
+        "ORANGE": "Naranja",
+        "YELLOW": "Amarillo",
+        "GREEN": "Verde",
+        "BLUE": "Azul",
+        "PURPLE": "Morado"
+      },
+      "inactiveBadge": "Inactiva",
+      "deactivate": "Desactivar",
+      "deactivateTitle": "¿Desactivar {{name}}?",
+      "deactivateMessage": "Dejará de ofrecerse al registrar pacientes y al agendar citas. Los pacientes y las citas que ya la tienen la siguen mostrando, y puedes reactivarla cuando quieras.",
+      "reactivate": "Reactivar",
+      "created": "Sede creada",
+      "saved": "Sede guardada",
+      "deactivated": "Sede desactivada",
+      "reactivated": "Sede reactivada",
+      "duplicateName": "Ya tienes una sede con ese nombre.",
+      "lastActiveBranch": "Debe quedar al menos una sede activa",
+      "actionsLabel": "Acciones de {{name}}",
+      "selectedColor": "Color elegido: {{name}}"
+    },
+    "equipment": {
+      "pageTitle": "Equipos · AudioColors Gestión Clínica",
+      "loading": "Cargando equipos...",
+      "loadError": "No se pudieron cargar los equipos",
+      "emptyTitle": "Aún no hay equipos",
+      "emptyHint": "Registra tus audiómetros para elegir con cuál se hace cada audiometría.",
+      "add": "Nuevo equipo",
+      "newTitle": "Nuevo equipo",
+      "editTitle": "Editar equipo",
+      "editLabel": "Editar {{name}}",
+      "edit": "Editar",
+      "brand": "Marca",
+      "brandRequired": "Escribe la marca del equipo",
+      "brandTooLong": "La marca es demasiado larga",
+      "model": "Modelo",
+      "modelRequired": "Escribe el modelo del equipo",
+      "modelTooLong": "El modelo es demasiado largo",
+      "inactiveBadge": "Inactivo",
+      "deactivate": "Desactivar",
+      "deactivateTitle": "¿Desactivar {{name}}?",
+      "deactivateMessage": "Dejará de ofrecerse en audiometrías nuevas. Las que ya lo usan lo siguen mostrando. Puedes reactivarlo cuando quieras.",
+      "reactivate": "Reactivar",
+      "created": "Equipo creado",
+      "saved": "Equipo guardado",
+      "deactivated": "Equipo desactivado",
+      "reactivated": "Equipo reactivado",
+      "duplicate": "Ya existe un equipo con esa marca y modelo.",
+      "actionsLabel": "Acciones de {{name}}"
     }
   },
+  "branches": {
+    "inactiveOption": "{{name}} (inactiva)",
+    "noActiveForPatient": "Este paciente no tiene sedes activas. Edítalo para asignarle una."
+  },
   "documentTemplates": {
+    "licensePrefix": "Cód.",
     "pageTitle": "Plantillas · AudioColors Gestión Clínica",
     "loading": "Cargando plantillas...",
     "loadError": "No se pudieron cargar las plantillas",
@@ -438,7 +710,7 @@
       },
       "profesional": {
         "label": "Profesional",
-        "example": "Dra. Ana Vargas"
+        "example": "Dra. Ana Vargas · Cód. 1234"
       }
     },
     "errors": {
@@ -481,6 +753,7 @@
     "sectionNameRequired": "Escribe el nombre de la sección",
     "sectionContinue": "Continuar",
     "sectionNewHint": "Agrega las preguntas y guarda para crear la sección.",
+    "saveBarLabel": "Cambios en {{title}}",
     "sectionSaved": "Sección guardada",
     "sectionsLoading": "Cargando secciones...",
     "sectionsLoadError": "No se pudieron cargar las secciones",
@@ -1024,7 +1297,8 @@
         "issued": "Emitido",
         "branch_one": "Sede",
         "branch_other": "Sedes",
-        "authorship": "{{author}}, {{date}}"
+        "authorship": "{{author}}, {{date}}",
+        "signature": "Firma de quien genera el resumen"
       }
     },
     "flags": {
@@ -1082,7 +1356,18 @@
       "priority": {
         "mark": "Marcar como prioridad",
         "unmark": "Quitar prioridad",
-        "patientAction": "{{action}}: {{name}}"
+        "patientAction": "{{action}}: {{name}}",
+        "reasonTitle": "Marcar como prioridad",
+        "reasonLabel": "Motivo",
+        "reasonHint": "Queda en el control de evolución del paciente.",
+        "reasonRequired": "Escribe el motivo de la prioridad",
+        "reasonTooLong": "El motivo es demasiado largo",
+        "reasonConfirm": "Marcar prioridad",
+        "reasonLineDate": "Motivo: {{reason}} · {{date}}",
+        "reasonLineAuthor": "Motivo: {{reason}} · {{author}}, {{date}}",
+        "reasonTooltip": "{{action}}. Motivo: {{reason}}",
+        "listLine": "Prioridad: {{reason}}",
+        "alreadyMarked": "Este paciente ya estaba marcado como prioridad."
       },
       "toastsOn": {
         "hearingAidsInLab": "Audífonos marcados en laboratorio",
@@ -1191,6 +1476,7 @@
       "typePlaceholder": "Seleccione un tipo",
       "branchLabel": "Sede",
       "branchPlaceholder": "Elige la sede de la cita",
+      "editPatient": "Editar paciente",
       "noTypes": "No hay tipos de cita configurados. Pide a soporte que los agregue.",
       "back": "Volver",
       "validation": {
@@ -1221,6 +1507,8 @@
       "contacts": "Contactos",
       "patientContact": "Paciente",
       "editContacts": "Editar contactos",
+      "editForbidden": "Tu usuario no puede modificar pacientes. Pídele a un administrador que lo haga.",
+      "editForbiddenBack": "Volver al paciente",
       "evolutionNote": {
         "viewAudiometry": "Ver audiometría",
         "openAudiometryLabel": "Ver la audiometría de esta nota"
@@ -1237,6 +1525,10 @@
         "entryWithPta": "{{date}} · PTA OD {{right}} / OI {{left}}",
         "saveHint": "Marca al menos un punto para guardar",
         "entryAuthorDate": "Registrada por {{author}} · {{date}}",
+        "entryEquipment": "Equipo: {{equipment}}",
+        "equipmentLabel": "Equipo",
+        "equipmentPlaceholder": "Elige el equipo",
+        "equipmentRequired": "Elige el equipo con el que se hizo la audiometría",
         "entryLoading": "Cargando la audiometría…",
         "print": "Imprimir",
         "entryTyped": "{{date}} · {{type}}",
@@ -1279,6 +1571,7 @@
           "birthDate": "Fecha de nacimiento",
           "date": "Fecha de la audiometría",
           "professional": "Profesional",
+          "equipment": "Equipo",
           "frequencyHz": "{{frequency}} Hz",
           "signature": "Firma del profesional",
           "printedOn": "Impreso el {{date}}"
@@ -1399,7 +1692,10 @@
         "weber": {
           "center": "Centro",
           "right": "Derecha",
-          "left": "Izquierda"
+          "left": "Izquierda",
+          "noResponse": "Sin respuesta",
+          "noResponseShort": "NR",
+          "noResponseOption": "NR · Sin respuesta"
         }
       },
       "fields": {
@@ -1491,6 +1787,41 @@
       "remove": "Quitar contacto",
       "add": "Agregar contacto",
       "saved": "Contactos guardados"
+    }
+  },
+  "profile": {
+    "menu": "Mi perfil",
+    "pageTitle": "Mi perfil",
+    "title": "Mi perfil",
+    "loading": "Cargando tu perfil…",
+    "professional": "Datos profesionales",
+    "professionalTitle": "Título",
+    "titlePlaceholder": "Elige tu título",
+    "licenseNumber": "Número de colegiado",
+    "licenseMissing": "Falta tu número de colegiado. Complétalo para que salga en tus documentos.",
+    "previewTitle": "Así sales en tus documentos",
+    "notProfessional": "Tu cuenta no atiende pacientes, así que no necesitas datos profesionales.",
+    "saved": "Perfil actualizado",
+    "errors": {
+      "licenseMax": "El número de colegiado es demasiado largo"
+    },
+    "password": {
+      "title": "Contraseña",
+      "description": "Cambia la contraseña con la que entras a tu cuenta.",
+      "modalTitle": "Cambiar contraseña",
+      "current": "Contraseña actual",
+      "new": "Contraseña nueva",
+      "confirm": "Confirmar contraseña nueva",
+      "submit": "Cambiar contraseña",
+      "changed": "Contraseña cambiada",
+      "errors": {
+        "currentRequired": "Escribe tu contraseña actual",
+        "confirmRequired": "Repite la contraseña nueva",
+        "confirmMismatch": "Las contraseñas no coinciden",
+        "currentInvalid": "La contraseña actual no es correcta",
+        "samePassword": "La contraseña nueva debe ser distinta de la actual",
+        "saveFailed": "No pudimos cambiar la contraseña. Intenta de nuevo."
+      }
     }
   }
 }

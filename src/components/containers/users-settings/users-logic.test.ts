@@ -1,0 +1,193 @@
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import { UserRole } from '../../../types/auth/auth';
+import { ManagedUser, UserStatus } from '../../../types/users/user';
+import {
+  getInitialRoleSelection,
+  getRoleChange,
+  getSelectableRoles,
+  getUserActions,
+  isLegacyRole,
+  isPasswordWithinByteLimit,
+  sortUsers,
+} from './users-logic';
+
+const buildUser = (overrides: Partial<ManagedUser>): ManagedUser => ({
+  uuid: 'u',
+  email: 'u@example.com',
+  fullName: 'Usuario',
+  role: UserRole.RECEPTION,
+  status: UserStatus.ACTIVE,
+  phoneNumber: null,
+  attendsPatients: false,
+  specialties: [],
+  professionalTitle: null,
+  licenseNumber: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  ...overrides,
+});
+
+describe('sortUsers', () => {
+  it('pone a los activos primero y ordena por nombre', () => {
+    const users = [
+      buildUser({ uuid: '1', fullName: 'Zoila', status: UserStatus.ACTIVE }),
+      buildUser({ uuid: '2', fullName: 'Ana', status: UserStatus.INACTIVE }),
+      buildUser({ uuid: '3', fullName: 'Bruno', status: UserStatus.ACTIVE }),
+    ];
+    assert.deepEqual(
+      sortUsers(users).map((user) => user.uuid),
+      ['3', '1', '2'],
+    );
+  });
+
+  it('no modifica el arreglo original', () => {
+    const users = [buildUser({ uuid: '1', status: UserStatus.INACTIVE }), buildUser({ uuid: '2' })];
+    sortUsers(users);
+    assert.equal(users[0].uuid, '1');
+  });
+});
+
+describe('getUserActions', () => {
+  const owner = buildUser({ uuid: 'owner', role: UserRole.OWNER });
+  const otherOwner = buildUser({ uuid: 'owner2', role: UserRole.OWNER });
+  const doctor = buildUser({ uuid: 'doc', role: UserRole.ADMIN });
+
+  it('el propio OWNER edita sus datos y su contraseña, sin rol ni estado', () => {
+    assert.deepEqual(getUserActions(owner, 'owner', UserRole.OWNER), {
+      canEdit: true,
+      canSetPassword: true,
+      canChangeRole: false,
+      canToggleStatus: false,
+    });
+  });
+
+  it('un OWNER administra a otro OWNER: editar, contraseña, nivel y estado', () => {
+    assert.deepEqual(getUserActions(otherOwner, 'owner', UserRole.OWNER), {
+      canEdit: true,
+      canSetPassword: true,
+      canChangeRole: true,
+      canToggleStatus: true,
+    });
+  });
+
+  it('un ADMIN ve a un OWNER de solo lectura', () => {
+    assert.deepEqual(getUserActions(otherOwner, 'admin', UserRole.ADMIN), {
+      canEdit: false,
+      canSetPassword: false,
+      canChangeRole: false,
+      canToggleStatus: false,
+    });
+  });
+
+  it('sin actor, un OWNER ajeno queda de solo lectura', () => {
+    assert.equal(getUserActions(otherOwner, 'owner', undefined).canEdit, false);
+    assert.equal(getUserActions(otherOwner, undefined, null).canToggleStatus, false);
+  });
+
+  it('un inactivo que es otro OWNER solo lo reactiva otro OWNER', () => {
+    const inactiveOwner = buildUser({
+      uuid: 'old',
+      role: UserRole.OWNER,
+      status: UserStatus.INACTIVE,
+    });
+    assert.equal(getUserActions(inactiveOwner, 'owner', UserRole.OWNER).canToggleStatus, true);
+    assert.equal(getUserActions(inactiveOwner, 'admin', UserRole.ADMIN).canToggleStatus, false);
+  });
+
+  it('otro usuario puede editarse, cambiar de rol y desactivarse', () => {
+    assert.deepEqual(getUserActions(doctor, 'owner', UserRole.OWNER), {
+      canEdit: true,
+      canSetPassword: true,
+      canChangeRole: true,
+      canToggleStatus: true,
+    });
+  });
+
+  it('un inactivo se puede reactivar', () => {
+    const inactive = buildUser({ uuid: 'in', status: UserStatus.INACTIVE });
+    assert.equal(getUserActions(inactive, 'owner', UserRole.OWNER).canToggleStatus, true);
+  });
+
+  it('un usuario con rol viejo o vacío se administra como cualquier otro', () => {
+    const legacy = buildUser({ uuid: 'leg', role: 'MEDICO' });
+    const empty = buildUser({ uuid: 'nul', role: null });
+    assert.equal(getUserActions(legacy, 'owner', UserRole.OWNER).canChangeRole, true);
+    assert.equal(getUserActions(empty, 'owner', UserRole.OWNER).canEdit, true);
+  });
+});
+
+describe('roles', () => {
+  it('USER, MEDICO y vacío son roles anteriores; los fijos no', () => {
+    assert.equal(isLegacyRole('USER'), true);
+    assert.equal(isLegacyRole('MEDICO'), true);
+    assert.equal(isLegacyRole(null), true);
+    assert.equal(isLegacyRole(UserRole.OWNER), false);
+    assert.equal(isLegacyRole(UserRole.RECEPTION), false);
+  });
+
+  it('solo un rol asignable se preselecciona al editar', () => {
+    assert.equal(getInitialRoleSelection(UserRole.ADMIN), UserRole.ADMIN);
+    assert.equal(getInitialRoleSelection(UserRole.OWNER), '');
+    assert.equal(getInitialRoleSelection('USER'), '');
+    assert.equal(getInitialRoleSelection(null), '');
+  });
+
+  it('el rol no viaja si no se tocó', () => {
+    assert.equal(getRoleChange(UserRole.ADMIN, UserRole.ADMIN), undefined);
+    assert.equal(getRoleChange('', 'MEDICO'), undefined);
+    assert.equal(getRoleChange('', null), undefined);
+  });
+
+  it('el rol viaja si se eligió uno distinto, también desde un rol anterior', () => {
+    assert.equal(getRoleChange(UserRole.ADMIN, UserRole.RECEPTION), UserRole.ADMIN);
+    assert.equal(getRoleChange(UserRole.RECEPTION, 'USER'), UserRole.RECEPTION);
+    assert.equal(getRoleChange(UserRole.RECEPTION, null), UserRole.RECEPTION);
+  });
+
+  it('OWNER nunca viaja como rol nuevo', () => {
+    assert.equal(getRoleChange(UserRole.OWNER, UserRole.RECEPTION), undefined);
+  });
+});
+
+describe('getSelectableRoles', () => {
+  const assignable = [UserRole.RECEPTION, UserRole.ADMIN];
+
+  it('suma el nivel actual si Administración ve a un propietario, para que quede elegido', () => {
+    assert.deepEqual(getSelectableRoles(assignable, UserRole.OWNER), [
+      UserRole.RECEPTION,
+      UserRole.ADMIN,
+      UserRole.OWNER,
+    ]);
+  });
+
+  it('no duplica un nivel que ya se puede asignar', () => {
+    assert.deepEqual(getSelectableRoles(assignable, UserRole.ADMIN), assignable);
+  });
+
+  it('no agrega un nivel anterior o vacío', () => {
+    assert.deepEqual(getSelectableRoles(assignable, 'MEDICO'), assignable);
+    assert.deepEqual(getSelectableRoles(assignable, null), assignable);
+    assert.deepEqual(getSelectableRoles(assignable, undefined), assignable);
+  });
+});
+
+describe('isPasswordWithinByteLimit', () => {
+  it('acepta hasta 72 bytes', () => {
+    assert.equal(isPasswordWithinByteLimit('A1'.padEnd(72, 'a')), true);
+  });
+
+  it('rechaza 73 bytes', () => {
+    assert.equal(isPasswordWithinByteLimit('A1'.padEnd(73, 'a')), false);
+  });
+
+  it('mide bytes y no caracteres: 40 «ñ» son 80 bytes', () => {
+    const password = 'ñ'.repeat(40);
+    assert.equal(password.length < 72, true);
+    assert.equal(isPasswordWithinByteLimit(password), false);
+  });
+
+  it('un emoji ocupa 4 bytes: 18 caben y 19 no', () => {
+    assert.equal(isPasswordWithinByteLimit('😀'.repeat(18)), true);
+    assert.equal(isPasswordWithinByteLimit('😀'.repeat(19)), false);
+  });
+});

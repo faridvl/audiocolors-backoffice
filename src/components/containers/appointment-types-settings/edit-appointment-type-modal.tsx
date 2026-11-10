@@ -119,7 +119,7 @@ export const EditAppointmentTypeModal: React.FC<EditAppointmentTypeModalProps> =
             )}
           </label>
 
-          <label htmlFor={DURATION_ID} className="flex flex-col gap-1.5">
+          <label htmlFor={DURATION_ID} className="flex w-48 max-w-full flex-col gap-1.5">
             <Typography variant={TypographyVariant.BODY}>
               {t(TEXT.SETTINGS.APPOINTMENT_TYPES.DURATION)}
             </Typography>

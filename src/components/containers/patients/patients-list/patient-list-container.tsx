@@ -24,6 +24,7 @@ import {
 } from "@/components/common/typography/typography";
 import { inputBaseClasses } from "@/components/common/input/input";
 import { FilterBar } from "@/components/common/filter-bar/filter-bar";
+import { getPriorityReasonText } from "@/components/containers/patients/patient-flags/priority-reason";
 import { PatientStatusPill } from "@/components/containers/patients/patient-status-pill";
 import {
   PatientFlagPills,
@@ -38,6 +39,9 @@ import {
 import { tailwind } from "@/utils/tailwind-utils";
 import { getBranchStripeColor } from "@/shared/design/tokens";
 import { useBranchesQuery } from "@/shared/api/querys/branches-query";
+import { usePermissions } from "@/hooks/use-permissions";
+import { Permission } from "@/shared/auth/permissions";
+import { findBranch } from "@/shared/utils/branches";
 import {
   usePatientList,
   ALL_VALUE,
@@ -71,6 +75,14 @@ function buildColumns(
             </Typography>
             <PatientStatusPill status={patient.status} />
           </span>
+          {/* En la tabla el motivo va en el tooltip de la bandera; en las tarjetas del celular no hay dónde pasar el cursor. */}
+          {patient.prioritySince && getPriorityReasonText(patient.priorityReason) && (
+            <Typography variant={TypographyVariant.HELPER} className="truncate md:hidden">
+              {t(TEXT.PATIENTS.FLAGS.PRIORITY.LIST_LINE, {
+                reason: getPriorityReasonText(patient.priorityReason),
+              })}
+            </Typography>
+          )}
           {/* La cédula va bajo el nombre: así no ocupa una columna propia. */}
           {(patient.documentId || patient.email) && (
             <Typography
@@ -101,17 +113,18 @@ function buildColumns(
       header: t(TEXT.PATIENTS.FORM.BRANCHES_LABEL),
       width: "16%",
       render: (patient) => {
-        const branchNames = getPatientBranchUuids(patient)
-          .map(
-            (branchUuid) =>
-              branches?.find((branch) => branch.uuid === branchUuid)?.name,
-          )
-          .filter((name): name is string => Boolean(name));
-        if (branchNames.length === 0) return EMPTY_VALUE;
+        const patientBranches = getPatientBranchUuids(patient)
+          .map((branchUuid) => findBranch(branches, { uuid: branchUuid }))
+          .filter((branch): branch is Branch => Boolean(branch));
+        if (patientBranches.length === 0) return EMPTY_VALUE;
         return (
           <div className="flex flex-wrap gap-1">
-            {branchNames.map((name) => (
-              <BranchBadge key={name} name={name} size={BadgeSize.REGULAR} />
+            {patientBranches.map((branch) => (
+              <BranchBadge
+                key={branch.uuid}
+                branch={branch}
+                size={BadgeSize.REGULAR}
+              />
             ))}
           </div>
         );
@@ -218,12 +231,11 @@ export const PatientListContainer: React.FC = () => {
 
   const { data: branches } = useBranchesQuery();
   const { t } = useTranslation();
+  const { can } = usePermissions();
   const columns = useMemo(() => buildColumns(branches, t), [branches, t]);
   const getRowAccentColor = (patient: Patient) =>
     getBranchStripeColor(
-      branches?.find(
-        (branch) => branch.uuid === getPatientBranchUuids(patient)[0],
-      )?.name,
+      findBranch(branches, { uuid: getPatientBranchUuids(patient)[0] })?.color,
     );
 
   const createButton = (
@@ -367,14 +379,16 @@ export const PatientListContainer: React.FC = () => {
           rowActions={(patient) => (
             <div className="flex items-center justify-end gap-2">
               <PatientPriorityButton patient={patient} />
-              <Button
-                variant={ButtonVariant.GHOST}
-                onClick={() => navigateToEdit(patient.uuid)}
-                aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
-                className="min-h-[44px] min-w-[44px] px-2 py-1.5 sm:min-h-0 sm:min-w-0"
-              >
-                <Pencil className="h-4 w-4" aria-hidden />
-              </Button>
+              {can(Permission.EDIT_PATIENT) && (
+                <Button
+                  variant={ButtonVariant.GHOST}
+                  onClick={() => navigateToEdit(patient.uuid)}
+                  aria-label={`Editar ${getFullName(patient.firstName, patient.lastName)}`}
+                  className="min-h-[44px] min-w-[44px] px-2 py-1.5"
+                >
+                  <Pencil className="h-4 w-4" aria-hidden />
+                </Button>
+              )}
             </div>
           )}
         />

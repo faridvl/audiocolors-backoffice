@@ -1,25 +1,27 @@
 import React from 'react';
 import { getBranchStripeColor, getBranchTextColor } from '@/shared/design/tokens';
+import { Branch } from '@/types/branches/branch';
 import { Badge, BadgeSize } from './badge';
 
 interface BranchBadgeProps {
-  name?: string;
+  /** La sede; sin ella no se muestra nada. */
+  branch?: Pick<Branch, 'name' | 'color'>;
   size?: BadgeSize;
   className?: string;
 }
 
-/** La sede con su color de marca, igual en pacientes, bitácora y agenda. */
-export const BranchBadge: React.FC<BranchBadgeProps> = ({ name, size, className }) => {
-  if (!name) return null;
+/** La sede con el color que le dio la clínica, igual en pacientes, bitácora y agenda. */
+export const BranchBadge: React.FC<BranchBadgeProps> = ({ branch, size, className }) => {
+  if (!branch) return null;
 
   return (
     <Badge
-      accentColor={getBranchStripeColor(name)}
-      textColor={getBranchTextColor(name)}
+      accentColor={getBranchStripeColor(branch.color)}
+      textColor={getBranchTextColor(branch.color)}
       size={size}
       className={className}
     >
-      {name}
+      {branch.name}
     </Badge>
   );
 };

@@ -1,7 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ButtonVariant, buttonClasses } from '@/components/common/button/button';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
 import { SettingsNav } from './settings-nav';
 import { useSettingsHome } from './use-settings-home';
@@ -21,9 +24,15 @@ export const SettingsHomeContainer: React.FC = () => {
 
   if (sections.length === 0) {
     return (
-      <Typography variant={TypographyVariant.BODY} className="py-12 text-center">
-        {t(TEXT.GENERAL.FORBIDDEN)}
-      </Typography>
+      <div className="mx-auto flex max-w-md flex-col items-center gap-2 py-12 text-center">
+        <Typography variant={TypographyVariant.BODY}>{t(TEXT.GENERAL.FORBIDDEN)}</Typography>
+        <Link
+          href={routesPrivate.patients.index}
+          className={buttonClasses(ButtonVariant.SECONDARY, 'mt-2')}
+        >
+          {t(TEXT.GENERAL.BACK_HOME)}
+        </Link>
+      </div>
     );
   }
 

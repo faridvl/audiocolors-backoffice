@@ -95,6 +95,7 @@ export function buildSummaryAudiometry(
     entryDate: formatDateTime(entry.createdAt),
     professional,
     typeName: entry.typeName,
+    equipment: entry.equipment,
     screening: screeningState ? { result: screeningState.result } : undefined,
     marks: state.marks,
     gradingScale: state.gradingScale,

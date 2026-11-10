@@ -6,9 +6,14 @@ import { PatientStatusPill } from '@/components/containers/patients/patient-stat
 import { PatientFlagPills } from '@/components/containers/patients/patient-flags/patient-flag-pills';
 import { PatientMaintenancePills } from '@/components/containers/patients/patient-flags/patient-maintenance-pills';
 import { VideoCandidateCheck } from '@/components/containers/patients/patient-flags/video-candidate-check';
+import { PatientPriorityReason } from '@/components/containers/patients/patient-flags/patient-priority-reason';
 import { PatientPriorityButton } from '@/components/containers/patients/patients-list/patient-priority-button';
 import { PatientContactsContainer } from '@/components/containers/patients/patient-contacts/patient-contacts-container';
+import { usePermissions } from '@/hooks/use-permissions';
+import { Permission } from '@/shared/auth/permissions';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { findBranch } from '@/shared/utils/branches';
+import { Branch } from '@/types/branches/branch';
 import {
   calculateAge,
   formatCalendarDate,
@@ -35,6 +40,9 @@ const MODAL_FLAGS = [
   PatientFlag.WARRANTY_EXPIRED,
   PatientFlag.RENEW_PRESCRIPTION,
 ];
+
+/** Lo que se ve como chip sin permiso de cambiarlo (igual que en la lista). */
+const READ_ONLY_FLAGS = [PatientFlag.VIDEO_CANDIDATE];
 
 interface PatientSummaryProps {
   patient: Patient;
@@ -63,6 +71,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
   onGenerateSummary,
 }) => {
   const { t } = useTranslation();
+  const { can } = usePermissions();
   const { data: branches } = useBranchesQuery();
 
   const age = calculateAge(patient.birthDate);
@@ -77,9 +86,9 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
     .filter(Boolean)
     .join(' · ');
 
-  const branchNames = getPatientBranchUuids(patient)
-    .map((branchUuid) => branches?.find((branch) => branch.uuid === branchUuid)?.name)
-    .filter((name): name is string => Boolean(name));
+  const patientBranches = getPatientBranchUuids(patient)
+    .map((branchUuid) => findBranch(branches, { uuid: branchUuid }))
+    .filter((branch): branch is Branch => Boolean(branch));
 
   // A un paciente fallecido no se le agendan citas (el API lo rechaza).
   const isDeceased = patient.status === PatientStatus.DECEASED;
@@ -98,9 +107,10 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <Typography variant={TypographyVariant.SUBTITLE} as="p" className="break-words">
               {getFullName(patient.firstName, patient.lastName)}
             </Typography>
-            <PatientPriorityButton patient={patient} className="-my-2" />
+            <PatientPriorityButton patient={patient} className="-my-2" showLabel />
             <PatientStatusPill status={patient.status} />
           </div>
+          <PatientPriorityReason patient={patient} className="mt-1.5" />
           {identity && (
             <Typography variant={TypographyVariant.HELPER} className="mt-0.5">
               {identity}
@@ -112,9 +122,20 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-          <PatientFlagPills patient={patient} flags={MODAL_FLAGS} showDates onClick={onEditFlags} />
-          <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
-          <VideoCandidateCheck patient={patient} />
+          <PatientFlagPills
+            patient={patient}
+            flags={MODAL_FLAGS}
+            showDates
+            onClick={can(Permission.VIEW_CLINICAL_RECORD) ? onEditFlags : undefined}
+          />
+          {can(Permission.VIEW_CLINICAL_RECORD) && (
+            <PatientMaintenancePills patient={patient} onClick={onEditMaintenance} />
+          )}
+          {can(Permission.VIEW_CLINICAL_RECORD) ? (
+            <VideoCandidateCheck patient={patient} />
+          ) : (
+            <PatientFlagPills patient={patient} flags={READ_ONLY_FLAGS} />
+          )}
         </div>
 
         <div className="mt-4 grid gap-4 border-t border-ink-100 pt-4 lg:grid-cols-2">
@@ -129,7 +150,7 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             <PatientContactsContainer
               patientUuid={patient.uuid}
               patientPhone={patient.phone}
-              onEdit={onEditContacts}
+              onEdit={can(Permission.EDIT_PATIENT) ? onEditContacts : undefined}
             />
           </div>
         </div>
@@ -140,10 +161,12 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             value={patient.birthDate ? formatCalendarDate(patient.birthDate) : null}
           />
           <PatientDatum
-            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, { count: branchNames.length })}
+            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, {
+              count: patientBranches.length,
+            })}
           >
-            {branchNames.map((name) => (
-              <BranchBadge key={name} name={name} />
+            {patientBranches.map((branch) => (
+              <BranchBadge key={branch.uuid} branch={branch} />
             ))}
           </PatientDatum>
         </dl>

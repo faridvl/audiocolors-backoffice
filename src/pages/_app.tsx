@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { ACCESS_REFRESHED_EVENT } from '@/shared/api/api-service-client';
+import { useIsMobile } from '@/hooks/use-is-mobile';
+import { SESSION_QUERY_KEY } from '@/hooks/use-session';
 import '@/styles/globals.css';
 import '@/shared/i18n/i18n';
 
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
+  // En celular los avisos abajo tapan los botones de las ventanas que suben desde abajo.
+  const isMobile = useIsMobile();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -18,6 +23,14 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
         },
       }),
   );
+
+  useEffect(() => {
+    const refreshSession = () => {
+      void queryClient.invalidateQueries({ queryKey: [SESSION_QUERY_KEY] });
+    };
+    window.addEventListener(ACCESS_REFRESHED_EVENT, refreshSession);
+    return () => window.removeEventListener(ACCESS_REFRESHED_EVENT, refreshSession);
+  }, [queryClient]);
 
   return (
     <>
@@ -33,7 +46,12 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
 
       <QueryClientProvider client={queryClient}>
         <Component {...pageProps} />
-        <Toaster position="bottom-right" richColors closeButton duration={4000} />
+        <Toaster
+          position={isMobile ? 'top-center' : 'bottom-right'}
+          richColors
+          closeButton
+          duration={4000}
+        />
       </QueryClientProvider>
     </>
   );

@@ -175,25 +175,29 @@ mergear a `main` (D24).
 
 ## 7. Roles y permisos
 
-Pensado para varias clínicas (multi-tenant): cada usuario tiene un rol y lo que
-ve sale de ese rol, nunca del nombre de la clínica.
+Pensado para varias clínicas (multi-tenant): lo que ve cada usuario sale de su
+**nivel** y de **"Atiende pacientes"**, nunca del nombre de la clínica (D71).
 
-| Rol | Quién es | Ve |
-|---|---|---|
-| `OWNER` | Dueño (puede ser médico) | Todo |
-| `ADMIN` | Administrador | Todo |
-| `DOCTOR` | Médico | Todo, incluido cambiar las preguntas de la historia clínica |
-| `STAFF` | Empleado: recepción, secretaría | Pacientes (datos generales, contactos, citas), Agenda y Archivos. **No** ve historia clínica, Control de evolución, Bitácora ni las preguntas |
+| Combinación | Ve |
+|---|---|
+| Recepción | Pacientes (datos generales, contactos, citas) y Agenda; registra pacientes nuevos pero no modifica uno existente ni cambia su estado. Sin expediente clínico ni Archivos |
+| Administración | Lo de Recepción + modificar paciente y cambiar su estado, Configuración, Bitácora y Usuarios |
+| Propietario | Lo de Administración + todo Usuarios |
+| Cualquier nivel + atiende pacientes | Suma modificar paciente, el expediente completo (historia, evolución, pruebas, preguntas, indicadores, resumen, mantenimientos) y Archivos |
+| Atiende pacientes con Audiología | Suma crear e invalidar pruebas; sin Audiología las pruebas solo se ven |
 
+- Ningún nivel, ni el Propietario, ve datos clínicos sin "Atiende pacientes".
 - Los permisos viven en `src/shared/auth/permissions.ts` (`Permission` y
-  `ROLE_PERMISSIONS`); se consultan con `usePermissions().can(...)`. Nunca
-  comparar el rol suelto en un componente.
+  `hasPermission(nivel, atiende, especialidades)`); se consultan con
+  `usePermissions().can(...)`. Nunca comparar el rol suelto en un componente.
 - Una pantalla entera va dentro de `RequirePermission`; un bloque del expediente
   se renderiza solo con el permiso, para que ni siquiera pida sus datos.
 - Una entrada del menú lateral lleva `permission` y se oculta sin él.
-- **`permissions.ts` debe coincidir con `CLINICAL_ACCESS_ROLES` del API**
-  (medical-records): ocultar en pantalla no protege datos clínicos (Ley 8968). Un
+- **`permissions.ts` debe coincidir con las reglas del API** (`@ClinicalAccess()`
+  y los niveles): ocultar en pantalla no protege datos clínicos (Ley 8968). Un
   permiso nuevo se agrega en los dos lados.
+- El token lleva el acceso: si el API responde 403, el cliente pide
+  `/auth/refresh` y repite la petición una vez.
 
 ---
 

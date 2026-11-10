@@ -36,7 +36,7 @@ const SHEET_BREAK_CLASSES = 'break-before-page';
 const KEEP_WITH_SIGNATURE_CLASSES = 'break-after-avoid';
 // En pantalla cada hoja es una A4 con su margen; al imprimir el margen lo pone el body.
 const SHEET_CLASSES =
-  'flex w-[210mm] min-h-[297mm] shrink-0 flex-col gap-4 bg-white p-[12mm] shadow-md print:min-h-0 print:w-auto print:p-0 print:shadow-none';
+  'flex w-[210mm] min-h-[297mm] shrink-0 flex-col gap-3 bg-white p-[12mm] shadow-md print:min-h-0 print:w-auto print:p-0 print:shadow-none';
 
 /**
  * El resumen armado como hojas A4: lo que se ve en la vista previa es lo que sale al imprimir.

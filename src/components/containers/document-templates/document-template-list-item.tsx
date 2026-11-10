@@ -23,7 +23,7 @@ export const DocumentTemplateListItem: React.FC<DocumentTemplateListItemProps> =
         type="button"
         onClick={onEdit}
         aria-label={t(TEXT.DOCUMENT_TEMPLATES.EDIT_LABEL, { name: template.name })}
-        className="flex min-h-[56px] w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink-50 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
+        className="flex min-h-[60px] w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-ink-50 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
       >
         <span className="flex min-w-0 flex-col gap-0.5">
           <Typography variant={TypographyVariant.BODY_SEMIBOLD} className="block truncate" inline>
@@ -35,7 +35,7 @@ export const DocumentTemplateListItem: React.FC<DocumentTemplateListItemProps> =
             })}
           </Typography>
         </span>
-        <ChevronRight className="h-5 w-5 shrink-0 text-ink-400" aria-hidden />
+        <ChevronRight className="h-4 w-4 shrink-0 text-ink-400" aria-hidden />
       </button>
     </li>
   );

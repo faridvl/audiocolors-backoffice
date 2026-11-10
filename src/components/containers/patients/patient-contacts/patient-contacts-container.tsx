@@ -28,7 +28,8 @@ interface PatientContactsContainerProps {
   patientUuid: string;
   /** Teléfono guardado en el paciente: el del contacto principal. */
   patientPhone?: string;
-  onEdit: () => void;
+  /** Sin él (sin permiso de modificar) los contactos se ven pero no hay botón de editar. */
+  onEdit?: () => void;
 }
 
 /**
@@ -61,14 +62,16 @@ export const PatientContactsContainer: React.FC<PatientContactsContainerProps> =
         />
       ))}
 
-      <button
-        type="button"
-        onClick={onEdit}
-        className="flex w-fit items-center gap-1.5 whitespace-nowrap text-sm text-ink-500 hover:text-brand-700 hover:underline"
-      >
-        <Pencil className="h-3.5 w-3.5" aria-hidden />
-        {t(TEXT.PATIENTS.DETAIL.EDIT_CONTACTS)}
-      </button>
+      {onEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="flex w-fit items-center gap-1.5 whitespace-nowrap text-sm text-ink-500 hover:text-brand-700 hover:underline"
+        >
+          <Pencil className="h-3.5 w-3.5" aria-hidden />
+          {t(TEXT.PATIENTS.DETAIL.EDIT_CONTACTS)}
+        </button>
+      )}
     </div>
   );
 };

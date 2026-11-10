@@ -13,6 +13,7 @@ import {
   Bell,
   ArrowLeft,
   Settings,
+  UserRound,
   type LucideIcon,
 } from 'lucide-react';
 import { CalendarSyncSheet } from '@/components/containers/agenda/calendar-sync/calendar-sync-sheet';
@@ -28,6 +29,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { useLogout } from '@/hooks/use-logout';
 import { tailwind } from '@/utils/tailwind-utils';
+import { UserAvatar } from '@/components/common/user-avatar/user-avatar';
 import { ClinicBrand } from '@/components/common/brand/clinic-brand';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
 
@@ -51,16 +53,6 @@ const NAVIGATION: NavigationItem[] = [
   },
 ];
 
-function getInitials(fullName?: string): string {
-  if (!fullName) return 'AC';
-  return fullName
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('');
-}
-
 const UserMenu: React.FC = () => {
   const { user, tenant } = useSession();
   const logout = useLogout();
@@ -74,8 +66,7 @@ const UserMenu: React.FC = () => {
     <div className="relative">
       <Menu as="div" className="relative">
         <Menu.Button className="flex min-h-[44px] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-ink-100">
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
-            {getInitials(user?.fullName)}
+          <UserAvatar fullName={user?.fullName}>
             {/* Invita a abrir el menú: ahí está la novedad sin ver. */}
             {notifications.unreadCount > 0 && (
               <span
@@ -83,14 +74,27 @@ const UserMenu: React.FC = () => {
                 aria-hidden
               />
             )}
-          </span>
+          </UserAvatar>
           <span className="hidden text-left lg:flex lg:flex-col">
-            <Typography variant={TypographyVariant.BODY_SEMIBOLD}>
+            <Typography
+              variant={TypographyVariant.BODY_SEMIBOLD}
+              className="max-w-[16rem] truncate"
+              title={user?.fullName}
+            >
               {user?.fullName ?? t(TEXT.LAYOUT.LOADING_USER)}
             </Typography>
-            <Typography variant={TypographyVariant.HELPER}>{tenant?.businessName ?? ''}</Typography>
+            <Typography
+              variant={TypographyVariant.HELPER}
+              className="max-w-[16rem] truncate"
+              title={tenant?.businessName}
+            >
+              {tenant?.businessName ?? ''}
+            </Typography>
           </span>
           <ChevronDown className="h-4 w-4 text-ink-400" aria-hidden />
+          {notifications.unreadCount > 0 && (
+            <span className="sr-only">{t(TEXT.LAYOUT.UNREAD_NEWS)}</span>
+          )}
         </Menu.Button>
 
         <Transition
@@ -130,6 +134,21 @@ const UserMenu: React.FC = () => {
                 )}
               </Menu.Item>
             )}
+
+            <Menu.Item>
+              {({ active }) => (
+                <Link
+                  href={routesPrivate.profile.index}
+                  className={tailwind(
+                    'flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-left text-sm text-ink-700',
+                    active && 'bg-ink-50',
+                  )}
+                >
+                  <UserRound className="h-4 w-4" aria-hidden />
+                  {t(TEXT.PROFILE.MENU)}
+                </Link>
+              )}
+            </Menu.Item>
 
             <Menu.Item>
               {({ active }) => (
@@ -230,6 +249,8 @@ interface AppLayoutProps {
    * el contenido, para que en movil no compita con los datos por el ancho.
    */
   action?: React.ReactNode;
+  /** En el celular la barra muestra el título en vez del logo de la clínica. */
+  isTitleVisibleOnMobile?: boolean;
   children: React.ReactNode;
 }
 
@@ -238,6 +259,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   backHref,
   subtitle,
   action,
+  isTitleVisibleOnMobile = false,
   children,
 }) => {
   const router = useRouter();
@@ -301,18 +323,23 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 <ArrowLeft className="h-4 w-4" aria-hidden />
               </Link>
             ) : (
-              <ClinicBrand
-                logoUrl={tenant?.logoUrl}
-                name={tenant?.businessName}
-                height={28}
-                className="max-w-[60vw] shrink-0 md:hidden"
-              />
+              !isTitleVisibleOnMobile && (
+                <ClinicBrand
+                  logoUrl={tenant?.logoUrl}
+                  name={tenant?.businessName}
+                  height={28}
+                  className="max-w-[60vw] shrink-0 md:hidden"
+                />
+              )
             )}
 
             <div className="flex min-w-0 flex-col">
               <Typography
                 variant={TypographyVariant.HEADER}
-                className={tailwind('truncate text-lg md:text-2xl', !backHref && 'hidden md:block')}
+                className={tailwind(
+                  'truncate text-lg md:text-2xl',
+                  !backHref && !isTitleVisibleOnMobile && 'hidden md:block',
+                )}
               >
                 {title}
               </Typography>
