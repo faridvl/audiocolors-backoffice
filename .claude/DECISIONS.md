@@ -1204,7 +1204,7 @@ independientes:
 
 ## D79 · Sedes: siempre una activa y la cita no se agenda sin sede (2026-11-09)
 
-- No se puede desactivar la única sede activa: el botón queda deshabilitado con la ayuda "Debe quedar al menos una sede activa" y, si el API responde 409 `BRANCH_LAST_ACTIVE`, se muestra ese mismo texto. El front distingue el error por `code`, no solo por el status.
+- No se puede desactivar la única sede activa: el botón queda deshabilitado con la ayuda "Debe quedar al menos una sede activa" y, si el API responde 409 al desactivar, se muestra ese mismo texto. El front lo distingue por el status 409 porque el API no transmite el código (`BRANCH_LAST_ACTIVE` se pierde en su filtro global de errores).
 - Una cita existente cuya sede se desactiva conserva su sede al reagendarla: la sede de la cita se suma a las opciones aunque esté inactiva.
 - El API no exige sede al agendar (Zynka la comparte), así que el front nunca envía una cita sin sede cuando el paciente tiene sedes: las opciones salen de las sedes activas del paciente; con una se elige sola, con varias el selector es obligatorio.
 - Un paciente sin sedes activas no se puede agendar: se avisa "Este paciente no tiene sedes activas. Edítalo para asignarle una." con enlace a editarlo, y el botón de agendar queda deshabilitado. Lo mismo al agendar arrastrando en la agenda: toast y no se crea la cita.

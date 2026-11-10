@@ -28,6 +28,9 @@ const ADDRESS_LABEL = 'Dirección';
 const COLOR_BLUE = 'Azul';
 const COLOR_PURPLE = 'Morado';
 const DEACTIVATE_BUTTON = 'Desactivar';
+const EDIT_BUTTON = /^Editar/;
+const ACTIONS_MENU = /^Acciones de/;
+const DESKTOP_MIN_WIDTH = 640;
 const REACTIVATE_BUTTON = 'Reactivar';
 const INACTIVE_BADGE = 'Inactiva';
 const CREATED_TOAST = 'Sede creada';
@@ -164,6 +167,16 @@ function branchRow(page: Page, name: string): Locator {
   return page.getByRole('listitem').filter({ hasText: name });
 }
 
+/** Con menos de `sm` las acciones de la fila van en el menú "Acciones de {nombre}". */
+async function clickRowAction(page: Page, row: Locator, name: string | RegExp, width: number) {
+  if (width < DESKTOP_MIN_WIDTH) {
+    await row.getByRole('button', { name: ACTIONS_MENU }).click();
+    await page.getByRole('menuitem', { name }).click();
+    return;
+  }
+  await row.getByRole('button', { name }).click();
+}
+
 async function pickColor(page: Page, color: string) {
   await page.getByRole('radio', { name: color }).check({ force: true });
 }
@@ -226,9 +239,7 @@ for (const viewport of VIEWPORTS) {
       const name = `Sede editar ${runStamp()}`;
       await createBranch(page, name, runPhone(), 'Dirección a editar');
 
-      await branchRow(page, name)
-        .getByRole('button', { name: /^Editar/ })
-        .click();
+      await clickRowAction(page, branchRow(page, name), EDIT_BUTTON, width);
       await expect(page.getByRole('dialog', { name: EDIT_BRANCH_TITLE })).toBeVisible();
       await pickColor(page, COLOR_PURPLE);
       await page.getByLabel(PHONE_LABEL, { exact: true }).fill('');
@@ -241,7 +252,7 @@ for (const viewport of VIEWPORTS) {
       await expect(row).toBeVisible();
       await expect(row).toContainText('Dirección a editar');
 
-      await row.getByRole('button', { name: /^Editar/ }).click();
+      await clickRowAction(page, row, EDIT_BUTTON, width);
       await expect(page.getByLabel(PHONE_LABEL, { exact: true })).toHaveValue('');
       await expect(page.getByRole('radio', { name: COLOR_PURPLE })).toBeChecked();
       await screenshot(page, `sedes-${label}-5-editada`);
@@ -253,7 +264,7 @@ for (const viewport of VIEWPORTS) {
       const name = `Sede activar ${runStamp()}`;
       await createBranch(page, name, runPhone(), 'Dirección a desactivar');
 
-      await branchRow(page, name).getByRole('button', { name: DEACTIVATE_BUTTON }).click();
+      await clickRowAction(page, branchRow(page, name), DEACTIVATE_BUTTON, width);
       await page.getByRole('button', { name: DEACTIVATE_BUTTON, exact: true }).last().click();
       await expectToast(page, DEACTIVATED_TOAST);
       await expect(branchRow(page, name)).toContainText(INACTIVE_BADGE);
@@ -262,7 +273,7 @@ for (const viewport of VIEWPORTS) {
       await reload(page);
       await expect(branchRow(page, name)).toContainText(INACTIVE_BADGE);
 
-      await branchRow(page, name).getByRole('button', { name: REACTIVATE_BUTTON }).click();
+      await clickRowAction(page, branchRow(page, name), REACTIVATE_BUTTON, width);
       await expectToast(page, REACTIVATED_TOAST);
       await expect(branchRow(page, name)).not.toContainText(INACTIVE_BADGE);
       await screenshot(page, `sedes-${label}-7-reactivada`);

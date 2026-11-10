@@ -16,7 +16,7 @@ export interface BranchSaveCallbacks {
   onError: (error: Error) => void;
 }
 
-const LAST_ACTIVE_BRANCH_CODE = 'BRANCH_LAST_ACTIVE';
+const HTTP_CONFLICT = 409;
 
 export function useBranchesSettings() {
   const { t } = useTranslation();
@@ -81,7 +81,7 @@ export function useBranchesSettings() {
           void refreshBranches();
         },
         onError: (error: Error) => {
-          const isLastActive = error instanceof ApiError && error.code === LAST_ACTIVE_BRANCH_CODE;
+          const isLastActive = error instanceof ApiError && error.status === HTTP_CONFLICT;
           toast.error(isLastActive ? t(TEXT.SETTINGS.BRANCHES.LAST_ACTIVE_BRANCH) : error.message);
         },
         onSettled: () => {
