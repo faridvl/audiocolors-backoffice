@@ -1232,3 +1232,5 @@ independientes:
 - Equipos vive en Configuracion con ruta `/configuracion/equipos`, grupo CARE, icono `Ear` y el mismo permiso que Sedes (`EDIT_APPOINTMENT_TYPES`). El 409 se muestra en el campo modelo.
 - El selector de equipo de la audiometria nueva solo aparece si hay equipos activos; con uno solo queda preseleccionado; si falta, el guardado se frena con aviso en el campo y `EQUIPMENT_REQUIRED` del API se traduce a un toast. `ApiError` expone ahora `code`.
 - Weber `NO_RESPONSE` se muestra como "NR" con etiqueta accesible "Sin respuesta".
+- Weber arranca vacío ("Sin registrar") en cada frecuencia y solo se envía lo que el audiólogo elige; el API acepta Weber parcial. Antes arrancaba en "Centro" y quedaba guardado aunque nadie lo eligiera. El informe imprime "Sin registrar" donde no hay valor.
+- En la lista de opciones, NR se lee "NR · Sin respuesta". El 409 `PATIENT_ALREADY_PRIORITY` recarga al paciente y avisa que ya estaba marcado.

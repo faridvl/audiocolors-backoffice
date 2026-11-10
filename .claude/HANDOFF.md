@@ -351,9 +351,8 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
   publicar, en producción (solo lectura): conteo de roles; los ADMIN actuales pierden el acceso clínico
   hasta que el Propietario les active "Atiende pacientes".
 
-## En que estamos (pedidos de la clinica, avance)
-- Hechos y con lint, typecheck y test:audiometry en verde: motivo de prioridad, Weber NR, Configuracion de Equipos y selector de equipo en la audiometria nueva (con equipo junto a profesional y fecha).
-- Hecho (punto 5): informe impreso con bloque final Paciente, Cedula, Equipo y firma; en el resumen, fila Equipo junto a fecha y profesional. Equipo llega desde la audiometria guardada (impresion suelta, modal de Archivos y Generar resumen). Sin probar en navegador.
-- Falta: las pruebas en navegador contra el API local.
-
-- Ajustes de la clínica (2026-11-09, ronda 2, en la rama `feature/pedidos-clinica-1109`): hechos en código los puntos 1-16 (prioridad 409/null/lista/expediente, equipos 409/vacío/nombres largos, audiometría: foco al equipo, `EQUIPMENT_REQUIRED`, NR en el desplegable, Weber vacío por defecto con "Sin registrar" en el informe, bloque final a dos columnas sin cortar). Falta verificarlos en navegador (375/768/1440) y con el `code` del API.
+## En que estamos (pedidos de la clinica)
+- Terminado y probado en navegador (2026-11-09), rama `feature/pedidos-clinica-1109` en los dos repos, sin push ni PR (falta el sí del usuario). API: 1948734, 8e65681, aaa24ee (el filtro global devuelve `code`). Front: 11a489c, aa60a68, c10d6f1. Migración aplicada solo en la base de pruebas 5433.
+- qa pasó: prioridad (motivo, 409 en dos pestañas, Recepción sin motivo), Equipos (crear, duplicado, editar, desactivar/reactivar, 403/404), audiometría (equipo obligatorio, NR, Weber vacío, línea Equipo truncada), informe (bloque final, sin cédula, 2 hojas sin cortar la firma, audiometría vieja sin equipo), Generar resumen y notas de laboratorio. Evidencia en `test-results/pedidos-clinica/qa1..qa4`.
+- Pendientes menores: los modales de motivo y de Nuevo equipo muestran el error de obligatorio al abrir solo en desarrollo (StrictMode monta dos veces `useFocusTrap` y el campo queda tocado); confirmar en build antes del PR. El campo Equipo con error no pone `aria-invalid`. El 400 de equipo inactivo no trae `code`. El vacío de Equipos no se probó (no hay clínica sin equipos). Buscar "QA Temporal" con espacio no encuentra (buscador, anterior al lote).
+- Antes del PR: novedades de la versión para la clínica (D23) y aviso a Zynka de que la audiometría exige `equipmentUuid` si la clínica tiene equipos.
