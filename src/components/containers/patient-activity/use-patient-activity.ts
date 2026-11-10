@@ -8,6 +8,7 @@ import { useBranchesQuery } from '@/shared/api/querys/branches-query';
 import { useAppointmentTypesQuery } from '@/shared/api/querys/appointment-types-query';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useRememberedState } from '@/hooks/use-remembered-state';
+import { getBranchOptionLabel } from '@/shared/utils/branches';
 import { addDays, fromDayKey, toDayKey } from '@/shared/utils/dates';
 import { TEXT } from '@/static/texts/i18n';
 import {
@@ -118,7 +119,10 @@ export function usePatientActivity() {
   const branchOptions = useMemo(
     () => [
       { label: t(TEXT.ACTIVITY.FILTERS.ALL_ACTIONS), value: ALL_VALUE },
-      ...(branches ?? []).map((branch) => ({ label: branch.name, value: branch.uuid })),
+      ...(branches ?? []).map((branch) => ({
+        label: getBranchOptionLabel(branch, t),
+        value: branch.uuid,
+      })),
     ],
     [branches, t],
   );
@@ -133,9 +137,14 @@ export function usePatientActivity() {
 
   const rows = useMemo(() => groupConsecutiveUploads(data?.data ?? []), [data]);
 
-  const resolveBranchName = useCallback(
-    (branchUuid: string) => branches?.find((branch) => branch.uuid === branchUuid)?.name,
+  const resolveBranch = useCallback(
+    (branchUuid: string) => branches?.find((branch) => branch.uuid === branchUuid),
     [branches],
+  );
+
+  const resolveBranchName = useCallback(
+    (branchUuid: string) => resolveBranch(branchUuid)?.name,
+    [resolveBranch],
   );
 
   const handleScopeChange = (nextScope: ActivityScope) => {
@@ -183,6 +192,7 @@ export function usePatientActivity() {
     branchOptions,
     typeFilter,
     typeOptions,
+    resolveBranch,
     resolveBranchName,
     setSearchTerm,
     handleScopeChange,

@@ -18,6 +18,7 @@ el usuario explica o decide algo y antes de cada commit; lo cerrado pasa a
   `develop` (D24).
 
 ## Reglas de negocio confirmadas
+- Sedes (2026-11-09): una sede tiene nombre, teléfono, dirección y color; solo se desactivan, nunca se borran.
 
 Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 
@@ -133,6 +134,11 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
     impresos. Sin logo subido se muestra el nombre de la clínica en texto, nunca el de AudioColors.
 
 ## En qué estamos
+- **Sedes en Configuración (2026-11-09, rama `feature/sedes-configuracion` en el front y en el API, con PR a `develop` en cada repo):** crear, editar, desactivar y reactivar sedes con nombre, teléfono, dirección y color (D78, D79). qa hecho en navegador contra el API local y la base Docker 5433, 11 casos que pasan: sede inactiva no ofrecida en alta, registro rápido, agendar ni calendario del iPhone; paciente sin sede activa: aviso, sin cita; cita reagendada conserva su sede desactivada; editar conserva las sedes; "(inactiva)" al final de los filtros; colores desde la sede; 375 px sin scroll horizontal. `e2e/sedes.spec.ts`: 8 de 8 pasan contra :3002. Contraste de las píldoras corregido (rojo, naranja y verde con texto más oscuro).
+  - PR: API faridvl/standard-saas-api#21 y el del front. Sigue: mergearlos a `develop`, con permiso del usuario.
+  - Antes de publicar, en producción y solo lectura: `SELECT name, color FROM "Branch"` (por el caso `ELSE 'BLUE'` del backfill) y confirmar que Zynka tolera sedes inactivas en `GET /branches`.
+  - Orden de publicación: migración `20261109180000_branch_settings`, luego el API, luego el front.
+  - Datos de qa en la base local: sedes "QA Inactiva" y "QA Temporal" (inactivas); pacientes "QA SoloInactiva", "QA Mixto" y "QA Temporal".
 - **Mi perfil rediseñado (2026-11-09, en `develop`):** encabezado de identidad con avatar, campos Título y colegiado al ancho de su dato y vista previa del nombre en documentos (D77). Aviso de colegiado faltante en ámbar, chevron propio en todos los selectores y escala `warning` 50–800 en el tema. Probado con `e2e/mi-perfil.spec.ts` (solo lectura contra :3000).
 - **Acordeones cerrados (2026-11-09, en `develop`):** en el expediente y en Configuración → Formularios todo acordeón arranca cerrado y solo se abre por acción de la persona (D76).
 - **Configuración estandarizada (2026-11-09, en `develop`):** las 5 secciones comparten tarjeta, botón "Nuevo" y estados de carga/error (D74); el menú tiene grupos y un solo resaltado, y los campos de Clínica miden lo que su dato (D75). El editor de usuario usa la misma tarjeta con filas, la barra de Guardar de Formularios va fuera de la tarjeta al ancho de las demás secciones y los ítems del menú resaltan al pasar el mouse. Medido a 390, 1440 y 1920 sin scroll horizontal; carga y error de las 4 listas probados interceptando respuestas. Probado con 4 specs e2e (`configuracion-estandar`, `acordeones-cerrados` de solo lectura contra :3000; `formularios-guardar`, `configuracion-guardar` de escritura contra el API local con `E2E_BASE_URL`): todos pasan..
@@ -275,7 +281,7 @@ Roles y permisos: RULES.md §7. Reglas de layout y código: RULES.md.
 4. **Antes de publicar** (pre-registro, etapa 6): la migración `birthDate` opcional va antes
    que el front en cada ambiente. Zynka (`next-audiology-files`,
    `use-patient-summary-header.ts:28-43,70`) muestra una edad falsa cuando `birthDate` es null.
-5. Luego **P3-1** (Configuración: faltan sedes y usuarios, D21) y **P3-2**
+5. Luego **P3-1** (Configuración, D21: completa) y **P3-2**
    (permisos configurables por el administrador, D20).
 6. **Pruebas guardadas en el repo** (2026-10-30, para gastar menos en navegador): empezar con un
    test del API (editar y volver a leer) y un flujo de Playwright, el del pre-registro; comando

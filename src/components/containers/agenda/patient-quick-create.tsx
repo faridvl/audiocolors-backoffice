@@ -99,7 +99,7 @@ export const PatientQuickCreateForm: React.FC<PatientQuickCreateFormProps> = ({
               options={branches.map((branch) => ({
                 value: branch.uuid,
                 label: branch.name,
-                accentColor: getBranchStripeColor(branch.name),
+                accentColor: getBranchStripeColor(branch.color),
               }))}
               isSheetOnMobile
               required={isBranchRequired}

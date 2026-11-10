@@ -84,6 +84,7 @@ export const PatientActivityContainer: React.FC = () => {
     branchOptions,
     typeFilter,
     typeOptions,
+    resolveBranch,
     resolveBranchName,
     setSearchTerm,
     handleScopeChange,
@@ -118,9 +119,9 @@ export const PatientActivityContainer: React.FC = () => {
             <Typography variant={TypographyVariant.BODY}>{row.activity.patientName}</Typography>
             <BranchBadge
               className="mt-0.5"
-              name={
+              branch={
                 row.activity.patientBranchUuid
-                  ? resolveBranchName(row.activity.patientBranchUuid)
+                  ? resolveBranch(row.activity.patientBranchUuid)
                   : undefined
               }
             />
@@ -149,7 +150,7 @@ export const PatientActivityContainer: React.FC = () => {
         render: (row) => <span className="italic">{row.activity.actorName}</span>,
       },
     ],
-    [t, resolveBranchName],
+    [t, resolveBranch, resolveBranchName],
   );
 
   const scopeOptions = [
@@ -284,7 +285,7 @@ export const PatientActivityContainer: React.FC = () => {
         onRowClick={(row) => navigateToPatient(row.activity.patientUuid)}
         rowAccentColor={(row) =>
           row.activity.patientBranchUuid
-            ? getBranchStripeColor(resolveBranchName(row.activity.patientBranchUuid))
+            ? getBranchStripeColor(resolveBranch(row.activity.patientBranchUuid)?.color)
             : undefined
         }
         errorTitle={t(TEXT.ACTIVITY.STATES.ERROR_TITLE)}

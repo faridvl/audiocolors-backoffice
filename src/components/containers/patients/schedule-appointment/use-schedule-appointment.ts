@@ -20,6 +20,8 @@ import {
   toSlotHour,
 } from '@/components/containers/agenda/agenda-presenter';
 import { formatDate, formatMonthLabel } from '@/shared/utils/formatters';
+import { findBranch, getBranchOptionLabel } from '@/shared/utils/branches';
+import { Branch } from '@/types/branches/branch';
 import {
   formatHour,
   MINUTES_IN_HOUR,
@@ -107,20 +109,35 @@ export function useScheduleAppointment({
   // Solo lo que el usuario elige: la sede inicial se deriva, así llega bien aunque el paciente cargue después.
   const [pickedBranchUuid, setPickedBranchUuid] = useState('');
   const patientBranchUuids = patient ? getPatientBranchUuids(patient) : [];
-  const branchOptionUuids =
+  // Solo sedes activas del paciente; la que ya traía la cita se conserva aunque se haya desactivado.
+  const branchOptionUuids = (
     nextAppointmentBranchUuid && !patientBranchUuids.includes(nextAppointmentBranchUuid)
       ? [...patientBranchUuids, nextAppointmentBranchUuid]
-      : patientBranchUuids;
-  const initialBranchUuid =
-    nextAppointmentBranchUuid ||
-    (branchUuid && patientBranchUuids.includes(branchUuid) ? branchUuid : '') ||
-    (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
-  const selectedBranchUuid = pickedBranchUuid || initialBranchUuid;
-  const branchOptions = branchOptionUuids.map((uuid) => {
-    const name = branches?.find((branch) => branch.uuid === uuid)?.name ?? '';
-    return { value: uuid, label: name, accentColor: getBranchStripeColor(name) };
+      : patientBranchUuids
+  ).filter((uuid) => {
+    const branch = findBranch(branches, { uuid });
+    return Boolean(branch) && (branch!.isActive || uuid === nextAppointmentBranchUuid);
   });
+  const initialBranchUuid =
+    (nextAppointmentBranchUuid && branchOptionUuids.includes(nextAppointmentBranchUuid)
+      ? nextAppointmentBranchUuid
+      : '') ||
+    (branchUuid && branchOptionUuids.includes(branchUuid) ? branchUuid : '') ||
+    (branchOptionUuids.length === 1 ? branchOptionUuids[0] : '');
+  const selectedBranchUuid = branchOptionUuids.includes(pickedBranchUuid)
+    ? pickedBranchUuid
+    : initialBranchUuid;
+  const branchOptions = branchOptionUuids
+    .map((uuid) => findBranch(branches, { uuid }))
+    .filter((branch): branch is Branch => Boolean(branch))
+    .map((branch) => ({
+      value: branch.uuid,
+      label: getBranchOptionLabel(branch, t),
+      accentColor: getBranchStripeColor(branch.color),
+    }));
   const hasBranchChoice = branchOptions.length > 1;
+  // Con el paciente y las sedes ya cargados y ninguna opción, no se puede agendar el día.
+  const hasNoActiveBranches = Boolean(patient && branches) && branchOptions.length === 0;
 
   // Al reagendar una cita confirmada el API da el tipo solo por nombre.
   const selectedTypeUuid =
@@ -256,7 +273,11 @@ export function useScheduleAppointment({
       setError(t(TEXT.PATIENTS.SCHEDULE.VALIDATION.TYPE_REQUIRED));
       return;
     }
-    if (hasBranchChoice && !selectedBranchUuid) {
+    if (hasNoActiveBranches) {
+      setError(t(TEXT.BRANCHES.NO_ACTIVE_FOR_PATIENT));
+      return;
+    }
+    if (!selectedBranchUuid) {
       setError(t(TEXT.PATIENTS.SCHEDULE.VALIDATION.BRANCH_REQUIRED));
       return;
     }
@@ -268,7 +289,7 @@ export function useScheduleAppointment({
         patientUuid,
         date,
         typeUUID: selectedTypeUuid,
-        ...(selectedBranchUuid ? { branchUUID: selectedBranchUuid } : {}),
+        branchUUID: selectedBranchUuid,
       });
 
       if (hour === null) {
@@ -324,6 +345,7 @@ export function useScheduleAppointment({
     selectedBranchUuid,
     branchOptions,
     hasBranchChoice,
+    hasNoActiveBranches,
     appointmentTypes: appointmentTypes ?? [],
     hasNoAppointmentTypes,
     hasNextAppointment,

@@ -41,7 +41,7 @@ export const DayList: React.FC<{ agenda: AgendaState }> = ({ agenda }) => {
                 section={group.section}
                 scheduledByLabel={agenda.resolveScheduledBy(appointment.userUUID)}
                 typeColor={agenda.resolveTypeColor(appointment.typeUUID)}
-                branchName={agenda.resolveBranchName(appointment.branchUUID)}
+                branch={agenda.resolveBranch(appointment.branchUUID)}
                 onClick={() => agenda.handleOpenAppointment(appointment.id)}
               />
             ))}

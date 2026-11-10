@@ -253,6 +253,10 @@
       "USERS": {
         "title": "Usuarios",
         "description": "Quién entra y qué puede hacer"
+      },
+      "BRANCHES": {
+        "title": "Sedes",
+        "description": "Dónde atiende la clínica"
       }
     },
     "clinic": {
@@ -452,7 +456,52 @@
       "editLabel": "Editar {{name}}",
       "updatedAt": "Actualizada el {{date}}",
       "minutesShort": "{{count}} min"
+    },
+    "branches": {
+      "pageTitle": "Sedes · AudioColors Gestión Clínica",
+      "loading": "Cargando sedes...",
+      "loadError": "No se pudieron cargar las sedes",
+      "emptyTitle": "Aún no hay sedes",
+      "emptyHint": "Crea la primera para registrar pacientes y agendar citas en ella.",
+      "add": "Nueva sede",
+      "newTitle": "Nueva sede",
+      "editTitle": "Editar sede",
+      "editLabel": "Editar {{name}}",
+      "edit": "Editar",
+      "name": "Nombre",
+      "nameRequired": "Escribe el nombre de la sede",
+      "nameTooLong": "El nombre es demasiado largo",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "addressTooLong": "La dirección es demasiado larga",
+      "color": "Color",
+      "colorHint": "Identifica la sede en la agenda y en las listas.",
+      "colors": {
+        "RED": "Rojo",
+        "ORANGE": "Naranja",
+        "YELLOW": "Amarillo",
+        "GREEN": "Verde",
+        "BLUE": "Azul",
+        "PURPLE": "Morado"
+      },
+      "inactiveBadge": "Inactiva",
+      "deactivate": "Desactivar",
+      "deactivateTitle": "¿Desactivar {{name}}?",
+      "deactivateMessage": "Dejará de ofrecerse al registrar pacientes y al agendar citas. Los pacientes y las citas que ya la tienen la siguen mostrando, y puedes reactivarla cuando quieras.",
+      "reactivate": "Reactivar",
+      "created": "Sede creada",
+      "saved": "Sede guardada",
+      "deactivated": "Sede desactivada",
+      "reactivated": "Sede reactivada",
+      "duplicateName": "Ya tienes una sede con ese nombre.",
+      "lastActiveBranch": "Debe quedar al menos una sede activa",
+      "actionsLabel": "Acciones de {{name}}",
+      "selectedColor": "Color elegido: {{name}}"
     }
+  },
+  "branches": {
+    "inactiveOption": "{{name}} (inactiva)",
+    "noActiveForPatient": "Este paciente no tiene sedes activas. Edítalo para asignarle una."
   },
   "documentTemplates": {
     "licensePrefix": "Cód.",
@@ -1334,6 +1383,7 @@
       "typePlaceholder": "Seleccione un tipo",
       "branchLabel": "Sede",
       "branchPlaceholder": "Elige la sede de la cita",
+      "editPatient": "Editar paciente",
       "noTypes": "No hay tipos de cita configurados. Pide a soporte que los agregue.",
       "back": "Volver",
       "validation": {

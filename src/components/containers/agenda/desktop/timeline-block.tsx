@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { Button, ButtonVariant } from '@/components/common/button/button';
 import { ColorDot } from '@/components/common/color-dot/color-dot';
 import { Typography, TypographyVariant } from '@/components/common/typography/typography';
+import { Branch } from '@/types/branches/branch';
 import { getBranchStripeColor, topStripeStyle } from '@/shared/design/tokens';
 import { formatMinuteOfDay } from '@/shared/utils/dates';
 import { EMPTY_VALUE } from '@/shared/utils/formatters';
@@ -18,7 +19,7 @@ interface TimelineBlockProps {
   block: TimelineBlockData;
   section: AgendaSection;
   typeColor?: string;
-  branchName?: string;
+  branch?: Branch;
   style: React.CSSProperties;
   heightPx: number;
   drag?: RowDragProps;
@@ -33,7 +34,7 @@ export const TimelineBlock: React.FC<TimelineBlockProps> = ({
   block,
   section,
   typeColor,
-  branchName,
+  branch,
   style,
   heightPx,
   drag,
@@ -64,7 +65,7 @@ export const TimelineBlock: React.FC<TimelineBlockProps> = ({
       title={[appointment.patientName ?? EMPTY_VALUE, timeRange, appointment.typeName]
         .filter(Boolean)
         .join(' · ')}
-      style={{ ...style, ...topStripeStyle(getBranchStripeColor(branchName)) }}
+      style={{ ...style, ...topStripeStyle(getBranchStripeColor(branch?.color)) }}
       className={tailwind(
         // El alto y el ancho los da la duración (style), no el mínimo táctil de una fila.
         'absolute min-h-0 flex-col items-stretch justify-start gap-0 overflow-hidden rounded-md px-2 py-0.5 text-left',
