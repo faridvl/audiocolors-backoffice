@@ -39,6 +39,7 @@ export interface ApiFieldError {
 interface ApiErrorBody {
   message?: string | string[];
   details?: ApiFieldError[];
+  error?: { message?: string | string[] };
 }
 
 const resolveFieldErrors = (body: ApiErrorBody | null): ApiFieldError[] =>
@@ -87,8 +88,9 @@ export const handleSessionExpired = (): void => {
  * de Zod/class-validator). Se normaliza a una sola linea legible.
  */
 const resolveErrorMessage = (body: ApiErrorBody | null, fallback: string): string => {
-  if (!body?.message) return fallback;
-  return Array.isArray(body.message) ? body.message.join('. ') : body.message;
+  const message = body?.message ?? body?.error?.message;
+  if (!message) return fallback;
+  return Array.isArray(message) ? message.join('. ') : message;
 };
 
 /**

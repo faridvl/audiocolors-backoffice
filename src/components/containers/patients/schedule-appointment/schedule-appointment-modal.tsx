@@ -7,6 +7,8 @@ import { DateField } from '@/components/common/date-field/date-field';
 import { MonthGrid } from '@/components/common/month-grid/month-grid';
 import { PillSelect, PillSelectVariant } from '@/components/common/pill-select/pill-select';
 import { formatMonthLabel } from '@/shared/utils/formatters';
+import Link from 'next/link';
+import { routesPrivate } from '@/shared/navigation/routes';
 import { TEXT } from '@/static/texts/i18n';
 import { tailwind } from '@/utils/tailwind-utils';
 import {
@@ -40,6 +42,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
     selectedBranchUuid,
     branchOptions,
     hasBranchChoice,
+    hasNoActiveBranches,
     appointmentTypes,
     hasNoAppointmentTypes,
     hasNextAppointment,
@@ -174,6 +177,20 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
             </div>
           )}
 
+          {mode === ScheduleMode.DAY && hasNoActiveBranches && (
+            <div className="flex flex-col items-start gap-2" role="alert">
+              <Typography variant={TypographyVariant.ERROR}>
+                {t(TEXT.BRANCHES.NO_ACTIVE_FOR_PATIENT)}
+              </Typography>
+              <Link
+                href={routesPrivate.patients.edit(props.patientUuid)}
+                className="text-sm font-medium text-brand hover:underline"
+              >
+                {t(TEXT.PATIENTS.SCHEDULE.EDIT_PATIENT)}
+              </Link>
+            </div>
+          )}
+
           {mode === ScheduleMode.MONTH && (
             <div className="flex flex-col gap-1.5">
               <Typography variant={TypographyVariant.BODY_SEMIBOLD} as="span">
@@ -254,6 +271,7 @@ export const ScheduleAppointmentModal: React.FC<ScheduleAppointmentOptions> = (p
               type="submit"
               variant={isConfirmingClear ? ButtonVariant.DANGER : ButtonVariant.PRIMARY}
               isLoading={isPending}
+              disabled={mode === ScheduleMode.DAY && hasNoActiveBranches}
             >
               {t(`${TEXT.PATIENTS.SCHEDULE.SUBMIT_PREFIX}.${mode}`)}
             </Button>

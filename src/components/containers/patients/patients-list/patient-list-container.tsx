@@ -40,6 +40,7 @@ import { getBranchStripeColor } from "@/shared/design/tokens";
 import { useBranchesQuery } from "@/shared/api/querys/branches-query";
 import { usePermissions } from "@/hooks/use-permissions";
 import { Permission } from "@/shared/auth/permissions";
+import { findBranch } from "@/shared/utils/branches";
 import {
   usePatientList,
   ALL_VALUE,
@@ -103,17 +104,18 @@ function buildColumns(
       header: t(TEXT.PATIENTS.FORM.BRANCHES_LABEL),
       width: "16%",
       render: (patient) => {
-        const branchNames = getPatientBranchUuids(patient)
-          .map(
-            (branchUuid) =>
-              branches?.find((branch) => branch.uuid === branchUuid)?.name,
-          )
-          .filter((name): name is string => Boolean(name));
-        if (branchNames.length === 0) return EMPTY_VALUE;
+        const patientBranches = getPatientBranchUuids(patient)
+          .map((branchUuid) => findBranch(branches, { uuid: branchUuid }))
+          .filter((branch): branch is Branch => Boolean(branch));
+        if (patientBranches.length === 0) return EMPTY_VALUE;
         return (
           <div className="flex flex-wrap gap-1">
-            {branchNames.map((name) => (
-              <BranchBadge key={name} name={name} size={BadgeSize.REGULAR} />
+            {patientBranches.map((branch) => (
+              <BranchBadge
+                key={branch.uuid}
+                branch={branch}
+                size={BadgeSize.REGULAR}
+              />
             ))}
           </div>
         );
@@ -224,9 +226,7 @@ export const PatientListContainer: React.FC = () => {
   const columns = useMemo(() => buildColumns(branches, t), [branches, t]);
   const getRowAccentColor = (patient: Patient) =>
     getBranchStripeColor(
-      branches?.find(
-        (branch) => branch.uuid === getPatientBranchUuids(patient)[0],
-      )?.name,
+      findBranch(branches, { uuid: getPatientBranchUuids(patient)[0] })?.color,
     );
 
   const createButton = (

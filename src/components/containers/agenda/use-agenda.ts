@@ -22,6 +22,7 @@ import { useUpdateAppointmentStatusMutation } from '@/shared/api/mutations/appoi
 import { ApiServiceClient } from '@/shared/api/api-service-client';
 import { env } from '@/shared/api/config';
 import { getBranchStripeColor } from '@/shared/design/tokens';
+import { findBranch, getBranchOptionLabel } from '@/shared/utils/branches';
 import { buildMonthOption, formatMonthLabel } from '@/shared/utils/formatters';
 import { toTelHref } from '@/shared/utils/phone';
 import { buildWhatsAppLink } from '@/shared/utils/whatsapp';
@@ -259,9 +260,9 @@ export function useAgenda() {
     () => [
       { label: t(TEXT.AGENDA.FILTERS.ALL_BRANCHES), value: ALL_BRANCHES },
       ...(branches ?? []).map((branch) => ({
-        label: branch.name,
+        label: getBranchOptionLabel(branch, t),
         value: branch.uuid,
-        accentColor: getBranchStripeColor(branch.name),
+        accentColor: getBranchStripeColor(branch.color),
       })),
     ],
     [branches, t],
@@ -295,20 +296,24 @@ export function useAgenda() {
     [typeColors],
   );
 
-  const resolveBranchName = useCallback(
-    (branchUuid?: string | null) =>
-      branchUuid ? branches?.find((branch) => branch.uuid === branchUuid)?.name : undefined,
+  const resolveBranch = useCallback(
+    (branchUuid?: string | null) => findBranch(branches, { uuid: branchUuid }),
     [branches],
   );
 
+  const resolveBranchName = useCallback(
+    (branchUuid?: string | null) => resolveBranch(branchUuid)?.name,
+    [resolveBranch],
+  );
+
   /** Sede con la que se muestra y se agenda al paciente: la del filtro si la tiene, si no la principal. */
-  const resolvePatientBranchName = (patient: Patient) =>
-    resolveBranchName(pickPatientBranchUuid(patient, branchFilter));
+  const resolvePatientBranch = (patient: Patient) =>
+    resolveBranch(pickPatientBranchUuid(patient, branchFilter));
 
   /** Color de marca de la sede de una cita, para los puntos del calendario. */
   const resolveBranchColor = useCallback(
-    (branchUuid?: string | null) => getBranchStripeColor(resolveBranchName(branchUuid)),
-    [resolveBranchName],
+    (branchUuid?: string | null) => getBranchStripeColor(resolveBranch(branchUuid)?.color),
+    [resolveBranch],
   );
 
   /**
@@ -517,8 +522,9 @@ export function useAgenda() {
     branchOptions,
     hasBranches: (branches?.length ?? 0) > 1,
     resolveTypeColor,
+    resolveBranch,
     resolveBranchName,
-    resolvePatientBranchName,
+    resolvePatientBranch,
     resolveBranchColor,
     matchesBranch,
     resolveScheduledBy,

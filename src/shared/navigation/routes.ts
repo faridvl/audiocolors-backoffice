@@ -17,6 +17,7 @@ export const routesPrivate = {
     appointmentTypes: '/configuracion/tipos-de-cita',
     templates: '/configuracion/plantillas',
     clinic: '/configuracion/clinica',
+    branches: '/configuracion/sedes',
     users: '/configuracion/usuarios',
     usersNew: '/configuracion/usuarios/nuevo',
     userDetail: (uuid: string) => `/configuracion/usuarios/${uuid}`,

@@ -11,6 +11,8 @@ import { PatientContactsContainer } from '@/components/containers/patients/patie
 import { usePermissions } from '@/hooks/use-permissions';
 import { Permission } from '@/shared/auth/permissions';
 import { useBranchesQuery } from '@/shared/api/querys/branches-query';
+import { findBranch } from '@/shared/utils/branches';
+import { Branch } from '@/types/branches/branch';
 import {
   calculateAge,
   formatCalendarDate,
@@ -83,9 +85,9 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
     .filter(Boolean)
     .join(' · ');
 
-  const branchNames = getPatientBranchUuids(patient)
-    .map((branchUuid) => branches?.find((branch) => branch.uuid === branchUuid)?.name)
-    .filter((name): name is string => Boolean(name));
+  const patientBranches = getPatientBranchUuids(patient)
+    .map((branchUuid) => findBranch(branches, { uuid: branchUuid }))
+    .filter((branch): branch is Branch => Boolean(branch));
 
   // A un paciente fallecido no se le agendan citas (el API lo rechaza).
   const isDeceased = patient.status === PatientStatus.DECEASED;
@@ -157,10 +159,10 @@ export const PatientSummary: React.FC<PatientSummaryProps> = ({
             value={patient.birthDate ? formatCalendarDate(patient.birthDate) : null}
           />
           <PatientDatum
-            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, { count: branchNames.length })}
+            label={t(TEXT.PATIENTS.DETAIL.FIELDS.BRANCH, { count: patientBranches.length })}
           >
-            {branchNames.map((name) => (
-              <BranchBadge key={name} name={name} />
+            {patientBranches.map((branch) => (
+              <BranchBadge key={branch.uuid} branch={branch} />
             ))}
           </PatientDatum>
         </dl>
